@@ -17,7 +17,7 @@ Aplikasi landing page sekolah lengkap dengan fitur LMS, PMB, dan panel admin.
 cp .env.example .env
 cp backend/.env.docker backend/.env
 
-# 2. Start backend + MySQL
+# 2. Start backend + MySQL (auto-migrate + seed jika DB kosong)
 make dev
 
 # 3. Start frontend (hot reload) — terminal terpisah

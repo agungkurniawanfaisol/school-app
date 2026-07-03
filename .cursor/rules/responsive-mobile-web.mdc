@@ -1,0 +1,90 @@
+---
+description: Mobile-first responsive layouts for web and phone
+globs: frontend/**/*.{tsx,css}
+alwaysApply: false
+---
+
+# Responsive — Mobile & Web
+
+**Mobile-first always.** Style base for phone, enhance with `sm:` `md:` `lg:` breakpoints.
+
+| Breakpoint | Width | Use |
+|------------|-------|-----|
+| (default) | < 640px | Phone — single column, stacked UI |
+| `sm:` | ≥ 640px | Large phone / small tablet |
+| `md:` | ≥ 768px | Tablet — 2-column grids |
+| `lg:` | ≥ 1024px | Desktop — full nav, sidebars |
+
+## Layout
+
+```tsx
+// ✅ GOOD — mobile stack → desktop grid
+<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+// ✅ GOOD — container padding scales
+<div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+
+// ❌ BAD — desktop-only fixed width
+<div className="w-[1200px]">
+```
+
+Use project utilities from `index.css`: `.container-page`, `.section-padding`, `.section-title`.
+
+## Navigation
+
+- Desktop (`lg:`): horizontal nav in `Header`.
+- Mobile: `Sheet` / hamburger menu — never hide critical links without a mobile alternative.
+- Admin: collapsible sidebar or sheet on `< lg`.
+
+```tsx
+<nav className="hidden lg:flex">...</nav>
+<Sheet>...</Sheet>  {/* lg:hidden trigger */}
+```
+
+## Tables & lists (admin)
+
+Dual view on small screens:
+
+| Viewport | Pattern |
+|----------|---------|
+| `< md` | Card list — label + value per row |
+| `≥ md` | Data table |
+
+Never horizontal-scroll-only tables without a card fallback on mobile.
+
+## Forms
+
+```tsx
+<div className="grid gap-4 sm:grid-cols-2">  {/* stack on phone */}
+<Button className="w-full sm:w-auto">       {/* full-width CTA on mobile */}
+```
+
+## Touch & readability
+
+- Tap targets: **min 44×44px** (`min-h-11 min-w-11` or `size-11` for icon buttons).
+- Body text: `text-base` on mobile; `md:text-lg` for lead paragraphs only.
+- Avoid hover-only actions — expose same action via tap/visible button on mobile.
+
+## Images & media
+
+```tsx
+<img className="h-auto w-full object-cover" />
+// Hero: shorter on mobile
+<div className="min-h-[50vh] md:min-h-[70vh]">
+```
+
+## Testing checklist
+
+- [ ] 375px (iPhone SE) — no overflow-x, readable text
+- [ ] 768px (tablet) — grid transitions cleanly
+- [ ] 1280px (desktop) — full layout, no excessive whitespace
+
+## Related
+
+| Resource | Link |
+|----------|------|
+| Cursor rule (overview) | [`frontend-patterns.mdc`](frontend-patterns.mdc) |
+| Agent conventions | [`AGENTS.md`](../../AGENTS.md) §3 |
+| Deeper patterns | **`tailwindcss-mobile-first`** skill (`.agents/skills/tailwindcss-mobile-first/`) |
+
+Pairs with `tailwindcss-mobile-first` for advanced layout, grid, and component responsive patterns.

@@ -21,7 +21,7 @@ alwaysApply: true
 
 - **NO Redis** — use `CACHE_STORE=file` (or `database`). Never add Redis dependencies.
 - UI text: **Bahasa Indonesia**. Code/comments: English.
-- Mobile-first responsive design.
+- Mobile-first responsive design — rule `responsive-mobile-web.mdc`; skill `tailwindcss-mobile-first`.
 
 ## Architecture
 

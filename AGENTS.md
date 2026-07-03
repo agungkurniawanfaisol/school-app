@@ -13,17 +13,19 @@ School website & admin portal: **Laravel 12 API** + **React PWA** (public conten
 | External skills | `.agents/skills/` | Installed from [skills.sh](https://skills.sh) |
 | Skills index | [`skills.md`](skills.md) | What to load per task |
 | Session handoff | [`memory.md`](memory.md) | Recent work & follow-ups — read when resuming |
+| **Harness** | [`HARNESS.md`](HARNESS.md) | Run, test, verify — start here for Docker + tests |
 
 ---
 
 ## 1. Start here (60 seconds)
 
-1. **Architecture & commands** → this file §2–§5
-2. **In-flight work** → [`memory.md`](memory.md)
-3. **Skills by task** → [`skills.md`](skills.md)
-4. **Stack overview** → `.cursor/rules/core-stack.mdc` (always applied)
-5. **Feature workflow** → `.cursor/skills/nurul-hikmah-stack/SKILL.md`
-6. **New features** → `brainstorming` skill before coding (see `superpowers-workflow`)
+1. **Run / test / verify** → [`HARNESS.md`](HARNESS.md)
+2. **Architecture & commands** → this file §2–§5
+3. **In-flight work** → [`memory.md`](memory.md)
+4. **Skills by task** → [`skills.md`](skills.md)
+5. **Stack overview** → `.cursor/rules/core-stack.mdc` (always applied)
+6. **Feature workflow** → `.cursor/skills/nurul-hikmah-stack/SKILL.md`
+7. **New features** → `brainstorming` skill before coding (see `superpowers-workflow`)
 
 **Precedence:** explicit user prompt > `memory.md` (session) > `.cursor/rules/` > this file > generic Laravel/React knowledge.
 
@@ -73,6 +75,8 @@ nurul-hikmah-app/
 | **Forms** | Zod in `src/schemas/`, errors in Bahasa Indonesia | `.cursor/rules/zod-input-validation.mdc` |
 | **API calls** | TanStack Query in `src/hooks/` only | `.cursor/rules/react-query-api.mdc` |
 | **UI** | Radix via shadcn, mobile-first, UI text Bahasa Indonesia | `.cursor/rules/frontend-patterns.mdc` |
+| **Responsive** | Mobile + desktop layouts, touch targets, dual table/card | `.cursor/rules/responsive-mobile-web.mdc` + skill `tailwindcss-mobile-first` |
+| **Animation** | Motion spring, tiered by route; no motion on tables/forms | `.cursor/rules/motion-animation.mdc` |
 | **PWA** | Offline-first, Workbox for static + public GET | `.cursor/rules/pwa-offline-first.mdc` |
 | **Security** | OWASP always on; Form Request + Zod; no raw SQL | `.cursor/rules/owasp-security.mdc` |
 | **Tests** | PHPUnit + Vitest required on behavior changes | `.cursor/rules/tests-required.mdc` |
@@ -125,12 +129,16 @@ cp .env.example .env
 cp backend/.env.docker backend/.env
 
 make dev                      # MySQL + backend API (:8000)
-cd frontend && npm run dev    # Vite HMR (:5173)
+make dev-full                 # + nginx (:8080) + Vite in Docker (:5173)
+make sync-frontend            # npm ci into Docker node_modules volume (after lockfile changes)
+cd frontend && npm run dev    # Vite on host (:5173) — stop Docker frontend if port 5173 is busy
 
 make logs                     # follow all logs
 make rebuild                  # rebuild images after Dockerfile changes
 make migrate                  # run migrations
 make test                     # backend + frontend
+make harness                  # verify docs, rules, Docker status
+make harness-test             # harness + run tests
 make down                     # stop stack
 
 # URLs (development)
@@ -181,7 +189,8 @@ See `docker-compose.yml` and `Makefile` for full options.
 | API hooks | `tanstack-query-best-practices` |
 | React / Vite | `vercel-react-best-practices`, `react-vite-best-practices` |
 | UI design | `frontend-design`, `web-design-guidelines` |
-| Tailwind layout | `tailwind-css-patterns`, `tailwindcss-mobile-first` |
+| Tailwind / responsive | `responsive-mobile-web.mdc` + `tailwind-css-patterns` + `tailwindcss-mobile-first` (also in `frontend-patterns.mdc`) |
+| Motion / spring animation | `motion-animation.mdc` — `FadeInView`, `PageEnter`, tier policy |
 | MySQL / indexes | `mysql`, `database-indexing-strategy` |
 | PWA / offline | `pwa-development` |
 

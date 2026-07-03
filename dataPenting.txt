@@ -1,0 +1,52 @@
+Nurul Hikmah App — Data Penting (Development)
+============================================
+
+Jalankan Docker (detached / background)
+---------------------------------------
+Dari folder root project:
+
+  # Backend + MySQL saja (frontend di host: npm run dev)
+  docker compose up -d mysql backend
+  # atau singkatnya:
+  make dev
+
+  # Full stack di Docker (MySQL + backend + frontend Vite)
+  docker compose --profile full up -d --build
+  # atau:
+  make dev-full
+
+  # Stop semua container
+  docker compose down
+  # atau:
+  make down
+
+Setup pertama kali (WAJIB sebelum login admin)
+---------------------------------------------
+Setelah docker compose up -d, jalankan migrate + seed:
+
+  make migrate
+  make seed
+
+Tanpa seed, login admin akan gagal ("Email atau kata sandi salah.")
+karena user belum ada di database.
+
+  # Atau reset database + seed ulang sekaligus:
+  make fresh
+
+Login Panel Admin
+-----------------
+  URL:      http://localhost:5173/admin/login
+  Email:    admin@nurulhikmah.sch.id
+  Password: password
+
+  (Akun dibuat oleh backend/database/seeders/DatabaseSeeder.php — hanya untuk development.)
+
+URL penting
+-----------
+  Frontend (Vite):  http://localhost:5173
+  Backend API:      http://localhost:8000/api
+  MySQL (host):     localhost:3307
+
+Frontend di host (tanpa profile full)
+------------------------------------
+  cd frontend && npm run dev

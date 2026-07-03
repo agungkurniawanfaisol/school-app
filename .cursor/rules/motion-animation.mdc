@@ -1,0 +1,72 @@
+---
+description: Lightweight Motion (Framer Motion) spring animations for React
+globs: frontend/**/*.{tsx,ts}
+alwaysApply: false
+---
+
+# Motion Animation — Spring & Performance
+
+Use **[Motion for React](https://motion.dev/docs/react)** (`motion` package) with **spring** transitions. Keep Chrome main-thread light; scrolling must stay smooth.
+
+## Setup (required)
+
+| Rule | Detail |
+|------|--------|
+| Provider | `MotionProvider` in `main.tsx` — `LazyMotion` + `domAnimation` + `strict` |
+| Component | `m` from `motion/react-m` — **never** import full `motion` |
+| Presets | `springSnappy`, `springGentle`, `viewportOnce` from `src/lib/motion.ts` |
+| Reduced motion | `usePrefersReducedMotion()` — skip animation, render static |
+
+## Animation tiers
+
+| Tier | Routes / usage | Behavior |
+|------|----------------|----------|
+| `full` | `/` landing | `FadeInView`, `StaggerChildren` on sections & card grids |
+| `lite` | `/kursus`, `/pmb`, `/admin` | `PageEnter` fade on route mount via `AnimatedOutlet` |
+| `none` | Forms, tables, `/admin/login`, `/pmb/daftar` | No Motion wrappers on data-heavy UI |
+
+Route tier logic lives in [`AnimatedOutlet.tsx`](../../frontend/src/components/motion/AnimatedOutlet.tsx).
+
+## Allowed properties
+
+Animate **only** compositor-friendly properties:
+
+- `opacity`
+- `transform` (`x`, `y`, `scale`)
+
+## Forbidden
+
+- `layout` prop, `domMax`, drag/pan gestures
+- `useScroll` parallax or scroll event listeners for animation
+- Animating `width`, `height`, `top`, `left`, `margin`, `padding`
+- Motion on admin tables (`AdminPaginatedTable`), forms, skeleton loaders
+- Replacing Radix/shadcn CSS enter/exit (Sheet, Dialog, Accordion)
+
+## Components
+
+| Component | Use |
+|-----------|-----|
+| `FadeInView` | Scroll reveal (`whileInView`, `once`) |
+| `StaggerChildren` + `StaggerItem` | Card grids on landing |
+| `PageEnter` | Route mount fade (`lite` tier) |
+| `MotionTierProvider` | Pass tier to descendants |
+
+## Example
+
+```tsx
+import { FadeInView, StaggerChildren, StaggerItem } from '@/components/motion'
+
+<StaggerChildren className="grid gap-6 sm:grid-cols-2">
+  {items.map((item) => (
+    <StaggerItem key={item.id}>
+      <Card>...</Card>
+    </StaggerItem>
+  ))}
+</StaggerChildren>
+```
+
+## Related
+
+- [`frontend-patterns.mdc`](frontend-patterns.mdc) — component stack
+- [`responsive-mobile-web.mdc`](responsive-mobile-web.mdc) — layout breakpoints
+- [`AGENTS.md`](../../AGENTS.md) §3 conventions

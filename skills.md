@@ -11,11 +11,11 @@ Skills and install guide for AI assistants in **Nurul Hikmah School App**.
 
 ### Dev URLs
 
-| Service | URL |
-|---------|-----|
-| Frontend (UI) | http://localhost:5173 |
+| Service       | URL                       |
+| ------------- | ------------------------- |
+| Frontend (UI) | http://localhost:5173     |
 | Backend (API) | http://localhost:8000/api |
-| MySQL | localhost:3307 |
+| MySQL         | localhost:3307            |
 
 ```bash
 make dev                      # Docker: MySQL + backend
@@ -28,12 +28,12 @@ cd frontend && npm run dev    # Host: Vite HMR
 
 Committed with the repo. No install step.
 
-| Skill | When to use |
-|-------|-------------|
-| `nurul-hikmah-stack` | New feature end-to-end (migration → API → Zod → React Query → UI → PWA) |
-| `security-audit` | OWASP review — auth, injection, IDOR, uploads |
-| `superpowers-workflow` | Brainstorm → plan → TDD → verify |
-| `laravel-development` | Backend repository + PHPUnit patterns |
+| Skill                  | When to use                                                             |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `nurul-hikmah-stack`   | New feature end-to-end (migration → API → Zod → React Query → UI → PWA) |
+| `security-audit`       | OWASP review — auth, injection, IDOR, uploads                           |
+| `superpowers-workflow` | Brainstorm → plan → TDD → verify                                        |
+| `laravel-development`  | Backend repository + PHPUnit patterns                                   |
 
 ---
 
@@ -43,68 +43,68 @@ Committed with the repo. No install step.
 
 ### Backend (Laravel / MySQL)
 
-| Skill | Purpose |
-|-------|---------|
-| `laravel-specialist` | Laravel 12 patterns, Eloquent, routing |
+| Skill                          | Purpose                                   |
+| ------------------------------ | ----------------------------------------- |
+| `laravel-specialist`           | Laravel 12 patterns, Eloquent, routing    |
 | `laravel-11-12-app-guidelines` | Laravel 11/12 app structure & conventions |
-| `laravel-patterns` | Architecture, service layer, repositories |
-| `laravel-security` | Auth, validation, OWASP for Laravel |
-| `pest-testing` | Pest feature/unit tests |
-| `mysql` | Query optimization, EXPLAIN, indexes |
-| `database-indexing-strategy` | Composite index design |
+| `laravel-patterns`             | Architecture, service layer, repositories |
+| `laravel-security`             | Auth, validation, OWASP for Laravel       |
+| `pest-testing`                 | Pest feature/unit tests                   |
+| `mysql`                        | Query optimization, EXPLAIN, indexes      |
+| `database-indexing-strategy`   | Composite index design                    |
 
 ### Frontend (React / Vite / UI)
 
-| Skill | Purpose |
-|-------|---------|
-| `shadcn` | Radix UI components via shadcn CLI |
-| `radix-ui-design-system` | Radix primitives & accessibility |
-| `tailwind-css-patterns` | Tailwind utility patterns |
-| `tailwindcss-mobile-first` | Mobile-first responsive layouts |
-| `react-vite-best-practices` | Vite + React build & HMR |
-| `vercel-react-best-practices` | React performance |
-| `vercel-composition-patterns` | Component composition |
-| `frontend-design` | Distinctive, production-grade UI |
-| `web-design-guidelines` | UX audit & accessibility checklist |
+| Skill                         | Purpose                            |
+| ----------------------------- | ---------------------------------- |
+| `shadcn`                      | Radix UI components via shadcn CLI |
+| `radix-ui-design-system`      | Radix primitives & accessibility   |
+| `tailwind-css-patterns`       | Tailwind utility patterns          |
+| `tailwindcss-mobile-first`    | Mobile-first responsive layouts    |
+| `react-vite-best-practices`   | Vite + React build & HMR           |
+| `vercel-react-best-practices` | React performance                  |
+| `vercel-composition-patterns` | Component composition              |
+| `frontend-design`             | Distinctive, production-grade UI   |
+| `web-design-guidelines`       | UX audit & accessibility checklist |
 
 ### Data & forms
 
-| Skill | Purpose |
-|-------|---------|
+| Skill                           | Purpose                            |
+| ------------------------------- | ---------------------------------- |
 | `tanstack-query-best-practices` | TanStack Query caching & mutations |
-| `zod` | Schema validation |
-| `react-hook-form-zod-shadcn` | Forms with RHF + Zod + shadcn |
+| `zod`                           | Schema validation                  |
+| `react-hook-form-zod-shadcn`    | Forms with RHF + Zod + shadcn      |
 
 ### Superpowers (obra)
 
-| Skill | Purpose |
-|-------|---------|
-| `using-superpowers` | Check applicable skills first |
-| `brainstorming` | Design before implementation |
-| `writing-plans` | Implementation plan |
-| `test-driven-development` | Red-green-refactor |
-| `executing-plans` | Batch plan execution |
-| `verification-before-completion` | Evidence before done |
+| Skill                            | Purpose                       |
+| -------------------------------- | ----------------------------- |
+| `using-superpowers`              | Check applicable skills first |
+| `brainstorming`                  | Design before implementation  |
+| `writing-plans`                  | Implementation plan           |
+| `test-driven-development`        | Red-green-refactor            |
+| `executing-plans`                | Batch plan execution          |
+| `verification-before-completion` | Evidence before done          |
 
 ### Testing
 
-| Skill | Purpose |
-|-------|---------|
-| `laravel-testing` | PHPUnit feature/unit tests |
-| `vitest` | Vitest + Testing Library |
+| Skill              | Purpose                       |
+| ------------------ | ----------------------------- |
+| `laravel-testing`  | PHPUnit feature/unit tests    |
+| `vitest`           | Vitest + Testing Library      |
 | `frontend-testing` | React component test patterns |
 
 ### Security (OWASP)
 
-| Skill | Purpose |
-|-------|---------|
-| `owasp-security-check` | OWASP Top 10 checklist |
+| Skill                    | Purpose                              |
+| ------------------------ | ------------------------------------ |
+| `owasp-security-check`   | OWASP Top 10 checklist               |
 | `laravel-security-audit` | Laravel route & model security audit |
 
 ### PWA
 
-| Skill | Purpose |
-|-------|---------|
+| Skill             | Purpose                           |
+| ----------------- | --------------------------------- |
 | `pwa-development` | Service worker, manifest, offline |
 
 ### Install / update
@@ -157,51 +157,54 @@ npx skills add aj-geddes/useful-ai-prompts@frontend-testing -y -p
 
 Auto-attached by file glob — no manual load needed.
 
-| Rule | Scope | Topic |
-|------|-------|-------|
-| `core-stack.mdc` | Always | Stack overview, no Redis |
-| `backend-cache-performance.mdc` | `backend/**/*` | File cache, repository pattern |
-| `database-indexing-queries.mdc` | migrations, Repositories, Models | Indexes + query optimization |
-| `database-optimization.mdc` | Repositories | Pagination |
-| `zod-input-validation.mdc` | `frontend/src/schemas/**` | Zod forms |
-| `react-query-api.mdc` | `frontend/src/hooks/**` | TanStack Query |
-| `frontend-patterns.mdc` | `frontend/**/*` | shadcn, structure |
-| `pwa-offline-first.mdc` | `frontend/**/*` | Workbox offline-first |
-| `owasp-security.mdc` | Always | OWASP Top 10, auth, access control |
-| `injection-prevention.mdc` | Requests, Repositories, Models | SQL/input injection |
+| Rule                            | Scope                            | Topic                              |
+| ------------------------------- | -------------------------------- | ---------------------------------- |
+| `core-stack.mdc`                | Always                           | Stack overview, no Redis           |
+| `backend-cache-performance.mdc` | `backend/**/*`                   | File cache, repository pattern     |
+| `database-indexing-queries.mdc` | migrations, Repositories, Models | Indexes + query optimization       |
+| `database-optimization.mdc`     | Repositories                     | Pagination                         |
+| `zod-input-validation.mdc`      | `frontend/src/schemas/**`        | Zod forms                          |
+| `react-query-api.mdc`           | `frontend/src/hooks/**`          | TanStack Query                     |
+| `frontend-patterns.mdc`         | `frontend/**/*`                  | shadcn, structure — links to responsive rule |
+| `responsive-mobile-web.mdc`     | `frontend/**/*.{tsx,css}`        | Mobile & web layouts; pairs with `tailwindcss-mobile-first` |
+| `motion-animation.mdc`          | `frontend/**/*.{tsx,ts}`         | Motion spring animations; lightweight Chrome performance |
+| `pwa-offline-first.mdc`         | `frontend/**/*`                  | Workbox offline-first              |
+| `owasp-security.mdc`            | Always                           | OWASP Top 10, auth, access control |
+| `injection-prevention.mdc`      | Requests, Repositories, Models   | SQL/input injection                |
 
 ---
 
 ## Load by task
 
-| Task | Skills |
-|------|--------|
-| New CRUD feature | `nurul-hikmah-stack` + `laravel-patterns` + `laravel-specialist` |
-| Database migration | `database-indexing-strategy` + `mysql` |
-| Backend tests | `pest-testing` |
-| API security | `laravel-security` |
-| Form / input | `zod` + `react-hook-form-zod-shadcn` |
-| API hook | `tanstack-query-best-practices` |
-| shadcn component | `shadcn` + `radix-ui-design-system` |
-| Page layout / styling | `tailwind-css-patterns` + `tailwindcss-mobile-first` |
-| Public page design | `frontend-design` + `web-design-guidelines` |
-| React performance | `vercel-react-best-practices` + `react-vite-best-practices` |
-| Superpowers / TDD | `superpowers-workflow`, `brainstorming`, `test-driven-development` |
-| Backend + tests | `laravel-development`, `laravel-testing` |
-| Frontend tests | `vitest`, `frontend-testing` |
-| Security audit | `security-audit`, `owasp-security-check`, `laravel-security-audit` |
-| Auth / admin API | `laravel-security` + rules `owasp-security` |
-| Vite config / build | `react-vite-best-practices` |
+| Task                  | Skills                                                             |
+| --------------------- | ------------------------------------------------------------------ |
+| New CRUD feature      | `nurul-hikmah-stack` + `laravel-patterns` + `laravel-specialist`   |
+| Database migration    | `database-indexing-strategy` + `mysql`                             |
+| Backend tests         | `pest-testing`                                                     |
+| API security          | `laravel-security`                                                 |
+| Form / input          | `zod` + `react-hook-form-zod-shadcn`                               |
+| API hook              | `tanstack-query-best-practices`                                    |
+| shadcn component      | `shadcn` + `radix-ui-design-system`                                |
+| Page layout / responsive | `responsive-mobile-web.mdc` + `tailwind-css-patterns` + `tailwindcss-mobile-first` (linked from `frontend-patterns.mdc`, `AGENTS.md`) |
+| UI animation / spring    | `motion-animation.mdc` — Motion (`motion` package), spring presets, tier policy |
+| Public page design    | `frontend-design` + `web-design-guidelines`                        |
+| React performance     | `vercel-react-best-practices` + `react-vite-best-practices`        |
+| Superpowers / TDD     | `superpowers-workflow`, `brainstorming`, `test-driven-development` |
+| Backend + tests       | `laravel-development`, `laravel-testing`                           |
+| Frontend tests        | `vitest`, `frontend-testing`                                       |
+| Security audit        | `security-audit`, `owasp-security-check`, `laravel-security-audit` |
+| Auth / admin API      | `laravel-security` + rules `owasp-security`                        |
+| Vite config / build   | `react-vite-best-practices`                                        |
 
 ---
 
 ## Not recommended for this project
 
-| Skill / tool | Reason |
-|--------------|--------|
-| Redis-related skills | Hosting does not support Redis |
-| `supabase-postgres-best-practices` | Project uses MySQL |
-| `vercel-react-native-skills` | Web PWA only |
+| Skill / tool                       | Reason                         |
+| ---------------------------------- | ------------------------------ |
+| Redis-related skills               | Hosting does not support Redis |
+| `supabase-postgres-best-practices` | Project uses MySQL             |
+| `vercel-react-native-skills`       | Web PWA only                   |
 
 ---
 

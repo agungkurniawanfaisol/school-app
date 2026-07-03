@@ -1,4 +1,4 @@
-.PHONY: up down build rebuild logs update prod migrate fresh shell-backend shell-frontend test-backend test-frontend test dev dev-frontend
+.PHONY: up down build rebuild logs update prod migrate fresh shell-backend shell-frontend test-backend test-frontend test dev dev-full dev-frontend sync-frontend harness
 
 COMPOSE := docker compose
 COMPOSE_PROD := docker compose -f docker-compose.yml -f docker-compose.prod.yml
@@ -7,8 +7,22 @@ dev:
 	$(COMPOSE) up -d mysql backend
 	@echo ""
 	@echo "Backend API: http://localhost:8000/api"
-	@echo "Frontend:    cd frontend && npm run dev  →  http://localhost:5173"
+	@echo "Frontend (host):  cd frontend && npm run dev  →  http://localhost:5173"
+	@echo "Frontend (Docker): make dev-full  →  http://localhost:8080 (nginx) / :5173 (Vite)"
 	@echo ""
+
+dev-full:
+	$(COMPOSE) --profile full up -d --build
+	@echo ""
+	@echo "Full stack: http://localhost:8080"
+	@echo "Vite HMR:   http://localhost:5173"
+	@echo "Backend:    http://localhost:8000/api"
+	@echo ""
+
+# Refresh frontend node_modules volume after package-lock.json changes (Docker full profile)
+sync-frontend:
+	$(COMPOSE) --profile full run --rm --no-deps --entrypoint "" frontend sh -c "npm ci && sha256sum package-lock.json | awk '{print \$$1}' > node_modules/.package_lock_sha256"
+	@echo "Frontend Docker volume synced. Restart: docker compose --profile full restart frontend"
 
 dev-frontend:
 	cd frontend && npm run dev
@@ -67,6 +81,13 @@ test-frontend:
 	$(COMPOSE) exec frontend npm test
 
 test: test-backend test-frontend
+
+# Verify project harness (docs, rules, optional --test via script)
+harness:
+	@./scripts/harness.sh
+
+harness-test:
+	@./scripts/harness.sh --test
 
 workers:
 	$(COMPOSE) --profile workers up -d queue_worker scheduler

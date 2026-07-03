@@ -12,7 +12,39 @@ alwaysApply: false
 - Components live in `src/components/ui/`. Do not fork Radix behavior unnecessarily.
 - Use `cn()` utility for conditional Tailwind classes.
 
-## Zod Validation
+## Animation (Motion + spring)
+
+Spring animations via **Motion** (`motion` package). Keep lightweight — GPU-friendly props only.
+
+| Resource | Purpose |
+|----------|---------|
+| [`motion-animation.mdc`](motion-animation.mdc) | Tiers, spring presets, performance rules |
+| `src/components/motion/` | `FadeInView`, `StaggerChildren`, `PageEnter`, `AnimatedOutlet` |
+
+Also documented in [`AGENTS.md`](../../AGENTS.md) §3 conventions.
+
+## Responsive (mobile & web)
+
+Mobile-first layouts are required for every page and component.
+
+| Resource | Purpose |
+|----------|---------|
+| [`responsive-mobile-web.mdc`](responsive-mobile-web.mdc) | Breakpoints, nav, tables, touch targets |
+| [`tailwindcss-mobile-first`](../../.agents/skills/tailwindcss-mobile-first/SKILL.md) skill | Deeper Tailwind responsive patterns |
+
+Also documented in [`AGENTS.md`](../../AGENTS.md) §3 conventions.
+
+## Theme (light / dark / system)
+
+- **Provider:** `ThemeProvider` in `main.tsx` — toggles `.dark` on `<html>`
+- **Toggle:** `ThemeToggle` in Header, Admin sidebar, login page
+- **Tokens:** semantic CSS variables in `index.css` (`:root` + `.dark`) — no raw hex in components
+- **FOUC:** inline script in `index.html` reads `localStorage` before paint
+- **Persistence:** `localStorage` key `nurul-hikmah-theme`
+
+Use Tailwind semantic classes (`bg-background`, `text-foreground`, `border-border`) so dark mode works automatically. Brand sections (hero, footer, PMB CTA) use `--gradient-hero`, `--footer-bg`, `--hero-overlay`.
+
+## File Structure
 
 All forms MUST use Zod schemas in `src/schemas/`. See `zod-input-validation.mdc` for full patterns.
 
