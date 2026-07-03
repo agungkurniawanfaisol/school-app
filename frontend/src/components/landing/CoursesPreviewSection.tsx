@@ -1,68 +1,112 @@
-import { ArrowRight, Clock } from 'lucide-react'
+import { ArrowRight, Clock, PlayCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { StaggerChildren, StaggerItem } from '@/components/motion'
+import { SectionHeader } from '@/components/landing/SectionHeader'
 import { formatCurrency } from '@/lib/utils'
 import { useCoursesList } from '@/hooks/useCourses'
 
 export function CoursesPreviewSection() {
-  const { data, isLoading, isFetching } = useCoursesList({ per_page: 3, featured: true })
+  const { data, isLoading, isFetching } = useCoursesList({ per_page: 6, featured: true })
+  const courses = data?.data ?? []
 
   return (
-    <section id="kursus" className="section-padding bg-secondary/20">
+    <section id="kursus" className="section-padding">
       <div className="container-page">
-        <div className="mb-10 flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <div className="text-center sm:text-left">
-            <h2 className="mb-3 text-3xl font-bold text-primary sm:text-4xl">Kursus Online</h2>
-            <p className="max-w-xl text-muted-foreground">Belajar kapan saja dengan materi berkualitas dari pengajar terbaik.</p>
-          </div>
-          <Button asChild>
+        <div className="mb-10 flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
+          <SectionHeader
+            badge="E-Learning"
+            title="Kursus Online"
+            description="Belajar kapan saja dengan materi berkualitas dari pengajar terbaik."
+            align="left"
+            className="mb-0"
+          />
+          <Button asChild className="shrink-0 shadow-md shadow-primary/20">
             <Link to="/kursus">
-              Lihat Semua Kursus
+              Lihat Katalog Kursus
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>
 
         {isLoading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex gap-4 overflow-hidden">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-72 w-full" />
+              <Skeleton key={i} className="h-72 w-72 shrink-0 rounded-xl" />
             ))}
           </div>
+        ) : courses.length === 0 ? (
+          <p className="text-center text-muted-foreground">Belum ada kursus tersedia.</p>
         ) : (
-          <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${isFetching ? 'opacity-70' : ''}`}>
-            {data?.data.map((course) => (
-              <Card key={course.id} className="overflow-hidden transition-shadow hover:shadow-md">
-                {course.thumbnail && (
-                  <img src={course.thumbnail} alt={course.title} className="h-44 w-full object-cover" />
-                )}
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    {course.level && <Badge variant="secondary">{course.level}</Badge>}
-                    {course.category && <Badge variant="outline">{course.category}</Badge>}
+          <StaggerChildren
+            className={`-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 scrollbar-thin sm:-mx-6 sm:px-6 ${isFetching ? 'opacity-70' : ''}`}
+          >
+            {courses.map((course) => {
+              const isFree = course.price === 0
+              return (
+                <StaggerItem key={course.id} className="w-72 shrink-0 sm:w-80">
+                  <Card className="card-hover h-full overflow-hidden border-primary/10">
+                  <div className="relative">
+                    {course.thumbnail ? (
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="aspect-video w-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="flex aspect-video items-center justify-center bg-secondary/60">
+                        <PlayCircle className="h-12 w-12 text-primary/40" />
+                      </div>
+                    )}
+                    <Badge
+                      className={`absolute left-3 top-3 border-0 ${isFree ? 'bg-primary text-primary-foreground' : 'bg-[var(--gold-accent)] text-primary-foreground'}`}
+                    >
+                      {isFree ? 'Gratis' : 'Premium'}
+                    </Badge>
                   </div>
-                  <CardTitle className="line-clamp-2 text-lg">
-                    <Link to={`/kursus/${course.slug}`} className="hover:text-primary">
-                      {course.title}
-                    </Link>
-                  </CardTitle>
-                  {course.excerpt && <CardDescription className="line-clamp-2">{course.excerpt}</CardDescription>}
-                </CardHeader>
-                <CardContent className="flex items-center justify-between pt-0">
-                  <span className="font-semibold text-primary">{formatCurrency(course.price)}</span>
-                  {course.duration_minutes && (
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {course.duration_minutes} menit
-                    </span>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  <CardHeader className="pb-2">
+                    <div className="flex flex-wrap gap-1.5">
+                      {course.level && <Badge variant="secondary">{course.level}</Badge>}
+                      {course.category && (
+                        <Badge variant="outline" className="capitalize">
+                          {course.category}
+                        </Badge>
+                      )}
+                    </div>
+                    <CardTitle className="line-clamp-2 text-base leading-snug">
+                      <Link to={`/kursus/${course.slug}`} className="hover:text-primary">
+                        {course.title}
+                      </Link>
+                    </CardTitle>
+                    {course.excerpt && (
+                      <CardDescription className="line-clamp-2 text-sm">{course.excerpt}</CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-3 pt-0">
+                    <div className="h-1.5 overflow-hidden rounded-full bg-secondary">
+                      <div className="h-full w-2/5 rounded-full bg-primary/60" aria-hidden />
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-semibold text-primary">
+                        {isFree ? 'Gratis' : formatCurrency(course.price)}
+                      </span>
+                      {course.duration_minutes != null && course.duration_minutes > 0 && (
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3.5 w-3.5" />
+                          {course.duration_minutes} menit
+                        </span>
+                      )}
+                    </div>
+                  </CardContent>
+                  </Card>
+                </StaggerItem>
+              )
+            })}
+          </StaggerChildren>
         )}
       </div>
     </section>

@@ -1,12 +1,31 @@
+import { Award, BookOpen, GraduationCap, Sparkles, Users } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { StaggerChildren, StaggerItem } from '@/components/motion'
 import { Button } from '@/components/ui/button'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { Skeleton } from '@/components/ui/skeleton'
+import { CountUp } from '@/components/landing/CountUp'
+import { IslamicPattern } from '@/components/landing/IslamicPattern'
 import { api } from '@/lib/api'
 import { queryConfig } from '@/hooks/queryConfig'
 import { useSchool } from '@/hooks/useSchool'
 import type { HeroSlider, PaginatedResponse } from '@/types'
+import { cn } from '@/lib/utils'
+
+const trustStats = [
+  { icon: Users, value: 500, suffix: '+', label: 'Siswa Aktif' },
+  { icon: Award, value: 15, suffix: '+', label: 'Tahun Berdiri' },
+  { icon: BookOpen, value: null as number | null, suffix: '', label: 'Program Tahfidz' },
+  { icon: GraduationCap, value: null as number | null, suffix: '', label: 'Terakreditasi A' },
+]
+
+const collageItems = [
+  { label: 'Tahfidz', color: 'from-primary/30 to-primary/10' },
+  { label: 'Akademik', color: 'from-[#2d7a3e]/40 to-primary/10' },
+  { label: 'Karakter', color: 'from-[var(--gold-accent)]/30 to-primary/10' },
+  { label: 'Kegiatan', color: 'from-primary/25 to-accent/40' },
+]
 
 export function HeroSection() {
   const { data: school, isLoading: schoolLoading } = useSchool()
@@ -22,70 +41,211 @@ export function HeroSection() {
   })
 
   const isLoading = schoolLoading || slidersLoading
-  const slides = sliders?.length ? sliders : [
-    {
-      id: 0,
-      title: school?.name ?? 'Nurul Hikmah School',
-      subtitle: school?.tagline ?? 'Sekolah Islam Terpadu',
-      image: null,
-      cta_text: 'Daftar Sekarang',
-      cta_url: '/pmb/daftar',
-    } as HeroSlider,
-  ]
+  const slides = sliders?.length
+    ? sliders
+    : [
+        {
+          id: 0,
+          title: 'Membentuk Generasi Qurani & Berakhlak Mulia',
+          subtitle: school?.tagline ?? 'Sekolah Islam Terpadu',
+          image: null,
+          cta_text: 'Daftar PMB',
+          cta_url: '/pmb/daftar',
+        } as HeroSlider,
+      ]
 
   if (isLoading) {
     return (
       <section className="relative">
-        <Skeleton className="h-[60vh] min-h-[400px] w-full rounded-none" />
+        <Skeleton className="skeleton-shimmer min-h-[70vh] w-full rounded-none" />
       </section>
     )
   }
 
   return (
-    <section className="relative overflow-hidden bg-primary/5">
+    <section className="relative overflow-hidden">
       <Carousel className="w-full">
         <CarouselContent>
           {slides.map((slide) => (
             <CarouselItem key={slide.id}>
-              <div className="relative flex min-h-[60vh] items-center">
-                {slide.image && (
+              <div className="relative min-h-[75vh] lg:min-h-[90vh]">
+                {slide.image ? (
                   <img
                     src={slide.image}
-                    alt={slide.title}
-                    className="absolute inset-0 h-full w-full object-cover"
+                    alt=""
+                    className="absolute inset-0 h-full w-full scale-105 object-cover"
+                    aria-hidden
+                  />
+                ) : (
+                  <div
+                    className="animate-gradient-shift absolute inset-0 bg-[length:200%_200%]"
+                    style={{ backgroundImage: 'var(--gradient-hero)' }}
+                    aria-hidden
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/40" />
-                <div className="container-page relative z-10 py-16 text-primary-foreground">
-                  <p className="mb-2 text-sm font-medium uppercase tracking-wider opacity-90">Selamat Datang</p>
-                  <h1 className="mb-4 max-w-2xl text-3xl font-bold sm:text-4xl lg:text-5xl">{slide.title}</h1>
-                  {slide.subtitle && (
-                    <p className="mb-8 max-w-xl text-lg opacity-90 sm:text-xl">{slide.subtitle}</p>
-                  )}
-                  <div className="flex flex-wrap gap-3">
-                    {slide.cta_url && (
-                      <Button asChild size="lg" variant="secondary">
-                        <Link to={slide.cta_url.startsWith('/') ? slide.cta_url : `/${slide.cta_url}`}>
-                          {slide.cta_text ?? 'Selengkapnya'}
-                        </Link>
-                      </Button>
-                    )}
-                    <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10">
-                      <a href="#tentang">Pelajari Lebih Lanjut</a>
-                    </Button>
+
+                <div
+                  className="absolute inset-0 bg-hero-overlay"
+                  aria-hidden
+                />
+
+                <IslamicPattern opacity={0.08} />
+
+                {/* Animated blobs */}
+                <div
+                  className="animate-float absolute -right-24 top-[15%] h-80 w-80 rounded-full bg-primary-foreground/8 blur-3xl"
+                  aria-hidden
+                />
+                <div
+                  className="animate-float-delayed absolute -left-16 bottom-[20%] h-64 w-64 rounded-full bg-[var(--gold-accent)]/15 blur-3xl"
+                  aria-hidden
+                />
+                <div
+                  className="animate-pulse-soft absolute right-[30%] top-[10%] h-3 w-3 rounded-full bg-[var(--gold-accent)]"
+                  aria-hidden
+                />
+
+                <div className="container-page relative z-10 flex min-h-[75vh] flex-col justify-center py-20 lg:min-h-[90vh] lg:py-24">
+                  <div className="grid items-center gap-12 lg:grid-cols-2">
+                    <StaggerChildren className="space-y-6">
+                      <StaggerItem>
+                        <p className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/25 bg-primary-foreground/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground backdrop-blur-sm">
+                          <Sparkles className="h-3.5 w-3.5 text-[var(--gold-accent)]" />
+                          Selamat Datang di {school?.name?.split(' ').slice(-2).join(' ') ?? 'Nurul Hikmah'}
+                        </p>
+                      </StaggerItem>
+
+                      <StaggerItem>
+                        <h1 className="max-w-xl text-3xl font-extrabold leading-[1.1] text-primary-foreground sm:text-4xl lg:text-5xl xl:text-[3.5rem]">
+                          {slide.title.includes('&') ? (
+                            <>
+                              {slide.title.split('&')[0]}
+                              <span className="text-gradient-gold">&</span>
+                              {slide.title.split('&').slice(1).join('&')}
+                            </>
+                          ) : (
+                            slide.title
+                          )}
+                        </h1>
+                      </StaggerItem>
+
+                      {slide.subtitle && (
+                        <StaggerItem>
+                          <p className="max-w-lg text-base leading-relaxed text-primary-foreground/90 sm:text-lg">
+                            {slide.subtitle}
+                          </p>
+                        </StaggerItem>
+                      )}
+
+                      <StaggerItem>
+                        <div className="flex flex-wrap gap-3">
+                          <Button
+                            asChild
+                            size="lg"
+                            className="btn-shine h-12 bg-primary-foreground px-7 text-primary shadow-xl shadow-black/25 transition-transform hover:scale-[1.02] hover:bg-primary-foreground/95"
+                          >
+                            <Link
+                              to={
+                                slide.cta_url?.startsWith('/')
+                                  ? slide.cta_url
+                                  : `/${slide.cta_url ?? 'pmb/daftar'}`
+                              }
+                            >
+                              {slide.cta_text ?? 'Daftar PMB'}
+                            </Link>
+                          </Button>
+                          <Button
+                            asChild
+                            size="lg"
+                            variant="outline"
+                            className="h-12 border-primary-foreground/50 bg-primary-foreground/5 px-7 text-primary-foreground backdrop-blur-sm transition-transform hover:scale-[1.02] hover:bg-primary-foreground/15"
+                          >
+                            <a href="#tentang">Jelajahi Sekolah</a>
+                          </Button>
+                        </div>
+                      </StaggerItem>
+                    </StaggerChildren>
+
+                    <div className="hidden lg:block" aria-hidden>
+                      <div className="animate-float relative ml-auto w-full max-w-md">
+                        <div className="absolute -inset-6 rounded-[2rem] bg-[var(--gold-accent)]/10 blur-2xl" />
+                        <div className="card-glass relative overflow-hidden rounded-3xl p-6 shadow-2xl">
+                          <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full border border-primary-foreground/20" />
+                          <div className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full border border-[var(--gold-accent)]/30" />
+                          <div className="grid grid-cols-2 gap-3">
+                            {collageItems.map((item, i) => (
+                              <div
+                                key={item.label}
+                                className={cn(
+                                  'group relative flex aspect-square flex-col items-center justify-center rounded-2xl bg-gradient-to-br p-4 transition-transform duration-300 hover:scale-105',
+                                  item.color,
+                                  i % 2 === 0 ? 'animate-float' : 'animate-float-delayed',
+                                )}
+                              >
+                                <span className="text-2xl font-bold text-primary-foreground/90">
+                                  {item.label.charAt(0)}
+                                </span>
+                                <span className="mt-1 text-xs font-semibold text-primary-foreground/75">
+                                  {item.label}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="mt-5 text-center text-sm font-medium text-primary-foreground/85">
+                            Lingkungan belajar yang hangat & inspiratif
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+                </div>
+
+                {/* Bottom wave */}
+                <div className="absolute bottom-0 left-0 right-0 text-background" aria-hidden>
+                  <svg viewBox="0 0 1440 60" fill="currentColor" className="block w-full" preserveAspectRatio="none">
+                    <path d="M0,40 C360,60 720,20 1080,40 C1260,50 1380,55 1440,40 L1440,60 L0,60 Z" />
+                  </svg>
                 </div>
               </div>
             </CarouselItem>
           ))}
         </CarouselContent>
+
         {slides.length > 1 && (
           <>
-            <CarouselPrevious className="left-4 border-primary-foreground/30 text-primary-foreground" />
-            <CarouselNext className="right-4 border-primary-foreground/30 text-primary-foreground" />
+            <CarouselPrevious className="left-4 border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground backdrop-blur-sm transition-transform hover:scale-105 hover:bg-primary-foreground/25" />
+            <CarouselNext className="right-4 border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground backdrop-blur-sm transition-transform hover:scale-105 hover:bg-primary-foreground/25" />
           </>
         )}
       </Carousel>
+
+      <div className="relative z-10 bg-background">
+        <div className="container-page -mt-2 pb-8 pt-4">
+          <StaggerChildren className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+            {trustStats.map(({ icon: Icon, value, suffix, label }) => (
+              <StaggerItem key={label}>
+                <div className="card-hover group flex items-center gap-3 rounded-2xl border border-primary/10 bg-card p-4 shadow-sm">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-lg font-bold text-primary">
+                      {value != null ? (
+                        <CountUp end={value} suffix={suffix ?? ''} />
+                      ) : (
+                        label.split(' ')[0]
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {value != null ? label : label.includes(' ') ? label.split(' ').slice(1).join(' ') : label}
+                    </p>
+                  </div>
+                </div>
+              </StaggerItem>
+            ))}
+          </StaggerChildren>
+        </div>
+      </div>
     </section>
   )
 }

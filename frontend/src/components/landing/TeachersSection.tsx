@@ -1,51 +1,122 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ArrowRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { RevealOnScroll } from '@/components/landing/RevealOnScroll'
+import { SectionHeader } from '@/components/landing/SectionHeader'
+import { TeacherAvatar } from '@/components/teachers/TeacherAvatar'
 import { useTeachersList } from '@/hooks/useTeachers'
+import type { Teacher } from '@/types'
+
+export const LANDING_TEACHER_LIMIT = 7
+
+function TeacherCard({ teacher, featured = false }: { teacher: Teacher; featured?: boolean }) {
+  const detailHref = `/guru/${teacher.slug}`
+
+  if (featured) {
+    return (
+      <Link to={detailHref} className="block lg:col-span-2">
+        <Card className="card-hover h-full overflow-hidden border-primary/15 bg-gradient-to-br from-secondary/50 to-card">
+          <div className="flex flex-col items-center gap-6 p-8 sm:flex-row sm:items-start">
+            <div className="shrink-0 overflow-hidden rounded-2xl border-2 border-primary/20 shadow-md">
+              <TeacherAvatar teacher={teacher} size="lg" className="h-32 w-32" />
+            </div>
+            <div className="text-center sm:text-left">
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">Guru Unggulan</p>
+              <h3 className="mt-1 text-2xl font-bold text-foreground">{teacher.name}</h3>
+              {teacher.title && (
+                <p className="mt-1 text-sm text-muted-foreground">{teacher.title}</p>
+              )}
+              {teacher.subject && (
+                <p className="mt-3 inline-flex rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                  {teacher.subject}
+                </p>
+              )}
+              {teacher.bio && (
+                <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                  {teacher.bio}
+                </p>
+              )}
+              <p className="mt-4 text-sm font-medium text-primary">Lihat profil lengkap →</p>
+            </div>
+          </div>
+        </Card>
+      </Link>
+    )
+  }
+
+  return (
+    <Link to={detailHref} className="block">
+      <Card className="card-hover group h-full overflow-hidden border-primary/10">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl bg-muted">
+          <TeacherAvatar teacher={teacher} size="lg" className="h-full w-full rounded-none text-3xl" />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary/90 via-primary/70 to-transparent p-4 pt-12 text-primary-foreground">
+            <p className="font-semibold">{teacher.name}</p>
+            {teacher.subject && <p className="text-sm text-primary-foreground/85">{teacher.subject}</p>}
+          </div>
+        </div>
+        {teacher.title && (
+          <CardContent className="py-3 text-center text-xs text-muted-foreground">{teacher.title}</CardContent>
+        )}
+      </Card>
+    </Link>
+  )
+}
 
 export function TeachersSection() {
-  const { data, isLoading, isFetching } = useTeachersList({ per_page: 8, featured: true })
+  const { data, isLoading, isFetching } = useTeachersList({ per_page: LANDING_TEACHER_LIMIT })
+  const teachers = data?.data ?? []
+  const featured = teachers.find((t) => t.is_featured) ?? teachers[0]
+  const rest = teachers.filter((t) => t.id !== featured?.id)
+  const hasMore = (data?.meta.total ?? 0) > teachers.length
 
   return (
     <section id="guru" className="section-padding">
       <div className="container-page">
-        <div className="mb-10 text-center">
-          <h2 className="mb-3 text-3xl font-bold text-primary sm:text-4xl">Guru & Tenaga Pendidik</h2>
-          <p className="mx-auto max-w-2xl text-muted-foreground">
-            Tim pengajar profesional yang berdedikasi membimbing siswa menuju kesuksesan.
-          </p>
+        <div className="mb-10 flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
+          <SectionHeader
+            badge="Tenaga Pendidik"
+            title="Guru & Tenaga Pendidik"
+            description="Tim pengajar profesional yang berdedikasi membimbing siswa menuju kesuksesan."
+            align="left"
+            className="mb-0"
+          />
+          {hasMore && !isLoading && (
+            <Button asChild className="shrink-0 shadow-md shadow-primary/20">
+              <Link to="/guru">
+                Lihat Selengkapnya
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
+            </Button>
+          )}
         </div>
 
         {isLoading ? (
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-64 w-full" />
+            {Array.from({ length: LANDING_TEACHER_LIMIT }).map((_, i) => (
+              <Skeleton key={i} className="aspect-[3/4] w-full rounded-xl" />
             ))}
           </div>
+        ) : teachers.length === 0 ? (
+          <p className="text-center text-muted-foreground">Belum ada data guru.</p>
         ) : (
-          <div className={`grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ${isFetching ? 'opacity-70' : ''}`}>
-            {data?.data.map((teacher) => (
-              <Card key={teacher.id} className="overflow-hidden text-center transition-shadow hover:shadow-md">
-                <div className="aspect-square overflow-hidden bg-muted">
-                  {teacher.photo ? (
-                    <img src={teacher.photo} alt={teacher.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-4xl font-bold text-primary/30">
-                      {teacher.name.charAt(0)}
-                    </div>
-                  )}
+          <RevealOnScroll direction="up">
+            <div className={`space-y-6 ${isFetching ? 'opacity-70' : ''}`}>
+              {featured && (
+                <div className="grid gap-6 lg:grid-cols-4">
+                  <TeacherCard teacher={featured} featured />
                 </div>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{teacher.name}</CardTitle>
-                  {teacher.title && <CardDescription>{teacher.title}</CardDescription>}
-                </CardHeader>
-                {teacher.subject && (
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-primary">{teacher.subject}</p>
-                  </CardContent>
-                )}
-              </Card>
-            ))}
-          </div>
+              )}
+              {rest.length > 0 && (
+                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                  {rest.map((teacher) => (
+                    <TeacherCard key={teacher.id} teacher={teacher} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </RevealOnScroll>
         )}
       </div>
     </section>

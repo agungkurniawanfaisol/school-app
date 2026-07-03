@@ -1,75 +1,101 @@
-import {
-  BookOpen,
-  GraduationCap,
-  LayoutDashboard,
-  LogOut,
-  Newspaper,
-  Users,
-} from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import { ExternalLink, LogOut, PanelLeft } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { AdminNav } from '@/components/admin/AdminNav'
+import { AdminSidebarFlyout } from '@/components/admin/AdminSidebarFlyout'
+import { useAdminSidebar } from '@/components/admin/AdminSidebarContext'
+import { SchoolLogo } from '@/components/brand/SchoolLogo'
+import { AdminSidebarTree } from '@/components/layout/AdminSidebarTree'
+import { ThemeToggle } from '@/components/theme'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { useAuthMe, useLogout } from '@/hooks/useAuth'
+import { useLogout } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
-const menuItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/admin/news', label: 'Berita', icon: Newspaper },
-  { href: '/admin/teachers', label: 'Guru', icon: Users },
-  { href: '/admin/curriculums', label: 'Kurikulum', icon: BookOpen },
-  { href: '/admin/pmb', label: 'PMB', icon: GraduationCap },
-]
+interface AdminSidebarProps {
+  className?: string
+}
 
-export function AdminSidebar() {
-  const location = useLocation()
-  const { data: user } = useAuthMe()
+function AdminSidebarRail() {
   const logout = useLogout()
+  const { toggleCollapsed, closeFlyout } = useAdminSidebar()
 
   return (
-    <aside className="flex h-full w-64 flex-col border-r bg-card">
-      <div className="p-6">
-        <h2 className="text-lg font-semibold text-primary">Panel Admin</h2>
-        <p className="text-sm text-muted-foreground">{user?.name ?? 'Administrator'}</p>
+    <div className="relative flex h-full flex-col items-center border-[var(--sidebar-border)] py-3">
+      <div className="admin-sidebar-pattern pointer-events-none absolute inset-0" aria-hidden />
+
+      <div className="relative mb-3 flex size-10 items-center justify-center rounded-xl border border-[rgb(255_255_255/0.15)] bg-[rgb(255_255_255/0.1)] p-1.5">
+        <SchoolLogo alt="Nurul Hikmah" variant="sidebar" className="max-h-6 brightness-0 invert" />
       </div>
 
-      <Separator />
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="relative mb-2 size-10 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
+        onClick={toggleCollapsed}
+        aria-label="Perluas sidebar"
+      >
+        <PanelLeft className="size-5" aria-hidden />
+      </Button>
 
-      <nav className="flex-1 space-y-1 p-4">
-        {menuItems.map((item) => {
-          const isActive = item.exact
-            ? location.pathname === item.href
-            : location.pathname.startsWith(item.href)
-          const Icon = item.icon
+      <div className="admin-sidebar-scroll relative flex-1 overflow-y-auto">
+        <AdminSidebarTree mode="icons" />
+      </div>
 
-          return (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground',
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              {item.label}
-            </Link>
-          )
-        })}
-      </nav>
-
-      <div className="p-4">
-        <Button
+      <div
+        className="relative mt-2 flex flex-col items-center gap-1.5 border-t border-[var(--sidebar-border)] pt-3"
+        onMouseEnter={closeFlyout}
+      >
+        <ThemeToggle
           variant="outline"
-          className="w-full justify-start gap-2"
+          className="border-[rgb(255_255_255/0.15)] bg-[rgb(255_255_255/0.06)] text-[var(--sidebar-text)] hover:bg-[rgb(255_255_255/0.12)]"
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-10 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
+          aria-label="Lihat Situs"
+          asChild
+        >
+          <Link to="/">
+            <ExternalLink className="size-4" aria-hidden />
+          </Link>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-10 text-[var(--sidebar-muted)] hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-200"
+          aria-label="Keluar"
           onClick={() => logout.mutate()}
           disabled={logout.isPending}
         >
-          <LogOut className="h-4 w-4" />
-          Keluar
+          <LogOut className="size-4" aria-hidden />
         </Button>
       </div>
-    </aside>
+    </div>
+  )
+}
+
+export function AdminSidebar({ className }: AdminSidebarProps) {
+  const { collapsed, sidebarWidthClass, toggleCollapsed, closeFlyout } = useAdminSidebar()
+
+  return (
+    <>
+      <aside
+        className={cn(
+          'admin-sidebar fixed inset-y-0 left-0 z-30 hidden h-dvh flex-col border-r transition-[width] duration-200 ease-out motion-reduce:transition-none lg:flex',
+          sidebarWidthClass,
+          className,
+        )}
+        aria-label="Sidebar admin"
+      >
+        {collapsed ? (
+          <AdminSidebarRail />
+        ) : (
+          <AdminNav showCollapse onCollapse={toggleCollapsed} />
+        )}
+      </aside>
+
+      {collapsed && <AdminSidebarFlyout onNavigate={closeFlyout} />}
+    </>
   )
 }
