@@ -13,16 +13,17 @@ export const mainNavTree: NavGroup[] = [
     label: 'Profil',
     children: [
       { label: 'Tentang', href: '/#tentang' },
-      { label: 'Kurikulum', href: '/#kurikulum' },
+      { label: 'Program Unggulan', href: '/program-unggulan' },
       { label: 'Guru', href: '/#guru' },
-      { label: 'Fasilitas', href: '/#fasilitas' },
+      { label: 'Fasilitas', href: '/fasilitas' },
+      { label: 'Tur Virtual', href: '/tur-virtual' },
     ],
   },
   {
     label: 'Konten',
     children: [
-      { label: 'Kegiatan', href: '/#kegiatan' },
-      { label: 'Berita', href: '/#berita' },
+      { label: 'Kegiatan', href: '/kegiatan' },
+      { label: 'Berita', href: '/berita' },
       { label: 'Kursus', href: '/kursus' },
     ],
   },

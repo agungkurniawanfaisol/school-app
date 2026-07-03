@@ -2,6 +2,7 @@ import type { LucideIcon } from 'lucide-react'
 import {
   BookOpen,
   Building2,
+  Compass,
   FileImage,
   FolderOpen,
   GraduationCap,
@@ -13,6 +14,7 @@ import {
   Settings,
   Sparkles,
   Star,
+  Target,
   Users,
   UserCheck,
   UserCog,
@@ -55,7 +57,9 @@ export const adminNavTree: AdminNavGroup[] = [
     defaultHref: '/admin/news',
     children: [
       { label: 'Berita', href: '/admin/news', icon: Newspaper },
-      { label: 'Hero Slider', href: '/admin/hero-sliders', icon: Image },
+      { label: 'Carousel Beranda', href: '/admin/hero-sliders', icon: Image },
+      { label: 'Tur Virtual', href: '/admin/virtual-tours', icon: Compass },
+      { label: 'Program Unggulan', href: '/admin/program-unggulan', icon: GraduationCap },
       { label: 'Kegiatan Siswa', href: '/admin/student-activities', icon: Sparkles },
       { label: 'Testimoni', href: '/admin/testimonials', icon: Star },
     ],
@@ -63,9 +67,8 @@ export const adminNavTree: AdminNavGroup[] = [
   {
     label: 'Profil',
     icon: UserRound,
-    defaultHref: '/admin/curriculums',
+    defaultHref: '/admin/teachers',
     children: [
-      { label: 'Kurikulum', href: '/admin/curriculums', icon: BookOpen },
       { label: 'Guru', href: '/admin/teachers', icon: Users },
       { label: 'Fasilitas', href: '/admin/facilities', icon: Building2 },
     ],
@@ -94,6 +97,7 @@ export const adminNavTree: AdminNavGroup[] = [
     defaultHref: '/admin/settings',
     children: [
       { label: 'Data Sekolah', href: '/admin/schools', icon: School },
+      { label: 'Visi & Misi', href: '/admin/vision-mission', icon: Target },
       { label: 'Media', href: '/admin/media', icon: FileImage },
       { label: 'Pengguna', href: '/admin/users', icon: UserCog },
       { label: 'Pengaturan', href: '/admin/settings', icon: Settings },
@@ -162,8 +166,15 @@ export function getAdminBreadcrumbs(pathname: string): { label: string; href?: s
     return crumbs
   }
 
+  if (pathname.startsWith('/admin/virtual-tours')) {
+    crumbs.push({ label: 'Konten' }, { label: 'Tur Virtual', href: '/admin/virtual-tours' })
+    if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
+    else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
+    return crumbs
+  }
+
   if (pathname.startsWith('/admin/hero-sliders')) {
-    crumbs.push({ label: 'Konten' }, { label: 'Hero Slider' })
+    crumbs.push({ label: 'Konten' }, { label: 'Carousel Beranda' })
     if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
     else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
     return crumbs
@@ -176,8 +187,8 @@ export function getAdminBreadcrumbs(pathname: string): { label: string; href?: s
     return crumbs
   }
 
-  if (pathname.startsWith('/admin/curriculums')) {
-    crumbs.push({ label: 'Profil' }, { label: 'Kurikulum' })
+  if (pathname.startsWith('/admin/program-unggulan') || pathname.startsWith('/admin/curriculums')) {
+    crumbs.push({ label: 'Konten' }, { label: 'Program Unggulan', href: '/admin/program-unggulan' })
     if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
     else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
     return crumbs
@@ -211,6 +222,11 @@ export function getAdminBreadcrumbs(pathname: string): { label: string; href?: s
     crumbs.push({ label: 'Sistem' }, { label: 'Data Sekolah' })
     if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
     else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
+    return crumbs
+  }
+
+  if (pathname === '/admin/vision-mission') {
+    crumbs.push({ label: 'Sistem' }, { label: 'Visi & Misi' })
     return crumbs
   }
 

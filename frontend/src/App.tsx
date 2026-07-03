@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { AnimatedOutlet } from '@/components/motion'
 import { AdminPreviewGate } from '@/components/admin/AdminPreviewGate'
 import { FloatingActions } from '@/components/layout/FloatingActions'
@@ -8,12 +8,17 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { AdminLayout } from '@/pages/admin/AdminLayout'
 import { HomePage } from '@/pages/landing/HomePage'
 import { LoginPage } from '@/pages/admin/LoginPage'
+import { OAuthCallbackPage } from '@/pages/admin/OAuthCallbackPage'
+import { NewsCatalogPage } from '@/pages/news/NewsCatalogPage'
 import { NewsDetailPage } from '@/pages/news/NewsDetailPage'
+import { ActivitiesCatalogPage } from '@/pages/activities/ActivitiesCatalogPage'
 import { ActivityDetailPage } from '@/pages/activities/ActivityDetailPage'
 import { TeachersCatalogPage } from '@/pages/teachers/TeachersCatalogPage'
 import { TeacherPublicDetailPage } from '@/pages/teachers/TeacherPublicDetailPage'
 import { FacilityPublicDetailPage } from '@/pages/facilities/FacilityPublicDetailPage'
+import { FacilitiesCatalogPage } from '@/pages/facilities/FacilitiesCatalogPage'
 import { CurriculumPublicDetailPage } from '@/pages/curriculums/CurriculumPublicDetailPage'
+import { FeaturedProgramsCatalogPage } from '@/pages/curriculums/FeaturedProgramsCatalogPage'
 import { PmbInfoPage } from '@/pages/pmb/PmbInfoPage'
 import { PmbRegisterPage } from '@/pages/pmb/PmbRegisterPage'
 import { PmbStatusPage } from '@/pages/pmb/PmbStatusPage'
@@ -48,11 +53,11 @@ const ActivityPreviewPage = lazy(() =>
 const StudentActivitiesListPage = lazy(() =>
   import('@/pages/admin/StudentActivitiesListPage').then((m) => ({ default: m.StudentActivitiesListPage })),
 )
-const AdminCurriculumsListPage = lazy(() =>
-  import('@/pages/admin/CurriculumsListPage').then((m) => ({ default: m.AdminCurriculumsListPage })),
+const FeaturedProgramsListPage = lazy(() =>
+  import('@/pages/admin/FeaturedProgramsListPage').then((m) => ({ default: m.FeaturedProgramsListPage })),
 )
-const CurriculumFormPage = lazy(() =>
-  import('@/pages/admin/CurriculumFormPage').then((m) => ({ default: m.CurriculumFormPage })),
+const FeaturedProgramFormPage = lazy(() =>
+  import('@/pages/admin/FeaturedProgramFormPage').then((m) => ({ default: m.FeaturedProgramFormPage })),
 )
 const HeroSlidersListPage = lazy(() =>
   import('@/pages/admin/HeroSlidersListPage').then((m) => ({ default: m.HeroSlidersListPage })),
@@ -82,6 +87,9 @@ const PmbRegistrationDetailPage = lazy(() =>
 )
 const SchoolsListPage = lazy(() => import('@/pages/admin/SchoolsListPage').then((m) => ({ default: m.SchoolsListPage })))
 const SchoolFormPage = lazy(() => import('@/pages/admin/SchoolFormPage').then((m) => ({ default: m.SchoolFormPage })))
+const VisionMissionPage = lazy(() =>
+  import('@/pages/admin/VisionMissionPage').then((m) => ({ default: m.VisionMissionPage })),
+)
 const MediaLibraryPage = lazy(() =>
   import('@/pages/admin/MediaLibraryPage').then((m) => ({ default: m.MediaLibraryPage })),
 )
@@ -89,6 +97,18 @@ const SettingsPage = lazy(() => import('@/pages/admin/SettingsPage').then((m) =>
 const UsersListPage = lazy(() => import('@/pages/admin/UsersListPage').then((m) => ({ default: m.UsersListPage })))
 const UserFormPage = lazy(() => import('@/pages/admin/UserFormPage').then((m) => ({ default: m.UserFormPage })))
 const ProfilePage = lazy(() => import('@/pages/admin/ProfilePage').then((m) => ({ default: m.ProfilePage })))
+const VirtualTourListPage = lazy(() =>
+  import('@/pages/admin/VirtualTourListPage').then((m) => ({ default: m.VirtualTourListPage })),
+)
+const VirtualTourEditorPage = lazy(() =>
+  import('@/pages/admin/VirtualTourEditorPage').then((m) => ({ default: m.VirtualTourEditorPage })),
+)
+const VirtualTourCatalogPage = lazy(() =>
+  import('@/pages/virtual-tour/VirtualTourCatalogPage').then((m) => ({ default: m.VirtualTourCatalogPage })),
+)
+const VirtualTourViewerPage = lazy(() =>
+  import('@/pages/virtual-tour/VirtualTourViewerPage').then((m) => ({ default: m.VirtualTourViewerPage })),
+)
 
 function AdminRouteFallback() {
   return (
@@ -103,6 +123,11 @@ function LazyAdmin({ children }: { children: React.ReactNode }) {
   return <Suspense fallback={<AdminRouteFallback />}>{children}</Suspense>
 }
 
+function CurriculumAdminEditRedirect() {
+  const { id } = useParams<{ id: string }>()
+  return <Navigate to={`/admin/program-unggulan/${id}/edit`} replace />
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -114,7 +139,10 @@ export default function App() {
           <Route path="/guru" element={<TeachersCatalogPage />} />
           <Route path="/guru/detail/:uuid" element={<TeacherPublicDetailPage />} />
           <Route path="/guru/:slug" element={<TeacherPublicDetailPage />} />
+          <Route path="/fasilitas" element={<FacilitiesCatalogPage />} />
           <Route path="/fasilitas/:slug" element={<FacilityPublicDetailPage />} />
+          <Route path="/program-unggulan" element={<FeaturedProgramsCatalogPage />} />
+          <Route path="/program/:slug" element={<CurriculumPublicDetailPage />} />
           <Route path="/kurikulum/:slug" element={<CurriculumPublicDetailPage />} />
           <Route path="/kursus" element={<CourseCatalogPage />} />
           <Route path="/kursus/:slug" element={<CourseDetailPage />} />
@@ -122,10 +150,15 @@ export default function App() {
           <Route path="/pmb/daftar" element={<PmbRegisterPage />} />
           <Route path="/pmb/status" element={<PmbStatusPage />} />
           <Route path="/pmb/status/:token" element={<PmbStatusPage />} />
+          <Route path="/berita" element={<NewsCatalogPage />} />
           <Route path="/berita/detail/:uuid" element={<NewsDetailPage />} />
+          <Route path="/kegiatan" element={<ActivitiesCatalogPage />} />
           <Route path="/kegiatan/detail/:uuid" element={<ActivityDetailPage />} />
+          <Route path="/tur-virtual" element={<VirtualTourCatalogPage />} />
+          <Route path="/tur-virtual/:slug" element={<VirtualTourViewerPage />} />
 
           <Route path="/admin/login" element={<LoginPage />} />
+          <Route path="/admin/login/oauth" element={<OAuthCallbackPage />} />
 
           <Route
             path="/admin/teachers/preview"
@@ -194,12 +227,18 @@ export default function App() {
             <Route path="teachers/create" element={<LazyAdmin><TeacherFormPage /></LazyAdmin>} />
             <Route path="teachers/:uuid/edit" element={<LazyAdmin><TeacherFormPage /></LazyAdmin>} />
             <Route path="teachers/:uuid" element={<LazyAdmin><AdminTeacherDetailPage /></LazyAdmin>} />
-            <Route path="curriculums" element={<LazyAdmin><AdminCurriculumsListPage /></LazyAdmin>} />
-            <Route path="curriculums/create" element={<LazyAdmin><CurriculumFormPage /></LazyAdmin>} />
-            <Route path="curriculums/:id/edit" element={<LazyAdmin><CurriculumFormPage /></LazyAdmin>} />
+            <Route path="program-unggulan" element={<LazyAdmin><FeaturedProgramsListPage /></LazyAdmin>} />
+            <Route path="program-unggulan/create" element={<LazyAdmin><FeaturedProgramFormPage /></LazyAdmin>} />
+            <Route path="program-unggulan/:id/edit" element={<LazyAdmin><FeaturedProgramFormPage /></LazyAdmin>} />
+            <Route path="curriculums" element={<Navigate to="/admin/program-unggulan" replace />} />
+            <Route path="curriculums/create" element={<Navigate to="/admin/program-unggulan/create" replace />} />
+            <Route path="curriculums/:id/edit" element={<CurriculumAdminEditRedirect />} />
             <Route path="hero-sliders" element={<LazyAdmin><HeroSlidersListPage /></LazyAdmin>} />
             <Route path="hero-sliders/create" element={<LazyAdmin><HeroSliderFormPage /></LazyAdmin>} />
             <Route path="hero-sliders/:id/edit" element={<LazyAdmin><HeroSliderFormPage /></LazyAdmin>} />
+            <Route path="virtual-tours" element={<LazyAdmin><VirtualTourListPage /></LazyAdmin>} />
+            <Route path="virtual-tours/create" element={<LazyAdmin><VirtualTourEditorPage /></LazyAdmin>} />
+            <Route path="virtual-tours/:uuid/edit" element={<LazyAdmin><VirtualTourEditorPage /></LazyAdmin>} />
             <Route path="student-activities" element={<LazyAdmin><StudentActivitiesListPage /></LazyAdmin>} />
             <Route path="student-activities/create" element={<LazyAdmin><ActivityFormPage /></LazyAdmin>} />
             <Route path="student-activities/:uuid/edit" element={<LazyAdmin><ActivityFormPage /></LazyAdmin>} />
@@ -220,6 +259,7 @@ export default function App() {
             <Route path="schools" element={<LazyAdmin><SchoolsListPage /></LazyAdmin>} />
             <Route path="schools/create" element={<LazyAdmin><SchoolFormPage /></LazyAdmin>} />
             <Route path="schools/:id/edit" element={<LazyAdmin><SchoolFormPage /></LazyAdmin>} />
+            <Route path="vision-mission" element={<LazyAdmin><VisionMissionPage /></LazyAdmin>} />
             <Route path="media" element={<LazyAdmin><MediaLibraryPage /></LazyAdmin>} />
             <Route path="settings" element={<LazyAdmin><SettingsPage /></LazyAdmin>} />
             <Route path="users" element={<LazyAdmin><UsersListPage /></LazyAdmin>} />
