@@ -1,0 +1,29 @@
+# Nurul Hikmah School App - Cursor Rules
+
+## Tech Stack
+
+- Backend: Laravel 12, PHP 8.3+, MySQL 8.0, File cache (NO REDIS), Sanctum
+- Frontend: React 18, TypeScript, Vite, Radix UI (shadcn), TanStack Query v5, Zod, Tailwind v4, Workbox PWA
+
+## Database
+
+- Every table: id, timestamps(), softDeletes()
+- string columns MUST specify max length
+- Foreign keys MUST have ->index()
+- Composite indexes for common query patterns
+
+## Backend Patterns
+
+- Repository pattern with caching (HasCache trait)
+- select() + with() for all queries
+- Cache::remember() on GET, clear on CUD
+- API Resources for responses
+- Form Requests for validation
+
+## Frontend Patterns
+
+- ALL forms: Zod validation in src/schemas/
+- ALL API calls: TanStack Query in src/hooks/
+- Radix UI components in src/components/ui/
+- Bahasa Indonesia for UI text
+- Mobile-first design

@@ -1,0 +1,31 @@
+# Environment
+.env
+.env.local
+backend/.env
+!backend/.env.example
+!backend/.env.docker
+!.env.example
+
+# Dependencies
+backend/vendor/
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+backend/public/build/
+backend/public/hot/
+
+# Agent skills (reinstall via skills-lock.json)
+.agents/
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs & cache
+*.log
+.phpunit.result.cache
+.phpunit.cache
