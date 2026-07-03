@@ -1,0 +1,111 @@
+import { Link, useParams } from 'react-router-dom'
+import { useState } from 'react'
+import { BlockRenderer } from '@/components/editor/BlockRenderer'
+import { PageMeta } from '@/components/seo/PageMeta'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useFacilityDetail } from '@/hooks/useFacilities'
+import type { FacilityPhoto } from '@/types'
+
+function photoSrc(photo: FacilityPhoto) {
+  const src = photo.url ?? photo.path
+  if (src.startsWith('http') || src.startsWith('/')) return src
+  return `/storage/${src}`
+}
+
+export function FacilityPublicDetailPage() {
+  const { slug } = useParams<{ slug: string }>()
+  const { data: facility, isLoading, isError } = useFacilityDetail(slug ?? '')
+  const [activePhoto, setActivePhoto] = useState(0)
+
+  if (isLoading) {
+    return (
+      <div className="container-page section-padding">
+        <Skeleton className="mb-6 h-9 w-32" />
+        <Skeleton className="mb-8 aspect-video w-full rounded-xl" />
+        <Skeleton className="h-40 w-full" />
+      </div>
+    )
+  }
+
+  if (isError || !facility) {
+    return (
+      <div className="container-page section-padding text-center">
+        <p className="text-muted-foreground">Fasilitas tidak ditemukan.</p>
+        <Button asChild className="mt-4">
+          <Link to="/#fasilitas">Kembali ke beranda</Link>
+        </Button>
+      </div>
+    )
+  }
+
+  const photos = facility.photos ?? []
+  const heroSrc = facility.thumbnail ?? (photos[activePhoto] ? photoSrc(photos[activePhoto]) : null)
+
+  return (
+    <>
+      <PageMeta
+        title={facility.name}
+        description={facility.description ?? `Fasilitas ${facility.name} di Nurul Hikmah`}
+      />
+      <article className="container-page section-padding">
+        <div className="mx-auto max-w-4xl space-y-8">
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/#fasilitas">← Kembali</Link>
+          </Button>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {facility.category && <Badge variant="secondary">{facility.category}</Badge>}
+            {facility.is_featured && <Badge>Unggulan</Badge>}
+          </div>
+
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{facility.name}</h1>
+
+          {heroSrc && (
+            <img
+              src={heroSrc}
+              alt={facility.name}
+              className="aspect-video w-full rounded-xl object-cover shadow-sm"
+            />
+          )}
+
+          {facility.description && (
+            <p className="text-lg leading-relaxed text-muted-foreground">{facility.description}</p>
+          )}
+
+          {photos.length > 0 && (
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Galeri Foto</h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {photos.map((photo, index) => (
+                  <button
+                    key={photo.id}
+                    type="button"
+                    onClick={() => setActivePhoto(index)}
+                    className={`overflow-hidden rounded-xl border-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                      activePhoto === index ? 'border-primary' : 'border-transparent hover:border-primary/30'
+                    }`}
+                    aria-label={photo.caption ?? `Foto ${index + 1}`}
+                  >
+                    <img
+                      src={photoSrc(photo)}
+                      alt={photo.caption ?? facility.name}
+                      className="aspect-[4/3] w-full object-cover"
+                      loading="lazy"
+                    />
+                    {photo.caption && (
+                      <p className="border-t px-3 py-2 text-xs text-muted-foreground">{photo.caption}</p>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <BlockRenderer contentJson={facility.content_json} contentHtml={facility.content} />
+        </div>
+      </article>
+    </>
+  )
+}

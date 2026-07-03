@@ -1,0 +1,30 @@
+import { screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { PmbStatusPage } from '@/pages/pmb/PmbStatusPage'
+import { renderWithProviders } from '@/test/renderWithProviders'
+
+vi.mock('@/components/layout/Header', () => ({
+  Header: () => <header>Header</header>,
+}))
+
+vi.mock('@/components/layout/Footer', () => ({
+  Footer: () => <footer>Footer</footer>,
+}))
+
+vi.mock('@/hooks/usePmb', () => ({
+  usePmbTrack: () => ({
+    data: undefined,
+    isLoading: false,
+    isError: false,
+  }),
+}))
+
+describe('PmbStatusPage', () => {
+  it('renders track form', () => {
+    renderWithProviders(<PmbStatusPage />, { route: '/pmb/status', path: '/pmb/status' })
+
+    expect(screen.getByText('Cek Status Pendaftaran')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Token pelacakan...')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cek' })).toBeInTheDocument()
+  })
+})

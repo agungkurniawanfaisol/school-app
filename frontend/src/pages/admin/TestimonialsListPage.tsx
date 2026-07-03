@@ -3,21 +3,21 @@ import { AdminDeleteDialog } from '@/components/admin/AdminDeleteDialog'
 import { AdminPaginatedTable } from '@/components/admin/AdminPaginatedTable'
 import { AdminActiveBadge, AdminFeaturedBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
-import { useAdminCurriculumsList, useDeleteCurriculum } from '@/hooks/useCurriculums'
-import type { Curriculum } from '@/types'
+import { useAdminTestimonialsList, useDeleteTestimonial } from '@/hooks/useTestimonials'
+import type { Testimonial } from '@/types'
 
-export function AdminCurriculumsListPage() {
+export function TestimonialsListPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
-  const [deleteTarget, setDeleteTarget] = useState<Curriculum | null>(null)
-  const { data, isLoading, isFetching } = useAdminCurriculumsList({ page, per_page: 15, search })
-  const deleteItem = useDeleteCurriculum()
+  const [deleteTarget, setDeleteTarget] = useState<Testimonial | null>(null)
+  const { data, isLoading, isFetching } = useAdminTestimonialsList({ page, per_page: 15, search })
+  const deleteItem = useDeleteTestimonial()
 
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Kurikulum"
-        description="Daftar program kurikulum sekolah"
+        title="Kelola Testimoni"
+        description="Ulasan dari orang tua dan alumni"
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -29,16 +29,17 @@ export function AdminCurriculumsListPage() {
           setSearch(v)
           setPage(1)
         }}
-        createHref="/admin/curriculums/create"
+        createHref="/admin/testimonials/create"
         columns={[
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
-          { key: 'category', header: 'Kategori', cell: (item) => item.category ?? '—' },
+          { key: 'name', header: 'Nama', cell: (item) => item.name },
+          { key: 'role', header: 'Peran', cell: (item) => item.role ?? '—' },
+          { key: 'rating', header: 'Rating', cell: (item) => item.rating ?? '—' },
           { key: 'featured', header: 'Unggulan', cell: (item) => <AdminFeaturedBadge isFeatured={item.is_featured} /> },
           { key: 'active', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions
-            editHref={`/admin/curriculums/${item.id}/edit`}
+            editHref={`/admin/testimonials/${item.id}/edit`}
             onDelete={() => setDeleteTarget(item)}
           />
         )}

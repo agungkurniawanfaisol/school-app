@@ -1,23 +1,23 @@
 import { useState } from 'react'
 import { AdminDeleteDialog } from '@/components/admin/AdminDeleteDialog'
 import { AdminPaginatedTable } from '@/components/admin/AdminPaginatedTable'
-import { AdminActiveBadge, AdminFeaturedBadge } from '@/components/admin/AdminStatusBadge'
+import { AdminActiveBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
-import { useAdminCurriculumsList, useDeleteCurriculum } from '@/hooks/useCurriculums'
-import type { Curriculum } from '@/types'
+import { useAdminHeroSlidersList, useDeleteHeroSlider } from '@/hooks/useHeroSliders'
+import type { HeroSlider } from '@/types'
 
-export function AdminCurriculumsListPage() {
+export function HeroSlidersListPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
-  const [deleteTarget, setDeleteTarget] = useState<Curriculum | null>(null)
-  const { data, isLoading, isFetching } = useAdminCurriculumsList({ page, per_page: 15, search })
-  const deleteItem = useDeleteCurriculum()
+  const [deleteTarget, setDeleteTarget] = useState<HeroSlider | null>(null)
+  const { data, isLoading, isFetching } = useAdminHeroSlidersList({ page, per_page: 15, search })
+  const deleteItem = useDeleteHeroSlider()
 
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Kurikulum"
-        description="Daftar program kurikulum sekolah"
+        title="Kelola Hero Slider"
+        description="Atur slide utama halaman beranda"
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -29,16 +29,25 @@ export function AdminCurriculumsListPage() {
           setSearch(v)
           setPage(1)
         }}
-        createHref="/admin/curriculums/create"
+        createHref="/admin/hero-sliders/create"
         columns={[
+          {
+            key: 'image',
+            header: 'Gambar',
+            cell: (item) =>
+              item.image ? (
+                <img src={item.image} alt="" className="h-10 w-16 rounded object-cover" />
+              ) : (
+                '—'
+              ),
+          },
           { key: 'title', header: 'Judul', cell: (item) => item.title },
-          { key: 'category', header: 'Kategori', cell: (item) => item.category ?? '—' },
-          { key: 'featured', header: 'Unggulan', cell: (item) => <AdminFeaturedBadge isFeatured={item.is_featured} /> },
+          { key: 'order', header: 'Urutan', cell: (item) => item.order },
           { key: 'active', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions
-            editHref={`/admin/curriculums/${item.id}/edit`}
+            editHref={`/admin/hero-sliders/${item.id}/edit`}
             onDelete={() => setDeleteTarget(item)}
           />
         )}
@@ -46,6 +55,8 @@ export function AdminCurriculumsListPage() {
       <AdminDeleteDialog
         open={!!deleteTarget}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Hapus hero slider?"
+        description={`"${deleteTarget?.title}" akan dihapus permanen.`}
         onConfirm={() => {
           if (!deleteTarget) return
           deleteItem.mutate(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) })

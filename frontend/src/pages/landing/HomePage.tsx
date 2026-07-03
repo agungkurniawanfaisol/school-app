@@ -9,6 +9,7 @@ import { FacilitiesSection } from '@/components/landing/FacilitiesSection'
 import { HeroSection } from '@/components/landing/HeroSection'
 import { NewsSection } from '@/components/landing/NewsSection'
 import { PmbCtaSection } from '@/components/landing/PmbCtaSection'
+import { SectionDivider } from '@/components/landing/SectionDivider'
 import { TeachersSection } from '@/components/landing/TeachersSection'
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
 
@@ -16,15 +17,23 @@ export function HomePage() {
   return (
     <div className="flex min-h-svh flex-col">
       <Header />
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <HeroSection />
+        <SectionDivider />
         <AboutSection />
+        <SectionDivider />
         <CurriculumSection />
+        <SectionDivider />
         <TeachersSection />
+        <SectionDivider />
         <ActivitiesSection />
+        <SectionDivider />
         <FacilitiesSection />
+        <SectionDivider />
         <NewsSection />
+        <SectionDivider />
         <TestimonialsSection />
+        <SectionDivider />
         <CoursesPreviewSection />
         <PmbCtaSection />
         <ContactSection />

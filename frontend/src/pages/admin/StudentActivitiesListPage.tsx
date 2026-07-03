@@ -13,28 +13,29 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
-  useAdminNewsList,
-  useDeleteNews,
-  usePublishNews,
-  useUnpublishNews,
-} from '@/hooks/useNews'
-import type { News } from '@/types'
+  useAdminActivitiesList,
+  useDeleteActivity,
+  usePublishActivity,
+  useUnpublishActivity,
+} from '@/hooks/useActivities'
+import type { StudentActivity } from '@/types'
+import { formatDate } from '@/lib/utils'
 
-export function AdminNewsListPage() {
+export function StudentActivitiesListPage() {
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
-  const [deleteTarget, setDeleteTarget] = useState<News | null>(null)
-  const { data, isLoading, isFetching } = useAdminNewsList({ page, per_page: 15, search })
-  const deleteNews = useDeleteNews()
-  const publishNews = usePublishNews()
-  const unpublishNews = useUnpublishNews()
+  const [deleteTarget, setDeleteTarget] = useState<StudentActivity | null>(null)
+  const { data, isLoading, isFetching } = useAdminActivitiesList({ page, per_page: 15, search })
+  const deleteActivity = useDeleteActivity()
+  const publishActivity = usePublishActivity()
+  const unpublishActivity = useUnpublishActivity()
 
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Berita"
-        description="Daftar berita dan artikel sekolah"
+        title="Kelola Kegiatan Siswa"
+        description="Dokumentasi kegiatan dan prestasi siswa"
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -46,10 +47,14 @@ export function AdminNewsListPage() {
           setSearch(v)
           setPage(1)
         }}
-        createHref="/admin/news/create"
+        createHref="/admin/student-activities/create"
         columns={[
           { key: 'title', header: 'Judul', cell: (item) => item.title },
-          { key: 'category', header: 'Kategori', cell: (item) => item.category ?? '-' },
+          {
+            key: 'activity_date',
+            header: 'Tanggal',
+            cell: (item) => (item.activity_date ? formatDate(item.activity_date) : '-'),
+          },
           {
             key: 'status',
             header: 'Status',
@@ -64,11 +69,11 @@ export function AdminNewsListPage() {
           <AdminContentRowActions
             uuid={item.uuid}
             status={item.status}
-            editHref={`/admin/news/${item.uuid}/edit`}
-            previewHref={`/admin/news/${item.uuid}/preview`}
-            isPublishing={publishNews.isPending || unpublishNews.isPending}
-            onPublish={() => publishNews.mutate(item.uuid)}
-            onUnpublish={() => unpublishNews.mutate(item.uuid)}
+            editHref={`/admin/student-activities/${item.uuid}/edit`}
+            previewHref={`/admin/student-activities/${item.uuid}/preview`}
+            isPublishing={publishActivity.isPending || unpublishActivity.isPending}
+            onPublish={() => publishActivity.mutate(item.uuid)}
+            onUnpublish={() => unpublishActivity.mutate(item.uuid)}
             onDelete={() => setDeleteTarget(item)}
           />
         )}
@@ -77,9 +82,9 @@ export function AdminNewsListPage() {
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Hapus berita?</DialogTitle>
+            <DialogTitle>Hapus kegiatan?</DialogTitle>
             <DialogDescription>
-              Berita &quot;{deleteTarget?.title}&quot; akan dihapus permanen.
+              Kegiatan &quot;{deleteTarget?.title}&quot; akan dihapus permanen.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -88,12 +93,12 @@ export function AdminNewsListPage() {
             </Button>
             <Button
               variant="destructive"
-              disabled={deleteNews.isPending}
+              disabled={deleteActivity.isPending}
               onClick={async () => {
                 if (!deleteTarget) return
-                await deleteNews.mutateAsync(deleteTarget.uuid)
+                await deleteActivity.mutateAsync(deleteTarget.uuid)
                 setDeleteTarget(null)
-                navigate('/admin/news')
+                navigate('/admin/student-activities')
               }}
             >
               Hapus
