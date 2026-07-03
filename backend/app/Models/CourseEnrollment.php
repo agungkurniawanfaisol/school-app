@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\CourseEnrollmentFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CourseEnrollment extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
+    /** @use HasFactory<CourseEnrollmentFactory> */
 
     protected $fillable = [
         'course_id',

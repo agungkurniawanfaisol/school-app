@@ -3,13 +3,16 @@
 namespace App\Models;
 
 use App\Traits\HasCommonScopes;
+use Database\Factories\CurriculumFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Curriculum extends Model
 {
-    use HasCommonScopes, SoftDeletes;
+    use HasCommonScopes, HasFactory, SoftDeletes;
+    /** @use HasFactory<CurriculumFactory> */
 
     protected $table = 'curriculums';
 

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Traits\HasCommonScopes;
+use Database\Factories\CourseModuleFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +12,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CourseModule extends Model
 {
-    use HasCommonScopes, SoftDeletes;
+    use HasCommonScopes, HasFactory, SoftDeletes;
+    /** @use HasFactory<CourseModuleFactory> */
 
     protected $fillable = [
         'course_id',

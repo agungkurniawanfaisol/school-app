@@ -11,6 +11,10 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
+    public const ROLE_ADMIN = 'admin';
+
+    public const ROLE_GURU = 'guru';
+
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
@@ -20,6 +24,7 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'teacher_id',
     ];
 
     protected $hidden = [
@@ -38,7 +43,22 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isGuru(): bool
+    {
+        return $this->role === self::ROLE_GURU;
+    }
+
+    public function isPanelUser(): bool
+    {
+        return in_array($this->role, [self::ROLE_ADMIN, self::ROLE_GURU], true);
+    }
+
+    public function teacher(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Teacher::class);
     }
 
     public function news(): \Illuminate\Database\Eloquent\Relations\HasMany
