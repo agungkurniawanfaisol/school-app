@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --background: #fafdf9;
+  --foreground: #1a2e1f;
+  --card: #ffffff;
+  --card-foreground: #1a2e1f;
+  --popover: #ffffff;
+  --popover-foreground: #1a2e1f;
+  --primary: #1a5f2a;
+  --primary-foreground: #f0fdf4;
+  --secondary: #e8f5e9;
+  --secondary-foreground: #1a5f2a;
+  --muted: #f1f5f1;
+  --muted-foreground: #5a6b5e;
+  --accent: #d4edda;
+  --accent-foreground: #14532d;
+  --destructive: #dc2626;
+  --destructive-foreground: #fef2f2;
+  --border: #d1e7d4;
+  --input: #d1e7d4;
+  --ring: #1a5f2a;
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: #0f1a12;
+  --foreground: #e8f5e9;
+  --card: #152018;
+  --card-foreground: #e8f5e9;
+  --popover: #152018;
+  --popover-foreground: #e8f5e9;
+  --primary: #4ade80;
+  --primary-foreground: #052e16;
+  --secondary: #1a2e1f;
+  --secondary-foreground: #bbf7d0;
+  --muted: #1a2e1f;
+  --muted-foreground: #86efac;
+  --accent: #1a3d24;
+  --accent-foreground: #bbf7d0;
+  --destructive: #ef4444;
+  --destructive-foreground: #fef2f2;
+  --border: #2d4a35;
+  --input: #2d4a35;
+  --ring: #4ade80;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    margin: 0;
+    min-height: 100svh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight text-foreground;
+  }
+}
+
+@layer utilities {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-padding {
+    @apply py-12 sm:py-16 lg:py-20;
+  }
+}
