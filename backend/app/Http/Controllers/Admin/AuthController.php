@@ -24,7 +24,7 @@ class AuthController extends Controller
             ]);
         }
 
-        if (! $user->isAdmin()) {
+        if (! $user->isPanelUser()) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
@@ -39,6 +39,7 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
+                    'teacher_id' => $user->teacher_id,
                 ],
             ],
         ]);
@@ -61,6 +62,7 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
+                'teacher_id' => $user->teacher_id,
             ],
         ]);
     }

@@ -19,6 +19,6 @@ class TestimonialController extends Controller
             'ordered' => true,
         ]), (int) $request->get('per_page', 15));
 
-        return response()->json(TestimonialResource::collection($items));
+        return TestimonialResource::collection($items)->response();
     }
 }

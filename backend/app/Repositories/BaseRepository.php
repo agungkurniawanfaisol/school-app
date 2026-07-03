@@ -8,6 +8,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 abstract class BaseRepository implements RepositoryInterface
 {
@@ -122,43 +123,54 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $key = $this->cacheKey('all', $filters);
 
-        return $this->remember($key, function () use ($filters) {
+        $result = $this->remember($key, function () use ($filters) {
             return $this->applyFilters($this->newQuery(), $filters)->get();
         });
+
+        if (! $result instanceof Collection) {
+            Cache::forget($key);
+
+            return $this->applyFilters($this->newQuery(), $filters)->get();
+        }
+
+        return $result;
     }
 
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $key = $this->cacheKey('paginate', array_merge($filters, ['per_page' => $perPage]));
-
-        return $this->remember($key, function () use ($filters, $perPage) {
-            return $this->applyFilters($this->newQuery(), $filters)
-                ->paginate($perPage)
-                ->withQueryString();
-        });
+        return $this->applyFilters($this->newQuery(), $filters)
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function find(int $id, array $with = []): ?Model
     {
-        $key = $this->cacheKey('find', ['id' => $id, 'with' => $with]);
+        $query = $this->newQuery()->whereKey($id);
 
-        return $this->remember($key, function () use ($id, $with) {
-            $query = $this->newQuery()->whereKey($id);
+        if ($with !== []) {
+            $query->with($with);
+        }
 
-            if ($with !== []) {
-                $query->with($with);
-            }
-
-            return $query->first();
-        });
+        return $query->first();
     }
 
     public function findBySlug(string $slug, array $with = []): ?Model
     {
-        $key = $this->cacheKey('findBySlug', ['slug' => $slug, 'with' => $with]);
+        $query = $this->newQuery()->where('slug', $slug);
 
-        return $this->remember($key, function () use ($slug, $with) {
-            $query = $this->newQuery()->where('slug', $slug);
+        if ($with !== []) {
+            $query->with($with);
+        }
+
+        return $query->first();
+    }
+
+    public function findByUuid(string $uuid, array $with = []): ?Model
+    {
+        $key = $this->cacheKey('findByUuid', ['uuid' => $uuid]);
+
+        $result = $this->remember($key, function () use ($uuid, $with) {
+            $query = $this->newQuery()->where('uuid', $uuid);
 
             if ($with !== []) {
                 $query->with($with);
@@ -166,6 +178,20 @@ abstract class BaseRepository implements RepositoryInterface
 
             return $query->first();
         });
+
+        if ($result instanceof Model) {
+            return $result;
+        }
+
+        Cache::forget($key);
+
+        $query = $this->newQuery()->where('uuid', $uuid);
+
+        if ($with !== []) {
+            $query->with($with);
+        }
+
+        return $query->first();
     }
 
     public function create(array $data): Model

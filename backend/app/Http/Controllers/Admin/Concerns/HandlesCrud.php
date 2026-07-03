@@ -23,7 +23,7 @@ trait HandlesCrud
             (int) $request->get('per_page', 15),
         );
 
-        return response()->json($this->resourceClass()::collection($items));
+        return $this->resourceClass()::collection($items)->response();
     }
 
     public function show(int $id): JsonResponse
@@ -55,6 +55,11 @@ trait HandlesCrud
             return response()->json(['message' => 'Data tidak ditemukan.'], 404);
         }
 
+        return $this->performUpdateOnModel($request, $item);
+    }
+
+    protected function performUpdateOnModel(FormRequest $request, Model $item): JsonResponse
+    {
         $item = $this->repository()->update($item, $request->validated());
 
         return response()->json([

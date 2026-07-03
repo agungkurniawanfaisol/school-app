@@ -27,6 +27,9 @@ class StudentActivityController extends Controller
 
     protected function publicFilters(Request $request): array
     {
-        return array_merge($this->defaultPublicFilters($request), ['published' => true]);
+        return array_merge($this->defaultPublicFilters($request), [
+            'published' => true,
+            'status' => 'published',
+        ]);
     }
 }

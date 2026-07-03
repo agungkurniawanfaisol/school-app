@@ -21,7 +21,7 @@ class FacilityRepository extends BaseRepository implements RepositoryInterface
 
     protected function defaultSelect(): array
     {
-        return ['id', 'school_id', 'name', 'slug', 'description', 'thumbnail', 'category', 'order', 'is_active', 'is_featured', 'created_at', 'updated_at'];
+        return ['id', 'uuid', 'school_id', 'name', 'slug', 'description', 'content', 'content_json', 'thumbnail', 'category', 'order', 'is_active', 'is_featured', 'created_at', 'updated_at'];
     }
 
     protected function searchableColumns(): array

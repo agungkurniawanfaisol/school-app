@@ -11,17 +11,33 @@ class StoreTeacherRequest extends AdminFormRequest
         return [
             'school_id' => ['required', 'exists:schools,id'],
             'name' => ['required', 'string', 'max:200'],
-            'slug' => ['required', 'string', 'max:270', 'unique:teachers,slug'],
+            'slug' => ['sometimes', 'string', 'max:270', 'unique:teachers,slug'],
             'title' => ['nullable', 'string', 'max:150'],
             'subject' => ['nullable', 'string', 'max:150'],
-            'bio' => ['nullable', 'string'],
+            'bio' => ['nullable', 'string', 'max:2000'],
+            'content' => ['nullable', 'string'],
+            'content_json' => ['nullable', 'array'],
             'photo' => ['nullable', 'string', 'max:500'],
             'email' => ['nullable', 'email', 'max:150'],
             'social_media' => ['nullable', 'array'],
+            'social_media.facebook' => ['nullable', 'string', 'max:500'],
+            'social_media.instagram' => ['nullable', 'string', 'max:500'],
+            'social_media.youtube' => ['nullable', 'string', 'max:500'],
+            'social_media.tiktok' => ['nullable', 'string', 'max:500'],
+            'social_media.twitter' => ['nullable', 'string', 'max:500'],
             'order' => ['sometimes', 'integer', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
             'is_featured' => ['sometimes', 'boolean'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('content_json') && is_string($this->content_json)) {
+            $this->merge([
+                'content_json' => json_decode($this->content_json, true),
+            ]);
+        }
     }
 
     public function messages(): array

@@ -12,9 +12,10 @@ class StoreNewsRequest extends AdminFormRequest
             'school_id' => ['required', 'exists:schools,id'],
             'user_id' => ['nullable', 'exists:users,id'],
             'title' => ['required', 'string', 'max:250'],
-            'slug' => ['required', 'string', 'max:270', 'unique:news,slug'],
+            'slug' => ['sometimes', 'string', 'max:270', 'unique:news,slug'],
             'excerpt' => ['nullable', 'string', 'max:500'],
-            'content' => ['required', 'string'],
+            'content' => ['nullable', 'string', 'required_without:content_json'],
+            'content_json' => ['nullable', 'array', 'required_without:content'],
             'thumbnail' => ['nullable', 'string', 'max:500'],
             'category' => ['nullable', 'string', 'max:100'],
             'status' => ['sometimes', 'string', 'in:draft,published,archived'],
@@ -23,6 +24,15 @@ class StoreNewsRequest extends AdminFormRequest
             'is_featured' => ['sometimes', 'boolean'],
             'published_at' => ['nullable', 'date'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('content_json') && is_string($this->content_json)) {
+            $this->merge([
+                'content_json' => json_decode($this->content_json, true),
+            ]);
+        }
     }
 
     public function messages(): array

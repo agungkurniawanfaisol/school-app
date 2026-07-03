@@ -19,7 +19,7 @@ class MediaRepository extends BaseRepository implements RepositoryInterface
 
     protected function defaultSelect(): array
     {
-        return ['id', 'user_id', 'filename', 'original_name', 'path', 'disk', 'mime_type', 'size', 'collection', 'meta', 'created_at', 'updated_at'];
+        return ['id', 'uuid', 'user_id', 'filename', 'original_name', 'path', 'disk', 'mime_type', 'size', 'collection', 'meta', 'created_at', 'updated_at'];
     }
 
     protected function searchableColumns(): array

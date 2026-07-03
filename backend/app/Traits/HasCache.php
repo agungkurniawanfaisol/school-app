@@ -35,7 +35,29 @@ trait HasCache
 
     protected function remember(string $key, callable $callback, ?int $ttl = null): mixed
     {
-        return Cache::remember($key, $ttl ?? $this->cacheTtl, $callback);
+        $cached = Cache::get($key);
+
+        if ($cached !== null && ! $this->isCorruptedCacheValue($cached)) {
+            return $cached;
+        }
+
+        if ($cached !== null) {
+            Cache::forget($key);
+        }
+
+        $value = $callback();
+        Cache::put($key, $value, $ttl ?? $this->cacheTtl);
+
+        return $value;
+    }
+
+    protected function isCorruptedCacheValue(mixed $value): bool
+    {
+        if (! is_object($value)) {
+            return false;
+        }
+
+        return get_class($value) === '__PHP_Incomplete_Class';
     }
 
     protected function clearCache(): void
