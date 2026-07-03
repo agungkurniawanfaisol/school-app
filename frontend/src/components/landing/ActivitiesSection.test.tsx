@@ -9,6 +9,16 @@ vi.mock('@/hooks/useActivities', () => ({
   useActivitiesList: () => useActivitiesListMock(),
 }))
 
+vi.mock('motion/react-m', () => ({
+  div: ({ children, className }: { children?: React.ReactNode; className?: string }) => (
+    <div className={className}>{children}</div>
+  ),
+}))
+
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: () => false,
+}))
+
 describe('ActivitiesSection', () => {
   beforeEach(() => {
     vi.clearAllMocks()

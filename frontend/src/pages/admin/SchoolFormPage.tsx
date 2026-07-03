@@ -1,13 +1,22 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { ExternalLink } from 'lucide-react'
+import { toast } from 'sonner'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
-import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { useAdminSchoolDetail, useCreateSchool, useUpdateSchool } from '@/hooks/useSchool'
-import { slugify } from '@/lib/utils'
+import {
+  MISSION_MAX_LENGTH,
+  schoolSchema,
+  visionMissionSchema,
+  VISION_MAX_LENGTH,
+} from '@/schemas/school'
+import { slugify, cn } from '@/lib/utils'
 
 export function SchoolFormPage() {
   const { id } = useParams<{ id: string }>()
@@ -71,10 +80,34 @@ export function SchoolFormPage() {
   }
 
   const handleSave = () => {
+    const visionMission = visionMissionSchema.safeParse({ vision, mission })
+    if (!visionMission.success) {
+      const firstError = visionMission.error.errors[0]?.message
+      toast.error(firstError ?? 'Visi atau misi tidak valid.')
+      return
+    }
+
+    const parsed = schoolSchema.safeParse({
+      ...payload,
+      vision: vision.trim() || null,
+      mission: mission.trim() || null,
+    })
+    if (!parsed.success) {
+      const firstError = parsed.error.errors[0]?.message
+      toast.error(firstError ?? 'Data sekolah tidak valid.')
+      return
+    }
+
+    const finalPayload = {
+      ...payload,
+      vision: vision.trim() || null,
+      mission: mission.trim() || null,
+    }
+
     if (isEdit) {
-      updateItem.mutate(payload, { onSuccess: () => navigate('/admin/schools') })
+      updateItem.mutate(finalPayload, { onSuccess: () => navigate('/admin/schools') })
     } else {
-      createItem.mutate(payload, { onSuccess: () => navigate('/admin/schools') })
+      createItem.mutate(finalPayload, { onSuccess: () => navigate('/admin/schools') })
     }
   }
 
@@ -139,14 +172,55 @@ export function SchoolFormPage() {
               <Input id="postal_code" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} className="h-11" />
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="admin-card">
+        <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3 space-y-0">
+          <div>
+            <CardTitle className="text-base">Visi & Misi</CardTitle>
+            <CardDescription>Tampil di bagian Tentang Kami pada beranda.</CardDescription>
+          </div>
+          <Button asChild variant="outline" size="sm" className="min-h-11 shrink-0 gap-2">
+            <Link to="/admin/vision-mission">
+              Buka editor Visi & Misi
+              <ExternalLink className="h-4 w-4" aria-hidden />
+            </Link>
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="vision">Visi</Label>
             <Textarea id="vision" value={vision} onChange={(e) => setVision(e.target.value)} rows={3} />
+            <p
+              className={cn(
+                'text-right text-xs text-muted-foreground',
+                vision.length > VISION_MAX_LENGTH && 'font-medium text-destructive',
+              )}
+            >
+              {vision.length}/{VISION_MAX_LENGTH}
+            </p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="mission">Misi</Label>
-            <Textarea id="mission" value={mission} onChange={(e) => setMission(e.target.value)} rows={3} />
+            <Textarea id="mission" value={mission} onChange={(e) => setMission(e.target.value)} rows={4} />
+            <p className="text-xs text-muted-foreground">
+              Satu baris = satu poin misi. Gunakan Enter untuk baris baru.
+            </p>
+            <p
+              className={cn(
+                'text-right text-xs text-muted-foreground',
+                mission.length > MISSION_MAX_LENGTH && 'font-medium text-destructive',
+              )}
+            >
+              {mission.length}/{MISSION_MAX_LENGTH}
+            </p>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="admin-card">
+        <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
             <Label htmlFor="is_active">Aktif</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />

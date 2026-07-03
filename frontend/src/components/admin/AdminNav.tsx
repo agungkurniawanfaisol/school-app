@@ -46,7 +46,7 @@ export function AdminNav({
       <div className="admin-sidebar-header relative shrink-0 border-b border-[var(--sidebar-border)] px-4 pb-4 pt-5">
         <div className="flex items-start gap-3">
           <div className="relative flex size-11 shrink-0 items-center justify-center rounded-xl border border-[rgb(255_255_255/0.15)] bg-[rgb(255_255_255/0.1)] p-2 shadow-inner">
-            <SchoolLogo alt="Nurul Hikmah" variant="sidebar" className="max-h-7 brightness-0 invert" />
+            <SchoolLogo alt="Nurul Hikmah" variant="sidebar" />
             <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-[#14532d] bg-emerald-400" aria-hidden />
           </div>
           <div className="min-w-0 flex-1 pt-0.5">

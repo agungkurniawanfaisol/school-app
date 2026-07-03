@@ -12,7 +12,27 @@ vi.mock('@/hooks/useAuth', () => ({
 
 vi.mock('@/hooks/useNews', () => ({
   useAdminNewsList: () => ({
-    data: { data: [{ id: 1, title: 'Berita Demo', category: 'pengumuman', is_active: true, status: 'published' }], meta: { total: 5 } },
+    data: {
+      data: [
+        {
+          id: 1,
+          uuid: 'news-uuid',
+          title: 'Berita Demo',
+          category: 'pengumuman',
+          is_active: true,
+          status: 'published',
+          published_at: '2026-01-01T00:00:00Z',
+        },
+      ],
+      meta: { total: 5 },
+    },
+    isLoading: false,
+  }),
+}))
+
+vi.mock('@/hooks/useActivities', () => ({
+  useAdminActivitiesList: () => ({
+    data: { meta: { total: 10 } },
     isLoading: false,
   }),
 }))
@@ -41,7 +61,7 @@ vi.mock('@/hooks/useCurriculums', () => ({
 vi.mock('@/hooks/usePmb', () => ({
   useAdminPmbRegistrationsList: () => ({
     data: {
-      data: [{ id: 1, student_name: 'Ahmad', registration_number: 'PMB-001', status: 'pending' }],
+      data: [{ id: 1, student_name: 'Ahmad', registration_number: 'PMB-001', status: 'pending', grade_applied: 'SD' }],
       meta: { total: 2 },
     },
     isLoading: false,
@@ -49,16 +69,20 @@ vi.mock('@/hooks/usePmb', () => ({
 }))
 
 describe('DashboardPage', () => {
-  it('shows welcome hero and stat cards', () => {
+  it('shows welcome hero, stats, modules, and activity feeds', () => {
     renderWithProviders(<DashboardPage />)
 
     expect(screen.getByText('Admin Nurul')).toBeInTheDocument()
-    expect(screen.getAllByText('Berita').length).toBeGreaterThan(0)
+    expect(screen.getByText('Ringkasan Konten')).toBeInTheDocument()
     expect(screen.getByText('5')).toBeInTheDocument()
-    expect(screen.getByText('Akses Cepat')).toBeInTheDocument()
+    expect(screen.getByText('10')).toBeInTheDocument()
+    expect(screen.getByText('Akses Modul')).toBeInTheDocument()
+    expect(screen.getByText('Aktivitas Terbaru')).toBeInTheDocument()
     expect(screen.getByText('Berita Terbaru')).toBeInTheDocument()
     expect(screen.getByText('Berita Demo')).toBeInTheDocument()
     expect(screen.getByText('PMB Menunggu Review')).toBeInTheDocument()
     expect(screen.getByText('Ahmad')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Tambah Berita/i })).toHaveAttribute('href', '/admin/news/create')
+    expect(screen.getByRole('link', { name: /Review PMB/i })).toHaveAttribute('href', '/admin/pmb-registrations')
   })
 })

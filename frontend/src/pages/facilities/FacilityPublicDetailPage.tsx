@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useState } from 'react'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
+import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { PageMeta } from '@/components/seo/PageMeta'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,22 +22,26 @@ export function FacilityPublicDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="container-page section-padding">
-        <Skeleton className="mb-6 h-9 w-32" />
-        <Skeleton className="mb-8 aspect-video w-full rounded-xl" />
-        <Skeleton className="h-40 w-full" />
-      </div>
+      <PublicPageShell>
+        <div className="container-page section-padding">
+          <Skeleton className="mb-6 h-11 w-40" />
+          <Skeleton className="mb-8 aspect-video w-full rounded-xl" />
+          <Skeleton className="h-40 w-full" />
+        </div>
+      </PublicPageShell>
     )
   }
 
   if (isError || !facility) {
     return (
-      <div className="container-page section-padding text-center">
-        <p className="text-muted-foreground">Fasilitas tidak ditemukan.</p>
-        <Button asChild className="mt-4">
-          <Link to="/#fasilitas">Kembali ke beranda</Link>
-        </Button>
-      </div>
+      <PublicPageShell>
+        <div className="container-page section-padding text-center">
+          <p className="text-muted-foreground">Fasilitas tidak ditemukan.</p>
+          <Button asChild className="mt-4 min-h-11">
+            <Link to="/fasilitas">Kembali ke daftar fasilitas</Link>
+          </Button>
+        </div>
+      </PublicPageShell>
     )
   }
 
@@ -44,15 +49,15 @@ export function FacilityPublicDetailPage() {
   const heroSrc = facility.thumbnail ?? (photos[activePhoto] ? photoSrc(photos[activePhoto]) : null)
 
   return (
-    <>
+    <PublicPageShell>
       <PageMeta
         title={facility.name}
         description={facility.description ?? `Fasilitas ${facility.name} di Nurul Hikmah`}
       />
       <article className="container-page section-padding">
         <div className="mx-auto max-w-4xl space-y-8">
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/#fasilitas">← Kembali</Link>
+          <Button asChild variant="ghost" size="sm" className="min-h-11">
+            <Link to="/fasilitas">← Kembali ke Fasilitas</Link>
           </Button>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -71,7 +76,7 @@ export function FacilityPublicDetailPage() {
           )}
 
           {facility.description && (
-            <p className="text-lg leading-relaxed text-muted-foreground">{facility.description}</p>
+            <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">{facility.description}</p>
           )}
 
           {photos.length > 0 && (
@@ -83,10 +88,11 @@ export function FacilityPublicDetailPage() {
                     key={photo.id}
                     type="button"
                     onClick={() => setActivePhoto(index)}
-                    className={`overflow-hidden rounded-xl border-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+                    className={`min-h-11 overflow-hidden rounded-xl border-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                       activePhoto === index ? 'border-primary' : 'border-transparent hover:border-primary/30'
                     }`}
                     aria-label={photo.caption ?? `Foto ${index + 1}`}
+                    aria-pressed={activePhoto === index}
                   >
                     <img
                       src={photoSrc(photo)}
@@ -106,6 +112,6 @@ export function FacilityPublicDetailPage() {
           <BlockRenderer contentJson={facility.content_json} contentHtml={facility.content} />
         </div>
       </article>
-    </>
+    </PublicPageShell>
   )
 }

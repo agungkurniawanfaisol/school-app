@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, screen } from '@testing-library/react'
+import axios from 'axios'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { AdminLayout } from '@/pages/admin/AdminLayout'
 import { renderWithProviders } from '@/test/renderWithProviders'
@@ -42,9 +43,11 @@ describe('AdminLayout', () => {
     localStorage.setItem('nh_admin_token', 'test-token')
     useAuthMeMock.mockReturnValue({
       data: { id: 1, name: 'Admin', email: 'admin@test.id', role: 'admin' },
+      isLoading: false,
       isPending: false,
       isError: false,
       isFetched: true,
+      isSuccess: true,
       fetchStatus: 'idle',
       error: null,
     })
@@ -63,6 +66,7 @@ describe('AdminLayout', () => {
     localStorage.setItem('nh_admin_sidebar_collapsed', 'true')
     useAuthMeMock.mockReturnValue({
       data: { id: 1, name: 'Admin', email: 'admin@test.id', role: 'admin' },
+      isLoading: false,
       isPending: false,
       isError: false,
       isFetched: true,
@@ -75,10 +79,37 @@ describe('AdminLayout', () => {
     expect(container.querySelector('.lg\\:pl-16')).toBeInTheDocument()
   })
 
+  it('keeps session and shows retry UI on network error', () => {
+    localStorage.setItem('nh_admin_token', 'test-token')
+    localStorage.setItem('nh_admin_user', JSON.stringify({ id: 1, name: 'Admin', email: 'admin@test.id', role: 'admin' }))
+    const refetch = vi.fn()
+    const networkError = new axios.AxiosError('Network Error')
+    networkError.request = {}
+    useAuthMeMock.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isPending: false,
+      isError: true,
+      isFetched: true,
+      fetchStatus: 'idle',
+      error: networkError,
+      refetch,
+      isRefetching: false,
+    })
+
+    renderWithProviders(<AdminLayout />, { route: '/admin', path: '/admin' })
+
+    expect(screen.getByText('Tidak dapat terhubung ke server')).toBeInTheDocument()
+    expect(localStorage.getItem('nh_admin_token')).toBe('test-token')
+    fireEvent.click(screen.getByRole('button', { name: 'Coba lagi' }))
+    expect(refetch).toHaveBeenCalled()
+  })
+
   it('toggles sidebar collapse from header', () => {
     localStorage.setItem('nh_admin_token', 'test-token')
     useAuthMeMock.mockReturnValue({
       data: { id: 1, name: 'Admin', email: 'admin@test.id', role: 'admin' },
+      isLoading: false,
       isPending: false,
       isError: false,
       isFetched: true,

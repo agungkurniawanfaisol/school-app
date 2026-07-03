@@ -44,7 +44,7 @@ function IconButton({
         asChild
         size="icon"
         variant="ghost"
-        className={`h-9 w-9 ${destructive ? 'text-destructive hover:text-destructive' : ''}`}
+        className={`h-11 w-11 min-h-11 min-w-11 ${destructive ? 'text-destructive hover:text-destructive' : ''}`}
       >
         <Link to={href} aria-label={label}>
           {children}
@@ -55,7 +55,7 @@ function IconButton({
         type="button"
         size="icon"
         variant="ghost"
-        className={`h-9 w-9 ${destructive ? 'text-destructive hover:text-destructive' : ''}`}
+        className={`h-11 w-11 min-h-11 min-w-11 ${destructive ? 'text-destructive hover:text-destructive' : ''}`}
         onClick={onClick}
         disabled={disabled}
         aria-label={label}
@@ -134,7 +134,7 @@ export function AdminSimpleRowActions({ editHref, onDelete, viewHref, extraItems
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" size="icon" variant="ghost" className="h-9 w-9" aria-label="Aksi lainnya">
+        <Button type="button" size="icon" variant="ghost" className="min-h-11 min-w-11" aria-label="Aksi lainnya">
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>

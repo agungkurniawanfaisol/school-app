@@ -111,6 +111,18 @@ function AdminPagination({
   )
 }
 
+function ListSummary({ meta }: { meta: PaginationMeta }) {
+  return (
+    <p className="text-sm text-muted-foreground">
+      Menampilkan{' '}
+      <span className="font-medium text-foreground tabular-nums">
+        {meta.from ?? 0}–{meta.to ?? 0}
+      </span>{' '}
+      dari <span className="font-medium text-foreground tabular-nums">{meta.total}</span> item
+    </p>
+  )
+}
+
 export function AdminDataTable<T extends { id: number }>({
   columns,
   data,
@@ -130,19 +142,21 @@ export function AdminDataTable<T extends { id: number }>({
   const showEmpty = !isLoading && !data?.length
 
   return (
-    <div className={cn('space-y-4', isFetching && 'opacity-70 transition-opacity')}>
-      <AdminToolbar
-        search={search}
-        onSearchChange={onSearchChange}
-        searchPlaceholder={searchPlaceholder}
-        filters={toolbarFilters}
-      />
+    <div className={cn('admin-list-panel', isFetching && 'opacity-70 transition-opacity')}>
+      <div className="admin-list-toolbar">
+        <AdminToolbar
+          search={search}
+          onSearchChange={onSearchChange}
+          searchPlaceholder={searchPlaceholder}
+          filters={toolbarFilters}
+        />
+      </div>
 
       <div className="md:hidden" data-testid="admin-card-list">
         {isLoading ? (
-          <div className="space-y-3">
+          <div className="space-y-3 p-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i} className="admin-card">
+              <Card key={i} className="admin-card border-primary/10">
                 <CardContent className="space-y-3 p-4">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
@@ -151,9 +165,12 @@ export function AdminDataTable<T extends { id: number }>({
             ))}
           </div>
         ) : data?.length ? (
-          <div className="space-y-3">
+          <div className="space-y-3 p-4">
             {data.map((item) => (
-              <Card key={item.id} className="admin-card overflow-hidden">
+              <Card
+                key={item.id}
+                className="admin-card overflow-hidden border-primary/10 transition-colors hover:border-primary/20"
+              >
                 <CardContent className="space-y-3 p-4">
                   {columns.map((col) => (
                     <div key={col.key} className="flex items-start justify-between gap-3 text-sm">
@@ -161,71 +178,78 @@ export function AdminDataTable<T extends { id: number }>({
                       <span className="min-w-0 text-right font-medium">{col.cell(item)}</span>
                     </div>
                   ))}
-                  {rowActions && <div className="flex justify-end border-t border-primary/10 pt-3">{rowActions(item)}</div>}
+                  {rowActions && (
+                    <div className="flex justify-end border-t border-primary/10 pt-3">{rowActions(item)}</div>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          <AdminEmptyState icon={Inbox} title={emptyTitle} description={emptyDescription} />
+          <div className="p-4">
+            <AdminEmptyState icon={Inbox} title={emptyTitle} description={emptyDescription} />
+          </div>
         )}
       </div>
 
       <div className="hidden md:block">
-        <div className="admin-card overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/40 hover:bg-muted/40">
-                {columns.map((col) => (
-                  <TableHead key={col.key} className={col.className}>
-                    {col.header}
-                  </TableHead>
-                ))}
-                {rowActions && <TableHead className="text-right">Aksi</TableHead>}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    {columns.map((col) => (
-                      <TableCell key={col.key}>
-                        <Skeleton className="h-4 w-full" />
-                      </TableCell>
-                    ))}
-                    {rowActions && (
-                      <TableCell>
-                        <Skeleton className="ml-auto h-6 w-20" />
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))
-              ) : data?.length ? (
-                data.map((item) => (
-                  <TableRow key={item.id}>
-                    {columns.map((col) => (
-                      <TableCell key={col.key} className={col.className}>
-                        {col.cell(item)}
-                      </TableCell>
-                    ))}
-                    {rowActions && <TableCell className="text-right">{rowActions(item)}</TableCell>}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length + (rowActions ? 1 : 0)} className="p-0">
-                    {showEmpty && (
-                      <AdminEmptyState icon={Inbox} title={emptyTitle} description={emptyDescription} className="border-0" />
-                    )}
-                  </TableCell>
+        <Table>
+          <TableHeader>
+            <TableRow className="border-primary/10 bg-muted/40 hover:bg-muted/40">
+              {columns.map((col) => (
+                <TableHead key={col.key} className={cn('font-semibold text-foreground/80', col.className)}>
+                  {col.header}
+                </TableHead>
+              ))}
+              {rowActions && <TableHead className="text-right font-semibold text-foreground/80">Aksi</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  {columns.map((col) => (
+                    <TableCell key={col.key}>
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                  {rowActions && (
+                    <TableCell>
+                      <Skeleton className="ml-auto h-6 w-20" />
+                    </TableCell>
+                  )}
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+              ))
+            ) : data?.length ? (
+              data.map((item) => (
+                <TableRow key={item.id} className="border-primary/5 transition-colors hover:bg-muted/30">
+                  {columns.map((col) => (
+                    <TableCell key={col.key} className={col.className}>
+                      {col.cell(item)}
+                    </TableCell>
+                  ))}
+                  {rowActions && <TableCell className="text-right">{rowActions(item)}</TableCell>}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length + (rowActions ? 1 : 0)} className="p-0">
+                  {showEmpty && (
+                    <AdminEmptyState icon={Inbox} title={emptyTitle} description={emptyDescription} className="border-0" />
+                  )}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
 
-      {meta && <AdminPagination meta={meta} page={page} onPageChange={onPageChange} />}
+      {meta && (meta.total > 0 || meta.last_page > 1) && (
+        <div className="flex flex-col gap-4 border-t border-primary/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          {meta.total > 0 ? <ListSummary meta={meta} /> : <span />}
+          <AdminPagination meta={meta} page={page} onPageChange={onPageChange} />
+        </div>
+      )}
     </div>
   )
 }

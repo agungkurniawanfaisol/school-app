@@ -22,7 +22,9 @@ import {
   useUpdateNews,
 } from '@/hooks/useNews'
 import { useSchool } from '@/hooks/useSchool'
-import { slugify } from '@/lib/utils'
+import { NewsPublishDialog } from '@/components/admin/NewsPublishDialog'
+import { slugify, formatDate } from '@/lib/utils'
+import { toDatetimeLocalValue, fromDatetimeLocalValue, NEWS_DISPLAY_STATUS_LABELS } from '@/lib/newsDisplayStatus'
 import { EMPTY_EDITOR_DOC, type EditorDocument } from '@/schemas/editor'
 import type { NewsFormValues } from '@/schemas/news'
 
@@ -36,6 +38,7 @@ export function NewsFormPage() {
   const updateNews = useUpdateNews(uuid ?? '')
   const publishNews = usePublishNews()
   const [fullscreenOpen, setFullscreenOpen] = useState(false)
+  const [publishOpen, setPublishOpen] = useState(false)
   const [dirty, setDirty] = useState(false)
 
   const [title, setTitle] = useState('')
@@ -44,6 +47,8 @@ export function NewsFormPage() {
   const [category, setCategory] = useState('')
   const [thumbnail, setThumbnail] = useState('')
   const [isFeatured, setIsFeatured] = useState(false)
+  const [publishedAt, setPublishedAt] = useState('')
+  const [publishEndsAt, setPublishEndsAt] = useState('')
   const [contentJson, setContentJson] = useState<EditorDocument>(EMPTY_EDITOR_DOC)
   const [contentHtml, setContentHtml] = useState('')
 
@@ -55,6 +60,8 @@ export function NewsFormPage() {
     setCategory(existing.category ?? '')
     setThumbnail(existing.thumbnail ?? '')
     setIsFeatured(existing.is_featured)
+    setPublishedAt(toDatetimeLocalValue(existing.published_at))
+    setPublishEndsAt(toDatetimeLocalValue(existing.publish_ends_at))
     setContentJson((existing.content_json as EditorDocument) ?? EMPTY_EDITOR_DOC)
     setContentHtml(existing.content ?? '')
   }, [existing])
@@ -72,7 +79,8 @@ export function NewsFormPage() {
     is_active: true,
     is_featured: isFeatured,
     order: existing?.order ?? 0,
-    published_at: existing?.published_at ?? null,
+    published_at: fromDatetimeLocalValue(publishedAt),
+    publish_ends_at: fromDatetimeLocalValue(publishEndsAt),
   })
 
   const handleSave = async (andPreview = false) => {
@@ -145,13 +153,51 @@ export function NewsFormPage() {
         />
         Tampilkan di beranda
       </label>
+
+      <div className="space-y-3 rounded-lg border border-dashed p-3">
+        <p className="text-sm font-medium">Jadwal tampil</p>
+        <div className="space-y-2">
+          <Label htmlFor="published-at">Mulai tampil</Label>
+          <Input
+            id="published-at"
+            type="datetime-local"
+            value={publishedAt}
+            onChange={(e) => {
+              setPublishedAt(e.target.value)
+              setDirty(true)
+            }}
+            className="h-11"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="publish-ends-at">Berakhir tampil (opsional)</Label>
+          <Input
+            id="publish-ends-at"
+            type="datetime-local"
+            value={publishEndsAt}
+            onChange={(e) => {
+              setPublishEndsAt(e.target.value)
+              setDirty(true)
+            }}
+            className="h-11"
+          />
+        </div>
+        {existing?.display_status && existing.display_status !== 'draft' && (
+          <p className="text-xs text-muted-foreground">
+            Status saat ini: {NEWS_DISPLAY_STATUS_LABELS[existing.display_status]}
+            {existing.published_at && ` · mulai ${formatDate(existing.published_at)}`}
+            {existing.publish_ends_at && ` · berakhir ${formatDate(existing.publish_ends_at)}`}
+          </p>
+        )}
+      </div>
+
       {isEdit && existing?.status !== 'published' && (
         <Button
           type="button"
           variant="secondary"
           className="w-full"
           disabled={publishNews.isPending}
-          onClick={() => uuid && publishNews.mutate(uuid)}
+          onClick={() => setPublishOpen(true)}
         >
           Publikasikan
         </Button>
@@ -259,6 +305,21 @@ export function NewsFormPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {existing && (
+        <NewsPublishDialog
+          news={existing}
+          open={publishOpen}
+          onOpenChange={setPublishOpen}
+          isPending={publishNews.isPending}
+          onConfirm={(newsUuid, payload) => {
+            publishNews.mutate(
+              { uuid: newsUuid, ...payload },
+              { onSuccess: () => setPublishOpen(false) },
+            )
+          }}
+        />
+      )}
     </div>
   )
 }

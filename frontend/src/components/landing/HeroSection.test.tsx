@@ -56,4 +56,39 @@ describe('HeroSection', () => {
     expect(headings.length).toBeGreaterThan(0)
     expect(screen.getAllByText(/Berakhlak Mulia/).length).toBeGreaterThan(0)
   })
+
+  it('shows dot indicators when multiple slides are loaded', async () => {
+    useSchoolMock.mockReturnValue({
+      data: { name: 'Nurul Hikmah School', tagline: 'Sekolah Islam Terpadu' },
+      isLoading: false,
+    })
+    apiGet.mockResolvedValue({
+      data: {
+        data: [
+          {
+            id: 1,
+            title: 'Slide Satu',
+            subtitle: 'Sub 1',
+            image: 'https://example.com/1.jpg',
+            cta_text: 'CTA',
+            cta_url: '/pmb',
+          },
+          {
+            id: 2,
+            title: 'Slide Dua',
+            subtitle: 'Sub 2',
+            image: 'https://example.com/2.jpg',
+            cta_text: 'CTA',
+            cta_url: '/kursus',
+          },
+        ],
+      },
+    })
+
+    renderWithProviders(<HeroSection />)
+
+    expect(await screen.findByRole('tablist', { name: 'Indikator slide' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Slide 1 dari 2' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Slide 2 dari 2' })).toBeInTheDocument()
+  })
 })

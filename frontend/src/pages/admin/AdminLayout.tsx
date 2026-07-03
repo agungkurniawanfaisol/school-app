@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { AdminConnectionError } from '@/components/admin/AdminConnectionError'
 import { AdminSidebarProvider, useAdminSidebar } from '@/components/admin/AdminSidebarContext'
 import { AdminHeader } from '@/components/layout/AdminHeader'
 import { AdminSidebar } from '@/components/layout/AdminSidebar'
@@ -6,8 +7,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { isGuruAllowedPath } from '@/config/admin-nav'
 import { useAuthMe } from '@/hooks/useAuth'
 import { isGuruRole } from '@/hooks/useUsers'
-import { clearAuthSession, getAuthToken, isAuthError } from '@/lib/api'
+import { clearAuthSession, getAuthToken, isAuthError, isNetworkError } from '@/lib/api'
 import { cn } from '@/lib/utils'
+import type { User } from '@/types'
 
 function AdminLayoutSkeleton() {
   return (
@@ -26,7 +28,7 @@ function AdminLayoutSkeleton() {
 
 export function AdminLayout() {
   const token = getAuthToken()
-  const { data: user, isPending, isError, error, fetchStatus } = useAuthMe()
+  const { data: user, isLoading, isError, error, refetch, isRefetching } = useAuthMe()
 
   if (!token) {
     return <Navigate to="/admin/login" replace />
@@ -37,8 +39,16 @@ export function AdminLayout() {
     return <Navigate to="/admin/login" replace />
   }
 
-  if (!user && (isPending || fetchStatus === 'fetching')) {
+  if (isError && isNetworkError(error)) {
+    return <AdminConnectionError onRetry={() => void refetch()} isRetrying={isRefetching} />
+  }
+
+  if (isLoading) {
     return <AdminLayoutSkeleton />
+  }
+
+  if (!user && isError) {
+    return <AdminConnectionError onRetry={() => void refetch()} isRetrying={isRefetching} />
   }
 
   if (!user) {
@@ -48,14 +58,13 @@ export function AdminLayout() {
 
   return (
     <AdminSidebarProvider>
-      <AdminLayoutShell />
+      <AdminLayoutShell user={user} />
     </AdminSidebarProvider>
   )
 }
 
-function AdminLayoutShell() {
+function AdminLayoutShell({ user }: { user: User }) {
   const { contentOffsetClass } = useAdminSidebar()
-  const { data: user } = useAuthMe()
   const { pathname } = useLocation()
 
   if (user && isGuruRole(user.role) && !isGuruAllowedPath(pathname)) {

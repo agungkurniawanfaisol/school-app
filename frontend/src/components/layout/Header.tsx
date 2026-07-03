@@ -65,6 +65,7 @@ export function Header() {
             logo={school?.logo}
             alt={school?.name ?? 'Nurul Hikmah'}
             variant="header"
+            className={cn(isHeroOverlay && 'drop-shadow-md')}
           />
         </Link>
 
@@ -137,14 +138,14 @@ export function Header() {
               <nav className="mt-6 flex flex-col gap-4" aria-label="Navigasi mobile">
                 <MobileNavTree isHome={isHome} onNavigate={() => setOpen(false)} />
                 <div className="flex flex-col gap-2 border-t border-border pt-4">
-                  <Button asChild variant="outline" className="w-full">
+                  <Button asChild variant="outline" className="min-h-11 w-full">
                     <Link to="/admin/login" onClick={() => setOpen(false)}>
                       <LogIn className="h-4 w-4" />
                       Login Admin
                     </Link>
                   </Button>
                   {school?.whatsapp && (
-                    <Button asChild variant="outline" className="w-full">
+                    <Button asChild variant="outline" className="min-h-11 w-full">
                       <a
                         href={`https://wa.me/${school.whatsapp.replace(/\D/g, '')}`}
                         target="_blank"

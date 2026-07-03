@@ -86,6 +86,7 @@ export interface Curriculum {
   slug: string
   excerpt: string | null
   content?: string | null
+  content_json?: Record<string, unknown> | null
   icon: string | null
   thumbnail: string | null
   category: string | null
@@ -185,6 +186,8 @@ export interface News {
   is_active: boolean
   is_featured: boolean
   published_at: string | null
+  publish_ends_at?: string | null
+  display_status?: 'draft' | 'scheduled' | 'live' | 'ended' | 'archived'
   author?: NewsAuthor
   created_at: string | null
 }
@@ -352,6 +355,7 @@ export interface ListFilters {
   featured?: boolean
   school_id?: number
   status?: string
+  display_status?: string
   group?: string
   is_active?: boolean
   is_featured?: boolean

@@ -1,67 +1,73 @@
 import { Link, useParams } from 'react-router-dom'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
+import {
+  ArticleDetailLayout,
+  ArticleDetailSkeleton,
+} from '@/components/content/ArticleDetailLayout'
+import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { PageMeta } from '@/components/seo/PageMeta'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
 import { useCurriculumDetail } from '@/hooks/useCurriculums'
+import type { EditorDocument } from '@/schemas/editor'
 
 export function CurriculumPublicDetailPage() {
   const { slug } = useParams<{ slug: string }>()
-  const { data: curriculum, isLoading, isError } = useCurriculumDetail(slug ?? '')
+  const { data: program, isLoading, isError } = useCurriculumDetail(slug ?? '')
 
   if (isLoading) {
     return (
-      <div className="container-page section-padding">
-        <Skeleton className="mb-6 h-9 w-32" />
-        <Skeleton className="mb-8 h-64 w-full rounded-xl" />
-        <Skeleton className="h-40 w-full" />
-      </div>
+      <PublicPageShell>
+        <ArticleDetailSkeleton />
+      </PublicPageShell>
     )
   }
 
-  if (isError || !curriculum) {
+  if (isError || !program) {
     return (
-      <div className="container-page section-padding text-center">
-        <p className="text-muted-foreground">Kurikulum tidak ditemukan.</p>
-        <Button asChild className="mt-4">
-          <Link to="/">Kembali ke beranda</Link>
-        </Button>
-      </div>
+      <PublicPageShell>
+        <div className="container-page section-padding text-center">
+          <p className="text-muted-foreground">Program unggulan tidak ditemukan.</p>
+          <Button asChild className="mt-4 min-h-11">
+            <Link to="/program-unggulan">Kembali ke daftar program</Link>
+          </Button>
+        </div>
+      </PublicPageShell>
     )
   }
+
+  const hasRichContent = Boolean(program.content_json)
+  const hasPlainContent = Boolean(program.content?.trim())
 
   return (
-    <>
+    <PublicPageShell>
       <PageMeta
-        title={curriculum.title}
-        description={curriculum.excerpt ?? `Kurikulum ${curriculum.title} — Nurul Hikmah`}
+        title={program.title}
+        description={program.excerpt ?? `Program unggulan ${program.title} — Nurul Hikmah`}
       />
-      <article className="container-page section-padding">
-        <div className="mx-auto max-w-4xl space-y-6">
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/">← Beranda</Link>
-          </Button>
-          <div className="flex flex-wrap gap-2">
-            {curriculum.category && <Badge variant="secondary">{curriculum.category}</Badge>}
-            {curriculum.is_featured && <Badge>Unggulan</Badge>}
+      <ArticleDetailLayout
+        backHref="/program-unggulan"
+        backLabel="Program Unggulan"
+        title={program.title}
+        excerpt={program.excerpt}
+        thumbnail={program.thumbnail}
+        category={program.category}
+        readingSource={program.content ?? program.excerpt ?? ''}
+        shareTitle={program.title}
+        footer={
+          program.is_featured ? (
+            <Badge className="mt-2">Program Unggulan</Badge>
+          ) : undefined
+        }
+      >
+        {hasRichContent ? (
+          <BlockRenderer document={program.content_json as EditorDocument} />
+        ) : hasPlainContent ? (
+          <div className="prose prose-neutral max-w-none whitespace-pre-line dark:prose-invert">
+            {program.content}
           </div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{curriculum.title}</h1>
-          {curriculum.thumbnail && (
-            <img
-              src={curriculum.thumbnail}
-              alt={curriculum.title}
-              className="aspect-video w-full rounded-xl object-cover"
-            />
-          )}
-          {curriculum.excerpt && (
-            <p className="text-lg text-muted-foreground">{curriculum.excerpt}</p>
-          )}
-          {curriculum.content && (
-            <div className="prose prose-neutral max-w-none dark:prose-invert">{curriculum.content}</div>
-          )}
-        </div>
-      </article>
-    </>
+        ) : null}
+      </ArticleDetailLayout>
+    </PublicPageShell>
   )
 }

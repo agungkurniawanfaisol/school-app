@@ -4,11 +4,12 @@ import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { renderWithProviders } from '@/test/renderWithProviders'
 
 describe('AdminPageHeader', () => {
-  it('renders title, description, and create action', () => {
+  it('renders title, description, total badge, and create action', () => {
     renderWithProviders(
       <AdminPageHeader
         title="Hero Slider"
         description="Kelola banner beranda"
+        totalCount={12}
         createHref="/admin/hero-sliders/create"
         createLabel="Tambah Slider"
       />,
@@ -16,6 +17,7 @@ describe('AdminPageHeader', () => {
 
     expect(screen.getByRole('heading', { name: 'Hero Slider' })).toBeInTheDocument()
     expect(screen.getByText('Kelola banner beranda')).toBeInTheDocument()
+    expect(screen.getByText('12 item')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Tambah Slider' })).toHaveAttribute(
       'href',
       '/admin/hero-sliders/create',

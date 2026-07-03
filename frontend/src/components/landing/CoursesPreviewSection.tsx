@@ -24,7 +24,7 @@ export function CoursesPreviewSection() {
             align="left"
             className="mb-0"
           />
-          <Button asChild className="shrink-0 shadow-md shadow-primary/20">
+          <Button asChild className="min-h-11 shrink-0 shadow-md shadow-primary/20">
             <Link to="/kursus">
               Lihat Katalog Kursus
               <ArrowRight className="h-4 w-4" />
@@ -42,12 +42,12 @@ export function CoursesPreviewSection() {
           <p className="text-center text-muted-foreground">Belum ada kursus tersedia.</p>
         ) : (
           <StaggerChildren
-            className={`-mx-4 flex gap-4 overflow-x-auto px-4 pb-2 scrollbar-thin sm:-mx-6 sm:px-6 ${isFetching ? 'opacity-70' : ''}`}
+            className={`-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 scrollbar-thin sm:-mx-6 sm:px-6 ${isFetching ? 'opacity-70' : ''}`}
           >
             {courses.map((course) => {
               const isFree = course.price === 0
               return (
-                <StaggerItem key={course.id} className="w-72 shrink-0 sm:w-80">
+                <StaggerItem key={course.id} className="w-72 shrink-0 snap-start sm:w-80">
                   <Card className="card-hover h-full overflow-hidden border-primary/10">
                   <div className="relative">
                     {course.thumbnail ? (

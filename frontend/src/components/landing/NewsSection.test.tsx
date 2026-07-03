@@ -35,4 +35,16 @@ describe('NewsSection', () => {
 
     expect(screen.getByText('Belum ada berita.')).toBeInTheDocument()
   })
+
+  it('links to full news catalog', () => {
+    useNewsListMock.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      isFetching: false,
+    })
+
+    renderWithProviders(<NewsSection />)
+
+    expect(screen.getByRole('link', { name: /Semua Berita/i })).toHaveAttribute('href', '/berita')
+  })
 })

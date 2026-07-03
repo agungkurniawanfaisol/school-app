@@ -23,7 +23,11 @@ describe('main-nav', () => {
 
   it('identifies internal routes', () => {
     expect(isInternalRoute('/kursus')).toBe(true)
+    expect(isInternalRoute('/program-unggulan')).toBe(true)
+    expect(isInternalRoute('/fasilitas')).toBe(true)
     expect(isInternalRoute('/pmb/daftar')).toBe(true)
+    expect(isInternalRoute('/berita')).toBe(true)
+    expect(isInternalRoute('/kegiatan')).toBe(true)
     expect(isInternalRoute('/#berita')).toBe(false)
   })
 })

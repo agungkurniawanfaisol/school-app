@@ -9,6 +9,10 @@ vi.mock('@/hooks/useTeachers', () => ({
   useTeachersList: () => useTeachersListMock(),
 }))
 
+vi.mock('@/components/layout/PublicPageShell', () => ({
+  PublicPageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}))
+
 describe('TeachersCatalogPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()

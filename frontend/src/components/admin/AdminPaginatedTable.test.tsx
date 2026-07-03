@@ -28,6 +28,7 @@ describe('AdminPaginatedTable', () => {
 
     expect(screen.getAllByText('Berita Pertama').length).toBeGreaterThan(0)
     expect(screen.getByRole('heading', { name: 'Daftar Berita' })).toBeInTheDocument()
+    expect(screen.getByText('1 item')).toBeInTheDocument()
     expect(screen.getAllByTestId('admin-card-list').length).toBeGreaterThanOrEqual(1)
   })
 

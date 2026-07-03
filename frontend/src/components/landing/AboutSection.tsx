@@ -46,7 +46,7 @@ export function AboutSection() {
             <div className="group relative">
               <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/10 to-[var(--gold-accent)]/10 opacity-60 transition-opacity group-hover:opacity-100" aria-hidden />
               <div className="relative overflow-hidden rounded-2xl border-2 border-primary/15 bg-secondary/40 shadow-lg shadow-primary/5">
-                <div className="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-secondary to-accent/50 transition-transform duration-500 group-hover:scale-[1.02]">
+                <div className="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-secondary to-accent/50 p-4 transition-transform duration-500 group-hover:scale-[1.02] sm:p-6">
                   <SchoolLogo
                     logo={school?.logo}
                     alt={school?.name ?? 'Nurul Hikmah'}

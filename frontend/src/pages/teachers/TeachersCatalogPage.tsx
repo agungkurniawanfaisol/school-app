@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
+import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { PageMeta } from '@/components/seo/PageMeta'
 import { TeacherAvatar } from '@/components/teachers/TeacherAvatar'
 import { Badge } from '@/components/ui/badge'
@@ -17,7 +18,7 @@ export function TeachersCatalogPage() {
   const teachers = data?.data ?? []
 
   return (
-    <>
+    <PublicPageShell>
       <PageMeta
         title="Guru & Tenaga Pendidik"
         description="Kenali tim pengajar profesional Sekolah Islam Nurul Hikmah."
@@ -25,8 +26,8 @@ export function TeachersCatalogPage() {
       <div className="container-page section-padding">
         <div className="mx-auto max-w-6xl space-y-8">
           <div className="space-y-2 text-center">
-            <Button asChild variant="ghost" size="sm" className="mb-2">
-              <Link to="/#guru">← Kembali ke beranda</Link>
+            <Button asChild variant="ghost" size="sm" className="mb-2 min-h-11">
+              <Link to="/">← Kembali ke beranda</Link>
             </Button>
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Guru & Tenaga Pendidik</h1>
             <p className="mx-auto max-w-2xl text-muted-foreground">
@@ -59,12 +60,12 @@ export function TeachersCatalogPage() {
                 <Link
                   key={teacher.id}
                   to={`/guru/${teacher.slug}`}
-                  className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="group block touch-manipulation rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <Card className="card-hover overflow-hidden border-primary/10">
                     <div className="relative aspect-[3/4] overflow-hidden bg-muted">
                       <TeacherAvatar teacher={teacher} className="h-full w-full rounded-none text-4xl" />
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary/90 via-primary/60 to-transparent p-4 pt-16 text-primary-foreground">
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary/90 via-primary/60 to-transparent p-4 pt-16 text-primary-foreground md:opacity-0 md:transition-opacity md:group-hover:opacity-100 md:group-focus-visible:opacity-100">
                         <p className="font-semibold">{teacher.name}</p>
                         {teacher.subject && (
                           <p className="text-sm text-primary-foreground/85">{teacher.subject}</p>
@@ -74,11 +75,12 @@ export function TeachersCatalogPage() {
                         <Badge className="absolute left-2 top-2">Unggulan</Badge>
                       )}
                     </div>
-                    {teacher.title && (
-                      <CardContent className="py-3 text-center text-xs text-muted-foreground group-hover:text-primary">
-                        {teacher.title}
-                      </CardContent>
-                    )}
+                    <CardContent className="border-t border-primary/10 py-3 text-center md:border-t-0">
+                      <p className="font-medium text-foreground md:hidden">{teacher.name}</p>
+                      {teacher.title && (
+                        <p className="text-xs text-muted-foreground md:group-hover:text-primary">{teacher.title}</p>
+                      )}
+                    </CardContent>
                   </Card>
                 </Link>
               ))}
@@ -86,6 +88,6 @@ export function TeachersCatalogPage() {
           )}
         </div>
       </div>
-    </>
+    </PublicPageShell>
   )
 }

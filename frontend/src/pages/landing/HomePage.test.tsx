@@ -19,8 +19,8 @@ vi.mock('@/components/landing/AboutSection', () => ({
   AboutSection: () => <section data-testid="about">About</section>,
 }))
 
-vi.mock('@/components/landing/CurriculumSection', () => ({
-  CurriculumSection: () => <section data-testid="curriculum">Curriculum</section>,
+vi.mock('@/components/landing/FeaturedProgramsSection', () => ({
+  FeaturedProgramsSection: () => <section data-testid="featured-programs">Featured Programs</section>,
 }))
 
 vi.mock('@/components/landing/TeachersSection', () => ({
@@ -66,7 +66,7 @@ describe('HomePage', () => {
     expect(screen.getByTestId('header')).toBeInTheDocument()
     expect(screen.getByTestId('hero')).toBeInTheDocument()
     expect(screen.getByTestId('about')).toBeInTheDocument()
-    expect(screen.getByTestId('curriculum')).toBeInTheDocument()
+    expect(screen.getByTestId('featured-programs')).toBeInTheDocument()
     expect(screen.getByTestId('teachers')).toBeInTheDocument()
     expect(screen.getByTestId('activities')).toBeInTheDocument()
     expect(screen.getByTestId('facilities')).toBeInTheDocument()

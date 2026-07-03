@@ -101,12 +101,12 @@ export function AdminFacilitiesListPage() {
         ]}
         rowActions={(item) => (
           <div className="flex flex-wrap justify-end gap-1">
-            <Button asChild size="sm" variant="ghost" className="h-9">
+            <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
               <Link to={`/admin/facilities/${item.uuid}/edit`} aria-label={`Edit ${item.name}`}>
                 <Pencil className="h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild size="sm" variant="ghost" className="h-9">
+            <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
               <Link
                 to={`/admin/facilities/${item.uuid}/preview`}
                 target="_blank"
@@ -120,7 +120,7 @@ export function AdminFacilitiesListPage() {
               type="button"
               size="sm"
               variant="ghost"
-              className="h-9 text-destructive hover:text-destructive"
+              className="min-h-11 min-w-11 text-destructive hover:text-destructive"
               aria-label={`Hapus ${item.name}`}
               onClick={() => setDeleteTarget(item)}
             >

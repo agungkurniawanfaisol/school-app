@@ -4,7 +4,7 @@ import { AboutSection } from '@/components/landing/AboutSection'
 import { ActivitiesSection } from '@/components/landing/ActivitiesSection'
 import { ContactSection } from '@/components/landing/ContactSection'
 import { CoursesPreviewSection } from '@/components/landing/CoursesPreviewSection'
-import { CurriculumSection } from '@/components/landing/CurriculumSection'
+import { FeaturedProgramsSection } from '@/components/landing/FeaturedProgramsSection'
 import { FacilitiesSection } from '@/components/landing/FacilitiesSection'
 import { HeroSection } from '@/components/landing/HeroSection'
 import { NewsSection } from '@/components/landing/NewsSection'
@@ -22,7 +22,7 @@ export function HomePage() {
         <SectionDivider />
         <AboutSection />
         <SectionDivider />
-        <CurriculumSection />
+        <FeaturedProgramsSection />
         <SectionDivider />
         <TeachersSection />
         <SectionDivider />

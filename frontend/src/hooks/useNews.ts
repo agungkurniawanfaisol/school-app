@@ -136,8 +136,15 @@ export function useDeleteNews() {
 export function usePublishNews() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (uuid: string) => {
-      const { data } = await api.patch<ApiResponse<News>>(`/admin/news/${uuid}/publish`)
+    mutationFn: async ({
+      uuid,
+      ...payload
+    }: {
+      uuid: string
+      published_at?: string | null
+      publish_ends_at?: string | null
+    }) => {
+      const { data } = await api.patch<ApiResponse<News>>(`/admin/news/${uuid}/publish`, payload)
       return data.data
     },
     onSuccess: () => {

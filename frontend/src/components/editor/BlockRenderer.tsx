@@ -1,6 +1,7 @@
 import { generateHTML } from '@tiptap/html'
 import type { JSONContent } from '@tiptap/core'
 import { rendererExtensions } from '@/components/editor/extensions'
+import { sanitizeRichHtml } from '@/lib/sanitizeRichHtml'
 import { EMPTY_EDITOR_DOC, parseEditorDocument } from '@/schemas/editor'
 import type { EditorDocument } from '@/schemas/editor'
 
@@ -10,22 +11,37 @@ interface BlockRendererProps {
   className?: string
 }
 
+function resolveHtml(
+  contentJson?: EditorDocument | Record<string, unknown> | null,
+  contentHtml?: string | null,
+): string {
+  if (contentHtml?.trim()) {
+    return contentHtml
+  }
+
+  if (!contentJson) {
+    return ''
+  }
+
+  const doc = parseEditorDocument(contentJson)
+  if (!doc.content?.length) {
+    return ''
+  }
+
+  try {
+    return generateHTML(doc as JSONContent, rendererExtensions)
+  } catch {
+    return ''
+  }
+}
+
 export function BlockRenderer({ contentJson, contentHtml, className }: BlockRendererProps) {
-  if (!contentJson && !contentHtml) {
+  const rawHtml = resolveHtml(contentJson, contentHtml)
+  if (!rawHtml) {
     return <p className="text-muted-foreground">Konten belum tersedia.</p>
   }
 
-  const doc = contentJson ? parseEditorDocument(contentJson) : EMPTY_EDITOR_DOC
-
-  let html = contentHtml ?? ''
-  if (!html && doc.content?.length) {
-    try {
-      html = generateHTML(doc as JSONContent, rendererExtensions)
-    } catch {
-      html = ''
-    }
-  }
-
+  const html = sanitizeRichHtml(rawHtml)
   if (!html) {
     return <p className="text-muted-foreground">Konten belum tersedia.</p>
   }

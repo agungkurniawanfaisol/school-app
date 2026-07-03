@@ -23,7 +23,7 @@ function AdminSidebarRail() {
       <div className="admin-sidebar-pattern pointer-events-none absolute inset-0" aria-hidden />
 
       <div className="relative mb-3 flex size-10 items-center justify-center rounded-xl border border-[rgb(255_255_255/0.15)] bg-[rgb(255_255_255/0.1)] p-1.5">
-        <SchoolLogo alt="Nurul Hikmah" variant="sidebar" className="max-h-6 brightness-0 invert" />
+        <SchoolLogo alt="Nurul Hikmah" variant="sidebar" />
       </div>
 
       <Button

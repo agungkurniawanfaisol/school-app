@@ -36,7 +36,7 @@ export function AdminFormShell({
   return (
     <div className={cn('admin-page admin-fade-in', className)}>
       <div className="mb-6 space-y-3">
-        <Button asChild variant="ghost" size="sm" className="gap-2 px-0 hover:bg-transparent">
+        <Button asChild variant="ghost" size="sm" className="min-h-11 gap-2 px-0 hover:bg-transparent">
           <Link to={backHref}>
             <ArrowLeft className="h-4 w-4" aria-hidden />
             {backLabel}
@@ -51,16 +51,27 @@ export function AdminFormShell({
       <div className="space-y-6">{children}</div>
 
       {(onSubmit || onCancel) && (
-        <div className="admin-form-footer mt-8">
+        <div className="admin-form-footer mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           {footerExtra}
-          <div className="ml-auto flex flex-wrap gap-2">
+          <div className="ml-auto flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
             {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isSubmitting}
+                className="min-h-11 w-full sm:w-auto"
+              >
                 Batal
               </Button>
             )}
             {onSubmit && (
-              <Button type="button" onClick={onSubmit} disabled={isSubmitting || isDisabled}>
+              <Button
+                type="button"
+                onClick={onSubmit}
+                disabled={isSubmitting || isDisabled}
+                className="min-h-11 w-full sm:w-auto"
+              >
                 {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
                 {submitLabel}
               </Button>

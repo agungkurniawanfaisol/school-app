@@ -43,7 +43,7 @@ export function AdminHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-primary/15 bg-background/90 px-4 shadow-sm shadow-primary/5 backdrop-blur-md supports-[backdrop-filter]:bg-background/75 lg:h-16 lg:px-6">
+    <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-primary/15 bg-background/95 px-4 shadow-sm shadow-primary/5 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 lg:h-16 lg:px-6">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
           <Button

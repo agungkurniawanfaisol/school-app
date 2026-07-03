@@ -3,10 +3,11 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { StaggerChildren, StaggerItem } from '@/components/motion'
 import { Button } from '@/components/ui/button'
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
+import { Carousel, CarouselContent, CarouselDots, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CountUp } from '@/components/landing/CountUp'
 import { IslamicPattern } from '@/components/landing/IslamicPattern'
+import { useCarouselAutoplayPlugins } from '@/hooks/useCarouselAutoplay'
 import { api } from '@/lib/api'
 import { queryConfig } from '@/hooks/queryConfig'
 import { useSchool } from '@/hooks/useSchool'
@@ -54,6 +55,8 @@ export function HeroSection() {
         } as HeroSlider,
       ]
 
+  const autoplayPlugins = useCarouselAutoplayPlugins(slides.length)
+
   if (isLoading) {
     return (
       <section className="relative">
@@ -64,17 +67,16 @@ export function HeroSection() {
 
   return (
     <section className="relative overflow-hidden">
-      <Carousel className="w-full">
-        <CarouselContent>
+      <Carousel className="w-full" opts={{ loop: true, align: 'start' }} plugins={autoplayPlugins}>
+        <CarouselContent className="-ml-0">
           {slides.map((slide) => (
-            <CarouselItem key={slide.id}>
+            <CarouselItem key={slide.id} className="pl-0">
               <div className="relative min-h-[75vh] lg:min-h-[90vh]">
                 {slide.image ? (
                   <img
                     src={slide.image}
-                    alt=""
+                    alt={slide.title}
                     className="absolute inset-0 h-full w-full scale-105 object-cover"
-                    aria-hidden
                   />
                 ) : (
                   <div
@@ -215,6 +217,10 @@ export function HeroSection() {
           <>
             <CarouselPrevious className="left-4 border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground backdrop-blur-sm transition-transform hover:scale-105 hover:bg-primary-foreground/25" />
             <CarouselNext className="right-4 border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground backdrop-blur-sm transition-transform hover:scale-105 hover:bg-primary-foreground/25" />
+            <CarouselDots
+              count={slides.length}
+              className="absolute bottom-20 left-1/2 z-20 -translate-x-1/2 lg:bottom-24"
+            />
           </>
         )}
       </Carousel>

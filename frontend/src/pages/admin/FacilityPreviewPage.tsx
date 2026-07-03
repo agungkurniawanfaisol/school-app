@@ -38,7 +38,7 @@ export function FacilityPreviewPage() {
           </Button>
           {facility.is_active && (
             <Button asChild variant="outline" size="sm">
-              <Link to="/#fasilitas">Lihat di beranda</Link>
+              <Link to="/fasilitas">Lihat semua fasilitas</Link>
             </Button>
           )}
         </>

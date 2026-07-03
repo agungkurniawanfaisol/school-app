@@ -11,6 +11,10 @@ vi.mock('@/hooks/useTeachers', () => ({
   useTeacherDetailByUuid: (uuid: string) => useTeacherDetailByUuidMock(uuid),
 }))
 
+vi.mock('@/components/layout/PublicPageShell', () => ({
+  PublicPageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}))
+
 const teacher = {
   id: 1,
   uuid: '00c1d94e-b90f-43a0-9f36-1fe6e59ab72b',

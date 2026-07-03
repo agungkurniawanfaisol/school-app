@@ -1,6 +1,6 @@
 import { Quote, Star } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
+import { Carousel, CarouselContent, CarouselDots, CarouselItem } from '@/components/ui/carousel'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SectionHeader } from '@/components/landing/SectionHeader'
 import { RevealOnScroll } from '@/components/landing/RevealOnScroll'
@@ -83,12 +83,7 @@ export function TestimonialsSection() {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              {items.length > 1 && (
-                <>
-                  <CarouselPrevious className="border-primary/20 hover:scale-105" />
-                  <CarouselNext className="border-primary/20 hover:scale-105" />
-                </>
-              )}
+              {items.length > 1 && <CarouselDots count={items.length} className="mt-6" />}
             </Carousel>
             </div>
           </RevealOnScroll>

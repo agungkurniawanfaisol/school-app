@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { resolveAssetUrl } from '@/lib/safe-url'
 import { cn } from '@/lib/utils'
 import type { Teacher } from '@/types'
 
@@ -14,20 +16,15 @@ const sizeClasses = {
   xl: 'h-32 w-32 text-4xl',
 } as const
 
-export function TeacherAvatar({ teacher, size = 'md', className }: TeacherAvatarProps) {
-  const sizeClass = sizeClasses[size]
-
-  if (teacher.photo) {
-    return (
-      <img
-        src={teacher.photo}
-        alt={teacher.name}
-        className={cn('shrink-0 rounded-xl object-cover', sizeClass, className)}
-        loading="lazy"
-      />
-    )
-  }
-
+function TeacherInitials({
+  name,
+  sizeClass,
+  className,
+}: {
+  name: string
+  sizeClass: string
+  className?: string
+}) {
   return (
     <div
       className={cn(
@@ -37,7 +34,27 @@ export function TeacherAvatar({ teacher, size = 'md', className }: TeacherAvatar
       )}
       aria-hidden
     >
-      {teacher.name.charAt(0).toUpperCase()}
+      {name.charAt(0).toUpperCase()}
     </div>
+  )
+}
+
+export function TeacherAvatar({ teacher, size = 'md', className }: TeacherAvatarProps) {
+  const sizeClass = sizeClasses[size]
+  const safePhoto = teacher.photo ? resolveAssetUrl(teacher.photo, '') : ''
+  const [showFallback, setShowFallback] = useState(!safePhoto)
+
+  if (showFallback) {
+    return <TeacherInitials name={teacher.name} sizeClass={sizeClass} className={className} />
+  }
+
+  return (
+    <img
+      src={safePhoto}
+      alt={teacher.name}
+      className={cn('shrink-0 rounded-xl object-cover', sizeClass, className)}
+      loading="lazy"
+      onError={() => setShowFallback(true)}
+    />
   )
 }

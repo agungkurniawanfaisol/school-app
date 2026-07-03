@@ -18,6 +18,7 @@ const newsBaseSchema = z.object({
   is_active: z.boolean().default(true),
   is_featured: z.boolean().default(false),
   published_at: z.string().optional().nullable(),
+  publish_ends_at: z.string().optional().nullable(),
   ...contentFields,
 })
 

@@ -83,9 +83,9 @@ export function useCreateCurriculum() {
     },
     onSuccess: () => {
       invalidate(queryClient)
-      toast.success('Kurikulum berhasil dibuat.')
+      toast.success('Program unggulan berhasil dibuat.')
     },
-    onError: (e) => toast.error(getApiErrorMessage(e, 'Gagal menyimpan kurikulum.')),
+    onError: (e) => toast.error(getApiErrorMessage(e, 'Gagal menyimpan program unggulan.')),
   })
 }
 
@@ -99,9 +99,9 @@ export function useUpdateCurriculum(id: number) {
     onSuccess: (data) => {
       invalidate(queryClient)
       queryClient.setQueryData(curriculumKeys.adminDetail(id), data)
-      toast.success('Kurikulum berhasil diperbarui.')
+      toast.success('Program unggulan berhasil diperbarui.')
     },
-    onError: (e) => toast.error(getApiErrorMessage(e, 'Gagal memperbarui kurikulum.')),
+    onError: (e) => toast.error(getApiErrorMessage(e, 'Gagal memperbarui program unggulan.')),
   })
 }
 
@@ -113,8 +113,8 @@ export function useDeleteCurriculum() {
     },
     onSuccess: () => {
       invalidate(queryClient)
-      toast.success('Kurikulum berhasil dihapus.')
+      toast.success('Program unggulan berhasil dihapus.')
     },
-    onError: (e) => toast.error(getApiErrorMessage(e, 'Gagal menghapus kurikulum.')),
+    onError: (e) => toast.error(getApiErrorMessage(e, 'Gagal menghapus program unggulan.')),
   })
 }

@@ -239,7 +239,7 @@ export function AdminSidebarTree({ mode = 'full', onNavigate, className }: Admin
               </AccordionTrigger>
               <AccordionContent className="space-y-0.5 border-l border-[rgb(255_255_255/0.1)] pb-1 pl-2 pt-0.5">
                 {group.children.map((item) => (
-                  <AdminNavLink key={item.href} item={item} onNavigate={onNavigate} nested />
+                  <AdminNavLink key={`${group.label}-${item.label}`} item={item} onNavigate={onNavigate} nested />
                 ))}
               </AccordionContent>
             </AccordionItem>

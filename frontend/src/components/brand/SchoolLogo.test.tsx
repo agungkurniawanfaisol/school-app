@@ -7,6 +7,7 @@ describe('SchoolLogo', () => {
     render(<SchoolLogo alt="Nurul Hikmah" />)
     const image = screen.getByRole('img', { name: 'Nurul Hikmah' })
     expect(image).toHaveAttribute('src', '/logo.png')
+    expect(image).toHaveClass('rounded-full')
   })
 
   it('renders custom school logo when provided', () => {

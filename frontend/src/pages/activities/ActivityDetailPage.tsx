@@ -1,55 +1,82 @@
 import { Link, useParams } from 'react-router-dom'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
-import { Badge } from '@/components/ui/badge'
+import { ArticleDetailLayout, ArticleDetailSkeleton } from '@/components/content/ArticleDetailLayout'
+import { RelatedContentCards } from '@/components/content/RelatedContentCards'
+import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { PageMeta } from '@/components/seo/PageMeta'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useActivityDetailByUuid } from '@/hooks/useActivities'
+import { useActivitiesList, useActivityDetailByUuid } from '@/hooks/useActivities'
 import { formatDate } from '@/lib/utils'
 
 export function ActivityDetailPage() {
   const { uuid } = useParams<{ uuid: string }>()
   const { data: activity, isLoading, isError } = useActivityDetailByUuid(uuid ?? '')
+  const { data: relatedData } = useActivitiesList({
+    per_page: 4,
+    category: activity?.category ?? undefined,
+  })
 
   if (isLoading) {
     return (
-      <div className="container-page section-padding">
-        <Skeleton className="mb-4 h-10 w-2/3" />
-        <Skeleton className="mb-8 h-64 w-full" />
-        <Skeleton className="h-40 w-full" />
-      </div>
+      <PublicPageShell>
+        <ArticleDetailSkeleton />
+      </PublicPageShell>
     )
   }
 
   if (isError || !activity) {
     return (
-      <div className="container-page section-padding text-center">
-        <p className="text-muted-foreground">Kegiatan tidak ditemukan.</p>
-        <Button asChild className="mt-4">
-          <Link to="/">Kembali ke beranda</Link>
-        </Button>
-      </div>
+      <PublicPageShell>
+        <div className="container-page section-padding text-center">
+          <h1 className="text-2xl font-bold">Kegiatan tidak ditemukan</h1>
+          <p className="mt-2 text-muted-foreground">
+            Kegiatan mungkin sudah dihapus atau tautan tidak valid.
+          </p>
+          <Button asChild className="mt-6 min-h-11">
+            <Link to="/kegiatan">Kembali ke daftar kegiatan</Link>
+          </Button>
+        </div>
+      </PublicPageShell>
     )
   }
 
+  const related = (relatedData?.data ?? [])
+    .filter((item) => item.uuid !== uuid)
+    .slice(0, 3)
+    .map((item) => ({
+      uuid: item.uuid,
+      title: item.title,
+      excerpt: item.excerpt,
+      thumbnail: item.thumbnail,
+      category: item.category,
+      dateLabel: item.activity_date ? formatDate(item.activity_date) : null,
+      href: `/kegiatan/detail/${item.uuid}`,
+    }))
+
   return (
-    <article className="container-page section-padding">
-      <div className="mx-auto max-w-4xl">
-        <Button asChild variant="ghost" size="sm" className="mb-4">
-          <Link to="/#kegiatan">← Kembali</Link>
-        </Button>
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          {activity.category && <Badge variant="secondary">{activity.category}</Badge>}
-          {activity.activity_date && (
-            <span className="text-sm text-muted-foreground">{formatDate(activity.activity_date)}</span>
-          )}
-        </div>
-        <h1 className="mb-6 text-3xl font-bold tracking-tight sm:text-4xl">{activity.title}</h1>
-        {activity.thumbnail && (
-          <img src={activity.thumbnail} alt={activity.title} className="mb-8 aspect-video w-full rounded-xl object-cover" />
-        )}
-        {activity.excerpt && <p className="mb-8 text-lg text-muted-foreground">{activity.excerpt}</p>}
+    <PublicPageShell>
+      <PageMeta title={activity.title} description={activity.excerpt ?? undefined} />
+      <ArticleDetailLayout
+        backHref="/kegiatan"
+        backLabel="Kegiatan"
+        title={activity.title}
+        excerpt={activity.excerpt}
+        thumbnail={activity.thumbnail}
+        category={activity.category}
+        dateLabel={activity.activity_date ? formatDate(activity.activity_date) : null}
+        readingSource={activity.content ?? activity.excerpt}
+        shareTitle={`Kegiatan: ${activity.title}`}
+        footer={
+          <RelatedContentCards
+            title="Kegiatan lainnya"
+            items={related}
+            viewAllHref="/kegiatan"
+            viewAllLabel="Semua kegiatan"
+          />
+        }
+      >
         <BlockRenderer contentJson={activity.content_json} contentHtml={activity.content} />
-      </div>
-    </article>
+      </ArticleDetailLayout>
+    </PublicPageShell>
   )
 }

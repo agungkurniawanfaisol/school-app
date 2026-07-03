@@ -1,14 +1,15 @@
-import { getSchoolLogo } from '@/lib/brand'
+import { useState } from 'react'
+import { getSchoolLogo, DEFAULT_SCHOOL_LOGO } from '@/lib/brand'
 import { cn } from '@/lib/utils'
 
 type SchoolLogoVariant = 'header' | 'footer' | 'about' | 'login' | 'sidebar'
 
 const variantClasses: Record<SchoolLogoVariant, string> = {
-  header: 'h-9 w-auto max-w-[9rem] object-contain sm:max-w-[11rem]',
-  footer: 'h-10 w-auto max-w-[10rem] object-contain',
-  about: 'w-full object-contain p-6 sm:p-8',
-  login: 'mx-auto h-16 w-auto max-w-[18rem] object-contain',
-  sidebar: 'h-8 w-auto max-w-[9rem] object-contain',
+  header: 'h-10 w-10 rounded-full object-cover sm:h-11 sm:w-11',
+  footer: 'h-11 w-11 rounded-full object-cover',
+  about: 'max-h-56 w-auto max-w-[min(100%,16rem)] rounded-full object-contain',
+  login: 'h-20 w-20 rounded-full object-cover sm:h-24 sm:w-24',
+  sidebar: 'h-8 w-8 rounded-full object-cover',
 }
 
 type SchoolLogoProps = {
@@ -19,11 +20,19 @@ type SchoolLogoProps = {
 }
 
 export function SchoolLogo({ logo, alt, variant = 'header', className }: SchoolLogoProps) {
+  const [src, setSrc] = useState(() => getSchoolLogo(logo))
+
   return (
     <img
-      src={getSchoolLogo(logo)}
+      src={src}
       alt={alt}
+      data-testid="school-logo"
       className={cn(variantClasses[variant], className)}
+      onError={() => {
+        if (src !== DEFAULT_SCHOOL_LOGO) {
+          setSrc(DEFAULT_SCHOOL_LOGO)
+        }
+      }}
     />
   )
 }

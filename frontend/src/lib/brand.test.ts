@@ -12,6 +12,10 @@ describe('brand', () => {
     expect(getSchoolLogo('/media/custom.png')).toBe('/media/custom.png')
   })
 
+  it('rejects unsafe logo URLs', () => {
+    expect(getSchoolLogo('javascript:alert(1)')).toBe(DEFAULT_SCHOOL_LOGO)
+  })
+
   it('returns default favicon when school favicon is empty', () => {
     expect(getSchoolFavicon(undefined)).toBe(DEFAULT_SCHOOL_FAVICON)
     expect(getSchoolFavicon('')).toBe(DEFAULT_SCHOOL_FAVICON)

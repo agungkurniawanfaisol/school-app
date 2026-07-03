@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ChevronRight, Eye, ExternalLink, Pencil, Power, Search, Star, Trash2, Users } from 'lucide-react'
+import { AdminMiniStat, AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import { TeacherAvatar } from '@/components/teachers/TeacherAvatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -86,7 +87,7 @@ function TeacherListCard({
         </Link>
 
         <div className="flex flex-wrap justify-end gap-1 border-t border-primary/10 p-2">
-          <Button asChild size="sm" variant="ghost" className="h-9">
+          <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
             <Link
               to={`/admin/teachers/${teacher.uuid}/preview`}
               target="_blank"
@@ -96,12 +97,12 @@ function TeacherListCard({
               <ExternalLink className="h-4 w-4" />
             </Link>
           </Button>
-          <Button asChild size="sm" variant="ghost" className="h-9">
+          <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
             <Link to={`/admin/teachers/${teacher.uuid}/edit`} aria-label={`Edit ${teacher.name}`}>
               <Pencil className="h-4 w-4" />
             </Link>
           </Button>
-          <Button asChild size="sm" variant="ghost" className="h-9">
+          <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
             <Link to={`/admin/teachers/${teacher.uuid}`} aria-label={`Detail ${teacher.name}`}>
               <Eye className="h-4 w-4" />
             </Link>
@@ -110,7 +111,7 @@ function TeacherListCard({
             type="button"
             size="sm"
             variant="ghost"
-            className="h-9"
+            className="min-h-11 min-w-11"
             disabled={isToggling}
             aria-label={teacher.is_active ? `Nonaktifkan ${teacher.name}` : `Aktifkan ${teacher.name}`}
             onClick={onToggleActive}
@@ -121,7 +122,7 @@ function TeacherListCard({
             type="button"
             size="sm"
             variant="ghost"
-            className="h-9 text-destructive hover:text-destructive"
+            className="min-h-11 min-w-11 text-destructive hover:text-destructive"
             aria-label={`Hapus ${teacher.name}`}
             onClick={() => onDelete(teacher)}
           >
@@ -224,103 +225,83 @@ export function AdminTeachersListPage() {
   const featuredCount = teachers.filter((t) => t.is_featured).length
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <Card className="border-primary/10 shadow-sm">
-        <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-          <div className="min-w-0">
-            <h1 className="text-xl font-bold sm:text-2xl">Kelola Guru</h1>
-            <p className="text-sm text-muted-foreground">Direktori tenaga pendidik sekolah</p>
-          </div>
-          <Button asChild className="w-full shrink-0 sm:w-auto">
-            <Link to="/admin/teachers/create">Tambah Guru</Link>
-          </Button>
-        </CardContent>
-      </Card>
+    <div className="admin-fade-in space-y-4 sm:space-y-6">
+      <AdminPageHeader
+        title="Kelola Guru"
+        description="Direktori tenaga pendidik sekolah — kelola profil, status, dan konten publik."
+        totalCount={data?.meta.total}
+        totalLabel="guru"
+        createHref="/admin/teachers/create"
+        createLabel="Tambah Guru"
+      />
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="border-primary/10">
-          <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Users className="h-5 w-5" aria-hidden />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Total Guru</p>
-              <p className="text-lg font-semibold tabular-nums">{data?.meta.total ?? '—'}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-primary/10">
-          <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-              <Users className="h-5 w-5" aria-hidden />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Aktif (halaman ini)</p>
-              <p className="text-lg font-semibold tabular-nums">{isLoading ? '—' : activeCount}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-primary/10">
-          <CardContent className="flex items-center gap-3 p-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-              <Star className="h-5 w-5" aria-hidden />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Unggulan (halaman ini)</p>
-              <p className="text-lg font-semibold tabular-nums">{isLoading ? '—' : featuredCount}</p>
-            </div>
-          </CardContent>
-        </Card>
+        <AdminMiniStat label="Total Guru" value={data?.meta.total ?? '—'} icon={Users} />
+        <AdminMiniStat
+          label="Aktif (halaman ini)"
+          value={isLoading ? '—' : activeCount}
+          icon={Users}
+          tone="success"
+        />
+        <AdminMiniStat
+          label="Unggulan (halaman ini)"
+          value={isLoading ? '—' : featuredCount}
+          icon={Star}
+          tone="gold"
+        />
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative w-full sm:max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-          <Input
-            placeholder="Cari nama atau slug guru..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value)
-              setPage(1)
-            }}
-            className="h-11 pl-9"
-            aria-label="Cari guru"
-          />
+      <div className="admin-list-panel">
+        <div className="admin-list-toolbar">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <div className="relative w-full sm:max-w-md">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+              <Input
+                placeholder="Cari nama atau slug guru..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value)
+                  setPage(1)
+                }}
+                className="h-11 pl-9"
+                aria-label="Cari guru"
+              />
+            </div>
+            <Select
+              value={statusFilter}
+              onValueChange={(v) => {
+                setStatusFilter(v as typeof statusFilter)
+                setPage(1)
+              }}
+            >
+              <SelectTrigger className="h-11 w-full sm:w-40" aria-label="Filter status">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua status</SelectItem>
+                <SelectItem value="active">Aktif</SelectItem>
+                <SelectItem value="inactive">Nonaktif</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={featuredFilter}
+              onValueChange={(v) => {
+                setFeaturedFilter(v as typeof featuredFilter)
+                setPage(1)
+              }}
+            >
+              <SelectTrigger className="h-11 w-full sm:w-44" aria-label="Filter unggulan">
+                <SelectValue placeholder="Unggulan" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua guru</SelectItem>
+                <SelectItem value="featured">Unggulan saja</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <Select
-          value={statusFilter}
-          onValueChange={(v) => {
-            setStatusFilter(v as typeof statusFilter)
-            setPage(1)
-          }}
-        >
-          <SelectTrigger className="h-11 w-full sm:w-40" aria-label="Filter status">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Semua status</SelectItem>
-            <SelectItem value="active">Aktif</SelectItem>
-            <SelectItem value="inactive">Nonaktif</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select
-          value={featuredFilter}
-          onValueChange={(v) => {
-            setFeaturedFilter(v as typeof featuredFilter)
-            setPage(1)
-          }}
-        >
-          <SelectTrigger className="h-11 w-full sm:w-44" aria-label="Filter unggulan">
-            <SelectValue placeholder="Unggulan" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Semua guru</SelectItem>
-            <SelectItem value="featured">Unggulan saja</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
-      <div className={`grid gap-4 sm:grid-cols-2 xl:grid-cols-3 ${isFetching ? 'opacity-70' : ''}`}>
+        <div className={`grid gap-4 p-4 sm:grid-cols-2 sm:p-6 xl:grid-cols-3 ${isFetching ? 'opacity-70' : ''}`}>
         {isLoading ? (
           Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} className="overflow-hidden">
@@ -358,11 +339,14 @@ export function AdminTeachersListPage() {
             </CardContent>
           </Card>
         )}
-      </div>
+        </div>
 
-      {data?.meta && (
-        <ListPagination lastPage={data.meta.last_page} page={page} onPageChange={setPage} />
-      )}
+        {data?.meta && (
+          <div className="border-t border-primary/10 px-4 py-4 sm:px-6">
+            <ListPagination lastPage={data.meta.last_page} page={page} onPageChange={setPage} />
+          </div>
+        )}
+      </div>
 
       <Dialog open={!!toggleTarget} onOpenChange={(open) => !open && setToggleTarget(null)}>
         <DialogContent>

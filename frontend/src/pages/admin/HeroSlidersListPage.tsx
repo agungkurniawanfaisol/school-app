@@ -16,8 +16,8 @@ export function HeroSlidersListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Hero Slider"
-        description="Atur slide utama halaman beranda"
+        title="Kelola Carousel Beranda"
+        description="Atur slide carousel utama halaman beranda"
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -55,7 +55,7 @@ export function HeroSlidersListPage() {
       <AdminDeleteDialog
         open={!!deleteTarget}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
-        title="Hapus hero slider?"
+        title="Hapus carousel?"
         description={`"${deleteTarget?.title}" akan dihapus permanen.`}
         onConfirm={() => {
           if (!deleteTarget) return

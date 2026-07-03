@@ -190,4 +190,77 @@ const CarouselNext = React.forwardRef<HTMLButtonElement, React.ComponentProps<ty
 )
 CarouselNext.displayName = 'CarouselNext'
 
-export { type CarouselApi, Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext }
+type CarouselDotsProps = React.HTMLAttributes<HTMLDivElement> & {
+  count: number
+}
+
+const CarouselDots = React.forwardRef<HTMLDivElement, CarouselDotsProps>(
+  ({ className, count, ...props }, ref) => {
+    const { api } = useCarousel()
+    const [selectedIndex, setSelectedIndex] = React.useState(0)
+
+    React.useEffect(() => {
+      if (!api) return
+
+      const onSelect = () => setSelectedIndex(api.selectedScrollSnap())
+      onSelect()
+      api.on('select', onSelect)
+      api.on('reInit', onSelect)
+
+      return () => {
+        api.off('select', onSelect)
+        api.off('reInit', onSelect)
+      }
+    }, [api])
+
+    if (count <= 1) {
+      return null
+    }
+
+    return (
+      <div
+        ref={ref}
+        role="tablist"
+        aria-label="Indikator slide"
+        className={cn('flex items-center justify-center gap-1', className)}
+        {...props}
+      >
+        {Array.from({ length: count }).map((_, index) => (
+          <button
+            key={index}
+            type="button"
+            role="tab"
+            aria-label={`Slide ${index + 1} dari ${count}`}
+            aria-current={selectedIndex === index ? 'true' : undefined}
+            className={cn(
+              'inline-flex h-11 w-11 items-center justify-center rounded-full',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            )}
+            onClick={() => api?.scrollTo(index)}
+          >
+            <span
+              className={cn(
+                'block h-2.5 rounded-full transition-all',
+                selectedIndex === index
+                  ? 'w-6 bg-primary-foreground'
+                  : 'w-2.5 bg-primary-foreground/40 hover:bg-primary-foreground/70',
+              )}
+            />
+          </button>
+        ))}
+      </div>
+    )
+  },
+)
+CarouselDots.displayName = 'CarouselDots'
+
+export {
+  type CarouselApi,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+  CarouselDots,
+  useCarousel,
+}

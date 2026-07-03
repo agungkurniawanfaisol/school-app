@@ -67,7 +67,7 @@ export function HeroSliderFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Hero Slider' : 'Tambah Hero Slider'}
+      title={isEdit ? 'Edit Carousel' : 'Tambah Carousel'}
       backHref="/admin/hero-sliders"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/hero-sliders')}
