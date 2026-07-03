@@ -30,6 +30,7 @@ class PublishingService
         $model->fill(array_merge([
             'status' => 'draft',
             'published_at' => null,
+            'publish_ends_at' => null,
         ], $extra));
 
         $model->save();

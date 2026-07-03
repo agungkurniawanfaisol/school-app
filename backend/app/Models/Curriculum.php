@@ -22,6 +22,7 @@ class Curriculum extends Model
         'slug',
         'excerpt',
         'content',
+        'content_json',
         'icon',
         'thumbnail',
         'category',
@@ -33,6 +34,7 @@ class Curriculum extends Model
     protected function casts(): array
     {
         return [
+            'content_json' => 'array',
             'order' => 'integer',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',

@@ -39,4 +39,35 @@ class NewsApiTest extends TestCase
 
         $this->assertInactiveHiddenFromShow('/api/v1/news', $news);
     }
+
+    public function test_scheduled_news_not_in_public_list(): void
+    {
+        News::factory()->scheduled()->create();
+        News::factory()->published()->create();
+
+        $response = $this->getJson('/api/v1/news');
+
+        $response->assertOk()->assertJsonCount(1, 'data');
+    }
+
+    public function test_ended_news_not_in_public_list_or_show(): void
+    {
+        $news = News::factory()->ended()->create();
+
+        $this->getJson('/api/v1/news')->assertOk()->assertJsonCount(0, 'data');
+        $this->getJson("/api/v1/news/{$news->slug}")->assertNotFound();
+    }
+
+    public function test_list_supports_search_and_pagination(): void
+    {
+        News::factory()->published()->create(['title' => 'Prestasi Olimpiade', 'excerpt' => 'Siswa juara nasional']);
+        News::factory()->published()->create(['title' => 'Kegiatan Ramadhan', 'excerpt' => 'Puasa bersama']);
+
+        $this->getJson('/api/v1/news?search=olimpiade&per_page=1&page=1')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.title', 'Prestasi Olimpiade')
+            ->assertJsonPath('meta.per_page', 1)
+            ->assertJsonPath('meta.total', 1);
+    }
 }

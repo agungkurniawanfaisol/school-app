@@ -19,6 +19,6 @@ class StudentActivityRepository extends BaseRepository implements RepositoryInte
 
     protected function searchableColumns(): array
     {
-        return ['title', 'slug'];
+        return ['title', 'slug', 'excerpt'];
     }
 }

@@ -25,21 +25,7 @@ class TeacherDemoSeeder extends Seeder
             ['slug' => 'pak-fajar-nugroho', 'name' => 'Pak Fajar Nugroho', 'title' => 'Guru Olahraga', 'subject' => 'PJOK', 'featured' => false],
             ['slug' => 'ustadzah-maryam-hanif', 'name' => 'Ustadzah Maryam Hanif', 'title' => 'Guru Tahfidz', 'subject' => 'Tahfidz', 'featured' => false],
             ['slug' => 'bu-rina-kartika', 'name' => 'Bu Rina Kartika, S.Pd.', 'title' => 'Guru IPS', 'subject' => 'IPS', 'featured' => false],
-            ['slug' => 'pak-doni-prasetya', 'name' => 'Pak Doni Prasetya', 'title' => 'Guru Seni Budaya', 'subject' => 'Seni Budaya', 'featured' => false],
-            ['slug' => 'ustadz-hasan-basri', 'name' => 'Ustadz Hasan Basri', 'title' => 'Guru Akidah Akhlak', 'subject' => 'Akidah Akhlak', 'featured' => false],
             ['slug' => 'bu-maya-sari', 'name' => 'Bu Maya Sari, M.Pd.', 'title' => 'Koordinator Kurikulum', 'subject' => 'Kurikulum', 'featured' => true],
-            ['slug' => 'pak-eko-widodo', 'name' => 'Pak Eko Widodo', 'title' => 'Guru Informatika', 'subject' => 'Informatika', 'featured' => false],
-            ['slug' => 'ustadzah-fatimah-az-zahra', 'name' => 'Ustadzah Fatimah Az-Zahra', 'title' => 'Guru Fiqih', 'subject' => 'Fiqih', 'featured' => false],
-            ['slug' => 'bu-larasati-indira', 'name' => 'Bu Larasati Indira', 'title' => 'Guru Bahasa Inggris', 'subject' => 'Bahasa Inggris', 'featured' => false],
-            ['slug' => 'pak-yusuf-ramadhan', 'name' => 'Pak Yusuf Ramadhan', 'title' => 'Guru Pramuka', 'subject' => 'Pramuka', 'featured' => false],
-            ['slug' => 'ustadz-ibrahim-syafei', 'name' => 'Ustadz Ibrahim Syafei', 'title' => 'Musyrif Asrama', 'subject' => 'Pembinaan Asrama', 'featured' => false],
-            ['slug' => 'bu-putri-ayu', 'name' => 'Bu Putri Ayu, S.Psi.', 'title' => 'Guru BK', 'subject' => 'Bimbingan Konseling', 'featured' => false],
-            ['slug' => 'pak-agung-saputra', 'name' => 'Pak Agung Saputra', 'title' => 'Guru TIK', 'subject' => 'Teknologi Informasi', 'featured' => false],
-            ['slug' => 'ustadzah-khadijah-rahma', 'name' => 'Ustadzah Khadijah Rahma', 'title' => 'Guru Al-Qur\'an Hadits', 'subject' => 'Al-Qur\'an Hadits', 'featured' => false],
-            ['slug' => 'bu-siska-melati', 'name' => 'Bu Siska Melati', 'title' => 'Guru Kelas 1', 'subject' => 'Kelas Awal', 'featured' => false],
-            ['slug' => 'pak-hendra-gunawan', 'name' => 'Pak Hendra Gunawan, M.Pd.', 'title' => 'Wali Kelas 9', 'subject' => 'Matematika', 'featured' => false],
-            ['slug' => 'ustadz-muhammad-hanif', 'name' => 'Ustadz Muhammad Hanif', 'title' => 'Guru Tahsin', 'subject' => 'Tahsin', 'featured' => false],
-            ['slug' => 'bu-clara-wijaya', 'name' => 'Bu Clara Wijaya', 'title' => 'Guru Seni Musik', 'subject' => 'Seni Musik', 'featured' => false],
         ];
 
         foreach ($teachers as $i => $teacher) {

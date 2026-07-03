@@ -14,7 +14,7 @@ class CurriculumRepository extends BaseRepository implements RepositoryInterface
 
     protected function defaultSelect(): array
     {
-        return ['id', 'school_id', 'title', 'slug', 'excerpt', 'content', 'icon', 'thumbnail', 'category', 'order', 'is_active', 'is_featured', 'created_at', 'updated_at'];
+        return ['id', 'school_id', 'title', 'slug', 'excerpt', 'content', 'content_json', 'icon', 'thumbnail', 'category', 'order', 'is_active', 'is_featured', 'created_at', 'updated_at'];
     }
 
     protected function searchableColumns(): array

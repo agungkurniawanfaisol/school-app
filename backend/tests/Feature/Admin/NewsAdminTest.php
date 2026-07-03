@@ -107,7 +107,61 @@ class NewsAdminTest extends TestCase
         $this->actingAsAdmin()
             ->patchJson("/api/admin/news/{$uuid}/unpublish")
             ->assertOk()
-            ->assertJsonPath('data.status', 'draft');
+            ->assertJsonPath('data.status', 'draft')
+            ->assertJsonPath('data.published_at', null)
+            ->assertJsonPath('data.publish_ends_at', null);
+    }
+
+    public function test_admin_can_publish_with_schedule(): void
+    {
+        $payload = $this->validPayload();
+        $payload['status'] = 'draft';
+        $payload['published_at'] = null;
+
+        $uuid = $this->assertAdminStoreSuccessUuid(self::RESOURCE, $payload);
+
+        $starts = now()->addDay()->startOfMinute();
+        $ends = now()->addDays(7)->startOfMinute();
+
+        $this->actingAsAdmin()
+            ->patchJson("/api/admin/news/{$uuid}/publish", [
+                'published_at' => $starts->toIso8601String(),
+                'publish_ends_at' => $ends->toIso8601String(),
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'published')
+            ->assertJsonPath('data.display_status', 'scheduled');
+    }
+
+    public function test_publish_rejects_invalid_schedule_range(): void
+    {
+        $payload = $this->validPayload();
+        $payload['status'] = 'draft';
+        $payload['published_at'] = null;
+
+        $uuid = $this->assertAdminStoreSuccessUuid(self::RESOURCE, $payload);
+
+        $this->actingAsAdmin()
+            ->patchJson("/api/admin/news/{$uuid}/publish", [
+                'published_at' => now()->addDay()->toIso8601String(),
+                'publish_ends_at' => now()->toIso8601String(),
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['publish_ends_at']);
+    }
+
+    public function test_admin_can_filter_by_display_status(): void
+    {
+        $school = $this->createSchool();
+        News::factory()->create(['school_id' => $school->id, 'status' => 'draft']);
+        News::factory()->scheduled()->create(['school_id' => $school->id]);
+        News::factory()->published()->create(['school_id' => $school->id]);
+        News::factory()->ended()->create(['school_id' => $school->id]);
+
+        $this->actingAsAdmin()
+            ->getJson('/api/admin/news?display_status=live')
+            ->assertOk()
+            ->assertJsonCount(1, 'data');
     }
 
     public function test_published_news_appears_in_public_api_after_admin_create(): void
@@ -139,5 +193,22 @@ class NewsAdminTest extends TestCase
 
         $this->getJson("/api/v1/news/uuid/{$news->uuid}")
             ->assertNotFound();
+    }
+
+    public function test_store_sanitizes_malicious_html_content(): void
+    {
+        $payload = $this->validPayload();
+        $payload['content'] = '<p>Aman</p><script>alert("xss")</script>';
+        $payload['thumbnail'] = 'javascript:alert(1)';
+
+        $response = $this->actingAsAdmin()
+            ->postJson('/api/admin/news', $payload)
+            ->assertCreated();
+
+        $news = News::query()->where('uuid', $response->json('data.uuid'))->firstOrFail();
+
+        $this->assertStringNotContainsString('<script>', (string) $news->content);
+        $this->assertStringContainsString('Aman', (string) $news->content);
+        $this->assertNull($news->thumbnail);
     }
 }

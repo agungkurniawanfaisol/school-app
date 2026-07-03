@@ -45,6 +45,7 @@ class NewsFactory extends Factory
         return $this->state(fn () => [
             'status' => 'draft',
             'published_at' => null,
+            'publish_ends_at' => null,
         ]);
     }
 
@@ -53,6 +54,27 @@ class NewsFactory extends Factory
         return $this->state(fn () => [
             'status' => 'published',
             'published_at' => now()->subDay(),
+            'publish_ends_at' => null,
+            'is_active' => true,
+        ]);
+    }
+
+    public function scheduled(): static
+    {
+        return $this->state(fn () => [
+            'status' => 'published',
+            'published_at' => now()->addDay(),
+            'publish_ends_at' => null,
+            'is_active' => true,
+        ]);
+    }
+
+    public function ended(): static
+    {
+        return $this->state(fn () => [
+            'status' => 'published',
+            'published_at' => now()->subDays(3),
+            'publish_ends_at' => now()->subDay(),
             'is_active' => true,
         ]);
     }

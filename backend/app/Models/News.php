@@ -30,17 +30,35 @@ class News extends Model
         'is_active',
         'is_featured',
         'published_at',
+        'publish_ends_at',
     ];
 
     protected function casts(): array
     {
         return [
             'published_at' => 'datetime',
+            'publish_ends_at' => 'datetime',
             'order' => 'integer',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'content_json' => 'array',
         ];
+    }
+
+    public function resolveDisplayStatus(): string
+    {
+        return \App\Support\NewsPublishSchedule::resolveDisplayStatus($this);
+    }
+
+    public function scopePublished(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->where(function (\Illuminate\Database\Eloquent\Builder $q) {
+                $q->whereNull('publish_ends_at')
+                    ->orWhere('publish_ends_at', '>', now());
+            });
     }
 
     public function school(): BelongsTo

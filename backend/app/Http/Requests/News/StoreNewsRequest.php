@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests\News;
 
-use App\Http\Requests\AdminFormRequest;
+use App\Http\Requests\RichContentAdminRequest;
+use App\Rules\SafeMediaUrl;
 
-class StoreNewsRequest extends AdminFormRequest
+class StoreNewsRequest extends RichContentAdminRequest
 {
+    use ValidatesNewsPublishSchedule;
+
     public function rules(): array
     {
         return [
@@ -16,27 +19,21 @@ class StoreNewsRequest extends AdminFormRequest
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['nullable', 'string', 'required_without:content_json'],
             'content_json' => ['nullable', 'array', 'required_without:content'],
-            'thumbnail' => ['nullable', 'string', 'max:500'],
+            'thumbnail' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
             'category' => ['nullable', 'string', 'max:100'],
             'status' => ['sometimes', 'string', 'in:draft,published,archived'],
             'order' => ['sometimes', 'integer', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
             'is_featured' => ['sometimes', 'boolean'],
             'published_at' => ['nullable', 'date'],
+            'publish_ends_at' => ['nullable', 'date', 'after:published_at'],
         ];
-    }
-
-    protected function prepareForValidation(): void
-    {
-        if ($this->has('content_json') && is_string($this->content_json)) {
-            $this->merge([
-                'content_json' => json_decode($this->content_json, true),
-            ]);
-        }
     }
 
     public function messages(): array
     {
-        return $this->commonMessages();
+        return array_merge($this->commonMessages(), [
+            'publish_ends_at.after' => 'Waktu berakhir harus setelah waktu mulai.',
+        ]);
     }
 }

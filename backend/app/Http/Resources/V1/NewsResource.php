@@ -31,6 +31,14 @@ class NewsResource extends JsonResource
             'is_active' => $this->is_active,
             'is_featured' => $this->is_featured,
             'published_at' => $this->published_at?->toIso8601String(),
+            'publish_ends_at' => $this->when(
+                $this->isAdminRequest($request),
+                $this->publish_ends_at?->toIso8601String(),
+            ),
+            'display_status' => $this->when(
+                $this->isAdminRequest($request),
+                $this->resource->resolveDisplayStatus(),
+            ),
             'author' => $this->whenLoaded('author', fn () => [
                 'id' => $this->author->id,
                 'name' => $this->author->name,

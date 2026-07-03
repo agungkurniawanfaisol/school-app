@@ -19,6 +19,7 @@ trait ExposesRichContent
             || $request->routeIs('v1.student-activities.showBySlug')
             || $request->routeIs('v1.student-activities.showByUuid')
             || $request->routeIs('v1.facilities.showBySlug')
+            || $request->routeIs('v1.curriculums.showBySlug')
             || $request->routeIs('v1.teachers.showBySlug')
             || $request->routeIs('v1.teachers.showByUuid');
     }

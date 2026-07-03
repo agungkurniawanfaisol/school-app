@@ -17,10 +17,14 @@ use App\Models\Setting;
 use App\Models\StudentActivity;
 use App\Models\Testimonial;
 use App\Models\User;
+use Database\Seeders\Concerns\SeedsActivityRichContent;
+use Database\Seeders\Concerns\SeedsNewsRichContent;
 use Illuminate\Database\Seeder;
 
 class DemoContentSeeder extends Seeder
 {
+    use SeedsActivityRichContent;
+    use SeedsNewsRichContent;
     public function run(): void
     {
         $school = School::query()->where('slug', 'nurul-hikmah')->firstOrFail();
@@ -44,6 +48,7 @@ class DemoContentSeeder extends Seeder
             [
                 'title' => 'Selamat Datang di Nurul Hikmah',
                 'subtitle' => 'Membentuk Generasi Qurani & Berakhlak Mulia',
+                'image' => 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1600&q=80',
                 'cta_text' => 'Daftar PMB',
                 'cta_url' => '/pmb/daftar',
                 'order' => 1,
@@ -51,6 +56,7 @@ class DemoContentSeeder extends Seeder
             [
                 'title' => 'Program Tahfidz Terstruktur',
                 'subtitle' => 'Bimbingan hafalan Al-Qur\'an dengan metode terbukti',
+                'image' => 'https://images.unsplash.com/photo-1609599006353-e6aa9f3f5b4a?w=1600&q=80',
                 'cta_text' => 'Pelajari Kurikulum',
                 'cta_url' => '/#kurikulum',
                 'order' => 2,
@@ -58,6 +64,7 @@ class DemoContentSeeder extends Seeder
             [
                 'title' => 'Kursus Online untuk Siswa',
                 'subtitle' => 'Belajar kapan saja melalui platform e-learning sekolah',
+                'image' => 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1600&q=80',
                 'cta_text' => 'Lihat Kursus',
                 'cta_url' => '/kursus',
                 'order' => 3,
@@ -69,7 +76,6 @@ class DemoContentSeeder extends Seeder
                 ['school_id' => $school->id, 'title' => $slide['title']],
                 [
                     ...$slide,
-                    'image' => '/logo.png',
                     'is_active' => true,
                 ],
             );
@@ -117,6 +123,66 @@ class DemoContentSeeder extends Seeder
                 'icon' => 'languages',
                 'category' => 'bahasa',
                 'order' => 4,
+                'is_featured' => true,
+            ],
+            [
+                'slug' => 'kurikulum-steam-robotik',
+                'title' => 'STEAM & Robotik',
+                'excerpt' => 'Sains, teknologi, dan coding untuk siswa kreatif.',
+                'content' => 'Laboratorium robotik, proyek Arduino, dan kompetisi sains tingkat sekolah hingga kota.',
+                'icon' => 'cpu',
+                'category' => 'teknologi',
+                'order' => 5,
+                'is_featured' => true,
+            ],
+            [
+                'slug' => 'kurikulum-amal-sosial',
+                'title' => 'Program AMAL Sosial',
+                'excerpt' => 'Akhlak, Ilmu, Amal — peduli sesama.',
+                'content' => 'Bakti sosial, zakat siswa, dan program adopsi lingkungan sekitar sekolah.',
+                'icon' => 'hand-heart',
+                'category' => 'sosial',
+                'order' => 6,
+                'is_featured' => true,
+            ],
+            [
+                'slug' => 'kurikulum-ekstrakurikuler',
+                'title' => 'Ekstrakurikuler Unggulan',
+                'excerpt' => 'Pramuka, seni, olahraga, dan paduan suara.',
+                'content' => 'Lebih dari 15 ekstrakurikuler dengan pembina berpengalaman dan jadwal terstruktur.',
+                'icon' => 'sparkles',
+                'category' => 'ekskur',
+                'order' => 7,
+                'is_featured' => false,
+            ],
+            [
+                'slug' => 'kurikulum-literasi-digital',
+                'title' => 'Literasi Digital',
+                'excerpt' => 'Cerdas ber-IT dengan etika digital.',
+                'content' => 'Pembelajaran coding dasar, keamanan siber, dan produksi konten positif.',
+                'icon' => 'monitor',
+                'category' => 'teknologi',
+                'order' => 8,
+                'is_featured' => false,
+            ],
+            [
+                'slug' => 'kurikulum-kepemimpinan',
+                'title' => 'Kepemimpinan Siswa',
+                'excerpt' => 'OSIS, MPK, dan duta sekolah.',
+                'content' => 'Pelatihan public speaking, manajemen acara, dan representasi sekolah di forum eksternal.',
+                'icon' => 'users',
+                'category' => 'kepemimpinan',
+                'order' => 9,
+                'is_featured' => false,
+            ],
+            [
+                'slug' => 'kurikulum-parenting',
+                'title' => 'Parenting School Partnership',
+                'excerpt' => 'Kolaborasi aktif sekolah dan orang tua.',
+                'content' => 'Workshop parenting, konsultasi BK, dan laporan perkembangan anak berkala.',
+                'icon' => 'home',
+                'category' => 'orang-tua',
+                'order' => 10,
                 'is_featured' => false,
             ],
         ];
@@ -135,11 +201,13 @@ class DemoContentSeeder extends Seeder
 
     private function seedActivities(School $school): void
     {
+        $richProfiles = $this->activityRichProfiles();
+
         $activities = [
             [
                 'slug' => 'lomba-tahfidz-2026',
                 'title' => 'Lomba Tahfidz Sekolah 2026',
-                'excerpt' => 'Kompetisi hafalan antar kelas tingkat SD dan SMP.',
+                'excerpt' => 'Gemuruh tilawah memenuhi aula — 126 peserta bersaing dalam 4 kategori hafalan.',
                 'category' => 'akademik',
                 'days_ago' => 7,
                 'featured' => true,
@@ -147,7 +215,7 @@ class DemoContentSeeder extends Seeder
             [
                 'slug' => 'bakti-sosial-ramadhan',
                 'title' => 'Bakti Sosial Ramadhan',
-                'excerpt' => 'Siswa menyalurkan sembako ke warga sekitar sekolah.',
+                'excerpt' => '250 paket sembako & berbuka disalurkan siswa ke warga sekitar dalam semangat berbagi.',
                 'category' => 'sosial',
                 'days_ago' => 21,
                 'featured' => true,
@@ -155,7 +223,7 @@ class DemoContentSeeder extends Seeder
             [
                 'slug' => 'study-tour-museum',
                 'title' => 'Study Tour Museum Nasional',
-                'excerpt' => 'Kunjungan edukatif kelas 5 untuk memperkaya wawasan sejarah.',
+                'excerpt' => 'Kelas 5 menjelajah sejarah Nusantara lewat artefak, workshop, dan petualangan interaktif.',
                 'category' => 'ekskur',
                 'days_ago' => 35,
                 'featured' => false,
@@ -163,7 +231,7 @@ class DemoContentSeeder extends Seeder
             [
                 'slug' => 'festival-seni-islam',
                 'title' => 'Festival Seni Islam',
-                'excerpt' => 'Pentas nasyid, kaligrafi, dan pidato bahasa Arab.',
+                'excerpt' => 'Panggung gemilang nasyid, kaligrafi, dan pidato Arab di hadapan 400+ orang tua.',
                 'category' => 'seni',
                 'days_ago' => 14,
                 'featured' => true,
@@ -171,7 +239,7 @@ class DemoContentSeeder extends Seeder
             [
                 'slug' => 'olimpiade-matematika',
                 'title' => 'Olimpiade Matematika Internal',
-                'excerpt' => 'Seleksi siswa berprestasi untuk kompetisi tingkat kota.',
+                'excerpt' => '500 siswa berkompetisi — 6 delegasi terpilih menuju olimpiade tingkat kota.',
                 'category' => 'akademik',
                 'days_ago' => 45,
                 'featured' => false,
@@ -179,24 +247,60 @@ class DemoContentSeeder extends Seeder
             [
                 'slug' => 'pramuka-persiapan-giat',
                 'title' => 'Persiapan Giat Pramuka',
-                'excerpt' => 'Latihan keterampilan kepemimpinan dan kemandirian di alam terbuka.',
+                'excerpt' => '72 pramuka penggalang latihan intensif: tenda, tali temali, dan survival di alam terbuka.',
                 'category' => 'pramuka',
                 'days_ago' => 3,
+                'featured' => false,
+            ],
+            [
+                'slug' => 'giat-pramuka-perkemahan',
+                'title' => 'Giat Pramuka Perkemahan Akhir Tahun',
+                'excerpt' => 'Perkemahan tiga hari dua malam penuh tantangan leadership dan kepedulian lingkungan.',
+                'category' => 'pramuka',
+                'days_ago' => 10,
+                'featured' => true,
+            ],
+            [
+                'slug' => 'kompetisi-kaligrafi',
+                'title' => 'Kompetisi Kaligrafi Islam',
+                'excerpt' => 'Karya kaligrafi siswa dipamerkan dalam festival seni Islam minggu ini.',
+                'category' => 'seni',
+                'days_ago' => 28,
+                'featured' => false,
+            ],
+            [
+                'slug' => 'senam-sehat-bersama',
+                'title' => 'Senam Sehat & Gizi Bersama',
+                'excerpt' => 'Seluruh warga sekolah senam pagi bersama ahli gizi untuk gaya hidup sehat.',
+                'category' => 'kesehatan',
+                'days_ago' => 2,
+                'featured' => false,
+            ],
+            [
+                'slug' => 'bakti-lingkungan-harian',
+                'title' => 'Gerakan Peduli Lingkungan Sekolah',
+                'excerpt' => 'Program Jumat bersih: daur ulang, taman hijau, dan edukasi eco-school.',
+                'category' => 'sosial',
+                'days_ago' => 1,
                 'featured' => false,
             ],
         ];
 
         foreach ($activities as $i => $activity) {
             $published = now()->subDays($activity['days_ago']);
+            $rich = $richProfiles[$activity['slug']] ?? null;
+
             StudentActivity::query()->updateOrCreate(
                 ['slug' => $activity['slug']],
                 [
                     'school_id' => $school->id,
                     'title' => $activity['title'],
                     'excerpt' => $activity['excerpt'],
-                    'content' => $activity['excerpt']."\n\nKegiatan ini melibatkan seluruh siswa dan didampingi guru pembina masing-masing unit.",
-                    'thumbnail' => null,
+                    'content' => $rich['content'] ?? null,
+                    'content_json' => $rich['content_json'] ?? null,
+                    'thumbnail' => $rich['thumbnail'] ?? null,
                     'category' => $activity['category'],
+                    'status' => 'published',
                     'activity_date' => $published->toDateString(),
                     'order' => $i + 1,
                     'is_active' => true,
@@ -210,41 +314,26 @@ class DemoContentSeeder extends Seeder
     private function seedFacilities(School $school): void
     {
         $facilities = [
-            [
-                'slug' => 'masjid-sekolah',
-                'name' => 'Masjid Nurul Hikmah',
-                'description' => 'Masjid sekolah untuk shalat berjamaah dan kegiatan keagamaan.',
-                'category' => 'ibadah',
-                'featured' => true,
-            ],
-            [
-                'slug' => 'perpustakaan',
-                'name' => 'Perpustakaan Digital',
-                'description' => 'Koleksi buku, e-book, dan ruang baca nyaman.',
-                'category' => 'akademik',
-                'featured' => true,
-            ],
-            [
-                'slug' => 'laboratorium-komputer',
-                'name' => 'Lab Komputer',
-                'description' => 'Fasilitas ICT untuk pembelajaran coding dan literasi digital.',
-                'category' => 'teknologi',
-                'featured' => false,
-            ],
-            [
-                'slug' => 'lapangan-olahraga',
-                'name' => 'Lapangan Olahraga',
-                'description' => 'Area futsal dan basket untuk kegiatan PJOK dan ekstrakurikuler.',
-                'category' => 'olahraga',
-                'featured' => true,
-            ],
-            [
-                'slug' => 'kantin-sehat',
-                'name' => 'Kantin Sehat',
-                'description' => 'Menu bergizi dengan pengawasan gizi sekolah.',
-                'category' => 'penunjang',
-                'featured' => false,
-            ],
+            ['slug' => 'masjid-sekolah', 'name' => 'Masjid Nurul Hikmah', 'description' => 'Masjid sekolah untuk shalat berjamaah dan kegiatan keagamaan.', 'category' => 'ibadah', 'featured' => true, 'image' => 'https://images.unsplash.com/photo-1609599006353-e6aa9f3f5b4a?w=1200&q=80'],
+            ['slug' => 'perpustakaan', 'name' => 'Perpustakaan Digital', 'description' => 'Koleksi buku, e-book, dan ruang baca nyaman.', 'category' => 'akademik', 'featured' => true, 'image' => 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200&q=80'],
+            ['slug' => 'laboratorium-komputer', 'name' => 'Lab Komputer', 'description' => 'Fasilitas ICT untuk pembelajaran coding dan literasi digital.', 'category' => 'teknologi', 'featured' => true, 'image' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&q=80'],
+            ['slug' => 'lapangan-olahraga', 'name' => 'Lapangan Olahraga', 'description' => 'Area futsal dan basket untuk kegiatan PJOK dan ekstrakurikuler.', 'category' => 'olahraga', 'featured' => true, 'image' => 'https://images.unsplash.com/photo-1461896836934-ffe607ba7951?w=1200&q=80'],
+            ['slug' => 'kantin-sehat', 'name' => 'Kantin Sehat', 'description' => 'Menu bergizi dengan pengawasan gizi sekolah.', 'category' => 'penunjang', 'featured' => false, 'image' => 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&q=80'],
+            ['slug' => 'ruang-tahfidz', 'name' => 'Ruang Tahfidz', 'description' => 'Ruang khusus setoran hafalan dengan akustik nyaman.', 'category' => 'ibadah', 'featured' => true, 'image' => 'https://images.unsplash.com/photo-1609599006353-e6aa9f3f5b4a?w=1200&q=80'],
+            ['slug' => 'laboratorium-ipa', 'name' => 'Laboratorium IPA', 'description' => 'Praktikum sains dengan peralatan eksperimen lengkap.', 'category' => 'akademik', 'featured' => true, 'image' => 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1200&q=80'],
+            ['slug' => 'ruang-seni-musik', 'name' => 'Ruang Seni & Musik', 'description' => 'Studio untuk paduan suara, nasyid, dan seni kaligrafi.', 'category' => 'seni', 'featured' => false, 'image' => 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&q=80'],
+            ['slug' => 'ruang-multimedia', 'name' => 'Ruang Multimedia', 'description' => 'Produksi konten edukatif dan siaran internal sekolah.', 'category' => 'teknologi', 'featured' => false, 'image' => 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&q=80'],
+            ['slug' => 'klinik-sekolah', 'name' => 'Klinik Sekolah', 'description' => 'Layanan kesehatan dasar dan UKS dengan perawat bersertifikat.', 'category' => 'kesehatan', 'featured' => false, 'image' => 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=80'],
+            ['slug' => 'ruang-bk', 'name' => 'Ruang Bimbingan Konseling', 'description' => 'Konsultasi siswa dan orang tua dengan guru BK profesional.', 'category' => 'penunjang', 'featured' => false, 'image' => 'https://images.unsplash.com/photo-1577896851231-70ef94081756?w=1200&q=80'],
+            ['slug' => 'asrama-putra', 'name' => 'Asrama Putra', 'description' => 'Pondok pesantren modern dengan pembinaan 24 jam.', 'category' => 'asrama', 'featured' => true, 'image' => 'https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80'],
+            ['slug' => 'asrama-putri', 'name' => 'Asrama Putri', 'description' => 'Asrama nyaman dengan pengawasan ustadzah dan keamanan tertutup.', 'category' => 'asrama', 'featured' => true, 'image' => 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80'],
+            ['slug' => 'ruang-pramuka', 'name' => 'Ruang Pramuka', 'description' => 'Peralatan camping, seragam, dan materi kepramukaan.', 'category' => 'ekskur', 'featured' => false, 'image' => 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200&q=80'],
+            ['slug' => 'auditorium', 'name' => 'Auditorium Serbaguna', 'description' => 'Kapasitas 500 orang untuk acara sekolah dan pertemuan orang tua.', 'category' => 'penunjang', 'featured' => true, 'image' => 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80'],
+            ['slug' => 'ruang-guru', 'name' => 'Ruang Guru & Musyawarah', 'description' => 'Ruang kerja kolaboratif tenaga pendidik dan staf.', 'category' => 'penunjang', 'featured' => false, 'image' => 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80'],
+            ['slug' => 'taman-baca', 'name' => 'Taman Baca Outdoor', 'description' => 'Area baca terbuka dengan pohon rindang dan wifi sekolah.', 'category' => 'akademik', 'featured' => false, 'image' => 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80'],
+            ['slug' => 'lapangan-futsal', 'name' => 'Lapangan Futsal', 'description' => 'Lapangan sintetis standar untuk latihan dan turnamen internal.', 'category' => 'olahraga', 'featured' => false, 'image' => 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80'],
+            ['slug' => 'ruang-robotik', 'name' => 'Lab Robotik & STEAM', 'description' => 'Proyek Arduino, LEGO robotics, dan kompetisi sains.', 'category' => 'teknologi', 'featured' => true, 'image' => 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1200&q=80'],
+            ['slug' => 'musholla-putri', 'name' => 'Musholla Putri', 'description' => 'Tempat ibadah dan kajian khusus siswi.', 'category' => 'ibadah', 'featured' => false, 'image' => 'https://images.unsplash.com/photo-1609599006353-e6aa9f3f5b4a?w=1200&q=80'],
         ];
 
         foreach ($facilities as $i => $data) {
@@ -255,7 +344,7 @@ class DemoContentSeeder extends Seeder
                     'name' => $data['name'],
                     'description' => $data['description'],
                     'category' => $data['category'],
-                    'thumbnail' => null,
+                    'thumbnail' => $data['image'],
                     'order' => $i + 1,
                     'is_active' => true,
                     'is_featured' => $data['featured'],
@@ -263,7 +352,7 @@ class DemoContentSeeder extends Seeder
             );
 
             FacilityPhoto::query()->updateOrCreate(
-                ['facility_id' => $facility->id, 'path' => "/images/facilities/{$data['slug']}.jpg"],
+                ['facility_id' => $facility->id, 'path' => $data['image']],
                 [
                     'caption' => "Foto {$data['name']}",
                     'order' => 1,
@@ -275,11 +364,13 @@ class DemoContentSeeder extends Seeder
 
     private function seedNews(School $school, User $admin): void
     {
+        $richProfiles = $this->newsRichProfiles();
+
         $articles = [
             [
                 'slug' => 'pembukaan-pmb-2026',
                 'title' => 'Pembukaan PMB Tahun Ajaran 2026/2027',
-                'excerpt' => 'Pendaftaran peserta didik baru resmi dibuka mulai hari ini.',
+                'excerpt' => 'Pendaftaran peserta didik baru resmi dibuka — lengkap dengan alur online, video profil, dan jadwal seleksi.',
                 'category' => 'pengumuman',
                 'featured' => true,
                 'days_ago' => 0,
@@ -287,7 +378,7 @@ class DemoContentSeeder extends Seeder
             [
                 'slug' => 'prestasi-olimpiade-tahfidz',
                 'title' => 'Siswa Raih Juara 1 Olimpiade Tahfidz Tingkat Kota',
-                'excerpt' => 'Tim tahfidz Nurul Hikmah membawa pulang medali emas.',
+                'excerpt' => 'Tim tahfidz Nurul Hikmah membawa pulang medali emas, perak, dan penghargaan sekolah berprestasi.',
                 'category' => 'prestasi',
                 'featured' => true,
                 'days_ago' => 5,
@@ -295,7 +386,7 @@ class DemoContentSeeder extends Seeder
             [
                 'slug' => 'workshop-orang-tua',
                 'title' => 'Workshop Parenting: Mendampingi Anak di Era Digital',
-                'excerpt' => 'Kegiatan rutin orang tua siswa bersama psikolog pendidikan.',
+                'excerpt' => 'Kegiatan interaktif orang tua siswa bersama psikolog pendidikan dan materi video pendamping.',
                 'category' => 'kegiatan',
                 'featured' => false,
                 'days_ago' => 12,
@@ -303,7 +394,7 @@ class DemoContentSeeder extends Seeder
             [
                 'slug' => 'jadwal-ujian-akhir',
                 'title' => 'Jadwal Ujian Akhir Semester Genap',
-                'excerpt' => 'Informasi lengkap jadwal ujian untuk seluruh jenjang.',
+                'excerpt' => 'Informasi lengkap jadwal ujian per jenjang, ketentuan peserta, dan jadwal remedial.',
                 'category' => 'pengumuman',
                 'featured' => false,
                 'days_ago' => 18,
@@ -311,15 +402,57 @@ class DemoContentSeeder extends Seeder
             [
                 'slug' => 'kunjungan-pesantren',
                 'title' => 'Kunjungan Edukatif ke Pesantren Mitra',
-                'excerpt' => 'Siswa kelas 8 mengikuti program inspirasi tahfidz intensif.',
+                'excerpt' => 'Siswa kelas 8 mengikuti program inspirasi tahfidz intensif dengan dokumentasi foto & video.',
                 'category' => 'kegiatan',
                 'featured' => false,
                 'days_ago' => 25,
+            ],
+            [
+                'slug' => 'libur-semester-akhir',
+                'title' => 'Libur Semester & Program Pengayaan',
+                'excerpt' => 'Jadwal libur resmi dan program tahfidz serta literasi opsional selama liburan.',
+                'category' => 'pengumuman',
+                'featured' => false,
+                'days_ago' => 8,
+            ],
+            [
+                'slug' => 'pelatihan-guru-kurikulum',
+                'title' => 'Pelatihan Guru Kurikulum Merdeka',
+                'excerpt' => 'Workshop internal untuk desain proyek P5 dan penilaian autentik.',
+                'category' => 'kegiatan',
+                'featured' => false,
+                'days_ago' => 15,
+            ],
+            [
+                'slug' => 'penghargaan-adiwiyata',
+                'title' => 'Penghargaan Adiwiyata Tingkat Kota',
+                'excerpt' => 'Nurul Hikmah meraih penghargaan sekolah peduli lingkungan.',
+                'category' => 'prestasi',
+                'featured' => true,
+                'days_ago' => 20,
+            ],
+            [
+                'slug' => 'program-khatam-quran',
+                'title' => 'Program Khatam Al-Qur\'an Angkatan 2026',
+                'excerpt' => '34 siswa khatam 30 juz dalam acara khidmat penuh haru.',
+                'category' => 'prestasi',
+                'featured' => true,
+                'days_ago' => 30,
+            ],
+            [
+                'slug' => 'hari-pahlawan-sekolah',
+                'title' => 'Peringatan Hari Pahlawan di Sekolah',
+                'excerpt' => 'Lomba pidato, pameran sejarah, dan kirab budaya Nusantara.',
+                'category' => 'kegiatan',
+                'featured' => false,
+                'days_ago' => 60,
             ],
         ];
 
         foreach ($articles as $i => $article) {
             $published = now()->subDays($article['days_ago']);
+            $rich = $richProfiles[$article['slug']] ?? null;
+
             News::query()->updateOrCreate(
                 ['slug' => $article['slug']],
                 [
@@ -327,8 +460,9 @@ class DemoContentSeeder extends Seeder
                     'user_id' => $admin->id,
                     'title' => $article['title'],
                     'excerpt' => $article['excerpt'],
-                    'content' => $article['excerpt']."\n\nInformasi lebih lanjut dapat menghubungi bagian humas sekolah melalui WhatsApp resmi.",
-                    'thumbnail' => null,
+                    'content' => $rich['content'] ?? null,
+                    'content_json' => $rich['content_json'] ?? null,
+                    'thumbnail' => $rich['thumbnail'] ?? null,
                     'category' => $article['category'],
                     'status' => 'published',
                     'order' => $i + 1,
