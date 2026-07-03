@@ -1,7 +1,9 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { api } from '@/lib/api'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { api, getApiErrorMessage, getAuthToken } from '@/lib/api'
 import { buildQueryParams, queryConfig } from '@/hooks/queryConfig'
 import type { ApiResponse, Curriculum, ListFilters, PaginatedResponse } from '@/types'
+import type { CurriculumFormValues } from '@/schemas/curriculum'
 
 export const curriculumKeys = {
   all: ['curriculums'] as const,
@@ -11,6 +13,7 @@ export const curriculumKeys = {
   detail: (slug: string) => [...curriculumKeys.details(), slug] as const,
   adminLists: () => [...curriculumKeys.all, 'admin', 'list'] as const,
   adminList: (filters: ListFilters) => [...curriculumKeys.adminLists(), buildQueryParams(filters)] as const,
+  adminDetail: (id: number) => [...curriculumKeys.all, 'admin', id] as const,
 }
 
 export function useCurriculumsList(filters: ListFilters = {}) {
@@ -48,7 +51,70 @@ export function useAdminCurriculumsList(filters: ListFilters = {}) {
       })
       return data
     },
+    enabled: !!getAuthToken(),
     placeholderData: keepPreviousData,
     ...queryConfig,
+  })
+}
+
+export function useAdminCurriculumDetail(id: number) {
+  return useQuery({
+    queryKey: curriculumKeys.adminDetail(id),
+    queryFn: async () => {
+      const { data } = await api.get<ApiResponse<Curriculum>>(`/admin/curriculums/${id}`)
+      return data.data
+    },
+    enabled: !!id && !!getAuthToken(),
+    ...queryConfig,
+  })
+}
+
+function invalidate(queryClient: ReturnType<typeof useQueryClient>) {
+  queryClient.invalidateQueries({ queryKey: curriculumKeys.lists() })
+  queryClient.invalidateQueries({ queryKey: curriculumKeys.adminLists() })
+}
+
+export function useCreateCurriculum() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: CurriculumFormValues) => {
+      const { data } = await api.post<ApiResponse<Curriculum>>('/admin/curriculums', payload)
+      return data.data
+    },
+    onSuccess: () => {
+      invalidate(queryClient)
+      toast.success('Kurikulum berhasil dibuat.')
+    },
+    onError: (e) => toast.error(getApiErrorMessage(e, 'Gagal menyimpan kurikulum.')),
+  })
+}
+
+export function useUpdateCurriculum(id: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: Partial<CurriculumFormValues>) => {
+      const { data } = await api.put<ApiResponse<Curriculum>>(`/admin/curriculums/${id}`, payload)
+      return data.data
+    },
+    onSuccess: (data) => {
+      invalidate(queryClient)
+      queryClient.setQueryData(curriculumKeys.adminDetail(id), data)
+      toast.success('Kurikulum berhasil diperbarui.')
+    },
+    onError: (e) => toast.error(getApiErrorMessage(e, 'Gagal memperbarui kurikulum.')),
+  })
+}
+
+export function useDeleteCurriculum() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await api.delete(`/admin/curriculums/${id}`)
+    },
+    onSuccess: () => {
+      invalidate(queryClient)
+      toast.success('Kurikulum berhasil dihapus.')
+    },
+    onError: (e) => toast.error(getApiErrorMessage(e, 'Gagal menghapus kurikulum.')),
   })
 }

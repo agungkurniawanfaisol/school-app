@@ -23,3 +23,12 @@ export function formatCurrency(amount: number | null | undefined) {
     minimumFractionDigits: 0,
   }).format(amount)
 }
+
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}

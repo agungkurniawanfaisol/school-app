@@ -1,5 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { api, clearAuthToken, getAuthToken, setAuthToken } from '@/lib/api'
+import {
+  api,
+  clearAuthSession,
+  getAuthToken,
+  getStoredUser,
+  isAuthError,
+  setAuthSession,
+} from '@/lib/api'
 import { queryConfig } from '@/hooks/queryConfig'
 import type { ApiResponse, LoginResponse, User } from '@/types'
 import type { LoginFormValues } from '@/schemas/auth'
@@ -10,15 +17,30 @@ export const authKeys = {
 }
 
 export function useAuthMe() {
+  const hasToken = !!getAuthToken()
+
   return useQuery({
     queryKey: authKeys.me(),
     queryFn: async () => {
       const { data } = await api.get<ApiResponse<User>>('/admin/me')
-      return data.data
+      const user = data.data
+      const token = getAuthToken()
+      if (token) {
+        setAuthSession(token, user)
+      }
+      return user
     },
-    enabled: !!getAuthToken(),
-    retry: false,
+    enabled: hasToken,
+    placeholderData: () => getStoredUser() ?? undefined,
     ...queryConfig,
+    staleTime: 0,
+    refetchOnMount: 'always',
+    retry: (failureCount, error) => {
+      if (isAuthError(error)) {
+        return false
+      }
+      return failureCount < 1
+    },
   })
 }
 
@@ -31,7 +53,7 @@ export function useLogin() {
       return data.data
     },
     onSuccess: (data) => {
-      setAuthToken(data.token)
+      setAuthSession(data.token, data.user)
       queryClient.setQueryData(authKeys.me(), data.user)
     },
   })
@@ -45,13 +67,23 @@ export function useLogout() {
       await api.post('/admin/logout')
     },
     onSettled: () => {
-      clearAuthToken()
+      clearAuthSession()
       queryClient.removeQueries({ queryKey: authKeys.all })
     },
   })
 }
 
 export function useIsAuthenticated(): boolean {
-  const { data, isLoading } = useAuthMe()
-  return !!getAuthToken() && !isLoading && !!data
+  const token = getAuthToken()
+  const { data, isPending, isError } = useAuthMe()
+
+  if (!token) {
+    return false
+  }
+
+  if (data) {
+    return true
+  }
+
+  return isPending && !isError
 }

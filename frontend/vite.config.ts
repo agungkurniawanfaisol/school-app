@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => ({
       ? [
           VitePWA({
             registerType: 'autoUpdate',
-            includeAssets: ['favicon.svg', 'manifest.json'],
+            includeAssets: ['favicon.png', 'logo.png', 'manifest.json'],
             manifest: false,
             workbox: {
               globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
@@ -49,11 +49,26 @@ export default defineConfig(({ mode }) => ({
     host: true,
     port: 5173,
     strictPort: true,
+    watch: {
+      usePolling: process.env.CHOKIDAR_USEPOLLING === 'true',
+      interval: 1000,
+    },
+    hmr: process.env.VITE_DEV_HMR_HOST
+      ? {
+          host: process.env.VITE_DEV_HMR_HOST,
+          clientPort: Number(process.env.VITE_DEV_HMR_PORT ?? 5173),
+        }
+      : undefined,
     proxy: {
       '/api': {
         target: process.env.VITE_API_PROXY_TARGET ?? 'http://localhost:8000',
         changeOrigin: true,
       },
     },
+  },
+  cacheDir: process.env.VITE_CACHE_DIR ?? 'node_modules/.vite',
+  test: {
+    environment: 'happy-dom',
+    setupFiles: ['./src/test/setup.ts'],
   },
 }))

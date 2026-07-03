@@ -3,7 +3,7 @@ FROM node:22-alpine AS development
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 RUN npm ci
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
@@ -19,7 +19,7 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 RUN npm ci
 
 COPY . .

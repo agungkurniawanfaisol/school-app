@@ -7,6 +7,7 @@ describe('newsSchema', () => {
       school_id: 1,
       title: 'Judul Berita',
       slug: 'judul-berita',
+      content: 'Isi berita',
       status: 'draft',
     })
 

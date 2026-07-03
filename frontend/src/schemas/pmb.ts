@@ -21,3 +21,11 @@ export const pmbTrackSchema = z.object({
 })
 
 export type PmbTrackFormValues = z.infer<typeof pmbTrackSchema>
+
+export const pmbAdminUpdateSchema = z.object({
+  status: z.enum(['pending', 'review', 'accepted', 'rejected']),
+  notes: z.string().optional().nullable(),
+  grade_applied: z.string().max(50).optional().nullable(),
+})
+
+export type PmbAdminUpdateFormValues = z.infer<typeof pmbAdminUpdateSchema>

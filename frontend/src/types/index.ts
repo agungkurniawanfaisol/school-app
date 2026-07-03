@@ -97,29 +97,37 @@ export interface Curriculum {
 
 export interface Teacher {
   id: number
+  uuid: string
   school_id: number
   name: string
   slug: string
   title: string | null
   subject: string | null
   bio?: string | null
+  content?: string | null
+  content_json?: Record<string, unknown> | null
   photo: string | null
   email?: string | null
   social_media: SocialMedia | null
   order: number
   is_active: boolean
   is_featured: boolean
+  has_linked_user?: boolean
+  created_at?: string | null
 }
 
 export interface StudentActivity {
   id: number
+  uuid: string
   school_id: number
   title: string
   slug: string
   excerpt: string | null
   content?: string | null
+  content_json?: Record<string, unknown> | null
   thumbnail: string | null
   category: string | null
+  status?: string
   activity_date: string | null
   order: number
   is_active: boolean
@@ -132,6 +140,7 @@ export interface FacilityPhoto {
   id: number
   facility_id: number
   path: string
+  url?: string
   caption: string | null
   order: number
   is_active: boolean
@@ -139,16 +148,20 @@ export interface FacilityPhoto {
 
 export interface Facility {
   id: number
+  uuid: string
   school_id: number
   name: string
   slug: string
   description: string | null
+  content?: string | null
+  content_json?: Record<string, unknown> | null
   thumbnail: string | null
   category: string | null
   order: number
   is_active: boolean
   is_featured: boolean
   photos?: FacilityPhoto[]
+  created_at?: string | null
 }
 
 export interface NewsAuthor {
@@ -158,11 +171,13 @@ export interface NewsAuthor {
 
 export interface News {
   id: number
+  uuid: string
   school_id: number
   title: string
   slug: string
   excerpt: string | null
   content?: string | null
+  content_json?: Record<string, unknown> | null
   thumbnail: string | null
   category: string | null
   status?: string
@@ -233,6 +248,36 @@ export interface Course {
   created_at: string | null
 }
 
+export interface CourseEnrollment {
+  id: number
+  course_id: number
+  student_name: string
+  student_email: string
+  status: 'active' | 'completed' | 'cancelled'
+  enrolled_at: string | null
+  completed_at: string | null
+  course?: {
+    id: number
+    title: string
+    slug: string
+  }
+}
+
+export interface Media {
+  id: number
+  uuid: string
+  filename: string
+  original_name: string | null
+  path: string
+  disk: string
+  mime_type: string | null
+  size: number | null
+  collection: string
+  meta: Record<string, unknown> | null
+  url: string | null
+  created_at: string | null
+}
+
 export interface Setting {
   id: number
   school_id: number
@@ -269,7 +314,29 @@ export interface User {
   id: number
   name: string
   email: string
-  role: string
+  role: UserRole
+  teacher_id?: number | null
+}
+
+export type UserRole = 'admin' | 'guru'
+
+export interface AdminUser extends User {
+  is_active: boolean
+  teacher_id: number | null
+  teacher?: {
+    id: number
+    name: string
+    slug: string
+    subject: string | null
+    title: string | null
+  } | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export interface ProfileData {
+  user: User
+  teacher: Teacher | null
 }
 
 export interface LoginResponse {
@@ -284,4 +351,8 @@ export interface ListFilters {
   category?: string
   featured?: boolean
   school_id?: number
+  status?: string
+  group?: string
+  is_active?: boolean
+  is_featured?: boolean
 }
