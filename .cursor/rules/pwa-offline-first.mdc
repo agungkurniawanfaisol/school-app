@@ -1,0 +1,80 @@
+---
+description: PWA offline-first strategy with Workbox service worker
+globs: frontend/**/*
+alwaysApply: false
+---
+
+# PWA — Offline First
+
+## Strategy
+
+Hosting has no Redis — push caching to **two layers**:
+
+1. **Service Worker** (Workbox) — cache static assets + API GET responses
+2. **TanStack Query** — in-memory + persisted cache as fallback
+
+## Workbox Setup (vite-plugin-pwa)
+
+```typescript
+// vite.config.ts
+VitePWA({
+  registerType: 'autoUpdate',
+  workbox: {
+    globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+    runtimeCaching: [
+      {
+        urlPattern: /^\/api\/v1\/(news|schools|facilities)/,
+        handler: 'StaleWhileRevalidate',
+        options: {
+          cacheName: 'api-public',
+          expiration: { maxEntries: 100, maxAgeSeconds: 86400 },
+          cacheableResponse: { statuses: [0, 200] },
+        },
+      },
+      {
+        urlPattern: /\.(?:png|jpg|jpeg|svg|webp)$/,
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'images',
+          expiration: { maxEntries: 200, maxAgeSeconds: 30 * 24 * 60 * 60 },
+        },
+      },
+    ],
+  },
+  manifest: {
+    name: 'Nurul Hikmah',
+    short_name: 'NH App',
+    theme_color: '#1a5f2a',
+    display: 'standalone',
+    start_url: '/',
+  },
+})
+```
+
+## Offline-First Rules
+
+- **Static shell**: cache app shell (HTML, JS, CSS) with `CacheFirst`.
+- **Public API reads**: `StaleWhileRevalidate` — show cached data instantly, refresh in background.
+- **Mutations (POST/PUT/DELETE)**: network-only; queue with background sync if offline.
+- **Auth endpoints**: never cache — `NetworkOnly`.
+- Show offline banner when `!navigator.onLine`.
+
+## TanStack Query Persistence
+
+```typescript
+import { persistQueryClient } from '@tanstack/react-query-persist-client';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+
+persistQueryClient({
+  queryClient,
+  persister: createSyncStoragePersister({ storage: window.localStorage }),
+  maxAge: 24 * 60 * 60 * 1000,
+});
+```
+
+## Cache Invalidation Flow
+
+```
+User mutation → API success → invalidateQueries → SW skips cache for that URL
+Admin CUD on backend → clearCache() → next SW revalidation fetches fresh data
+```

@@ -1,0 +1,22 @@
+---
+description: API pagination patterns for Laravel repositories
+globs: backend/app/Repositories/**/*.php
+alwaysApply: false
+---
+
+# Pagination
+
+- Default **15** per page; max **50**.
+- Always `->withQueryString()` to preserve filters in links.
+- Cache paginated results — filter params included in cache key (`BaseRepository`).
+- Use `LengthAwarePaginator` — never manually slice collections.
+
+```json
+{
+  "data": [...],
+  "meta": { "current_page": 1, "last_page": 5, "per_page": 15, "total": 72 },
+  "links": { "first": "...", "last": "...", "prev": null, "next": "..." }
+}
+```
+
+Indexing and query patterns: see `database-indexing-queries.mdc`.

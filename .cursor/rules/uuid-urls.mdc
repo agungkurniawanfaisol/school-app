@@ -1,0 +1,94 @@
+---
+description: Use UUID in URLs instead of numeric IDs — hard-to-guess detail routes
+alwaysApply: true
+---
+
+# UUID URLs (No Numeric IDs in Routes)
+
+Never expose auto-increment `id` in URLs. Use **UUID** for detail pages and API show routes.
+
+```
+✅ /berita/detail/9f3c2a1b-4e5d-6f7a-8b9c-0d1e2f3a4b5c
+❌ /berita/detail/42
+❌ /api/v1/news/17
+```
+
+Keep `id` as internal primary key; add `uuid` column for external references.
+
+## Database
+
+```php
+$table->uuid('uuid')->unique();
+// index if filtered often:
+$table->index('uuid');
+```
+
+Generate on create:
+
+```php
+// Model boot or HasUuids trait
+protected static function booted(): void
+{
+    static::creating(function (Model $model): void {
+        $model->uuid ??= (string) Str::uuid();
+    });
+}
+```
+
+## Backend routes
+
+```php
+// ✅ GOOD — bind by uuid
+Route::get('news/{news:uuid}', [NewsController::class, 'show']);
+Route::get('pmb/track/{registration:uuid}', [PmbController::class, 'track']);
+
+// ❌ BAD
+Route::get('news/{id}', ...);
+Route::apiResource('news', ...); // default {news} = numeric id
+```
+
+Override route key on model:
+
+```php
+public function getRouteKeyName(): string
+{
+    return 'uuid';
+}
+```
+
+Repository lookup:
+
+```php
+public function findByUuid(string $uuid): ?Model
+{
+    return $this->remember($this->cacheKey('findByUuid', ['uuid' => $uuid]), fn () =>
+        $this->newQuery()->where('uuid', $uuid)->first()
+    );
+}
+```
+
+## API responses
+
+Expose `uuid` in API Resources for client routing. Omit or hide numeric `id` from public JSON when possible.
+
+## Frontend
+
+```tsx
+// ✅ GOOD
+<Route path="/berita/detail/:uuid" element={<NewsDetailPage />} />
+navigate(`/berita/detail/${news.uuid}`)
+
+// ❌ BAD
+<Route path="/berita/detail/:id" element={<NewsDetailPage />} />
+```
+
+React Query keys use `uuid`: `newsKeys.detail(uuid)`.
+
+## Slugs vs UUID
+
+| Use case | URL key |
+|----------|---------|
+| Public SEO listing (optional) | `slug` in path is OK for marketing pages |
+| Detail, admin, private, PMB track | **UUID only** — not numeric `id` |
+
+Authorization still required — UUID prevents enumeration, not access control.

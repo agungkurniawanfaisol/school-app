@@ -1,0 +1,68 @@
+---
+description: Laravel patterns — repository, Form Requests, API Resources, scopes
+globs: backend/**/*.php
+alwaysApply: false
+---
+
+# Laravel Development
+
+Aligned with `laravel-development` skill and global `laravel-superpowers`. **This project uses Repository + HasCache**, not a separate Service layer.
+
+## Layer flow
+
+```
+Route → FormRequest → Controller → Repository (HasCache) → Model
+                         ↓
+                   API Resource
+```
+
+```php
+// ✅ GOOD — thin controller
+public function store(StoreNewsRequest $request): NewsResource
+{
+    $news = $this->repository->create($request->validated());
+    return new NewsResource($news);
+}
+
+// ❌ BAD — logic in controller
+public function store(Request $request) {
+    $news = News::create($request->all());
+    Cache::flush();
+    return $news;
+}
+```
+
+## Repository rules
+
+- Extend `BaseRepository`; override `defaultSelect()`, `defaultWith()`, `searchableColumns()`.
+- Reads: `$this->remember()` — writes: `$this->clearCache()`.
+- Complex multi-model writes: `DB::transaction()` inside repository method.
+
+## Model rules
+
+- `$fillable` explicit; use `HasCommonScopes` (`active`, `published`, `ordered`).
+- Casts in `casts()` method; no business logic beyond scopes/accessors.
+
+## API
+
+- **Form Request** per store/update — never inline `$request->validate()`.
+- **API Resource** for all JSON responses — hide internal fields.
+- Eager load in repository, not in controller.
+
+## Jobs & events
+
+Use when action has side effects (email, notifications) — dispatch from repository after successful commit:
+
+```php
+DB::transaction(function () use ($data) {
+    $model = $this->model()::create($data);
+    Event::dispatch(new NewsPublished($model));
+    return $model;
+});
+```
+
+## Performance (from laravel-superpowers)
+
+- `select()` only needed columns; `with()` all relations used in Resource.
+- `chunk()` / `cursor()` for exports — never `all()` on large tables.
+- `paginate(15)` max 50 for list endpoints.

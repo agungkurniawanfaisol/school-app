@@ -1,0 +1,42 @@
+---
+description: Superpowers workflow — brainstorm before build, TDD, verify before done
+alwaysApply: true
+---
+
+# Superpowers Workflow
+
+**Before any feature or behavior change**, follow this order. Skills in `.agents/skills/` from [obra/superpowers](https://skills.sh/obra/superpowers).
+
+## Skill order
+
+| Phase | Skill | When |
+|-------|-------|------|
+| 1 | `using-superpowers` | Start of every task — check applicable skills |
+| 2 | `brainstorming` | New features, non-trivial changes — **design before code** |
+| 3 | `writing-plans` | After approved design — implementation plan |
+| 4 | `test-driven-development` | During implementation — tests with code |
+| 5 | `executing-plans` | Multi-step plans in batches |
+| 6 | `verification-before-completion` | Before claiming done — run tests, show output |
+
+## Hard gates
+
+- **No implementation** until brainstorming design is approved (can be brief for tiny fixes).
+- **No "done"** without running relevant tests (`make test-backend` / `make test-frontend`).
+- Invoke skills proactively — if a skill might apply (even 1%), use it.
+
+## Quick vs full workflow
+
+| Change size | Workflow |
+|-------------|----------|
+| Typo, comment, config only | Skip brainstorming; still run affected tests if any |
+| Bug fix | `systematic-debugging` → fix → add regression test |
+| New endpoint / page / migration | Full: brainstorm → plan → TDD → verify |
+| Refactor | Plan → keep tests green → verify |
+
+## Project skills
+
+- `nurul-hikmah-stack` — feature checklist
+- `laravel-development` — backend patterns (repository + cache)
+- `security-audit` — auth / OWASP changes
+
+Spec docs (optional): `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`

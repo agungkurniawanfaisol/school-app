@@ -1,0 +1,42 @@
+---
+description: React, Radix UI, Zod, and TanStack Query frontend patterns
+globs: frontend/**/*
+alwaysApply: false
+---
+
+# Frontend Patterns
+
+## Component Stack
+
+- **Radix UI** primitives via **shadcn/ui** — install with `npx shadcn@latest add <component>`.
+- Components live in `src/components/ui/`. Do not fork Radix behavior unnecessarily.
+- Use `cn()` utility for conditional Tailwind classes.
+
+## Zod Validation
+
+All forms MUST use Zod schemas in `src/schemas/`. See `zod-input-validation.mdc` for full patterns.
+
+## API Requests
+
+All API calls use TanStack Query in `src/hooks/`. See `react-query-api.mdc` for full patterns.
+
+## Pagination UI
+
+```typescript
+const { data, isFetching } = useNewsList({ page, per_page: 15, ...filters });
+// Render: data.data (items), data.meta (pagination), data.links
+```
+
+Show skeleton loaders during `isFetching`, not full-page spinners.
+
+## File Structure
+
+```
+src/
+  components/ui/   # shadcn/Radix primitives
+  components/      # feature components
+  hooks/           # TanStack Query hooks
+  schemas/         # Zod schemas
+  lib/api.ts       # axios/fetch client
+  pages/           # route pages
+```

@@ -1,0 +1,46 @@
+---
+description: Core tech stack and architecture for Nurul Hikmah School App
+alwaysApply: true
+---
+
+# Nurul Hikmah School App — Core Stack
+
+## Stack
+
+| Layer | Technology |
+|-------|------------|
+| Backend | Laravel 12, PHP 8.3+, MySQL 8.0, Sanctum |
+| Cache | **File cache only** — hosting does not support Redis |
+| Frontend | React 18+, TypeScript, Vite, Tailwind v4 |
+| UI | Radix UI primitives via shadcn/ui (`src/components/ui/`) |
+| Forms | Zod schemas in `src/schemas/` |
+| Data fetching | TanStack Query v5 in `src/hooks/` |
+| PWA | Workbox — offline-first, cache API responses |
+
+## Constraints
+
+- **NO Redis** — use `CACHE_STORE=file` (or `database`). Never add Redis dependencies.
+- UI text: **Bahasa Indonesia**. Code/comments: English.
+- Mobile-first responsive design.
+
+## Architecture
+
+```
+Frontend (PWA) ── TanStack Query ──► Laravel API (Sanctum)
+                      │                    │
+                 Zod validation      Repository + File Cache
+                                           │
+                                      MySQL (indexed)
+```
+
+## Project Skills
+
+Installed via [skills.sh](https://skills.sh) in `.agents/skills/`:
+
+- `shadcn`, `vercel-react-best-practices`, `vercel-composition-patterns`
+- `tanstack-query-best-practices`, `zod`, `react-hook-form-zod-shadcn`
+- `laravel-specialist`, `mysql`, `database-indexing-strategy`, `pwa-development`
+- `brainstorming`, `test-driven-development`, `laravel-testing`, `vitest` (superpowers + testing)
+
+**Workflow:** `superpowers-workflow` → brainstorm → TDD → `make test` before done.  
+**Backend patterns:** `laravel-development` (Repository + HasCache; complements global `laravel-superpowers`).

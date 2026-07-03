@@ -1,0 +1,78 @@
+---
+description: Tests required when changing backend or frontend code
+alwaysApply: true
+---
+
+# Tests Required
+
+**Every code change that affects behavior MUST include or update tests.** Use `test-driven-development` skill for new features.
+
+## Backend — PHPUnit
+
+Framework: **PHPUnit** (`php artisan test`). Skill: `laravel-testing`.
+
+| Change | Test location |
+|--------|----------------|
+| API endpoint | `backend/tests/Feature/Api/` |
+| Admin endpoint | `backend/tests/Feature/Admin/` |
+| Repository / scope | `backend/tests/Unit/` or Feature |
+| Form Request rules | Feature test asserting 422 |
+
+```php
+// Feature test pattern
+public function test_guest_can_list_published_news(): void
+{
+    News::factory()->published()->count(3)->create();
+
+    $this->getJson('/api/v1/news')
+        ->assertOk()
+        ->assertJsonCount(3, 'data');
+}
+```
+
+- Use `RefreshDatabase` for DB tests.
+- `Sanctum::actingAs($admin)` for admin routes.
+- Fake: `Mail::fake()`, `Queue::fake()`, `Storage::fake()`.
+
+```bash
+make test-backend
+# or: docker compose exec backend php artisan test
+```
+
+## Frontend — Vitest + Testing Library
+
+Framework: **Vitest** + **@testing-library/react**. Skills: `vitest`, `frontend-testing`.
+
+| Change | Test location |
+|--------|----------------|
+| Component | `frontend/src/**/*.test.tsx` (colocated) |
+| Zod schema | `frontend/src/schemas/*.test.ts` |
+| Hook | `frontend/src/hooks/*.test.ts` |
+
+```typescript
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+
+describe('NewsCard', () => {
+  it('renders title', () => {
+    render(<NewsCard title="Berita" slug="berita" />);
+    expect(screen.getByText('Berita')).toBeInTheDocument();
+  });
+});
+```
+
+```bash
+make test-frontend
+# or: docker compose exec frontend npm test
+```
+
+## Definition of done
+
+- [ ] New/changed behavior has a test
+- [ ] `make test-backend` passes (if backend touched)
+- [ ] `make test-frontend` passes (if frontend touched)
+- [ ] `verification-before-completion` — show test output before claiming done
+
+## Exceptions (no test required)
+
+- `.mdc` rules, docs-only, `package-lock.json` from install — still run tests if CI would.

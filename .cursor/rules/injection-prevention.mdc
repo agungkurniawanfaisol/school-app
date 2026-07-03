@@ -1,0 +1,68 @@
+---
+description: SQL and input injection prevention for Laravel repositories and form requests
+globs: backend/app/{Http/Requests,Repositories,Models}/**/*.php
+alwaysApply: false
+---
+
+# Injection Prevention
+
+## SQL Injection
+
+Eloquent uses parameter binding — stay on the query builder.
+
+```php
+// ❌ BAD — concatenation / raw with user input
+DB::raw("ORDER BY {$column}");
+DB::select("SELECT * FROM news WHERE slug = '$slug'");
+$query->whereRaw("title LIKE '%{$search}%'");
+
+// ✅ GOOD
+$query->where('slug', $slug);
+$query->where('title', 'like', $search.'%');
+$query->orderBy($allowedColumn); // whitelist columns only
+```
+
+**Search in `BaseRepository`:** `searchableColumns()` must be a fixed list — never user-defined column names.
+
+## Mass Assignment
+
+```php
+// Model
+protected $fillable = ['title', 'slug', 'school_id', ...];
+
+// Controller — validated keys only
+$repository->create($request->validated());
+```
+
+## Validation Boundary
+
+Every write endpoint needs a **Form Request** in `app/Http/Requests/{Domain}/`:
+
+```php
+public function rules(): array
+{
+    return [
+        'email' => ['required', 'email', 'max:150'],
+        'school_id' => ['required', 'integer', 'exists:schools,id'],
+        'content' => ['required', 'string', 'max:65535'],
+    ];
+}
+```
+
+- `integer` / `exists` for all FK fields.
+- `max` on every string (matches migration length).
+- `Rule::enum()` or `in:` for status/category fields.
+
+## File & URL Input
+
+```php
+'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+'url' => ['nullable', 'url', 'max:500'],
+```
+
+- No `exec()`, `shell_exec()`, or `eval()` on user input.
+- External fetch URLs: allowlist hosts; block `localhost`, private IPs (SSRF).
+
+## Frontend Mirror
+
+Duplicate critical rules in Zod (`src/schemas/`) — backend validation is authoritative; frontend is UX only.

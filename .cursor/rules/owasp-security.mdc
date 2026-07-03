@@ -1,0 +1,67 @@
+---
+description: OWASP Top 10 security — access control, injection, auth (Laravel + React)
+alwaysApply: true
+---
+
+# OWASP Security
+
+Apply on every feature. Skills: `owasp-security-check`, `laravel-security`, `laravel-security-audit`, project `security-audit`.
+
+## A01 Access Control
+
+- Public API (`/api/v1`): read-only GET only; no auth bypass on admin routes.
+- Admin routes: `auth:sanctum` + `EnsureUserIsAdmin` — never skip middleware.
+- Enforce ownership: filter by `school_id` / user scope in repository, not controller alone.
+- Return **404** (not 403) when record exists but user lacks access — prevents IDOR enumeration.
+
+```php
+// ✅ GOOD — scoped query prevents IDOR
+$this->newQuery()->where('school_id', $schoolId)->whereKey($id)->first();
+```
+
+## A03 Injection
+
+**Backend — always Form Request validation; never trust `$request->all()` for mass assign.**
+
+```php
+// ❌ BAD
+User::create($request->all());
+DB::select("SELECT * FROM news WHERE title = '$search'");
+
+// ✅ GOOD — Eloquent bindings + validated input
+News::create($request->validated());
+$query->where('title', 'like', $search.'%'); // avoid leading %
+```
+
+- Use Eloquent / query builder only — no raw SQL with string concat.
+- `$fillable` or `$guarded` on every model; never pass unvalidated keys to `create()`/`update()`.
+- Validate file uploads: `mimes`, `max`, store outside `public/` with signed URLs or controlled route.
+
+**Frontend — Zod `safeParse()` before submit; never `dangerouslySetInnerHTML` without DOMPurify.**
+
+## A07 Authentication
+
+- Login: throttle `Route::middleware('throttle:5,1')` on `admin/login`.
+- Passwords: bcrypt via Laravel `Hash::make()` — never log or return passwords.
+- Sanctum tokens: revoke on logout; short-lived tokens for SPA if possible.
+- Generic error on failed login: `"Kredensial tidak valid."` — do not reveal if email exists.
+
+## A05 Misconfiguration
+
+- `APP_DEBUG=false` in production; never expose stack traces to clients.
+- Secrets in `.env` only — never commit `.env`, API keys, or tokens.
+- `CACHE_STORE=file` — no Redis; still sanitize all inputs.
+- CORS: restrict `SANCTUM_STATEFUL_DOMAINS` to known frontend origins.
+
+## A09 Logging
+
+Log security events (failed login, 403 admin access, validation abuse) — never log passwords or tokens.
+
+## Pre-merge checklist
+
+- [ ] Form Request / Zod on every input endpoint
+- [ ] Admin mutations behind Sanctum + admin middleware
+- [ ] No raw SQL; search uses bound parameters
+- [ ] Mass assignment guarded
+- [ ] Rate limit on auth and public POST (`pmb/registrations`)
+- [ ] API Resources hide internal fields (`password`, tokens)

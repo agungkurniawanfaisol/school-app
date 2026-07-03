@@ -1,0 +1,62 @@
+---
+description: Laravel backend caching and query performance (no Redis)
+globs: backend/**/*
+alwaysApply: false
+---
+
+# Backend Performance & Caching
+
+## Cache Strategy (File Driver)
+
+```env
+CACHE_STORE=file
+```
+
+- Use `HasCache` trait on repositories — never raw `Cache::get()` in controllers.
+- **Read**: `Cache::remember()` via `$this->remember()` in `BaseRepository`.
+- **Write/Update/Delete**: call `$this->clearCache()` immediately after CUD.
+- Tag caches per model: `Cache::tags([$this->cacheTag()])`.
+- Default TTL: 3600s. Shorter TTL (300–600s) for frequently changing data.
+
+```php
+// ✅ GOOD — cached read, cleared on write
+public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
+{
+    $key = $this->cacheKey('paginate', array_merge($filters, ['per_page' => $perPage]));
+    return $this->remember($key, fn () => $this->applyFilters($this->newQuery(), $filters)
+        ->paginate($perPage)->withQueryString());
+}
+
+public function create(array $data): Model
+{
+    $model = $this->model()::create($data);
+    $this->clearCache();
+    return $model->fresh($this->defaultWith());
+}
+```
+
+## Query Rules
+
+- Follow `database-indexing-queries.mdc` for select/with, scopes, and index alignment.
+- Never `Model::all()` in API endpoints — use `paginate()` or scoped `get()`.
+- API responses via **API Resources**, validation via **Form Requests**.
+
+## Repository Pattern
+
+```
+Controller → FormRequest → Repository (HasCache) → Model
+                ↓
+           API Resource
+```
+
+Override `searchableColumns()`, `defaultWith()`, `defaultSelect()` per repository.
+
+## HTTP Caching Headers
+
+For public read endpoints, add short `Cache-Control` headers:
+
+```php
+return (new NewsResource($news))
+    ->response()
+    ->header('Cache-Control', 'public, max-age=300');
+```

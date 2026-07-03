@@ -1,0 +1,110 @@
+---
+description: TanStack Query hooks for all API requests
+globs: frontend/src/hooks/**/*.ts
+alwaysApply: false
+---
+
+# API Requests with TanStack Query
+
+All API calls MUST live in `src/hooks/` — never `fetch`/`axios` directly in components.
+
+## File Layout
+
+```
+src/lib/api.ts          # HTTP client (base URL, auth headers)
+src/hooks/useNews.ts    # query + mutation hooks per domain
+src/hooks/query-keys.ts # shared query key factory
+```
+
+## Query Key Factory
+
+```typescript
+// src/hooks/query-keys.ts
+export const newsKeys = {
+  all: ['news'] as const,
+  lists: () => [...newsKeys.all, 'list'] as const,
+  list: (filters: NewsFilters) => [...newsKeys.lists(), filters] as const,
+  detail: (id: number) => [...newsKeys.all, 'detail', id] as const,
+};
+```
+
+Keys must be arrays, hierarchical, and include every filter the query depends on.
+
+## useQuery — Reads
+
+```typescript
+export function useNewsList(filters: NewsFilters) {
+  return useQuery({
+    queryKey: newsKeys.list(filters),
+    queryFn: () => api.getNews(filters),
+    staleTime: 5 * 60 * 1000,       // public: 5 min | admin: 30s
+    placeholderData: keepPreviousData, // paginated lists only
+  });
+}
+
+export function useNews(id: number) {
+  return useQuery({
+    queryKey: newsKeys.detail(id),
+    queryFn: () => api.getNewsById(id),
+    enabled: id > 0,
+  });
+}
+```
+
+- Paginated lists: always `placeholderData: keepPreviousData`.
+- Detail queries: `enabled` when ID is valid.
+- Use `select` to map API shape → UI shape without extra re-renders.
+
+## useMutation — Writes
+
+```typescript
+export function useCreateNews() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: NewsFormValues) => api.createNews(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: newsKeys.lists() });
+    },
+  });
+}
+```
+
+- Invalidate **targeted** keys after CUD — not `queryClient.clear()`.
+- Use `isPending` (not `isLoading`) for submit button disabled state.
+- Show toast on error; map API 422 errors to form fields.
+
+## API Client (`src/lib/api.ts`)
+
+```typescript
+// Single axios/fetch instance — attach Sanctum token here
+const client = axios.create({ baseURL: '/api/v1' });
+client.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+```
+
+Domain functions only — no React imports in `api.ts`.
+
+## Component Usage
+
+```typescript
+// ❌ BAD
+useEffect(() => { fetch('/api/v1/news').then(...) }, []);
+
+// ✅ GOOD
+const { data, isFetching, isError } = useNewsList({ page, per_page: 15 });
+if (isFetching) return <NewsSkeleton />;
+```
+
+Show skeleton on `isFetching`; reserve full-page loader for `isLoading` (no cached data).
+
+## staleTime Guide
+
+| Data type | staleTime |
+|-----------|-----------|
+| Public content (news, schools) | 5 min |
+| Admin dashboards | 30 s |
+| User session / auth | 0 (always refetch) |
+| Static settings | 30 min |

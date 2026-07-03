@@ -1,0 +1,80 @@
+---
+description: Zod schema validation for all form and API inputs
+globs: frontend/src/schemas/**/*.ts
+alwaysApply: false
+---
+
+# Zod Input Validation
+
+All user input MUST be validated with Zod before submit or API call.
+
+## File Location
+
+One schema file per domain in `src/schemas/`:
+
+```
+src/schemas/news.ts       → newsFormSchema, newsFilterSchema
+src/schemas/auth.ts       → loginSchema
+```
+
+Export both schema and inferred type:
+
+```typescript
+import { z } from 'zod';
+
+export const newsFormSchema = z.object({
+  title: z.string().trim().min(3, 'Judul minimal 3 karakter').max(250),
+  slug: z.string().regex(/^[a-z0-9-]+$/, 'Slug hanya huruf kecil, angka, dan strip'),
+  school_id: z.coerce.number().int().positive('Sekolah wajib dipilih'),
+  is_active: z.coerce.boolean(),
+  published_at: z.coerce.date().optional(),
+});
+
+export type NewsFormValues = z.infer<typeof newsFormSchema>;
+export const newsUpdateSchema = newsFormSchema.partial();
+```
+
+## Rules
+
+- Error messages: **Bahasa Indonesia** (user-facing).
+- Form/query strings: use `z.coerce.number()`, `z.coerce.boolean()`, `z.coerce.date()`.
+- Updates: derive with `.partial()` — do not duplicate fields.
+- Enums: `z.enum(['draft', 'published'])` for fixed values.
+- Never use `z.any()` — use `z.unknown()` if type is truly unknown.
+- Validate at boundaries with `safeParse()` — never trust raw API/JSON input.
+
+```typescript
+// ❌ BAD — unvalidated submit
+await api.createNews(formData);
+
+// ✅ GOOD
+const result = newsFormSchema.safeParse(formData);
+if (!result.success) return; // show result.error.flatten().fieldErrors
+await api.createNews(result.data);
+```
+
+## React Hook Form
+
+Bind schema via `@hookform/resolvers/zod`:
+
+```typescript
+const form = useForm<NewsFormValues>({
+  resolver: zodResolver(newsFormSchema),
+  defaultValues: { title: '', school_id: 0, is_active: true },
+});
+```
+
+Display errors with `form.formState.errors.<field>?.message`.
+
+## Shared Primitives
+
+Reuse common fields in `src/schemas/common.ts`:
+
+```typescript
+export const idSchema = z.coerce.number().int().positive();
+export const slugSchema = z.string().regex(/^[a-z0-9-]+$/);
+export const paginationSchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  per_page: z.coerce.number().int().min(1).max(50).default(15),
+});
+```

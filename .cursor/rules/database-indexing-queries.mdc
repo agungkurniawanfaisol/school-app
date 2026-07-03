@@ -1,0 +1,100 @@
+---
+description: MySQL table indexing in migrations and query optimization in repositories
+globs: backend/**/{migrations,Repositories,Models}/**/*.php
+alwaysApply: false
+---
+
+# Table Indexing & Query Optimization
+
+Indexes must match how `BaseRepository::applyFilters()` queries data.
+
+## Migration — Index Rules
+
+Every table:
+
+```php
+$table->id();
+$table->foreignId('school_id')->index()->constrained()->cascadeOnDelete();
+$table->string('title', 250);
+$table->boolean('is_active')->default(true)->index();
+$table->timestamps();
+$table->softDeletes();
+```
+
+| Rule | Example |
+|------|---------|
+| FK always indexed | `foreignId('school_id')->index()` |
+| Filter columns indexed | `status`, `is_active`, `category` |
+| Sort columns in composite | `order`, `published_at` |
+| Unique lookups | `slug` → `->unique()` |
+| Named composite indexes | `news_school_active_order_idx` |
+
+**Composite index column order** = equality filters first, then range/sort:
+
+```php
+// WHERE school_id = ? AND is_active = 1 ORDER BY order
+$table->index(['school_id', 'is_active', 'order'], 'news_school_active_order_idx');
+
+// WHERE is_active = 1 ORDER BY published_at DESC
+$table->index(['is_active', 'published_at'], 'news_active_published_idx');
+```
+
+Do NOT over-index: skip indexes on low-cardinality booleans alone unless part of a composite used in queries.
+
+## Repository — Query Rules
+
+Override per repository:
+
+```php
+protected function defaultSelect(): array
+{
+    return ['id', 'title', 'slug', 'thumbnail', 'published_at', 'school_id'];
+}
+
+protected function defaultWith(): array
+{
+    return ['school:id,name,slug']; // always specify FK columns in select
+}
+
+protected function searchableColumns(): array
+{
+    return ['title', 'excerpt'];
+}
+```
+
+```php
+// ❌ BAD — N+1, all columns, no index-friendly WHERE
+News::all();
+News::with('school')->get();
+News::where('title', 'like', "%{$search}%")->get(); // leading wildcard = full scan
+
+// ✅ GOOD — selective, eager-loaded, scoped, paginated
+$this->applyFilters($this->newQuery(), $filters)
+    ->paginate($perPage)
+    ->withQueryString();
+```
+
+## Query Checklist
+
+- [ ] `select()` only columns needed by API Resource
+- [ ] `with()` every relation accessed in Resource — specify parent FK in child select
+- [ ] Use model scopes (`published()`, `active()`, `ordered()`) not raw WHERE in controllers
+- [ ] `whereKey($id)` for single-record lookups
+- [ ] `LIKE` search only on indexed/full-text columns; prefer `LIKE 'term%'` over `'%term%'`
+- [ ] Never `get()` then `slice()` for pagination — use `paginate(15)` max 50
+- [ ] Never query inside loops — batch with `whereIn()` or eager load
+- [ ] Count queries: use `paginate()` total (one query) not separate `count()` + `get()`
+
+## Index ↔ Query Alignment
+
+Before adding an index, confirm the query exists:
+
+```php
+// applyFilters uses: school_id + is_active + ordered scope (order ASC)
+// → needs index (school_id, is_active, order)
+
+// applyFilters uses: is_active + published scope (published_at DESC)
+// → needs index (is_active, published_at)
+```
+
+Run `EXPLAIN` on slow queries in local dev before shipping new endpoints.
