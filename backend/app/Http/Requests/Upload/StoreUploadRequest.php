@@ -10,7 +10,7 @@ class StoreUploadRequest extends AdminFormRequest
     {
         return [
             'file' => ['required', 'file', 'mimes:jpg,jpeg,png,webp,mp4,webm', 'max:51200'],
-            'collection' => ['required', 'string', 'in:news,activities,facilities,teachers,general'],
+            'collection' => ['required', 'string', 'in:news,activities,facilities,teachers,general,virtual-tour'],
         ];
     }
 

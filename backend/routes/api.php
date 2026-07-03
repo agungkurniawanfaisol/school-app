@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\GoogleAuthController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Admin\CourseEnrollmentController;
 use App\Http\Controllers\Admin\CourseLessonController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Admin\CourseModuleController;
 use App\Http\Controllers\Admin\CourseProgressController;
 use App\Http\Controllers\Admin\CurriculumController as AdminCurriculumController;
 use App\Http\Controllers\Admin\FacilityController as AdminFacilityController;
+use App\Http\Controllers\Admin\VirtualTourController as AdminVirtualTourController;
 use App\Http\Controllers\Admin\FacilityPhotoController;
 use App\Http\Controllers\Admin\HeroSliderController as AdminHeroSliderController;
 use App\Http\Controllers\Admin\MediaController;
@@ -33,6 +35,7 @@ use App\Http\Controllers\Api\V1\SettingController;
 use App\Http\Controllers\Api\V1\StudentActivityController;
 use App\Http\Controllers\Api\V1\TeacherController;
 use App\Http\Controllers\Api\V1\TestimonialController;
+use App\Http\Controllers\Api\V1\VirtualTourController;
 use App\Http\Middleware\EnsurePanelUser;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Support\Facades\Route;
@@ -46,8 +49,10 @@ Route::prefix('v1')->group(function (): void {
     Route::get('curriculums/{slug}', [CurriculumController::class, 'showBySlug']);
     Route::get('teachers', [TeacherController::class, 'index']);
     Route::get('teachers/uuid/{uuid}', [TeacherController::class, 'showByUuid'])
+        ->whereUuid('uuid')
         ->name('v1.teachers.showByUuid');
     Route::get('teachers/{slug}', [TeacherController::class, 'showBySlug'])
+        ->where('slug', '[a-z0-9\-]+')
         ->name('v1.teachers.showBySlug');
     Route::get('student-activities', [StudentActivityController::class, 'index']);
     Route::get('student-activities/uuid/{uuid}', [StudentActivityController::class, 'showByUuid'])
@@ -63,16 +68,27 @@ Route::prefix('v1')->group(function (): void {
     Route::get('news/{slug}', [NewsController::class, 'showBySlug'])
         ->name('v1.news.showBySlug');
     Route::get('testimonials', [TestimonialController::class, 'index']);
+    Route::get('virtual-tours', [VirtualTourController::class, 'index']);
+    Route::get('virtual-tours/{slug}', [VirtualTourController::class, 'showBySlug'])
+        ->where('slug', '[a-z0-9\-]+')
+        ->name('v1.virtual-tours.showBySlug');
     Route::get('courses', [CourseController::class, 'index']);
     Route::get('courses/{slug}', [CourseController::class, 'showBySlug']);
     Route::get('settings', [SettingController::class, 'index']);
 
-    Route::post('pmb/registrations', [PmbRegistrationController::class, 'store']);
+    Route::post('pmb/registrations', [PmbRegistrationController::class, 'store'])
+        ->middleware('throttle:10,1');
     Route::get('pmb/track/{token}', [PmbRegistrationController::class, 'track']);
 });
 
 Route::prefix('admin')->group(function (): void {
-    Route::post('login', [AuthController::class, 'login']);
+    Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+
+    Route::prefix('auth/google')->middleware('throttle:10,1')->group(function (): void {
+        Route::get('redirect', [GoogleAuthController::class, 'redirect']);
+        Route::get('callback', [GoogleAuthController::class, 'callback']);
+        Route::post('exchange', [GoogleAuthController::class, 'exchange']);
+    });
 
     Route::middleware(['auth:sanctum', EnsurePanelUser::class])->group(function (): void {
         Route::post('logout', [AuthController::class, 'logout']);
@@ -96,6 +112,7 @@ Route::prefix('admin')->group(function (): void {
         Route::patch('student-activities/{student_activity}/unpublish', [AdminStudentActivityController::class, 'unpublish']);
         Route::apiResource('student-activities', AdminStudentActivityController::class);
         Route::apiResource('facilities', AdminFacilityController::class);
+        Route::apiResource('virtual-tours', AdminVirtualTourController::class);
         Route::apiResource('facility-photos', FacilityPhotoController::class);
         Route::apiResource('testimonials', AdminTestimonialController::class);
         Route::apiResource('courses', AdminCourseController::class);
