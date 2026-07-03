@@ -16,7 +16,11 @@ class UploadController extends Controller
     {
         $file = $request->file('file');
         $collection = $request->validated('collection');
-        $originalName = $file->getClientOriginalName();
+        $originalName = Str::limit(
+            preg_replace('/[\x00-\x1F\x7F]/', '', (string) $file->getClientOriginalName()) ?? '',
+            255,
+            '',
+        );
         $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
         $path = $file->storeAs("uploads/{$collection}", $filename, 'public');
 

@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests\Testimonial;
 
-use App\Http\Requests\AdminFormRequest;
+use App\Http\Requests\RichContentAdminRequest;
+use App\Rules\SafeMediaUrl;
 
-class UpdateTestimonialRequest extends AdminFormRequest
+class UpdateTestimonialRequest extends RichContentAdminRequest
 {
     public function rules(): array
     {
@@ -13,7 +14,7 @@ class UpdateTestimonialRequest extends AdminFormRequest
             'name' => ['sometimes', 'string', 'max:200'],
             'role' => ['nullable', 'string', 'max:150'],
             'content' => ['sometimes', 'string'],
-            'photo' => ['nullable', 'string', 'max:500'],
+            'photo' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
             'rating' => ['sometimes', 'integer', 'min:1', 'max:5'],
             'order' => ['sometimes', 'integer', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],

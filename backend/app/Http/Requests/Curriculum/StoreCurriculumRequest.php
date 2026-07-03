@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests\Curriculum;
 
-use App\Http\Requests\AdminFormRequest;
+use App\Http\Requests\RichContentAdminRequest;
+use App\Rules\SafeMediaUrl;
 
-class StoreCurriculumRequest extends AdminFormRequest
+class StoreCurriculumRequest extends RichContentAdminRequest
 {
     public function rules(): array
     {
@@ -14,8 +15,9 @@ class StoreCurriculumRequest extends AdminFormRequest
             'slug' => ['required', 'string', 'max:270', 'unique:curriculums,slug'],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['nullable', 'string'],
+            'content_json' => ['nullable', 'array'],
             'icon' => ['nullable', 'string', 'max:100'],
-            'thumbnail' => ['nullable', 'string', 'max:500'],
+            'thumbnail' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
             'category' => ['nullable', 'string', 'max:100'],
             'order' => ['sometimes', 'integer', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],

@@ -63,4 +63,22 @@ class CurriculumAdminTest extends TestCase
         $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());
         $this->assertAdminDestroy(self::RESOURCE, $id);
     }
+
+    public function test_admin_can_store_with_content_json(): void
+    {
+        $payload = array_merge($this->validPayload(), [
+            'content_json' => [
+                'type' => 'doc',
+                'content' => [
+                    ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => 'Program unggulan.']]],
+                ],
+            ],
+        ]);
+
+        $id = $this->assertAdminStoreSuccess(self::RESOURCE, $payload);
+        $this->assertDatabaseHas('curriculums', [
+            'id' => $id,
+            'title' => $payload['title'],
+        ]);
+    }
 }

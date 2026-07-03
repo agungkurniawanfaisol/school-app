@@ -56,4 +56,16 @@ class TeacherApiTest extends TestCase
 
         $this->assertInactiveHiddenFromShow('/api/v1/teachers', $teacher);
     }
+
+    public function test_invalid_uuid_format_returns_404(): void
+    {
+        $this->getJson('/api/v1/teachers/uuid/not-a-valid-uuid')
+            ->assertNotFound();
+    }
+
+    public function test_invalid_slug_format_returns_404(): void
+    {
+        $this->getJson('/api/v1/teachers/invalid slug!')
+            ->assertNotFound();
+    }
 }

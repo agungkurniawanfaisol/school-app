@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests\Curriculum;
 
-use App\Http\Requests\AdminFormRequest;
+use App\Http\Requests\RichContentAdminRequest;
+use App\Rules\SafeMediaUrl;
 use Illuminate\Validation\Rule;
 
-class UpdateCurriculumRequest extends AdminFormRequest
+class UpdateCurriculumRequest extends RichContentAdminRequest
 {
     public function rules(): array
     {
@@ -17,8 +18,9 @@ class UpdateCurriculumRequest extends AdminFormRequest
             'slug' => ['sometimes', 'string', 'max:270', Rule::unique('curriculums', 'slug')->ignore($id)],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['nullable', 'string'],
+            'content_json' => ['nullable', 'array'],
             'icon' => ['nullable', 'string', 'max:100'],
-            'thumbnail' => ['nullable', 'string', 'max:500'],
+            'thumbnail' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
             'category' => ['nullable', 'string', 'max:100'],
             'order' => ['sometimes', 'integer', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],

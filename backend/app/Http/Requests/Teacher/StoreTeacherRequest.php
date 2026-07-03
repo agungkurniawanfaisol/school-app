@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests\Teacher;
 
-use App\Http\Requests\AdminFormRequest;
+use App\Http\Requests\RichContentAdminRequest;
+use App\Rules\SafeMediaUrl;
 
-class StoreTeacherRequest extends AdminFormRequest
+class StoreTeacherRequest extends RichContentAdminRequest
 {
     public function rules(): array
     {
@@ -17,27 +18,18 @@ class StoreTeacherRequest extends AdminFormRequest
             'bio' => ['nullable', 'string', 'max:2000'],
             'content' => ['nullable', 'string'],
             'content_json' => ['nullable', 'array'],
-            'photo' => ['nullable', 'string', 'max:500'],
+            'photo' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
             'email' => ['nullable', 'email', 'max:150'],
             'social_media' => ['nullable', 'array'],
-            'social_media.facebook' => ['nullable', 'string', 'max:500'],
-            'social_media.instagram' => ['nullable', 'string', 'max:500'],
-            'social_media.youtube' => ['nullable', 'string', 'max:500'],
-            'social_media.tiktok' => ['nullable', 'string', 'max:500'],
-            'social_media.twitter' => ['nullable', 'string', 'max:500'],
+            'social_media.facebook' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
+            'social_media.instagram' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
+            'social_media.youtube' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
+            'social_media.tiktok' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
+            'social_media.twitter' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
             'order' => ['sometimes', 'integer', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
             'is_featured' => ['sometimes', 'boolean'],
         ];
-    }
-
-    protected function prepareForValidation(): void
-    {
-        if ($this->has('content_json') && is_string($this->content_json)) {
-            $this->merge([
-                'content_json' => json_decode($this->content_json, true),
-            ]);
-        }
     }
 
     public function messages(): array

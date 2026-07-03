@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests\CourseLesson;
 
-use App\Http\Requests\AdminFormRequest;
+use App\Http\Requests\RichContentAdminRequest;
+use App\Rules\SafeMediaUrl;
 
-class UpdateCourseLessonRequest extends AdminFormRequest
+class UpdateCourseLessonRequest extends RichContentAdminRequest
 {
     public function rules(): array
     {
@@ -14,7 +15,7 @@ class UpdateCourseLessonRequest extends AdminFormRequest
             'slug' => ['sometimes', 'string', 'max:270'],
             'type' => ['sometimes', 'string', 'in:text,video,quiz,file'],
             'content' => ['nullable', 'string'],
-            'video_url' => ['nullable', 'string', 'max:500'],
+            'video_url' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
             'duration_minutes' => ['sometimes', 'integer', 'min:0'],
             'order' => ['sometimes', 'integer', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],

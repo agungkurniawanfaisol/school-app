@@ -46,6 +46,9 @@ class UploadAdminTest extends TestCase
 
         $path = $response->json('data.path');
         Storage::disk('public')->assertExists($path);
+
+        $url = $response->json('data.url');
+        $this->assertStringStartsWith('/storage/', $url);
     }
 
     public function test_admin_upload_rejects_invalid_mime(): void

@@ -57,6 +57,20 @@ class SchoolAdminTest extends TestCase
         $this->assertAdminUpdate(self::RESOURCE, $id, ['name' => 'Updated School Name']);
     }
 
+    public function test_admin_can_update_vision_and_mission(): void
+    {
+        $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());
+
+        $response = $this->actingAsAdmin()->putJson('/api/admin/schools/'.$id, [
+            'vision' => 'Visi sekolah unggulan',
+            'mission' => "1. Poin pertama\n2. Poin kedua",
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.vision', 'Visi sekolah unggulan')
+            ->assertJsonPath('data.mission', "1. Poin pertama\n2. Poin kedua");
+    }
+
     public function test_admin_can_destroy(): void
     {
         $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());

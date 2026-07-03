@@ -62,6 +62,10 @@ trait HandlesPublicRead
 
     protected function isPubliclyVisible(Model $item): bool
     {
+        if ($item instanceof \App\Models\News) {
+            return \App\Support\NewsPublishSchedule::isPubliclyVisible($item);
+        }
+
         if (! $item->is_active) {
             return false;
         }
