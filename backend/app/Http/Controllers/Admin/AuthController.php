@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Concerns\IssuesAdminToken;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\JsonResponse;
@@ -11,6 +12,8 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    use IssuesAdminToken;
+
     public function login(LoginRequest $request): JsonResponse
     {
         $user = \App\Models\User::query()
@@ -28,21 +31,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
-        $token = $user->createToken('admin-token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'Login berhasil.',
-            'data' => [
-                'token' => $token,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->role,
-                    'teacher_id' => $user->teacher_id,
-                ],
-            ],
-        ]);
+        return $this->issueAuthResponse($user);
     }
 
     public function logout(Request $request): JsonResponse
