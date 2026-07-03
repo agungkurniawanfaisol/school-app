@@ -3,11 +3,10 @@ import {
   api,
   clearAuthSession,
   getAuthToken,
-  getStoredUser,
   isAuthError,
+  isNetworkError,
   setAuthSession,
 } from '@/lib/api'
-import { queryConfig } from '@/hooks/queryConfig'
 import type { ApiResponse, LoginResponse, User } from '@/types'
 import type { LoginFormValues } from '@/schemas/auth'
 
@@ -31,13 +30,16 @@ export function useAuthMe() {
       return user
     },
     enabled: hasToken,
-    placeholderData: () => getStoredUser() ?? undefined,
-    ...queryConfig,
-    staleTime: 0,
-    refetchOnMount: 'always',
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     retry: (failureCount, error) => {
       if (isAuthError(error)) {
         return false
+      }
+      if (isNetworkError(error)) {
+        return failureCount < 3
       }
       return failureCount < 1
     },
@@ -50,6 +52,23 @@ export function useLogin() {
   return useMutation({
     mutationFn: async (values: LoginFormValues) => {
       const { data } = await api.post<ApiResponse<LoginResponse>>('/admin/login', values)
+      return data.data
+    },
+    onSuccess: (data) => {
+      setAuthSession(data.token, data.user)
+      queryClient.setQueryData(authKeys.me(), data.user)
+    },
+  })
+}
+
+export function useGoogleExchange() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (ticket: string) => {
+      const { data } = await api.post<ApiResponse<LoginResponse>>('/admin/auth/google/exchange', {
+        ticket,
+      })
       return data.data
     },
     onSuccess: (data) => {

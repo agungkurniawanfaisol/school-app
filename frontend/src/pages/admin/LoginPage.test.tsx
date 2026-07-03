@@ -13,6 +13,8 @@ vi.mock('@/hooks/useAuth', () => ({
     isFetched: false,
     isError: false,
     fetchStatus: 'idle',
+    isLoading: false,
+    isSuccess: false,
   }),
 }))
 
@@ -21,18 +23,31 @@ vi.mock('@/components/theme', () => ({
 }))
 
 describe('LoginPage', () => {
-  it('shows login form fields', () => {
+  it('shows Google sign-in as primary action', () => {
     renderWithProviders(<LoginPage />)
 
     expect(screen.getByText('Panel Admin')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Masuk dengan Google' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Kembali/i })).toHaveAttribute('href', '/')
+  })
+
+  it('hides email password fields until accordion is expanded', () => {
+    renderWithProviders(<LoginPage />)
+
+    expect(screen.queryByPlaceholderText('admin@sekolah.id')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Masuk' })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /Masuk dengan email & kata sandi/i }))
+
     expect(screen.getByPlaceholderText('admin@sekolah.id')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('••••••••')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Masuk' })).toBeInTheDocument()
   })
 
-  it('uses mobile-friendly touch targets and input sizing', () => {
+  it('uses mobile-friendly touch targets after expanding email form', () => {
     const { container } = renderWithProviders(<LoginPage />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Masuk dengan email & kata sandi/i }))
 
     const emailInput = container.querySelector('input[name="email"]')
     const submitButton = container.querySelector('button[type="submit"]')
@@ -45,8 +60,10 @@ describe('LoginPage', () => {
     expect(submitButton).toHaveClass('w-full')
   })
 
-  it('shows validation errors on empty submit', async () => {
+  it('shows validation errors on empty submit after expanding form', async () => {
     const { container } = renderWithProviders(<LoginPage />)
+
+    fireEvent.click(screen.getByRole('button', { name: /Masuk dengan email & kata sandi/i }))
 
     const form = container.querySelector('form')
     expect(form).not.toBeNull()
