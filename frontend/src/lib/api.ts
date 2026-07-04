@@ -31,9 +31,31 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config
 })
 
+// #region agent log
+const __dbgApi = (msg: string, data?: Record<string, unknown>) => { fetch('http://127.0.0.1:7357/ingest/9d8959b5-b5eb-49d7-b822-17cfa3051c69',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'30f7f9'},body:JSON.stringify({sessionId:'30f7f9',location:'api.ts',message:msg,data:data??{},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{}); };
+// #endregion
+
+api.interceptors.request.use((config) => {
+  // #region agent log
+  (config as Record<string, unknown>).__dbgStart = performance.now();
+  __dbgApi('API request START', { url: config.url, params: config.params as Record<string, unknown> });
+  // #endregion
+  return config;
+})
+
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // #region agent log
+    const start = (response.config as Record<string, unknown>).__dbgStart as number | undefined;
+    __dbgApi('API request OK', { url: response.config.url, status: response.status, durationMs: start ? performance.now() - start : -1 });
+    // #endregion
+    return response;
+  },
   (error: AxiosError<{ message?: string; errors?: Record<string, string[]> }>) => {
+    // #region agent log
+    const start = (error.config as Record<string, unknown> | undefined)?.__dbgStart as number | undefined;
+    __dbgApi('API request FAIL', { url: error.config?.url, status: error.response?.status, code: error.code, durationMs: start ? performance.now() - start : -1 });
+    // #endregion
     if (error.response?.status === 401) {
       const url = error.config?.url ?? ''
       const isProtectedAdmin = url.includes('/admin/') && !url.includes('/admin/login')

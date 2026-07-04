@@ -12,6 +12,11 @@ import App from './App.tsx'
 import { authKeys } from '@/hooks/useAuth'
 import './index.css'
 
+// #region agent log
+const __dbg = (msg: string, data?: Record<string, unknown>) => { fetch('http://127.0.0.1:7357/ingest/9d8959b5-b5eb-49d7-b822-17cfa3051c69',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'30f7f9'},body:JSON.stringify({sessionId:'30f7f9',location:'main.tsx',message:msg,data:data??{},timestamp:Date.now(),hypothesisId:'A,C,D'})}).catch(()=>{}); };
+__dbg('main.tsx module evaluated', { timeSinceOrigin: performance.now() });
+// #endregion
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -40,6 +45,10 @@ function AuthSessionSync() {
 
 function AppShell() {
   const { resolvedTheme } = useTheme()
+
+  // #region agent log
+  useEffect(() => { __dbg('AppShell mounted (first render complete)', { timeSinceOrigin: performance.now() }); }, []);
+  // #endregion
 
   return (
     <TooltipProvider delayDuration={300}>

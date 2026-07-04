@@ -55,12 +55,17 @@ i18n.use(initReactI18next).init({
   ns: [...NAMESPACES],
   defaultNS: 'landing',
   interpolation: { escapeValue: false },
+  react: {
+    useSuspense: false,
+    bindI18n: 'languageChanged loaded',
+    bindI18nStore: 'added removed',
+  },
 })
 
 const storedLang = getStoredLang()
 
 export const i18nReady: Promise<void> = storedLang !== 'id'
-  ? loadLocale(storedLang).then(() => { i18n.changeLanguage(storedLang) })
+  ? loadLocale(storedLang).then(() => i18n.changeLanguage(storedLang)).then(() => {})
   : Promise.resolve()
 
 export { LANG_KEY, SUPPORTED_LOCALES }

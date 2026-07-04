@@ -62,13 +62,24 @@ function wrapPaginated<T>(items: T[], perPage: number): PaginatedResponse<T> {
   }
 }
 
+// #region agent log
+const __dbgLanding = (msg: string, data?: Record<string, unknown>) => { fetch('http://127.0.0.1:7357/ingest/9d8959b5-b5eb-49d7-b822-17cfa3051c69',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'30f7f9'},body:JSON.stringify({sessionId:'30f7f9',location:'useLandingPrefetch.ts',message:msg,data:data??{},timestamp:Date.now(),hypothesisId:'A,E'})}).catch(()=>{}); };
+// #endregion
+
 export function useLandingPrefetch() {
   const queryClient = useQueryClient()
 
   const { data } = useQuery({
     queryKey: LANDING_KEY,
     queryFn: async () => {
+      // #region agent log
+      const __t0 = performance.now();
+      __dbgLanding('API /v1/landing request START', { timeSinceOrigin: __t0 });
+      // #endregion
       const { data } = await api.get<{ data: LandingData }>('/v1/landing')
+      // #region agent log
+      __dbgLanding('API /v1/landing request END', { timeSinceOrigin: performance.now(), durationMs: performance.now() - __t0 });
+      // #endregion
       return data.data
     },
     ...queryConfig,

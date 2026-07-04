@@ -52,9 +52,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setIsChangingLocale(true)
     try {
       await loadLocale(next)
+      await i18n.changeLanguage(next)
       setLocaleState(next)
       localStorage.setItem(LANG_KEY, next)
-      i18n.changeLanguage(next)
       applyLocale(next)
     } finally {
       setIsChangingLocale(false)
