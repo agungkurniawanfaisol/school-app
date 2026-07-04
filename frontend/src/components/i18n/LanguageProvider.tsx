@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
-import { LANG_KEY, SUPPORTED_LOCALES, loadLocale, type SupportedLocale } from '@/lib/i18n'
+import { LANG_KEY, SUPPORTED_LOCALES, loadLocale, i18nReady, type SupportedLocale } from '@/lib/i18n'
 
 export type Locale = SupportedLocale
 export type Dir = 'ltr' | 'rtl'
@@ -9,6 +9,7 @@ export type Dir = 'ltr' | 'rtl'
 interface LanguageContextValue {
   locale: Locale
   dir: Dir
+  isChangingLocale: boolean
   setLocale: (locale: Locale) => void
 }
 
@@ -31,6 +32,14 @@ function getStoredLocale(): Locale {
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const { i18n } = useTranslation()
   const [locale, setLocaleState] = useState<Locale>(getStoredLocale)
+  const [isChangingLocale, setIsChangingLocale] = useState(false)
+  const [isReady, setIsReady] = useState(false)
+
+  useEffect(() => {
+    i18nReady
+      .then(() => setIsReady(true))
+      .catch(() => setIsReady(true))
+  }, [])
 
   const applyLocale = useCallback((loc: Locale) => {
     const root = document.documentElement
@@ -40,11 +49,16 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setLocale = useCallback(async (next: Locale) => {
-    await loadLocale(next)
-    setLocaleState(next)
-    localStorage.setItem(LANG_KEY, next)
-    i18n.changeLanguage(next)
-    applyLocale(next)
+    setIsChangingLocale(true)
+    try {
+      await loadLocale(next)
+      setLocaleState(next)
+      localStorage.setItem(LANG_KEY, next)
+      i18n.changeLanguage(next)
+      applyLocale(next)
+    } finally {
+      setIsChangingLocale(false)
+    }
   }, [i18n, applyLocale])
 
   useEffect(() => {
@@ -52,9 +66,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [locale, applyLocale])
 
   const value = useMemo(
-    () => ({ locale, dir: getDir(locale), setLocale }),
-    [locale, setLocale],
+    () => ({ locale, dir: getDir(locale), isChangingLocale, setLocale }),
+    [locale, isChangingLocale, setLocale],
   )
+
+  if (!isReady) {
+    return (
+      <div className="flex h-svh items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    )
+  }
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
 }

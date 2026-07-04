@@ -58,11 +58,10 @@ i18n.use(initReactI18next).init({
 })
 
 const storedLang = getStoredLang()
-if (storedLang !== 'id') {
-  loadLocale(storedLang).then(() => {
-    i18n.changeLanguage(storedLang)
-  })
-}
+
+export const i18nReady: Promise<void> = storedLang !== 'id'
+  ? loadLocale(storedLang).then(() => { i18n.changeLanguage(storedLang) })
+  : Promise.resolve()
 
 export { LANG_KEY, SUPPORTED_LOCALES }
 export type { SupportedLocale }
