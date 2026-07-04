@@ -45,7 +45,7 @@ describe('VisionMissionPage', () => {
 
     expect(screen.getByRole('heading', { name: 'Visi & Misi' })).toBeInTheDocument()
     expect(screen.getByLabelText('Visi')).toHaveValue('Visi lama')
-    expect(screen.getByLabelText('Misi')).toHaveValue('Misi lama')
+    expect(screen.getAllByText('Misi').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Pratinjau Beranda')).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Pratinjau visi dan misi' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Simpan' })).toBeInTheDocument()

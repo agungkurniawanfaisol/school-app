@@ -31,6 +31,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAdminTeachersList, useDeleteTeacher, useUpdateTeacher } from '@/hooks/useTeachers'
 import { TEACHER_TYPE_LABELS, type TeacherTypeValue } from '@/schemas/teacher'
 import type { Teacher } from '@/types'
@@ -94,49 +95,76 @@ function TeacherListCard({
           </div>
         </Link>
 
-        <div className="flex flex-wrap justify-end gap-1 border-t border-primary/10 p-2">
-          <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
-            <Link
-              to={`/admin/teachers/${teacher.uuid}/preview`}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Pratinjau ${teacher.name}`}
-            >
-              <ExternalLink className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
-            <Link to={`/admin/teachers/${teacher.uuid}/edit`} aria-label={`Edit ${teacher.name}`}>
-              <Pencil className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
-            <Link to={`/admin/teachers/${teacher.uuid}`} aria-label={`Detail ${teacher.name}`}>
-              <Eye className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            className="min-h-11 min-w-11"
-            disabled={isToggling}
-            aria-label={teacher.is_active ? `Nonaktifkan ${teacher.name}` : `Aktifkan ${teacher.name}`}
-            onClick={onToggleActive}
-          >
-            <Power className="h-4 w-4" />
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            className="min-h-11 min-w-11 text-destructive hover:text-destructive"
-            aria-label={`Hapus ${teacher.name}`}
-            onClick={() => onDelete(teacher)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
+        <TooltipProvider delayDuration={300}>
+          <div className="flex flex-wrap justify-end gap-1 border-t border-primary/10 p-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
+                  <Link
+                    to={`/admin/teachers/${teacher.uuid}/preview`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Pratinjau ${teacher.name}`}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Pratinjau</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
+                  <Link to={`/admin/teachers/${teacher.uuid}/edit`} aria-label={`Edit ${teacher.name}`}>
+                    <Pencil className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Edit</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
+                  <Link to={`/admin/teachers/${teacher.uuid}`} aria-label={`Detail ${teacher.name}`}>
+                    <Eye className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Detail</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="min-h-11 min-w-11"
+                  disabled={isToggling}
+                  aria-label={teacher.is_active ? `Nonaktifkan ${teacher.name}` : `Aktifkan ${teacher.name}`}
+                  onClick={onToggleActive}
+                >
+                  <Power className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{teacher.is_active ? 'Nonaktifkan' : 'Aktifkan'}</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="min-h-11 min-w-11 text-destructive hover:text-destructive"
+                  aria-label={`Hapus ${teacher.name}`}
+                  onClick={() => onDelete(teacher)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Hapus</TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
       </CardContent>
     </Card>
   )

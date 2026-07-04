@@ -1,15 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ExternalLink } from 'lucide-react'
-import { useEffect } from 'react'
+import { ExternalLink, GripVertical, Plus, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { VisionMissionPreview } from '@/components/admin/VisionMissionPreview'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useSchool, useUpdateSchool } from '@/hooks/useSchool'
 import {
   MISSION_MAX_LENGTH,
@@ -33,6 +35,118 @@ function CharCounter({ value, max }: { value: string; max: number }) {
   )
 }
 
+function parseMissionItems(mission: string | null | undefined): string[] {
+  if (!mission?.trim()) return ['']
+  const items = mission
+    .split('\n')
+    .map((line) => line.replace(/^\d+\.\s*/, '').trim())
+    .filter(Boolean)
+  return items.length ? items : ['']
+}
+
+function joinMissionItems(items: string[]): string {
+  return items
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item, i) => `${i + 1}. ${item}`)
+    .join('\n')
+}
+
+function MissionItemsList({
+  items,
+  onChange,
+}: {
+  items: string[]
+  onChange: (items: string[]) => void
+}) {
+  function updateItem(index: number, value: string) {
+    const next = [...items]
+    next[index] = value
+    onChange(next)
+  }
+
+  function removeItem(index: number) {
+    if (items.length <= 1) return
+    onChange(items.filter((_, i) => i !== index))
+  }
+
+  function addItem() {
+    onChange([...items, ''])
+  }
+
+  function moveItem(from: number, to: number) {
+    if (to < 0 || to >= items.length) return
+    const next = [...items]
+    const [moved] = next.splice(from, 1)
+    next.splice(to, 0, moved)
+    onChange(next)
+  }
+
+  return (
+    <TooltipProvider delayDuration={300}>
+      <div className="space-y-2">
+        {items.map((item, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <div className="flex flex-col">
+              <button
+                type="button"
+                className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
+                disabled={index === 0}
+                onClick={() => moveItem(index, index - 1)}
+                aria-label="Pindah ke atas"
+                tabIndex={-1}
+              >
+                <GripVertical className="h-4 w-4" />
+              </button>
+            </div>
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+              {index + 1}
+            </span>
+            <Input
+              value={item}
+              onChange={(e) => updateItem(index, e.target.value)}
+              placeholder={`Poin misi ke-${index + 1}`}
+              className="h-10 flex-1"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  addItem()
+                }
+              }}
+            />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 shrink-0 text-destructive hover:text-destructive"
+                  disabled={items.length <= 1}
+                  onClick={() => removeItem(index)}
+                  aria-label={`Hapus poin ${index + 1}`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Hapus poin</TooltipContent>
+            </Tooltip>
+          </div>
+        ))}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-1 w-full gap-1.5"
+          onClick={addItem}
+        >
+          <Plus className="h-4 w-4" />
+          Tambah poin misi
+        </Button>
+      </div>
+    </TooltipProvider>
+  )
+}
+
 export function VisionMissionPage() {
   const { data: school, isLoading, isError } = useSchool()
   const updateSchool = useUpdateSchool(school?.id ?? 0)
@@ -42,13 +156,21 @@ export function VisionMissionPage() {
     defaultValues: { vision: '', mission: '' },
   })
 
+  const [missionItems, setMissionItems] = useState<string[]>([''])
+
   useEffect(() => {
     if (!school) return
     form.reset({
       vision: school.vision ?? '',
       mission: school.mission ?? '',
     })
+    setMissionItems(parseMissionItems(school.mission))
   }, [school, form])
+
+  function handleMissionItemsChange(items: string[]) {
+    setMissionItems(items)
+    form.setValue('mission', joinMissionItems(items), { shouldDirty: true })
+  }
 
   const visionValue = form.watch('vision') ?? ''
   const missionValue = form.watch('mission') ?? ''
@@ -137,22 +259,13 @@ export function VisionMissionPage() {
                 <FormField
                   control={form.control}
                   name="mission"
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem>
-                      <FormLabel htmlFor="mission">Misi</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          id="mission"
-                          rows={8}
-                          className="min-h-[10rem] resize-y"
-                          placeholder={'1. Poin misi pertama\n2. Poin misi kedua'}
-                          {...field}
-                          value={field.value ?? ''}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Satu baris = satu poin misi. Gunakan Enter untuk baris baru.
-                      </FormDescription>
+                      <FormLabel>Misi</FormLabel>
+                      <MissionItemsList
+                        items={missionItems}
+                        onChange={handleMissionItemsChange}
+                      />
                       <CharCounter value={missionValue} max={MISSION_MAX_LENGTH} />
                       <FormMessage />
                     </FormItem>

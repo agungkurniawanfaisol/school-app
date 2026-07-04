@@ -53,5 +53,8 @@
   "article.relatedTitle": "関連記事",
   "article.viewAll": "すべて見る",
   "article.byAuthor": "{{name}} 著",
-  "header.whatsapp": "WhatsApp"
+  "header.whatsapp": "WhatsApp",
+  "announcement.dismiss": "お知らせを閉じる",
+  "announcement.dontShowAgain": "今後表示しない",
+  "announcement.understood": "了解"
 }

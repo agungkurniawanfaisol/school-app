@@ -104,5 +104,10 @@
   "principal.label": "Principal",
   "staff.badge": "Education Staff",
   "staff.title": "Staff & Administration",
-  "staff.desc": "Administrative team supporting smooth school operations."
+  "staff.desc": "Administrative team supporting smooth school operations.",
+  "gallery.badge": "Gallery",
+  "gallery.title": "School Photo Gallery",
+  "gallery.desc": "Documentation of activities and precious moments at Nurul Hikmah.",
+  "gallery.viewAll": "View All",
+  "gallery.empty": "No photo albums yet."
 }

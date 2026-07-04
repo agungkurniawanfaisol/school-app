@@ -104,5 +104,10 @@
   "principal.label": "校長",
   "staff.badge": "教育スタッフ",
   "staff.title": "スタッフと事務局",
-  "staff.desc": "学校運営を支える事務チーム。"
+  "staff.desc": "学校運営を支える事務チーム。",
+  "gallery.badge": "ギャラリー",
+  "gallery.title": "学校フォトギャラリー",
+  "gallery.desc": "ヌルル・ヒクマの活動と大切な瞬間の記録。",
+  "gallery.viewAll": "すべて見る",
+  "gallery.empty": "フォトアルバムはまだありません。"
 }

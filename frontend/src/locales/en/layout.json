@@ -30,8 +30,14 @@
   "nav.featuredPrograms": "Featured Programs",
   "nav.teachers": "Teachers",
   "nav.facilities": "Facilities",
+  "nav.achievements": "Achievements",
+  "nav.gallery": "Photo Gallery",
+  "nav.extracurricular": "Extracurricular",
   "nav.content": "Content",
   "nav.activities": "Activities",
+  "nav.agenda": "Agenda",
+  "nav.documents": "Documents",
+  "nav.suggestion": "Suggestion Box",
   "nav.pmbInfo": "PMB Info",
   "nav.registerNew": "Register New Student",
   "nav.checkStatus": "Check Status",
@@ -53,5 +59,8 @@
   "article.relatedTitle": "Related articles",
   "article.viewAll": "View all",
   "article.byAuthor": "By {{name}}",
-  "header.whatsapp": "WhatsApp"
+  "header.whatsapp": "WhatsApp",
+  "announcement.dismiss": "Dismiss announcement",
+  "announcement.dontShowAgain": "Don't show again",
+  "announcement.understood": "Got it"
 }

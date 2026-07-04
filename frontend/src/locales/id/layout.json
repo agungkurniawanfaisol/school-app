@@ -30,8 +30,14 @@
   "nav.featuredPrograms": "Program Unggulan",
   "nav.teachers": "Guru",
   "nav.facilities": "Fasilitas",
+  "nav.achievements": "Prestasi",
+  "nav.gallery": "Galeri Foto",
+  "nav.extracurricular": "Ekstrakurikuler",
   "nav.content": "Konten",
   "nav.activities": "Kegiatan",
+  "nav.agenda": "Agenda",
+  "nav.documents": "Dokumen Unduhan",
+  "nav.suggestion": "Kotak Saran",
   "nav.pmbInfo": "Informasi PMB",
   "nav.registerNew": "Daftar Siswa Baru",
   "nav.checkStatus": "Cek Status",
@@ -53,5 +59,8 @@
   "article.relatedTitle": "Baca juga",
   "article.viewAll": "Lihat semua",
   "article.byAuthor": "Oleh {{name}}",
-  "header.whatsapp": "WhatsApp"
+  "header.whatsapp": "WhatsApp",
+  "announcement.dismiss": "Tutup pengumuman",
+  "announcement.dontShowAgain": "Jangan tampilkan lagi",
+  "announcement.understood": "Saya mengerti"
 }

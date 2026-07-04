@@ -2,19 +2,25 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { api, SCHOOL_SLUG } from '@/lib/api'
 import { queryConfig, buildQueryParams } from '@/hooks/queryConfig'
-import { schoolKeys } from '@/hooks/useSchool'
-import { teacherKeys } from '@/hooks/useTeachers'
-import { curriculumKeys } from '@/hooks/useCurriculums'
+import { achievementKeys, type Achievement } from '@/hooks/useAchievements'
 import { activityKeys } from '@/hooks/useActivities'
+import { curriculumKeys } from '@/hooks/useCurriculums'
+import { documentKeys } from '@/hooks/useDocuments'
+import { eventKeys, type Event } from '@/hooks/useEvents'
 import { facilityKeys } from '@/hooks/useFacilities'
 import { newsKeys } from '@/hooks/useNews'
+import { photoAlbumKeys } from '@/hooks/usePhotoAlbums'
+import { schoolKeys } from '@/hooks/useSchool'
+import { teacherKeys } from '@/hooks/useTeachers'
 import { testimonialKeys } from '@/hooks/useTestimonials'
 import type {
   Curriculum,
+  Document,
   Facility,
   HeroSlider,
   News,
   PaginatedResponse,
+  PhotoAlbum,
   School,
   StudentActivity,
   Teacher,
@@ -29,6 +35,10 @@ interface LandingData {
   principal: Teacher[]
   staff: Teacher[]
   activities: StudentActivity[]
+  achievements: Achievement[]
+  events: Event[]
+  documents: Document[]
+  photo_albums: PhotoAlbum[]
   facilities: Facility[]
   news: News[]
   testimonials: Testimonial[]
@@ -94,8 +104,24 @@ export function useLandingPrefetch() {
       wrapPaginated(data.activities, 6),
     )
     queryClient.setQueryData(
+      achievementKeys.list(buildQueryParams({ per_page: 6 })),
+      wrapPaginated(data.achievements, 6),
+    )
+    queryClient.setQueryData(
       facilityKeys.list(buildQueryParams({ per_page: 6, featured: true })),
       wrapPaginated(data.facilities, 6),
+    )
+    queryClient.setQueryData(
+      eventKeys.list(buildQueryParams({ per_page: 5 })),
+      wrapPaginated(data.events, 5),
+    )
+    queryClient.setQueryData(
+      documentKeys.list(buildQueryParams({ per_page: 6 })),
+      wrapPaginated(data.documents, 6),
+    )
+    queryClient.setQueryData(
+      photoAlbumKeys.list(buildQueryParams({ per_page: 4 })),
+      wrapPaginated(data.photo_albums, 4),
     )
     queryClient.setQueryData(
       newsKeys.list(buildQueryParams({ per_page: 3, featured: true })),

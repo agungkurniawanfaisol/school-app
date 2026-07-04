@@ -30,8 +30,14 @@
   "nav.featuredPrograms": "البرامج المميزة",
   "nav.teachers": "المعلمون",
   "nav.facilities": "المرافق",
+  "nav.achievements": "الإنجازات",
+  "nav.gallery": "معرض الصور",
+  "nav.extracurricular": "الأنشطة اللامنهجية",
   "nav.content": "المحتوى",
   "nav.activities": "الأنشطة",
+  "nav.agenda": "جدول الأعمال",
+  "nav.documents": "الوثائق",
+  "nav.suggestion": "صندوق الاقتراحات",
   "nav.pmbInfo": "معلومات التسجيل",
   "nav.registerNew": "تسجيل طالب جديد",
   "nav.checkStatus": "التحقق من الحالة",
@@ -53,5 +59,8 @@
   "article.relatedTitle": "اقرأ أيضاً",
   "article.viewAll": "عرض الكل",
   "article.byAuthor": "بقلم {{name}}",
-  "header.whatsapp": "واتساب"
+  "header.whatsapp": "واتساب",
+  "announcement.dismiss": "إغلاق الإعلان",
+  "announcement.dontShowAgain": "لا تعرض مرة أخرى",
+  "announcement.understood": "فهمت"
 }

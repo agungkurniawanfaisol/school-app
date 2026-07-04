@@ -350,6 +350,128 @@ export interface LoginResponse {
   user: User
 }
 
+export interface Faq {
+  id: number
+  school_id: number
+  question: string
+  answer: string
+  category: 'pmb' | 'akademik' | 'biaya' | 'umum'
+  is_active: boolean
+  order: number
+}
+
+export interface Achievement {
+  id: number
+  uuid: string
+  school_id: number
+  title: string
+  description: string | null
+  category: 'akademik' | 'olahraga' | 'seni' | 'keagamaan' | 'lainnya'
+  level: 'sekolah' | 'kecamatan' | 'kota' | 'provinsi' | 'nasional' | 'internasional'
+  student_name: string | null
+  year: number
+  image: string | null
+  is_active: boolean
+  order: number
+}
+
+export interface Extracurricular {
+  id: number
+  uuid: string
+  school_id: number
+  name: string
+  description: string | null
+  category: 'olahraga' | 'seni' | 'akademik' | 'keagamaan' | 'lainnya'
+  schedule: string | null
+  instructor: string | null
+  image: string | null
+  is_active: boolean
+  order: number
+}
+
+export interface Announcement {
+  id: number
+  uuid: string
+  school_id: number
+  title: string
+  slug: string | null
+  content: string
+  priority: 'normal' | 'important' | 'urgent'
+  is_pinned: boolean
+  published_at: string | null
+  expires_at: string | null
+  is_active: boolean
+  order: number
+  cta_text: string | null
+  cta_url: string | null
+}
+
+export interface Document {
+  id: number
+  school_id: number
+  title: string
+  description: string | null
+  category: 'brosur' | 'formulir' | 'peraturan' | 'kalender' | 'lainnya'
+  file_url: string
+  file_size: number | null
+  file_type: string | null
+  download_count: number
+  is_active: boolean
+  order: number
+}
+
+export interface Event {
+  id: number
+  uuid: string
+  school_id: number
+  title: string
+  description: string | null
+  location: string | null
+  event_date: string
+  event_end_date: string | null
+  event_time: string | null
+  category: 'akademik' | 'keagamaan' | 'olahraga' | 'umum'
+  is_active: boolean
+  order: number
+}
+
+export interface PhotoAlbum {
+  id: number
+  uuid: string
+  school_id: number
+  title: string
+  slug: string | null
+  description: string | null
+  cover_image: string | null
+  event_date: string | null
+  is_active: boolean
+  order: number
+  photos?: AlbumPhoto[]
+  photos_count?: number
+}
+
+export interface AlbumPhoto {
+  id: number
+  photo_album_id: number
+  url: string
+  caption: string | null
+  order: number
+}
+
+export interface ContactMessage {
+  id: number
+  school_id: number
+  name: string
+  email: string
+  phone: string | null
+  subject: string
+  message: string
+  is_read: boolean
+  read_at: string | null
+  replied_at: string | null
+  created_at: string | null
+}
+
 export interface ListFilters {
   page?: number
   per_page?: number
