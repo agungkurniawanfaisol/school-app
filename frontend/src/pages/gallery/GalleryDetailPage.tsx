@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CalendarDays, ChevronLeft, Images, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -14,6 +15,7 @@ import type { AlbumPhoto } from '@/types'
 
 export function GalleryDetailPage() {
   const { t } = useTranslation('pages')
+  const { locale } = useLanguage()
   const { uuid } = useParams<{ uuid: string }>()
   const { data: album, isLoading } = usePhotoAlbumDetail(uuid ?? '')
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
@@ -87,7 +89,7 @@ export function GalleryDetailPage() {
             {album.event_date && (
               <span className="flex items-center gap-1.5">
                 <CalendarDays className="h-4 w-4" aria-hidden />
-                {formatDate(album.event_date)}
+                {formatDate(album.event_date, undefined, locale)}
               </span>
             )}
             <span className="flex items-center gap-1.5">

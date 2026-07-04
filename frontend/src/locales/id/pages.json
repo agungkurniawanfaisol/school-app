@@ -272,5 +272,7 @@
   "suggestion.message": "Pesan",
   "suggestion.messagePlaceholder": "Tuliskan saran, masukan, atau kritik Anda di sini...",
   "suggestion.send": "Kirim Saran",
-  "suggestion.sending": "Mengirim..."
+  "suggestion.sending": "Mengirim...",
+  "suggestion.subjectRequired": "Subjek wajib diisi",
+  "suggestion.messageRequired": "Pesan wajib diisi"
 }

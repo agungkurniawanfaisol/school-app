@@ -86,3 +86,9 @@ export function useLanguage(): LanguageContextValue {
   if (!ctx) throw new Error('useLanguage must be used within LanguageProvider')
   return ctx
 }
+
+export function useDateLocale(): string {
+  const { locale } = useLanguage()
+  const map: Record<string, string> = { id: 'id-ID', en: 'en-US', ar: 'ar-SA', ja: 'ja-JP' }
+  return map[locale] ?? 'id-ID'
+}

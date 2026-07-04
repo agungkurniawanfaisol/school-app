@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { ArticleDetailLayout, ArticleDetailSkeleton } from '@/components/content/ArticleDetailLayout'
 import { RelatedContentCards } from '@/components/content/RelatedContentCards'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { PageMeta } from '@/components/seo/PageMeta'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,7 @@ import { formatDate } from '@/lib/utils'
 
 export function NewsDetailPage() {
   const { t } = useTranslation('pages')
+  const { locale } = useLanguage()
   const { uuid } = useParams<{ uuid: string }>()
   const { data: news, isLoading, isError } = useNewsDetailByUuid(uuid ?? '')
   const { data: relatedData } = useNewsList({
@@ -51,7 +53,7 @@ export function NewsDetailPage() {
       excerpt: item.excerpt,
       thumbnail: item.thumbnail,
       category: item.category,
-      dateLabel: item.published_at ? formatDate(item.published_at) : null,
+      dateLabel: item.published_at ? formatDate(item.published_at, undefined, locale) : null,
       href: `/berita/detail/${item.uuid}`,
     }))
 
@@ -66,7 +68,7 @@ export function NewsDetailPage() {
         thumbnail={news.thumbnail}
         category={news.category}
         authorName={news.author?.name}
-        dateLabel={news.published_at ? formatDate(news.published_at) : null}
+        dateLabel={news.published_at ? formatDate(news.published_at, undefined, locale) : null}
         readingSource={news.content ?? news.excerpt}
         shareTitle={news.title}
         footer={

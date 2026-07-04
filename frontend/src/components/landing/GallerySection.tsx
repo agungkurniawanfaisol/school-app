@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FadeInView } from '@/components/motion/FadeInView'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { SectionHeader } from '@/components/landing/SectionHeader'
 import { usePhotoAlbumsList } from '@/hooks/usePhotoAlbums'
 import { formatDate } from '@/lib/utils'
 import type { PhotoAlbum } from '@/types'
 
 function AlbumCard({ album }: { album: PhotoAlbum }) {
+  const { locale } = useLanguage()
   return (
     <Card className="group relative overflow-hidden border-primary/10">
       <div className="relative aspect-[4/3] overflow-hidden">
@@ -39,7 +41,7 @@ function AlbumCard({ album }: { album: PhotoAlbum }) {
             {album.title}
           </h3>
           {album.event_date && (
-            <p className="mt-1 text-xs text-white/70">{formatDate(album.event_date)}</p>
+            <p className="mt-1 text-xs text-white/70">{formatDate(album.event_date, undefined, locale)}</p>
           )}
         </div>
       </div>

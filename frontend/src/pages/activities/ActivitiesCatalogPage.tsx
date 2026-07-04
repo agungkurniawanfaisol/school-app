@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Calendar, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { PublicCatalogPagination } from '@/components/content/PublicCatalogPagination'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -17,6 +18,7 @@ const PER_PAGE = 12
 
 export function ActivitiesCatalogPage() {
   const { t } = useTranslation('pages')
+  const { locale } = useLanguage()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const { data, isLoading, isFetching } = useActivitiesList({
@@ -93,7 +95,7 @@ export function ActivitiesCatalogPage() {
                         {activity.activity_date && (
                           <Badge className="shrink-0 border-0 bg-accent text-accent-foreground">
                             <Calendar className="mr-1 h-3 w-3" />
-                            {formatDate(activity.activity_date)}
+                            {formatDate(activity.activity_date, undefined, locale)}
                           </Badge>
                         )}
                       </div>

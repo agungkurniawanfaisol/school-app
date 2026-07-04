@@ -12,14 +12,16 @@ import { FadeInView } from '@/components/motion/FadeInView'
 import { SectionHeader } from '@/components/landing/SectionHeader'
 import { useSubmitContactMessage } from '@/hooks/useContactMessages'
 
-const suggestionSchema = z.object({
-  name: z.string().max(200).optional().default(''),
-  email: z.string().max(200).optional().default(''),
-  subject: z.string().min(1, 'Subjek wajib diisi').max(300),
-  message: z.string().min(1, 'Pesan wajib diisi').max(5000),
-})
+function createSuggestionSchema(t: (key: string) => string) {
+  return z.object({
+    name: z.string().max(200).optional().default(''),
+    email: z.string().max(200).optional().default(''),
+    subject: z.string().min(1, t('suggestion.subjectRequired')).max(300),
+    message: z.string().min(1, t('suggestion.messageRequired')).max(5000),
+  })
+}
 
-type SuggestionFormValues = z.infer<typeof suggestionSchema>
+type SuggestionFormValues = z.infer<ReturnType<typeof createSuggestionSchema>>
 
 export function SuggestionBoxSection() {
   const { t } = useTranslation('landing')
@@ -31,7 +33,7 @@ export function SuggestionBoxSection() {
     reset,
     formState: { errors },
   } = useForm<SuggestionFormValues>({
-    resolver: zodResolver(suggestionSchema),
+    resolver: zodResolver(createSuggestionSchema(t)),
     defaultValues: { name: '', email: '', subject: '', message: '' },
   })
 

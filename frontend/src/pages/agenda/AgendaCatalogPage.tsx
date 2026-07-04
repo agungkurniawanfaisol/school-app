@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { CalendarDays, Clock, MapPin, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { PublicCatalogPagination } from '@/components/content/PublicCatalogPagination'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -11,7 +12,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useEventsList, type Event } from '@/hooks/useEvents'
-import { formatDate } from '@/lib/utils'
+import { DATE_LOCALE_MAP, formatDate } from '@/lib/utils'
 
 const PER_PAGE = 12
 
@@ -23,6 +24,8 @@ const categoryColors: Record<string, string> = {
 }
 
 function EventCard({ event }: { event: Event }) {
+  const { locale } = useLanguage()
+  const dateLocale = DATE_LOCALE_MAP[locale] ?? 'id-ID'
   const date = new Date(event.event_date)
   return (
     <Link
@@ -34,7 +37,7 @@ function EventCard({ event }: { event: Event }) {
           <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-lg bg-primary/10 text-primary">
             <span className="text-xl font-bold leading-none">{date.getDate()}</span>
             <span className="mt-0.5 text-[10px] font-medium uppercase">
-              {date.toLocaleDateString('id-ID', { month: 'short' })}
+              {date.toLocaleDateString(dateLocale, { month: 'short' })}
             </span>
           </div>
           <div className="min-w-0 flex-1 space-y-1.5">
@@ -49,7 +52,7 @@ function EventCard({ event }: { event: Event }) {
             <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <CalendarDays className="h-3.5 w-3.5" aria-hidden />
-                {formatDate(event.event_date)}
+                {formatDate(event.event_date, undefined, locale)}
               </span>
               {event.event_time && (
                 <span className="flex items-center gap-1">

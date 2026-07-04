@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselDots, CarouselItem } from '@/components/ui/carousel'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { SectionHeader } from '@/components/landing/SectionHeader'
 import { formatDate } from '@/lib/utils'
 import { useNewsList } from '@/hooks/useNews'
@@ -16,6 +17,7 @@ import type { News } from '@/types'
 
 function NewsCard({ item }: { item: News }) {
   const { t } = useTranslation('landing')
+  const { locale } = useLanguage()
   return (
     <Link
       to={`/berita/detail/${item.uuid}`}
@@ -38,7 +40,7 @@ function NewsCard({ item }: { item: News }) {
               </Badge>
             )}
             {item.published_at && (
-              <span className="text-xs text-muted-foreground">{formatDate(item.published_at)}</span>
+              <span className="text-xs text-muted-foreground">{formatDate(item.published_at, undefined, locale)}</span>
             )}
           </div>
           <CardTitle className="line-clamp-2 text-lg leading-snug">{item.title}</CardTitle>

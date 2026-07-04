@@ -142,6 +142,8 @@
   "suggestion.messagePlaceholder": "Write your suggestions, feedback, or criticism here...",
   "suggestion.send": "Send Suggestion",
   "suggestion.sending": "Sending...",
+  "suggestion.subjectRequired": "Subject is required",
+  "suggestion.messageRequired": "Message is required",
   "gallery.badge": "Gallery",
   "gallery.title": "School Photo Gallery",
   "gallery.desc": "Documentation of activities and precious moments at Nurul Hikmah.",

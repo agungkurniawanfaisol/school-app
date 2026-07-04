@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { CalendarDays, Clock, MapPin } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -19,6 +20,7 @@ const categoryColors: Record<string, string> = {
 
 export function AgendaDetailPage() {
   const { t } = useTranslation('pages')
+  const { locale } = useLanguage()
   const { uuid } = useParams<{ uuid: string }>()
   const { data: event, isLoading } = useEventDetail(uuid ?? '')
 
@@ -49,8 +51,8 @@ export function AgendaDetailPage() {
   }
 
   const dateStr = event.event_end_date
-    ? `${formatDate(event.event_date)} — ${formatDate(event.event_end_date)}`
-    : formatDate(event.event_date)
+    ? `${formatDate(event.event_date, undefined, locale)} — ${formatDate(event.event_end_date, undefined, locale)}`
+    : formatDate(event.event_date, undefined, locale)
 
   return (
     <PublicPageShell>

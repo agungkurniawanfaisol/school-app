@@ -272,5 +272,7 @@
   "suggestion.message": "メッセージ",
   "suggestion.messagePlaceholder": "ご提案、ご意見、ご批判をこちらにお書きください...",
   "suggestion.send": "提案を送信",
-  "suggestion.sending": "送信中..."
+  "suggestion.sending": "送信中...",
+  "suggestion.subjectRequired": "件名は必須です",
+  "suggestion.messageRequired": "メッセージは必須です"
 }

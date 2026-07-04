@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselDots, CarouselItem } from '@/components/ui/carousel'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { RevealOnScroll } from '@/components/landing/RevealOnScroll'
 import { SectionHeader } from '@/components/landing/SectionHeader'
 import { formatDate } from '@/lib/utils'
@@ -14,6 +15,7 @@ import type { StudentActivity } from '@/types'
 import { cn } from '@/lib/utils'
 
 function ActivityCard({ activity, featured = false }: { activity: StudentActivity; featured?: boolean }) {
+  const { locale } = useLanguage()
   return (
     <Link
       to={`/kegiatan/detail/${activity.uuid}`}
@@ -41,7 +43,7 @@ function ActivityCard({ activity, featured = false }: { activity: StudentActivit
             {activity.activity_date && (
               <Badge className="shrink-0 border-0 bg-accent text-accent-foreground">
                 <Calendar className="mr-1 h-3 w-3" aria-hidden />
-                {formatDate(activity.activity_date)}
+                {formatDate(activity.activity_date, undefined, locale)}
               </Badge>
             )}
           </div>

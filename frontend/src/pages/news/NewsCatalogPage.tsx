@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { PublicCatalogPagination } from '@/components/content/PublicCatalogPagination'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -17,6 +18,7 @@ const PER_PAGE = 12
 
 export function NewsCatalogPage() {
   const { t } = useTranslation('pages')
+  const { locale } = useLanguage()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const { data, isLoading, isFetching } = useNewsList({
@@ -93,7 +95,7 @@ export function NewsCatalogPage() {
                           </Badge>
                         )}
                         {item.published_at && (
-                          <span className="text-xs text-muted-foreground">{formatDate(item.published_at)}</span>
+                          <span className="text-xs text-muted-foreground">{formatDate(item.published_at, undefined, locale)}</span>
                         )}
                       </div>
                       <CardTitle className="line-clamp-2 text-lg leading-snug group-hover:text-primary">

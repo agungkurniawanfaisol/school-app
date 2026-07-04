@@ -142,6 +142,8 @@
   "suggestion.messagePlaceholder": "اكتب اقتراحاتك أو ملاحظاتك أو نقدك هنا...",
   "suggestion.send": "إرسال الاقتراح",
   "suggestion.sending": "جاري الإرسال...",
+  "suggestion.subjectRequired": "الموضوع مطلوب",
+  "suggestion.messageRequired": "الرسالة مطلوبة",
   "gallery.badge": "المعرض",
   "gallery.title": "معرض صور المدرسة",
   "gallery.desc": "توثيق الأنشطة واللحظات القيمة في نور الحكمة.",

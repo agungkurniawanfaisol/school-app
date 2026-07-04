@@ -272,5 +272,7 @@
   "suggestion.message": "Message",
   "suggestion.messagePlaceholder": "Write your suggestion, feedback, or criticism here...",
   "suggestion.send": "Send Suggestion",
-  "suggestion.sending": "Sending..."
+  "suggestion.sending": "Sending...",
+  "suggestion.subjectRequired": "Subject is required",
+  "suggestion.messageRequired": "Message is required"
 }

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Camera, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { PublicCatalogPagination } from '@/components/content/PublicCatalogPagination'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -17,6 +18,7 @@ const PER_PAGE = 12
 
 export function GalleryCatalogPage() {
   const { t } = useTranslation('pages')
+  const { locale } = useLanguage()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const { data, isLoading, isFetching } = usePhotoAlbumsList({
@@ -101,7 +103,7 @@ export function GalleryCatalogPage() {
                           {album.title}
                         </h3>
                         {album.event_date && (
-                          <p className="mt-1 text-xs text-white/70">{formatDate(album.event_date)}</p>
+                          <p className="mt-1 text-xs text-white/70">{formatDate(album.event_date, undefined, locale)}</p>
                         )}
                       </div>
                     </div>

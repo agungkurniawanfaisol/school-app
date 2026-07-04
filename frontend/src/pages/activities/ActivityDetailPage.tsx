@@ -13,6 +13,7 @@ import {
   Tag,
 } from 'lucide-react'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { IslamicPattern } from '@/components/landing/IslamicPattern'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -51,6 +52,7 @@ function ActivityDetailSkeleton() {
 export function ActivityDetailPage() {
   const { t } = useTranslation('pages')
   const { t: tLayout } = useTranslation('layout')
+  const { locale } = useLanguage()
   const { uuid } = useParams<{ uuid: string }>()
   const { data: activity, isLoading, isError } = useActivityDetailByUuid(uuid ?? '')
   const { data: relatedData } = useActivitiesList({
@@ -89,7 +91,7 @@ export function ActivityDetailPage() {
 
   const pageUrl = typeof window !== 'undefined' ? window.location.href : ''
   const readingMinutes = estimateReadingTimeMinutes(activity.content ?? activity.excerpt ?? '')
-  const dateFormatted = activity.activity_date ? formatDate(activity.activity_date) : null
+  const dateFormatted = activity.activity_date ? formatDate(activity.activity_date, undefined, locale) : null
   const hasBackdrop = Boolean(activity.thumbnail)
 
   const related: RelatedContentItem[] = (relatedData?.data ?? [])
@@ -101,7 +103,7 @@ export function ActivityDetailPage() {
       excerpt: item.excerpt,
       thumbnail: item.thumbnail,
       category: item.category,
-      dateLabel: item.activity_date ? formatDate(item.activity_date) : null,
+      dateLabel: item.activity_date ? formatDate(item.activity_date, undefined, locale) : null,
       href: `/kegiatan/detail/${item.uuid}`,
     }))
 

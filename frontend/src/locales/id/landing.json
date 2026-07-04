@@ -142,6 +142,8 @@
   "suggestion.messagePlaceholder": "Tuliskan saran, masukan, atau kritik Anda di sini...",
   "suggestion.send": "Kirim Saran",
   "suggestion.sending": "Mengirim...",
+  "suggestion.subjectRequired": "Subjek wajib diisi",
+  "suggestion.messageRequired": "Pesan wajib diisi",
   "gallery.badge": "Galeri",
   "gallery.title": "Galeri Foto Sekolah",
   "gallery.desc": "Dokumentasi kegiatan dan momen berharga di Nurul Hikmah.",

@@ -272,5 +272,7 @@
   "suggestion.message": "الرسالة",
   "suggestion.messagePlaceholder": "اكتب اقتراحك أو ملاحظاتك أو نقدك هنا...",
   "suggestion.send": "إرسال الاقتراح",
-  "suggestion.sending": "جارٍ الإرسال..."
+  "suggestion.sending": "جارٍ الإرسال...",
+  "suggestion.subjectRequired": "الموضوع مطلوب",
+  "suggestion.messageRequired": "الرسالة مطلوبة"
 }

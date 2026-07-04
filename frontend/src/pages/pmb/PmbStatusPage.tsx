@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { Badge } from '@/components/ui/badge'
@@ -26,6 +27,7 @@ const statusVariants: Record<PmbStatus, 'default' | 'secondary' | 'destructive' 
 
 export function PmbStatusPage() {
   const { t } = useTranslation('pages')
+  const { locale } = useLanguage()
   const { token: urlToken } = useParams()
   const [activeToken, setActiveToken] = useState(urlToken ?? '')
   const { data: registration, isLoading, isError } = usePmbTrack(activeToken)
@@ -120,7 +122,7 @@ export function PmbStatusPage() {
                 <p><span className="text-muted-foreground">{t('pmbStatus.parentName')}:</span> {registration.parent_name}</p>
                 <p><span className="text-muted-foreground">{t('pmbStatus.phone')}:</span> {registration.parent_phone}</p>
                 {registration.created_at && (
-                  <p><span className="text-muted-foreground">{t('pmbStatus.regDate')}:</span> {formatDate(registration.created_at)}</p>
+                  <p><span className="text-muted-foreground">{t('pmbStatus.regDate')}:</span> {formatDate(registration.created_at, undefined, locale)}</p>
                 )}
               </CardContent>
             </Card>

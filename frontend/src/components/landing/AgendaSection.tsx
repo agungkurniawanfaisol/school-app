@@ -8,8 +8,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FadeInView } from '@/components/motion/FadeInView'
 import { SectionHeader } from '@/components/landing/SectionHeader'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { useEventsList, type Event } from '@/hooks/useEvents'
-import { cn } from '@/lib/utils'
+import { cn, DATE_LOCALE_MAP } from '@/lib/utils'
 
 const categoryColors: Record<string, string> = {
   akademik: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
@@ -21,12 +22,14 @@ const categoryColors: Record<string, string> = {
 }
 
 function MiniCalendar({ events }: { events: Event[] }) {
+  const { locale } = useLanguage()
+  const dateLocale = DATE_LOCALE_MAP[locale] ?? 'id-ID'
   const today = new Date()
   const year = today.getFullYear()
   const month = today.getMonth()
   const firstDay = new Date(year, month, 1).getDay()
   const daysInMonth = new Date(year, month + 1, 0).getDate()
-  const monthName = today.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+  const monthName = today.toLocaleDateString(dateLocale, { month: 'long', year: 'numeric' })
 
   const eventDates = useMemo(() => {
     const dates = new Set<number>()
@@ -77,9 +80,11 @@ function MiniCalendar({ events }: { events: Event[] }) {
 }
 
 function EventItem({ event }: { event: Event }) {
+  const { locale } = useLanguage()
+  const dateLocale = DATE_LOCALE_MAP[locale] ?? 'id-ID'
   const date = new Date(event.event_date)
   const day = date.getDate()
-  const monthShort = date.toLocaleDateString('id-ID', { month: 'short' })
+  const monthShort = date.toLocaleDateString(dateLocale, { month: 'short' })
 
   return (
     <div className="flex gap-4 rounded-lg border border-border/50 p-3 transition-colors hover:bg-secondary/30">
