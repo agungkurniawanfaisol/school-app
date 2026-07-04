@@ -41,7 +41,6 @@ describe('admin-nav', () => {
   it('getAdminGroupDefaultHref returns default page per group', () => {
     expect(getAdminGroupDefaultHref('Konten')).toBe('/admin/news')
     expect(getAdminGroupDefaultHref('Profil')).toBe('/admin/teachers')
-    expect(getAdminGroupDefaultHref('Kursus')).toBe('/admin/courses')
     expect(getAdminGroupDefaultHref('PMB')).toBe('/admin/pmb-registrations')
     expect(getAdminGroupDefaultHref('Sistem')).toBe('/admin/settings')
     expect(getAdminGroupDefaultHref('Unknown')).toBeNull()

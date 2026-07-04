@@ -1,14 +1,20 @@
 import type { LucideIcon } from 'lucide-react'
 import {
+  Award,
   BookOpen,
   Building2,
+  Calendar,
   Compass,
+  FileDown,
   FileImage,
   FolderOpen,
   GraduationCap,
+  HelpCircle,
   Image,
+  ImageIcon,
   LayoutDashboard,
-  Layers,
+  Mail,
+  Megaphone,
   Newspaper,
   School,
   Settings,
@@ -16,7 +22,6 @@ import {
   Star,
   Target,
   Users,
-  UserCheck,
   UserCog,
   UserRound,
 } from 'lucide-react'
@@ -57,11 +62,23 @@ export const adminNavTree: AdminNavGroup[] = [
     defaultHref: '/admin/news',
     children: [
       { label: 'Berita', href: '/admin/news', icon: Newspaper },
+      { label: 'Pengumuman', href: '/admin/announcements', icon: Megaphone },
+      { label: 'Galeri Foto', href: '/admin/photo-albums', icon: ImageIcon },
       { label: 'Carousel Beranda', href: '/admin/hero-sliders', icon: Image },
       { label: 'Tur Virtual', href: '/admin/virtual-tours', icon: Compass },
+      { label: 'Testimoni', href: '/admin/testimonials', icon: Star },
+    ],
+  },
+  {
+    label: 'Akademik',
+    icon: BookOpen,
+    defaultHref: '/admin/program-unggulan',
+    children: [
       { label: 'Program Unggulan', href: '/admin/program-unggulan', icon: GraduationCap },
       { label: 'Kegiatan Siswa', href: '/admin/student-activities', icon: Sparkles },
-      { label: 'Testimoni', href: '/admin/testimonials', icon: Star },
+      { label: 'Ekstrakurikuler', href: '/admin/extracurriculars', icon: Users },
+      { label: 'Prestasi', href: '/admin/achievements', icon: Award },
+      { label: 'Agenda', href: '/admin/events', icon: Calendar },
     ],
   },
   {
@@ -71,16 +88,7 @@ export const adminNavTree: AdminNavGroup[] = [
     children: [
       { label: 'Guru', href: '/admin/teachers', icon: Users },
       { label: 'Fasilitas', href: '/admin/facilities', icon: Building2 },
-    ],
-  },
-  {
-    label: 'Kursus',
-    icon: BookOpen,
-    defaultHref: '/admin/courses',
-    children: [
-      { label: 'Daftar Kursus', href: '/admin/courses', icon: GraduationCap },
-      { label: 'Modul & Pelajaran', href: '/admin/courses', icon: Layers },
-      { label: 'Pendaftaran Kursus', href: '/admin/course-enrollments', icon: UserCheck },
+      { label: 'Dokumen Unduhan', href: '/admin/documents', icon: FileDown },
     ],
   },
   {
@@ -89,6 +97,7 @@ export const adminNavTree: AdminNavGroup[] = [
     defaultHref: '/admin/pmb-registrations',
     children: [
       { label: 'Pendaftaran', href: '/admin/pmb-registrations', icon: GraduationCap },
+      { label: 'FAQ', href: '/admin/faqs', icon: HelpCircle },
     ],
   },
   {
@@ -99,6 +108,7 @@ export const adminNavTree: AdminNavGroup[] = [
       { label: 'Data Sekolah', href: '/admin/schools', icon: School },
       { label: 'Visi & Misi', href: '/admin/vision-mission', icon: Target },
       { label: 'Media', href: '/admin/media', icon: FileImage },
+      { label: 'Kontak Masuk', href: '/admin/contact-messages', icon: Mail },
       { label: 'Pengguna', href: '/admin/users', icon: UserCog },
       { label: 'Pengaturan', href: '/admin/settings', icon: Settings },
     ],
@@ -187,8 +197,50 @@ export function getAdminBreadcrumbs(pathname: string): { label: string; href?: s
     return crumbs
   }
 
+  if (pathname.startsWith('/admin/announcements')) {
+    crumbs.push({ label: 'Konten' }, { label: 'Pengumuman', href: '/admin/announcements' })
+    if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
+    else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/photo-albums')) {
+    crumbs.push({ label: 'Konten' }, { label: 'Galeri Foto', href: '/admin/photo-albums' })
+    if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
+    else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
+    return crumbs
+  }
+
   if (pathname.startsWith('/admin/program-unggulan') || pathname.startsWith('/admin/curriculums')) {
-    crumbs.push({ label: 'Konten' }, { label: 'Program Unggulan', href: '/admin/program-unggulan' })
+    crumbs.push({ label: 'Akademik' }, { label: 'Program Unggulan', href: '/admin/program-unggulan' })
+    if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
+    else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/student-activities')) {
+    crumbs.push({ label: 'Akademik' }, { label: 'Kegiatan Siswa', href: '/admin/student-activities' })
+    if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
+    else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/extracurriculars')) {
+    crumbs.push({ label: 'Akademik' }, { label: 'Ekstrakurikuler', href: '/admin/extracurriculars' })
+    if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
+    else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/achievements')) {
+    crumbs.push({ label: 'Akademik' }, { label: 'Prestasi', href: '/admin/achievements' })
+    if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
+    else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/events')) {
+    crumbs.push({ label: 'Akademik' }, { label: 'Agenda', href: '/admin/events' })
     if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
     else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
     return crumbs
@@ -203,12 +255,17 @@ export function getAdminBreadcrumbs(pathname: string): { label: string; href?: s
     return crumbs
   }
 
-  if (pathname.startsWith('/admin/courses')) {
-    crumbs.push({ label: 'Kursus' })
-    if (pathname.includes('/modules')) crumbs.push({ label: 'Modul & Pelajaran' })
-    else if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah Kursus' })
-    else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit Kursus' })
-    else crumbs.push({ label: 'Daftar Kursus' })
+  if (pathname.startsWith('/admin/documents')) {
+    crumbs.push({ label: 'Profil' }, { label: 'Dokumen Unduhan', href: '/admin/documents' })
+    if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
+    else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/faqs')) {
+    crumbs.push({ label: 'PMB' }, { label: 'FAQ', href: '/admin/faqs' })
+    if (pathname.endsWith('/create')) crumbs.push({ label: 'Tambah' })
+    else if (pathname.includes('/edit')) crumbs.push({ label: 'Edit' })
     return crumbs
   }
 
@@ -235,13 +292,14 @@ export function getAdminBreadcrumbs(pathname: string): { label: string; href?: s
     return crumbs
   }
 
-  if (pathname === '/admin/settings') {
-    crumbs.push({ label: 'Sistem' }, { label: 'Pengaturan' })
+  if (pathname.startsWith('/admin/contact-messages')) {
+    crumbs.push({ label: 'Sistem' }, { label: 'Kontak Masuk', href: '/admin/contact-messages' })
+    if (pathname !== '/admin/contact-messages') crumbs.push({ label: 'Detail' })
     return crumbs
   }
 
-  if (pathname === '/admin/course-enrollments') {
-    crumbs.push({ label: 'Kursus' }, { label: 'Pendaftaran Kursus' })
+  if (pathname === '/admin/settings') {
+    crumbs.push({ label: 'Sistem' }, { label: 'Pengaturan' })
     return crumbs
   }
 

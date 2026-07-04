@@ -1,7 +1,8 @@
 import type { LucideIcon } from 'lucide-react'
 import {
-  Building2, ClipboardList, Compass, GraduationCap, Info,
-  Newspaper, Sparkles, Star, Users, Search,
+  Award, Building2, CalendarDays, ClipboardList, Compass, Dumbbell, FileText,
+  GraduationCap, Images, Info, MessageSquare, Newspaper, Sparkles,
+  Star, Users, Search,
 } from 'lucide-react'
 
 export type NavLink = {
@@ -33,6 +34,9 @@ export const mainNavTree: NavEntry[] = [
       { label: 'nav.featuredPrograms', href: '/program-unggulan', icon: Star },
       { label: 'nav.teachers', href: '/#guru', icon: Users },
       { label: 'nav.facilities', href: '/fasilitas', icon: Building2 },
+      { label: 'nav.achievements', href: '/prestasi', icon: Award },
+      { label: 'nav.gallery', href: '/galeri', icon: Images },
+      { label: 'nav.extracurricular', href: '/ekstrakurikuler', icon: Dumbbell },
     ],
   },
   {
@@ -47,6 +51,9 @@ export const mainNavTree: NavEntry[] = [
     children: [
       { label: 'nav.activities', href: '/kegiatan', icon: Sparkles },
       { label: 'nav.news', href: '/berita', icon: Newspaper },
+      { label: 'nav.agenda', href: '/agenda', icon: CalendarDays },
+      { label: 'nav.documents', href: '/#dokumen', icon: FileText },
+      { label: 'nav.suggestion', href: '/kotak-saran', icon: MessageSquare },
     ],
   },
   {

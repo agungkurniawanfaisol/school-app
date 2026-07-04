@@ -24,6 +24,15 @@ import { PmbRegisterPage } from '@/pages/pmb/PmbRegisterPage'
 import { PmbStatusPage } from '@/pages/pmb/PmbStatusPage'
 import { CourseCatalogPage } from '@/pages/lms/CourseCatalogPage'
 import { CourseDetailPage } from '@/pages/lms/CourseDetailPage'
+import { GalleryCatalogPage } from '@/pages/gallery/GalleryCatalogPage'
+import { GalleryDetailPage } from '@/pages/gallery/GalleryDetailPage'
+import { ExtracurricularCatalogPage } from '@/pages/extracurriculars/ExtracurricularCatalogPage'
+import { ExtracurricularDetailPage } from '@/pages/extracurriculars/ExtracurricularDetailPage'
+import { AchievementsCatalogPage } from '@/pages/achievements/AchievementsCatalogPage'
+import { AchievementDetailPage } from '@/pages/achievements/AchievementDetailPage'
+import { AgendaCatalogPage } from '@/pages/agenda/AgendaCatalogPage'
+import { AgendaDetailPage } from '@/pages/agenda/AgendaDetailPage'
+import { SuggestionBoxPage } from '@/pages/suggestion/SuggestionBoxPage'
 
 const DashboardPage = lazy(() => import('@/pages/admin/DashboardPage').then((m) => ({ default: m.DashboardPage })))
 const AdminNewsListPage = lazy(() => import('@/pages/admin/NewsListPage').then((m) => ({ default: m.AdminNewsListPage })))
@@ -109,6 +118,50 @@ const VirtualTourCatalogPage = lazy(() =>
 const VirtualTourViewerPage = lazy(() =>
   import('@/pages/virtual-tour/VirtualTourViewerPage').then((m) => ({ default: m.VirtualTourViewerPage })),
 )
+const FaqsListPage = lazy(() => import('@/pages/admin/FaqsListPage').then((m) => ({ default: m.FaqsListPage })))
+const FaqFormPage = lazy(() => import('@/pages/admin/FaqFormPage').then((m) => ({ default: m.FaqFormPage })))
+const AchievementsListPage = lazy(() =>
+  import('@/pages/admin/AchievementsListPage').then((m) => ({ default: m.AchievementsListPage })),
+)
+const AchievementFormPage = lazy(() =>
+  import('@/pages/admin/AchievementFormPage').then((m) => ({ default: m.AchievementFormPage })),
+)
+const ExtracurricularsListPage = lazy(() =>
+  import('@/pages/admin/ExtracurricularsListPage').then((m) => ({ default: m.ExtracurricularsListPage })),
+)
+const ExtracurricularFormPage = lazy(() =>
+  import('@/pages/admin/ExtracurricularFormPage').then((m) => ({ default: m.ExtracurricularFormPage })),
+)
+const AnnouncementsListPage = lazy(() =>
+  import('@/pages/admin/AnnouncementsListPage').then((m) => ({ default: m.AnnouncementsListPage })),
+)
+const AnnouncementFormPage = lazy(() =>
+  import('@/pages/admin/AnnouncementFormPage').then((m) => ({ default: m.AnnouncementFormPage })),
+)
+const DocumentsListPage = lazy(() =>
+  import('@/pages/admin/DocumentsListPage').then((m) => ({ default: m.DocumentsListPage })),
+)
+const DocumentFormPage = lazy(() =>
+  import('@/pages/admin/DocumentFormPage').then((m) => ({ default: m.DocumentFormPage })),
+)
+const EventsListPage = lazy(() =>
+  import('@/pages/admin/EventsListPage').then((m) => ({ default: m.EventsListPage })),
+)
+const EventFormPage = lazy(() =>
+  import('@/pages/admin/EventFormPage').then((m) => ({ default: m.EventFormPage })),
+)
+const PhotoAlbumsListPage = lazy(() =>
+  import('@/pages/admin/PhotoAlbumsListPage').then((m) => ({ default: m.PhotoAlbumsListPage })),
+)
+const PhotoAlbumFormPage = lazy(() =>
+  import('@/pages/admin/PhotoAlbumFormPage').then((m) => ({ default: m.PhotoAlbumFormPage })),
+)
+const ContactMessagesListPage = lazy(() =>
+  import('@/pages/admin/ContactMessagesListPage').then((m) => ({ default: m.ContactMessagesListPage })),
+)
+const ContactMessageDetailPage = lazy(() =>
+  import('@/pages/admin/ContactMessageDetailPage').then((m) => ({ default: m.ContactMessageDetailPage })),
+)
 
 function AdminRouteFallback() {
   return (
@@ -156,6 +209,15 @@ export default function App() {
           <Route path="/kegiatan/detail/:uuid" element={<ActivityDetailPage />} />
           <Route path="/tur-virtual" element={<VirtualTourCatalogPage />} />
           <Route path="/tur-virtual/:slug" element={<VirtualTourViewerPage />} />
+          <Route path="/galeri" element={<GalleryCatalogPage />} />
+          <Route path="/galeri/detail/:uuid" element={<GalleryDetailPage />} />
+          <Route path="/ekstrakurikuler" element={<ExtracurricularCatalogPage />} />
+          <Route path="/ekstrakurikuler/detail/:uuid" element={<ExtracurricularDetailPage />} />
+          <Route path="/prestasi" element={<AchievementsCatalogPage />} />
+          <Route path="/prestasi/detail/:uuid" element={<AchievementDetailPage />} />
+          <Route path="/agenda" element={<AgendaCatalogPage />} />
+          <Route path="/agenda/detail/:uuid" element={<AgendaDetailPage />} />
+          <Route path="/kotak-saran" element={<SuggestionBoxPage />} />
 
           <Route path="/admin/login" element={<LoginPage />} />
           <Route path="/admin/login/oauth" element={<OAuthCallbackPage />} />
@@ -254,6 +316,29 @@ export default function App() {
             <Route path="courses/:id/modules" element={<LazyAdmin><CourseModulesPage /></LazyAdmin>} />
             <Route path="course-modules" element={<Navigate to="/admin/courses" replace />} />
             <Route path="course-enrollments" element={<LazyAdmin><CourseEnrollmentsListPage /></LazyAdmin>} />
+            <Route path="faqs" element={<LazyAdmin><FaqsListPage /></LazyAdmin>} />
+            <Route path="faqs/create" element={<LazyAdmin><FaqFormPage /></LazyAdmin>} />
+            <Route path="faqs/:id/edit" element={<LazyAdmin><FaqFormPage /></LazyAdmin>} />
+            <Route path="achievements" element={<LazyAdmin><AchievementsListPage /></LazyAdmin>} />
+            <Route path="achievements/create" element={<LazyAdmin><AchievementFormPage /></LazyAdmin>} />
+            <Route path="achievements/:id/edit" element={<LazyAdmin><AchievementFormPage /></LazyAdmin>} />
+            <Route path="extracurriculars" element={<LazyAdmin><ExtracurricularsListPage /></LazyAdmin>} />
+            <Route path="extracurriculars/create" element={<LazyAdmin><ExtracurricularFormPage /></LazyAdmin>} />
+            <Route path="extracurriculars/:id/edit" element={<LazyAdmin><ExtracurricularFormPage /></LazyAdmin>} />
+            <Route path="announcements" element={<LazyAdmin><AnnouncementsListPage /></LazyAdmin>} />
+            <Route path="announcements/create" element={<LazyAdmin><AnnouncementFormPage /></LazyAdmin>} />
+            <Route path="announcements/:id/edit" element={<LazyAdmin><AnnouncementFormPage /></LazyAdmin>} />
+            <Route path="documents" element={<LazyAdmin><DocumentsListPage /></LazyAdmin>} />
+            <Route path="documents/create" element={<LazyAdmin><DocumentFormPage /></LazyAdmin>} />
+            <Route path="documents/:id/edit" element={<LazyAdmin><DocumentFormPage /></LazyAdmin>} />
+            <Route path="events" element={<LazyAdmin><EventsListPage /></LazyAdmin>} />
+            <Route path="events/create" element={<LazyAdmin><EventFormPage /></LazyAdmin>} />
+            <Route path="events/:id/edit" element={<LazyAdmin><EventFormPage /></LazyAdmin>} />
+            <Route path="photo-albums" element={<LazyAdmin><PhotoAlbumsListPage /></LazyAdmin>} />
+            <Route path="photo-albums/create" element={<LazyAdmin><PhotoAlbumFormPage /></LazyAdmin>} />
+            <Route path="photo-albums/:id/edit" element={<LazyAdmin><PhotoAlbumFormPage /></LazyAdmin>} />
+            <Route path="contact-messages" element={<LazyAdmin><ContactMessagesListPage /></LazyAdmin>} />
+            <Route path="contact-messages/:id" element={<LazyAdmin><ContactMessageDetailPage /></LazyAdmin>} />
             <Route path="pmb-registrations" element={<LazyAdmin><PmbRegistrationsListPage /></LazyAdmin>} />
             <Route path="pmb-registrations/:id" element={<LazyAdmin><PmbRegistrationDetailPage /></LazyAdmin>} />
             <Route path="schools" element={<LazyAdmin><SchoolsListPage /></LazyAdmin>} />
