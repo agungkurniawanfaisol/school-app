@@ -14,6 +14,36 @@ function FooterWave() {
   )
 }
 
+function isAllowedMapEmbedUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url)
+    return (
+      parsed.protocol === 'https:' &&
+      /^(www\.)?google\.(com|co\.\w+)(\.maps)?$/i.test(parsed.hostname)
+    )
+  } catch {
+    return false
+  }
+}
+
+function safeSocialUrl(raw: string, platform: 'facebook' | 'instagram' | 'youtube'): string | null {
+  if (raw.startsWith('http://') || raw.startsWith('https://')) {
+    try {
+      const url = new URL(raw)
+      if (url.protocol !== 'https:' && url.protocol !== 'http:') return null
+      return raw
+    } catch {
+      return null
+    }
+  }
+  const prefixes: Record<string, string> = {
+    facebook: 'https://facebook.com/',
+    instagram: `https://instagram.com/${raw.replace('@', '')}`,
+    youtube: `https://youtube.com/${raw}`,
+  }
+  return prefixes[platform] ?? null
+}
+
 export function Footer() {
   const { data: school } = useSchool()
   const social = school?.social_media
@@ -47,11 +77,6 @@ export function Footer() {
                 <a href="#tentang" className="transition-colors hover:text-primary-foreground">
                   Tentang Kami
                 </a>
-              </li>
-              <li>
-                <Link to="/kursus" className="transition-colors hover:text-primary-foreground">
-                  Katalog Kursus
-                </Link>
               </li>
               <li>
                 <Link to="/pmb" className="transition-colors hover:text-primary-foreground">
@@ -104,41 +129,33 @@ export function Footer() {
               Media Sosial
             </h4>
             <div className="flex gap-3">
-              {social?.facebook && (
+              {social?.facebook && safeSocialUrl(social.facebook, 'facebook') && (
                 <a
-                  href={social.facebook}
+                  href={safeSocialUrl(social.facebook, 'facebook')!}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   aria-label="Facebook"
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/10 transition-colors hover:bg-primary-foreground/20"
                 >
                   <Facebook className="h-5 w-5" />
                 </a>
               )}
-              {social?.instagram && (
+              {social?.instagram && safeSocialUrl(social.instagram, 'instagram') && (
                 <a
-                  href={
-                    social.instagram.startsWith('http')
-                      ? social.instagram
-                      : `https://instagram.com/${social.instagram.replace('@', '')}`
-                  }
+                  href={safeSocialUrl(social.instagram, 'instagram')!}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   aria-label="Instagram"
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/10 transition-colors hover:bg-primary-foreground/20"
                 >
                   <Instagram className="h-5 w-5" />
                 </a>
               )}
-              {social?.youtube && (
+              {social?.youtube && safeSocialUrl(social.youtube, 'youtube') && (
                 <a
-                  href={
-                    social.youtube.startsWith('http')
-                      ? social.youtube
-                      : `https://youtube.com/${social.youtube}`
-                  }
+                  href={safeSocialUrl(social.youtube, 'youtube')!}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   aria-label="YouTube"
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/10 transition-colors hover:bg-primary-foreground/20"
                 >
@@ -148,6 +165,20 @@ export function Footer() {
             </div>
           </div>
         </div>
+
+        {school?.map_embed_url && isAllowedMapEmbedUrl(school.map_embed_url) && (
+          <div className="mt-10 overflow-hidden rounded-xl border border-primary-foreground/15">
+            <iframe
+              src={school.map_embed_url}
+              title="Lokasi sekolah di Google Maps"
+              className="h-[220px] w-full border-0 sm:h-[280px]"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              sandbox="allow-scripts allow-same-origin"
+              allowFullScreen
+            />
+          </div>
+        )}
 
         <Separator className="my-8 bg-primary-foreground/15" />
 

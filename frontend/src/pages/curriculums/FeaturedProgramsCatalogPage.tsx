@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SubpageHero } from '@/components/layout/SubpageHero'
 import { FeaturedProgramCard } from '@/components/landing/FeaturedProgramCard'
 import { PageMeta } from '@/components/seo/PageMeta'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCurriculumsList } from '@/hooks/useCurriculums'
@@ -25,21 +24,16 @@ export function FeaturedProgramsCatalogPage() {
         title="Program Unggulan"
         description="Program pembelajaran unggulan Sekolah Islam Nurul Hikmah yang mengembangkan potensi akademik dan karakter Islami siswa."
       />
-      <div className="section-padding bg-secondary/30 pattern-bg">
-        <div className="container-page">
-            <div className="mx-auto max-w-6xl space-y-8">
-              <div className="space-y-2 text-center">
-                <Button asChild variant="ghost" size="sm" className="mb-2 min-h-11">
-                  <Link to="/">← Kembali ke beranda</Link>
-                </Button>
-                <p className="text-sm font-semibold uppercase tracking-wider text-primary">Program Unggulan</p>
-                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Program Pembelajaran Unggulan</h1>
-                <p className="mx-auto max-w-2xl text-muted-foreground">
-                  Program terintegrasi yang mengembangkan potensi akademik dan karakter Islami siswa.
-                </p>
-              </div>
-
-              <div className="relative mx-auto max-w-md">
+      <SubpageHero
+        title="Program Pembelajaran Unggulan"
+        subtitle="Program terintegrasi yang mengembangkan potensi akademik dan karakter Islami siswa."
+        badge="Program Unggulan"
+        backHref="/"
+        backLabel="Kembali ke beranda"
+      />
+      <div className="container-page section-padding">
+        <div className="mx-auto max-w-6xl space-y-8">
+          <div className="relative mx-auto max-w-md">
                 <Search
                   className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
                   aria-hidden
@@ -72,7 +66,6 @@ export function FeaturedProgramsCatalogPage() {
               )}
             </div>
           </div>
-        </div>
     </PublicPageShell>
   )
 }

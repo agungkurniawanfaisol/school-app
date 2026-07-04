@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { ExternalLink, Facebook, Instagram, Mail, Share2, Youtube } from 'lucide-react'
+import { SubpageHero } from '@/components/layout/SubpageHero'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -60,12 +61,15 @@ function TeacherProfile({ teacher }: { teacher: Teacher }) {
   return (
     <PublicPageShell>
       <PageMeta title={teacher.name} description={metaDescription} />
+      <SubpageHero
+        title={teacher.name}
+        subtitle={[teacher.title, teacher.subject].filter(Boolean).join(' · ') || undefined}
+        backHref="/guru"
+        backLabel="Semua guru"
+      />
       <article className="container-page section-padding">
         <div className="mx-auto max-w-4xl space-y-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <Button asChild variant="ghost" size="sm" className="min-h-11">
-              <Link to="/guru">← Semua guru</Link>
-            </Button>
+          <div className="flex justify-end">
             <Button
               type="button"
               variant="outline"
@@ -82,7 +86,7 @@ function TeacherProfile({ teacher }: { teacher: Teacher }) {
             <TeacherAvatar teacher={teacher} size="xl" className="h-36 w-36 rounded-2xl shadow-md" />
             <div className="min-w-0 flex-1 space-y-3">
               <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{teacher.name}</h1>
+                <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{teacher.name}</h2>
                 {teacher.is_featured && <Badge>Unggulan</Badge>}
               </div>
               {(teacher.title || teacher.subject) && (

@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { isInternalRoute, mainNavTree, resolveNavHref, type NavLink } from '@/config/main-nav'
+import { isInternalRoute, isNavStandalone, mainNavTree, resolveNavHref, type NavLink } from '@/config/main-nav'
 import { cn } from '@/lib/utils'
 
 type MainNavProps = {
@@ -54,21 +54,39 @@ export function MainNav({ isHome, isHeroOverlay }: MainNavProps) {
       : 'text-muted-foreground hover:bg-accent hover:text-primary data-[state=open]:bg-accent data-[state=open]:text-primary',
   )
 
+  const linkClass = cn(
+    'inline-flex h-11 shrink-0 items-center rounded-lg border border-transparent px-3 text-sm font-medium transition-colors',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0',
+    isHeroOverlay
+      ? 'text-primary-foreground/90 hover:bg-primary-foreground/10 hover:text-primary-foreground'
+      : 'text-muted-foreground hover:bg-accent hover:text-primary',
+  )
+
   return (
     <nav className="flex items-center gap-0.5" aria-label="Navigasi utama">
-      {mainNavTree.map((group) => (
-        <DropdownMenu key={group.label} modal={false}>
-          <DropdownMenuTrigger className={triggerClass}>
-            {group.label}
-            <ChevronDown className="h-4 w-4 shrink-0 opacity-70 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center" sideOffset={8} className="min-w-[12rem]">
-            {group.children.map((child) => (
-              <NavMenuItem key={child.href} item={child} isHome={isHome} />
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ))}
+      {mainNavTree.map((entry) => {
+        if (isNavStandalone(entry)) {
+          return (
+            <Link key={entry.label} to={entry.href} className={linkClass}>
+              {entry.label}
+            </Link>
+          )
+        }
+
+        return (
+          <DropdownMenu key={entry.label} modal={false}>
+            <DropdownMenuTrigger className={triggerClass}>
+              {entry.label}
+              <ChevronDown className="h-4 w-4 shrink-0 opacity-70 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" sideOffset={8} className="min-w-[12rem]">
+              {entry.children.map((child) => (
+                <NavMenuItem key={child.href} item={child} isHome={isHome} />
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      })}
     </nav>
   )
 }

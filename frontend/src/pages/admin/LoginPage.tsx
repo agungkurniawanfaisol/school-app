@@ -85,19 +85,7 @@ export function LoginPage() {
         {isCheckingSession ? (
           <p className="text-sm text-muted-foreground">Memverifikasi sesi...</p>
         ) : (
-          <AdminLoginCard
-            footer={
-              import.meta.env.DEV ? (
-                <p className="text-center text-xs text-muted-foreground">
-                  Development: <span className="font-medium">admin@nurulhikmah.sch.id</span> /{' '}
-                  <span className="font-medium">password</span>
-                  <br />
-                  Jika login gagal, jalankan <code className="rounded bg-muted px-1">make seed</code> di terminal
-                  project.
-                </p>
-              ) : undefined
-            }
-          >
+          <AdminLoginCard>
             <GoogleSignInButton disabled={login.isPending} />
 
             <div className="relative py-1">

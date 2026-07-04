@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\HasCommonScopes;
 use App\Traits\HasUuid;
 use Database\Factories\TeacherFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,8 +16,19 @@ class Teacher extends Model
     use HasCommonScopes, HasFactory, HasUuid, SoftDeletes;
     /** @use HasFactory<TeacherFactory> */
 
+    public const TYPE_KEPALA_SEKOLAH = 'kepala_sekolah';
+    public const TYPE_GURU = 'guru';
+    public const TYPE_STAFF = 'staff';
+
+    public const TYPES = [
+        self::TYPE_KEPALA_SEKOLAH,
+        self::TYPE_GURU,
+        self::TYPE_STAFF,
+    ];
+
     protected $fillable = [
         'school_id',
+        'type',
         'name',
         'slug',
         'title',
@@ -41,6 +53,11 @@ class Teacher extends Model
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
         ];
+    }
+
+    public function scopeByType(Builder $query, string $type): Builder
+    {
+        return $query->where('type', $type);
     }
 
     public function school(): BelongsTo

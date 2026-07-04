@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { PublicCatalogPagination } from '@/components/content/PublicCatalogPagination'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -31,18 +31,14 @@ export function NewsCatalogPage() {
         title="Berita & Artikel"
         description="Informasi terbaru seputar kegiatan dan prestasi Sekolah Islam Nurul Hikmah."
       />
+      <SubpageHero
+        title="Berita & Artikel"
+        subtitle="Informasi terbaru seputar kegiatan dan prestasi sekolah."
+        backHref="/#berita"
+        backLabel="Kembali ke beranda"
+      />
       <div className="container-page section-padding">
         <div className="mx-auto max-w-6xl space-y-8">
-          <div className="space-y-2 text-center">
-            <Button asChild variant="ghost" size="sm" className="mb-2 min-h-11">
-              <Link to="/#berita">← Kembali ke beranda</Link>
-            </Button>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Berita & Artikel</h1>
-            <p className="mx-auto max-w-2xl text-muted-foreground">
-              Informasi terbaru seputar kegiatan dan prestasi sekolah.
-            </p>
-          </div>
-
           <div className="relative mx-auto max-w-md">
             <Search
               className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"

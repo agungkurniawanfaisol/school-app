@@ -29,7 +29,7 @@ class DemoContentCountsTest extends TestCase
         $this->assertNotEmpty($school->mission);
 
         $this->assertSame(10, Curriculum::query()->where('school_id', $school->id)->where('is_active', true)->count());
-        $this->assertSame(10, Teacher::query()->where('school_id', $school->id)->where('is_active', true)->count());
+        $this->assertSame(15, Teacher::query()->where('school_id', $school->id)->where('is_active', true)->count());
         $this->assertSame(20, Facility::query()->where('school_id', $school->id)->where('is_active', true)->count());
         $this->assertSame(10, StudentActivity::query()->where('school_id', $school->id)->where('is_active', true)->count());
         $this->assertSame(10, News::query()->where('school_id', $school->id)->where('is_active', true)->count());

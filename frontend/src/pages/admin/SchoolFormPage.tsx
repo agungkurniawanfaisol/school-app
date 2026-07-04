@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLink, Facebook, Instagram, Youtube, MapPin, Globe } from 'lucide-react'
 import { toast } from 'sonner'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { Button } from '@/components/ui/button'
@@ -41,6 +41,12 @@ export function SchoolFormPage() {
   const [vision, setVision] = useState('')
   const [mission, setMission] = useState('')
   const [isActive, setIsActive] = useState(true)
+  const [facebook, setFacebook] = useState('')
+  const [instagram, setInstagram] = useState('')
+  const [youtube, setYoutube] = useState('')
+  const [mapEmbedUrl, setMapEmbedUrl] = useState('')
+  const [latitude, setLatitude] = useState('')
+  const [longitude, setLongitude] = useState('')
 
   useEffect(() => {
     if (!existing) return
@@ -58,9 +64,19 @@ export function SchoolFormPage() {
     setVision(existing.vision ?? '')
     setMission(existing.mission ?? '')
     setIsActive(existing.is_active)
+    setFacebook(existing.social_media?.facebook ?? '')
+    setInstagram(existing.social_media?.instagram ?? '')
+    setYoutube(existing.social_media?.youtube ?? '')
+    setMapEmbedUrl(existing.map_embed_url ?? '')
+    setLatitude(existing.latitude != null ? String(existing.latitude) : '')
+    setLongitude(existing.longitude != null ? String(existing.longitude) : '')
   }, [existing])
 
   if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+
+  const socialMedia = (facebook || instagram || youtube)
+    ? { facebook: facebook || null, instagram: instagram || null, youtube: youtube || null }
+    : null
 
   const payload = {
     name,
@@ -74,6 +90,10 @@ export function SchoolFormPage() {
     city: city || null,
     province: province || null,
     postal_code: postalCode || null,
+    latitude: latitude ? parseFloat(latitude) : null,
+    longitude: longitude ? parseFloat(longitude) : null,
+    map_embed_url: mapEmbedUrl || null,
+    social_media: socialMedia,
     vision: vision || null,
     mission: mission || null,
     is_active: isActive,
@@ -172,6 +192,87 @@ export function SchoolFormPage() {
               <Input id="postal_code" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} className="h-11" />
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="admin-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Globe className="h-4 w-4" aria-hidden />
+            Media Sosial
+          </CardTitle>
+          <CardDescription>Link profil media sosial sekolah yang tampil di footer.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="facebook" className="flex items-center gap-2">
+              <Facebook className="h-4 w-4 text-blue-600" aria-hidden />
+              Facebook
+            </Label>
+            <Input id="facebook" placeholder="https://facebook.com/nurulhikmah" value={facebook} onChange={(e) => setFacebook(e.target.value)} className="h-11" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="instagram" className="flex items-center gap-2">
+              <Instagram className="h-4 w-4 text-pink-500" aria-hidden />
+              Instagram
+            </Label>
+            <Input id="instagram" placeholder="https://instagram.com/nurulhikmah atau @nurulhikmah" value={instagram} onChange={(e) => setInstagram(e.target.value)} className="h-11" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="youtube" className="flex items-center gap-2">
+              <Youtube className="h-4 w-4 text-red-600" aria-hidden />
+              YouTube
+            </Label>
+            <Input id="youtube" placeholder="https://youtube.com/@nurulhikmah" value={youtube} onChange={(e) => setYoutube(e.target.value)} className="h-11" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="admin-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <MapPin className="h-4 w-4" aria-hidden />
+            Google Maps
+          </CardTitle>
+          <CardDescription>Lokasi sekolah di peta yang tampil di footer.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="map_embed_url">URL Embed Google Maps</Label>
+            <Input id="map_embed_url" placeholder="https://www.google.com/maps/embed?pb=..." value={mapEmbedUrl} onChange={(e) => setMapEmbedUrl(e.target.value)} className="h-11" />
+            <p className="text-xs text-muted-foreground">
+              Buka Google Maps → cari lokasi → Bagikan → Sematkan peta → salin URL dari atribut <code>src</code>.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="latitude">Latitude</Label>
+              <Input id="latitude" type="number" step="any" placeholder="-6.2615025" value={latitude} onChange={(e) => setLatitude(e.target.value)} className="h-11" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="longitude">Longitude</Label>
+              <Input id="longitude" type="number" step="any" placeholder="106.7816014" value={longitude} onChange={(e) => setLongitude(e.target.value)} className="h-11" />
+            </div>
+          </div>
+          {mapEmbedUrl && (() => {
+            try {
+              const u = new URL(mapEmbedUrl)
+              if (u.protocol !== 'https:' || !/^(www\.)?google\.(com|co\.\w+)/i.test(u.hostname)) return null
+            } catch { return null }
+            return (
+              <div className="overflow-hidden rounded-lg border">
+                <iframe
+                  src={mapEmbedUrl}
+                  title="Pratinjau Google Maps"
+                  className="h-[250px] w-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  sandbox="allow-scripts allow-same-origin"
+                  allowFullScreen
+                />
+              </div>
+            )
+          })()}
         </CardContent>
       </Card>
 

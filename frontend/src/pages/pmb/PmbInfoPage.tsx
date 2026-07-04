@@ -1,7 +1,7 @@
-import { CheckCircle, FileText, GraduationCap } from 'lucide-react'
+import { CheckCircle, FileText } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Footer } from '@/components/layout/Footer'
-import { Header } from '@/components/layout/Header'
+import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SubpageHero } from '@/components/layout/SubpageHero'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -25,16 +25,15 @@ export function PmbInfoPage() {
   const settingMap = Object.fromEntries((settings ?? []).map((s) => [s.key, s.value]))
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <Header />
-      <main className="container-page flex-1 section-padding">
-        <div className="mb-10 text-center">
-          <GraduationCap className="mx-auto mb-4 h-12 w-12 text-primary" />
-          <h1 className="mb-3 text-3xl font-bold text-primary sm:text-4xl">Penerimaan Murid Baru</h1>
-          <p className="mx-auto max-w-2xl text-muted-foreground">
-            Informasi lengkap mengenai pendaftaran siswa baru di {school?.name ?? 'Nurul Hikmah School'}.
-          </p>
-        </div>
+    <PublicPageShell>
+      <SubpageHero
+        title="Penerimaan Murid Baru"
+        subtitle={`Informasi lengkap mengenai pendaftaran siswa baru di ${school?.name ?? 'Nurul Hikmah School'}.`}
+        badge="PMB"
+        backHref="/"
+        backLabel="Kembali ke beranda"
+      />
+      <section className="container-page section-padding">
 
         {isLoading ? (
           <Skeleton className="mb-8 h-48 w-full" />
@@ -94,8 +93,7 @@ export function PmbInfoPage() {
             <Link to="/pmb/status">Cek Status Pendaftaran</Link>
           </Button>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </section>
+    </PublicPageShell>
   )
 }

@@ -1,4 +1,3 @@
-import type { LucideIcon } from 'lucide-react'
 import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { AdminNavGroup } from '@/config/admin-nav'

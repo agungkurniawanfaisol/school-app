@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Footer } from '@/components/layout/Footer'
-import { Header } from '@/components/layout/Header'
+import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SubpageHero } from '@/components/layout/SubpageHero'
+import { PageMeta } from '@/components/seo/PageMeta'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -15,14 +16,16 @@ export function CourseCatalogPage() {
   const { data, isLoading, isFetching } = useCoursesList({ page, per_page: 12, search })
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <Header />
-      <main className="container-page flex-1 section-padding">
-        <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-primary">Katalog Kursus</h1>
-          <p className="text-muted-foreground">Temukan kursus online untuk mendukung pembelajaran Anda.</p>
-        </div>
-
+    <PublicPageShell>
+      <PageMeta title="Katalog Kursus" description="Temukan kursus online untuk mendukung pembelajaran Anda." />
+      <SubpageHero
+        title="Katalog Kursus"
+        subtitle="Temukan kursus online untuk mendukung pembelajaran Anda."
+        badge="Kursus Online"
+        backHref="/"
+        backLabel="Kembali ke beranda"
+      />
+      <section className="container-page section-padding">
         <Input
           placeholder="Cari kursus..."
           value={search}
@@ -92,8 +95,7 @@ export function CourseCatalogPage() {
             </button>
           </div>
         )}
-      </main>
-      <Footer />
-    </div>
+      </section>
+    </PublicPageShell>
   )
 }

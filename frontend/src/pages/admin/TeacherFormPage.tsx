@@ -25,6 +25,13 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import {
   useAdminTeacherDetail,
@@ -37,8 +44,8 @@ import { useUnsavedChanges } from '@/hooks/useUnsavedChanges'
 import { saveTeacherPreviewDraft } from '@/lib/teacherPreviewDraft'
 import { slugify } from '@/lib/utils'
 import { EMPTY_EDITOR_DOC, type EditorDocument } from '@/schemas/editor'
-import { teacherSchema, type TeacherFormValues } from '@/schemas/teacher'
-import type { SocialMedia } from '@/types'
+import { TEACHER_TYPE_LABELS, TEACHER_TYPES, teacherSchema, type TeacherFormValues } from '@/schemas/teacher'
+import type { SocialMedia, TeacherType } from '@/types'
 
 type SocialFields = Pick<SocialMedia, 'facebook' | 'instagram' | 'youtube'>
 
@@ -121,6 +128,7 @@ export function TeacherFormPage() {
   const photoUpload = useMediaUpload('teachers')
   const photoInputRef = useRef<HTMLInputElement>(null)
 
+  const [type, setType] = useState<TeacherType>('guru')
   const [name, setName] = useState('')
   const [slug, setSlug] = useState('')
   const [title, setTitle] = useState('')
@@ -141,6 +149,7 @@ export function TeacherFormPage() {
 
   const buildPayload = (): TeacherFormValues => ({
     school_id: school?.id ?? existing?.school_id ?? 0,
+    type,
     name,
     slug: slug || slugify(name),
     title: title || null,
@@ -173,6 +182,7 @@ export function TeacherFormPage() {
 
   useEffect(() => {
     if (!existing) return
+    setType(existing.type ?? 'guru')
     setName(existing.name)
     setSlug(existing.slug)
     setTitle(existing.title ?? '')
@@ -315,6 +325,30 @@ export function TeacherFormPage() {
           className="h-11 font-mono text-sm"
         />
         <p className="text-xs text-muted-foreground">Digunakan di alamat halaman publik guru.</p>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="type">Tipe</Label>
+        <Select
+          value={type}
+          onValueChange={(v) => {
+            setType(v as TeacherType)
+            markDirty()
+          }}
+        >
+          <SelectTrigger id="type" className="h-11">
+            <SelectValue placeholder="Pilih tipe" />
+          </SelectTrigger>
+          <SelectContent>
+            {TEACHER_TYPES.map((t) => (
+              <SelectItem key={t} value={t}>
+                {TEACHER_TYPE_LABELS[t]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          Menentukan kategori: Kepala Sekolah, Guru, atau Staff.
+        </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">

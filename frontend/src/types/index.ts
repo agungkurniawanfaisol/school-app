@@ -96,10 +96,13 @@ export interface Curriculum {
   created_at: string | null
 }
 
+export type TeacherType = 'kepala_sekolah' | 'guru' | 'staff'
+
 export interface Teacher {
   id: number
   uuid: string
   school_id: number
+  type: TeacherType
   name: string
   slug: string
   title: string | null
@@ -359,4 +362,5 @@ export interface ListFilters {
   group?: string
   is_active?: boolean
   is_featured?: boolean
+  type?: string
 }

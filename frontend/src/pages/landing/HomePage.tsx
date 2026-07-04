@@ -1,10 +1,13 @@
+import { BottomNav } from '@/components/layout/BottomNav'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { AboutSection } from '@/components/landing/AboutSection'
 import { ActivitiesSection } from '@/components/landing/ActivitiesSection'
 import { ContactSection } from '@/components/landing/ContactSection'
-import { CoursesPreviewSection } from '@/components/landing/CoursesPreviewSection'
+// import { CoursesPreviewSection } from '@/components/landing/CoursesPreviewSection'
 import { FeaturedProgramsSection } from '@/components/landing/FeaturedProgramsSection'
+import { PrincipalSection } from '@/components/landing/PrincipalSection'
+import { StaffSection } from '@/components/landing/StaffSection'
 import { FacilitiesSection } from '@/components/landing/FacilitiesSection'
 import { HeroSection } from '@/components/landing/HeroSection'
 import { NewsSection } from '@/components/landing/NewsSection'
@@ -17,14 +20,16 @@ export function HomePage() {
   return (
     <div className="flex min-h-svh flex-col">
       <Header />
-      <main id="main-content" className="flex-1">
+      <main id="main-content" className="flex-1 pb-16 lg:pb-0">
         <HeroSection />
         <SectionDivider />
         <AboutSection />
+        <PrincipalSection />
         <SectionDivider />
         <FeaturedProgramsSection />
         <SectionDivider />
         <TeachersSection />
+        <StaffSection />
         <SectionDivider />
         <ActivitiesSection />
         <SectionDivider />
@@ -34,11 +39,12 @@ export function HomePage() {
         <SectionDivider />
         <TestimonialsSection />
         <SectionDivider />
-        <CoursesPreviewSection />
+        {/* <CoursesPreviewSection /> — diaktifkan nanti saat kursus sudah tersedia */}
         <PmbCtaSection />
         <ContactSection />
       </main>
       <Footer />
+      <BottomNav />
     </div>
   )
 }

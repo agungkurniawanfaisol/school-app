@@ -18,11 +18,12 @@ class TeacherResource extends JsonResource
             'id' => $this->id,
             'uuid' => $this->uuid,
             'school_id' => $this->school_id,
+            'type' => $this->type,
             'name' => $this->name,
             'slug' => $this->slug,
             'title' => $this->title,
             'subject' => $this->subject,
-            'bio' => $this->when($isDetail, $this->bio),
+            'bio' => $this->bio,
             'content' => $this->when($this->exposesFullContent($request), $this->content),
             'content_json' => $this->when(
                 $this->isAdminRequest($request) || $this->exposesFullContent($request),

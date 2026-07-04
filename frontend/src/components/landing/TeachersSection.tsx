@@ -78,7 +78,7 @@ function TeacherCard({ teacher, featured = false }: { teacher: Teacher; featured
 }
 
 export function TeachersSection() {
-  const { data, isLoading, isFetching } = useTeachersList({ per_page: LANDING_TEACHER_LIMIT })
+  const { data, isLoading, isFetching } = useTeachersList({ per_page: LANDING_TEACHER_LIMIT, type: 'guru' })
   const teachers = data?.data ?? []
   const featured = teachers.find((t) => t.is_featured) ?? teachers[0]
   const rest = teachers.filter((t) => t.id !== featured?.id)

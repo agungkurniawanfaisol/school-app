@@ -2,14 +2,15 @@ import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
 import { TeacherAvatar } from '@/components/teachers/TeacherAvatar'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTeachersList } from '@/hooks/useTeachers'
+import { TEACHER_TYPE_LABELS, type TeacherTypeValue } from '@/schemas/teacher'
 
 export function TeachersCatalogPage() {
   const [search, setSearch] = useState('')
@@ -23,18 +24,14 @@ export function TeachersCatalogPage() {
         title="Guru & Tenaga Pendidik"
         description="Kenali tim pengajar profesional Sekolah Islam Nurul Hikmah."
       />
+      <SubpageHero
+        title="Guru & Tenaga Pendidik"
+        subtitle="Tim pengajar berdedikasi yang membimbing siswa menuju kesuksesan akademik dan karakter."
+        backHref="/"
+        backLabel="Kembali ke beranda"
+      />
       <div className="container-page section-padding">
         <div className="mx-auto max-w-6xl space-y-8">
-          <div className="space-y-2 text-center">
-            <Button asChild variant="ghost" size="sm" className="mb-2 min-h-11">
-              <Link to="/">← Kembali ke beranda</Link>
-            </Button>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Guru & Tenaga Pendidik</h1>
-            <p className="mx-auto max-w-2xl text-muted-foreground">
-              Tim pengajar berdedikasi yang membimbing siswa menuju kesuksesan akademik dan karakter.
-            </p>
-          </div>
-
           <div className="relative mx-auto max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
             <Input
@@ -71,9 +68,16 @@ export function TeachersCatalogPage() {
                           <p className="text-sm text-primary-foreground/85">{teacher.subject}</p>
                         )}
                       </div>
-                      {teacher.is_featured && (
-                        <Badge className="absolute left-2 top-2">Unggulan</Badge>
-                      )}
+                      <div className="absolute left-2 top-2 flex flex-col gap-1">
+                        {teacher.type && teacher.type !== 'guru' && (
+                          <Badge variant="secondary">
+                            {TEACHER_TYPE_LABELS[teacher.type as TeacherTypeValue] ?? teacher.type}
+                          </Badge>
+                        )}
+                        {teacher.is_featured && (
+                          <Badge>Unggulan</Badge>
+                        )}
+                      </div>
                     </div>
                     <CardContent className="border-t border-primary/10 py-3 text-center md:border-t-0">
                       <p className="font-medium text-foreground md:hidden">{teacher.name}</p>

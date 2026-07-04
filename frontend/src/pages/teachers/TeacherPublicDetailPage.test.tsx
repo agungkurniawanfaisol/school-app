@@ -50,7 +50,7 @@ describe('TeacherPublicDetailPage', () => {
       path: '/guru/:slug',
     })
 
-    expect(screen.getByRole('heading', { name: 'Ustadz Ahmad Fauzi' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: 'Ustadz Ahmad Fauzi' })).toBeInTheDocument()
     expect(screen.getByText('Profil lengkap guru.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Semua guru/i })).toHaveAttribute('href', '/guru')
     expect(useTeacherDetailMock).toHaveBeenCalledWith('ustadz-ahmad-fauzi')

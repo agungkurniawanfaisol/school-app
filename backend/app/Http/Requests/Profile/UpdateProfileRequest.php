@@ -22,6 +22,11 @@ class UpdateProfileRequest extends PanelFormRequest
             'teacher.photo' => ['nullable', 'string', 'max:500'],
             'teacher.email' => ['nullable', 'email', 'max:150'],
             'teacher.social_media' => ['nullable', 'array'],
+            'teacher.social_media.facebook' => ['nullable', 'string', 'max:500'],
+            'teacher.social_media.instagram' => ['nullable', 'string', 'max:500'],
+            'teacher.social_media.youtube' => ['nullable', 'string', 'max:500'],
+            'teacher.social_media.tiktok' => ['nullable', 'string', 'max:500'],
+            'teacher.social_media.twitter' => ['nullable', 'string', 'max:500'],
         ];
     }
 

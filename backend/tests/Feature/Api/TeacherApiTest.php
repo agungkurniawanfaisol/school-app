@@ -68,4 +68,46 @@ class TeacherApiTest extends TestCase
         $this->getJson('/api/v1/teachers/invalid slug!')
             ->assertNotFound();
     }
+
+    public function test_list_filters_by_type_guru(): void
+    {
+        Teacher::factory()->create(['type' => 'guru']);
+        Teacher::factory()->kepalaSekolah()->create();
+        Teacher::factory()->staff()->create();
+
+        $this->getJson('/api/v1/teachers?type=guru')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.type', 'guru');
+    }
+
+    public function test_list_filters_by_type_kepala_sekolah(): void
+    {
+        Teacher::factory()->count(2)->create(['type' => 'guru']);
+        Teacher::factory()->kepalaSekolah()->create();
+
+        $this->getJson('/api/v1/teachers?type=kepala_sekolah')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.type', 'kepala_sekolah');
+    }
+
+    public function test_list_filters_by_type_staff(): void
+    {
+        Teacher::factory()->count(2)->create(['type' => 'guru']);
+        Teacher::factory()->staff()->count(3)->create();
+
+        $this->getJson('/api/v1/teachers?type=staff')
+            ->assertOk()
+            ->assertJsonCount(3, 'data');
+    }
+
+    public function test_show_includes_type_field(): void
+    {
+        $teacher = Teacher::factory()->kepalaSekolah()->create();
+
+        $this->getJson("/api/v1/teachers/{$teacher->slug}")
+            ->assertOk()
+            ->assertJsonPath('data.type', 'kepala_sekolah');
+    }
 }

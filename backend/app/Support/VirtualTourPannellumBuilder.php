@@ -62,8 +62,6 @@ class VirtualTourPannellumBuilder
             return $image;
         }
 
-        $path = Str::startsWith($image, '/') ? $image : '/'.$image;
-
-        return rtrim((string) config('app.url'), '/').$path;
+        return Str::startsWith($image, '/') ? $image : '/'.$image;
     }
 }

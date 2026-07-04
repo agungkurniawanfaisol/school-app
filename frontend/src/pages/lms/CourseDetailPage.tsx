@@ -1,7 +1,7 @@
 import { Clock } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
-import { Footer } from '@/components/layout/Footer'
-import { Header } from '@/components/layout/Header'
+import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SubpageHero } from '@/components/layout/SubpageHero'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -16,36 +16,39 @@ export function CourseDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-svh flex-col">
-        <Header />
-        <main className="container-page flex-1 section-padding">
+      <PublicPageShell>
+        <SubpageHero title="Memuat kursus..." backHref="/kursus" backLabel="Katalog Kursus" />
+        <div className="container-page section-padding">
           <Skeleton className="mb-6 h-64 w-full" />
           <Skeleton className="h-8 w-1/2" />
-        </main>
-        <Footer />
-      </div>
+        </div>
+      </PublicPageShell>
     )
   }
 
   if (!course) {
     return (
-      <div className="flex min-h-svh flex-col">
-        <Header />
-        <main className="container-page flex-1 section-padding text-center">
-          <h1 className="text-2xl font-bold">Kursus tidak ditemukan</h1>
+      <PublicPageShell>
+        <SubpageHero title="Kursus tidak ditemukan" backHref="/kursus" backLabel="Katalog Kursus" />
+        <div className="container-page section-padding text-center">
           <Button asChild className="mt-4">
             <Link to="/kursus">Kembali ke Katalog</Link>
           </Button>
-        </main>
-        <Footer />
-      </div>
+        </div>
+      </PublicPageShell>
     )
   }
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <Header />
-      <main className="container-page flex-1 section-padding">
+    <PublicPageShell>
+      <SubpageHero
+        title={course.title}
+        subtitle={course.excerpt}
+        badge={course.category}
+        backHref="/kursus"
+        backLabel="Katalog Kursus"
+      />
+      <section className="container-page section-padding">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
             {course.thumbnail && (
@@ -55,7 +58,7 @@ export function CourseDetailPage() {
               {course.level && <Badge variant="secondary">{course.level}</Badge>}
               {course.category && <Badge variant="outline">{course.category}</Badge>}
             </div>
-            <h1 className="mb-4 text-3xl font-bold text-primary">{course.title}</h1>
+            <h2 className="sr-only">{course.title}</h2>
             {course.description && (
               <p className="mb-8 whitespace-pre-line text-muted-foreground">{course.description}</p>
             )}
@@ -112,8 +115,7 @@ export function CourseDetailPage() {
             </Card>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </section>
+    </PublicPageShell>
   )
 }

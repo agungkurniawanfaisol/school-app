@@ -3,7 +3,9 @@
 namespace App\Http\Requests\Teacher;
 
 use App\Http\Requests\RichContentAdminRequest;
+use App\Models\Teacher;
 use App\Rules\SafeMediaUrl;
+use Illuminate\Validation\Rule;
 
 class StoreTeacherRequest extends RichContentAdminRequest
 {
@@ -11,6 +13,7 @@ class StoreTeacherRequest extends RichContentAdminRequest
     {
         return [
             'school_id' => ['required', 'exists:schools,id'],
+            'type' => ['sometimes', 'string', Rule::in(Teacher::TYPES)],
             'name' => ['required', 'string', 'max:200'],
             'slug' => ['sometimes', 'string', 'max:270', 'unique:teachers,slug'],
             'title' => ['nullable', 'string', 'max:150'],

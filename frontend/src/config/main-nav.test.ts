@@ -1,19 +1,28 @@
 import { describe, expect, it } from 'vitest'
-import { isInternalRoute, mainNavTree, resolveNavHref } from '@/config/main-nav'
+import { isInternalRoute, isNavStandalone, mainNavTree, resolveNavHref } from '@/config/main-nav'
 
 describe('main-nav', () => {
-  it('groups navigation into tree structure with PMB', () => {
-    const labels = mainNavTree.map((group) => group.label)
-    expect(labels).toEqual(['Profil', 'Konten', 'PMB'])
+  it('groups navigation into tree with standalone Tur Virtual', () => {
+    const labels = mainNavTree.map((entry) => entry.label)
+    expect(labels).toEqual(['Profil', 'Tur Virtual', 'Konten', 'PMB'])
 
-    const pmbLinks = mainNavTree.find((group) => group.label === 'PMB')?.children
-    expect(pmbLinks).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ href: '/pmb' }),
-        expect.objectContaining({ href: '/pmb/daftar' }),
-        expect.objectContaining({ href: '/pmb/status' }),
-      ]),
-    )
+    const turVirtual = mainNavTree.find((e) => e.label === 'Tur Virtual')!
+    expect(isNavStandalone(turVirtual)).toBe(true)
+    if (isNavStandalone(turVirtual)) {
+      expect(turVirtual.href).toBe('/tur-virtual')
+    }
+
+    const pmbEntry = mainNavTree.find((e) => e.label === 'PMB')!
+    expect(isNavStandalone(pmbEntry)).toBe(false)
+    if (!isNavStandalone(pmbEntry)) {
+      expect(pmbEntry.children).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ href: '/pmb' }),
+          expect.objectContaining({ href: '/pmb/daftar' }),
+          expect.objectContaining({ href: '/pmb/status' }),
+        ]),
+      )
+    }
   })
 
   it('resolves home anchor links without leading slash', () => {

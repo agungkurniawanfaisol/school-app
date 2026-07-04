@@ -43,10 +43,6 @@ vi.mock('@/components/landing/TestimonialsSection', () => ({
   TestimonialsSection: () => <section data-testid="testimonials">Testimonials</section>,
 }))
 
-vi.mock('@/components/landing/CoursesPreviewSection', () => ({
-  CoursesPreviewSection: () => <section data-testid="courses">Courses</section>,
-}))
-
 vi.mock('@/components/landing/PmbCtaSection', () => ({
   PmbCtaSection: () => <section data-testid="pmb-cta">PMB CTA</section>,
 }))
@@ -55,8 +51,20 @@ vi.mock('@/components/landing/ContactSection', () => ({
   ContactSection: () => <section data-testid="contact">Contact</section>,
 }))
 
+vi.mock('@/components/landing/PrincipalSection', () => ({
+  PrincipalSection: () => <section data-testid="principal">Principal</section>,
+}))
+
+vi.mock('@/components/landing/StaffSection', () => ({
+  StaffSection: () => <section data-testid="staff">Staff</section>,
+}))
+
 vi.mock('@/components/landing/SectionDivider', () => ({
   SectionDivider: () => <hr data-testid="divider" />,
+}))
+
+vi.mock('@/components/layout/BottomNav', () => ({
+  BottomNav: () => <nav data-testid="bottom-nav">BottomNav</nav>,
 }))
 
 describe('HomePage', () => {
@@ -72,8 +80,9 @@ describe('HomePage', () => {
     expect(screen.getByTestId('facilities')).toBeInTheDocument()
     expect(screen.getByTestId('news')).toBeInTheDocument()
     expect(screen.getByTestId('testimonials')).toBeInTheDocument()
-    expect(screen.getByTestId('courses')).toBeInTheDocument()
     expect(screen.getByTestId('pmb-cta')).toBeInTheDocument()
+    expect(screen.getByTestId('principal')).toBeInTheDocument()
+    expect(screen.getByTestId('staff')).toBeInTheDocument()
     expect(screen.getByTestId('contact')).toBeInTheDocument()
     expect(screen.getByTestId('footer')).toBeInTheDocument()
   })

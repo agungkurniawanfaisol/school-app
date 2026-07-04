@@ -20,6 +20,7 @@ class TeacherFactory extends Factory
 
         return [
             'school_id' => School::factory(),
+            'type' => Teacher::TYPE_GURU,
             'name' => $name,
             'slug' => Str::slug($name).'-'.fake()->unique()->numerify('###'),
             'title' => fake()->jobTitle(),
@@ -39,5 +40,15 @@ class TeacherFactory extends Factory
     public function featured(): static
     {
         return $this->state(fn () => ['is_featured' => true]);
+    }
+
+    public function kepalaSekolah(): static
+    {
+        return $this->state(fn () => ['type' => Teacher::TYPE_KEPALA_SEKOLAH]);
+    }
+
+    public function staff(): static
+    {
+        return $this->state(fn () => ['type' => Teacher::TYPE_STAFF]);
     }
 }

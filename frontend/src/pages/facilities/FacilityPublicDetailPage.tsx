@@ -2,8 +2,8 @@ import { Link, useParams } from 'react-router-dom'
 import { useState } from 'react'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useFacilityDetail } from '@/hooks/useFacilities'
@@ -54,18 +54,15 @@ export function FacilityPublicDetailPage() {
         title={facility.name}
         description={facility.description ?? `Fasilitas ${facility.name} di Nurul Hikmah`}
       />
+      <SubpageHero
+        title={facility.name}
+        subtitle={facility.description}
+        badge={facility.category}
+        backHref="/fasilitas"
+        backLabel="Kembali ke Fasilitas"
+      />
       <article className="container-page section-padding">
         <div className="mx-auto max-w-4xl space-y-8">
-          <Button asChild variant="ghost" size="sm" className="min-h-11">
-            <Link to="/fasilitas">← Kembali ke Fasilitas</Link>
-          </Button>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {facility.category && <Badge variant="secondary">{facility.category}</Badge>}
-            {facility.is_featured && <Badge>Unggulan</Badge>}
-          </div>
-
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{facility.name}</h1>
 
           {heroSrc && (
             <img

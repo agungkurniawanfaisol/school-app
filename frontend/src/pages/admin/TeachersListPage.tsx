@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/pagination'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAdminTeachersList, useDeleteTeacher, useUpdateTeacher } from '@/hooks/useTeachers'
+import { TEACHER_TYPE_LABELS, type TeacherTypeValue } from '@/schemas/teacher'
 import type { Teacher } from '@/types'
 
 function TeacherListCard({
@@ -65,7 +66,14 @@ function TeacherListCard({
 
           <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 p-4">
             <div className="space-y-1.5">
-              <h2 className="truncate text-base font-semibold text-foreground group-hover:text-primary">{teacher.name}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="truncate text-base font-semibold text-foreground group-hover:text-primary">{teacher.name}</h2>
+                {teacher.type && teacher.type !== 'guru' && (
+                  <Badge variant={teacher.type === 'kepala_sekolah' ? 'default' : 'secondary'} className="shrink-0 text-[10px]">
+                    {TEACHER_TYPE_LABELS[teacher.type as TeacherTypeValue] ?? teacher.type}
+                  </Badge>
+                )}
+              </div>
               {teacher.title && <p className="truncate text-sm text-muted-foreground">{teacher.title}</p>}
               {teacher.subject && (
                 <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
@@ -205,6 +213,7 @@ export function AdminTeachersListPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all')
   const [featuredFilter, setFeaturedFilter] = useState<'all' | 'featured'>('all')
+  const [typeFilter, setTypeFilter] = useState<'all' | TeacherTypeValue>('all')
   const [deleteTarget, setDeleteTarget] = useState<Teacher | null>(null)
   const [toggleTarget, setToggleTarget] = useState<Teacher | null>(null)
 
@@ -215,6 +224,7 @@ export function AdminTeachersListPage() {
     ...(statusFilter === 'active' ? { is_active: true } : {}),
     ...(statusFilter === 'inactive' ? { is_active: false } : {}),
     ...(featuredFilter === 'featured' ? { is_featured: true } : {}),
+    ...(typeFilter !== 'all' ? { type: typeFilter } : {}),
   }
 
   const { data, isLoading, isFetching } = useAdminTeachersList(listFilters)
@@ -296,6 +306,23 @@ export function AdminTeachersListPage() {
               <SelectContent>
                 <SelectItem value="all">Semua guru</SelectItem>
                 <SelectItem value="featured">Unggulan saja</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={typeFilter}
+              onValueChange={(v) => {
+                setTypeFilter(v as typeof typeFilter)
+                setPage(1)
+              }}
+            >
+              <SelectTrigger className="h-11 w-full sm:w-44" aria-label="Filter tipe">
+                <SelectValue placeholder="Tipe" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua tipe</SelectItem>
+                <SelectItem value="kepala_sekolah">Kepala Sekolah</SelectItem>
+                <SelectItem value="guru">Guru</SelectItem>
+                <SelectItem value="staff">Staff</SelectItem>
               </SelectContent>
             </Select>
           </div>

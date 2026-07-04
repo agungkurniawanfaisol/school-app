@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { Facebook, Instagram, Youtube } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -25,7 +26,10 @@ export function ProfilePage() {
 
   const teacherForm = useForm<ProfileTeacherValues>({
     resolver: zodResolver(profileTeacherSchema),
-    defaultValues: { name: '', title: '', subject: '', bio: '', photo: '', email: '' },
+    defaultValues: {
+      name: '', title: '', subject: '', bio: '', photo: '', email: '',
+      social_media: { facebook: '', instagram: '', youtube: '', tiktok: '', twitter: '' },
+    },
   })
 
   useEffect(() => {
@@ -45,6 +49,13 @@ export function ProfilePage() {
           bio: profile.teacher.bio ?? '',
           photo: profile.teacher.photo ?? '',
           email: profile.teacher.email ?? '',
+          social_media: {
+            facebook: profile.teacher.social_media?.facebook ?? '',
+            instagram: profile.teacher.social_media?.instagram ?? '',
+            youtube: profile.teacher.social_media?.youtube ?? '',
+            tiktok: profile.teacher.social_media?.tiktok ?? '',
+            twitter: profile.teacher.social_media?.twitter ?? '',
+          },
         })
       }
     }
@@ -56,10 +67,23 @@ export function ProfilePage() {
 
     if (!accountValid || !teacherValid) return
 
+    const teacherValues = profile?.teacher ? teacherForm.getValues() : undefined
+    if (teacherValues?.social_media) {
+      const sm = teacherValues.social_media
+      const cleaned = {
+        facebook: sm.facebook || null,
+        instagram: sm.instagram || null,
+        youtube: sm.youtube || null,
+        tiktok: sm.tiktok || null,
+        twitter: sm.twitter || null,
+      }
+      teacherValues.social_media = Object.values(cleaned).some(Boolean) ? cleaned : undefined
+    }
+
     updateProfile.mutate(
       {
         user: accountForm.getValues(),
-        teacher: profile?.teacher ? teacherForm.getValues() : undefined,
+        teacher: teacherValues,
       },
       {
         onSuccess: () => {
@@ -247,6 +271,83 @@ export function ProfilePage() {
                       </FormItem>
                     )}
                   />
+
+                  <div className="space-y-3 rounded-lg border p-4">
+                    <p className="text-sm font-medium">Media Sosial</p>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <FormField
+                        control={teacherForm.control}
+                        name="social_media.facebook"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-1.5">
+                              <Facebook className="h-4 w-4" /> Facebook
+                            </FormLabel>
+                            <FormControl>
+                              <Input {...field} className="h-11" placeholder="https://facebook.com/..." />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={teacherForm.control}
+                        name="social_media.instagram"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-1.5">
+                              <Instagram className="h-4 w-4" /> Instagram
+                            </FormLabel>
+                            <FormControl>
+                              <Input {...field} className="h-11" placeholder="@username atau URL" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={teacherForm.control}
+                        name="social_media.youtube"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-1.5">
+                              <Youtube className="h-4 w-4" /> YouTube
+                            </FormLabel>
+                            <FormControl>
+                              <Input {...field} className="h-11" placeholder="https://youtube.com/..." />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={teacherForm.control}
+                        name="social_media.tiktok"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>TikTok</FormLabel>
+                            <FormControl>
+                              <Input {...field} className="h-11" placeholder="@username atau URL" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={teacherForm.control}
+                        name="social_media.twitter"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>X / Twitter</FormLabel>
+                            <FormControl>
+                              <Input {...field} className="h-11" placeholder="@username atau URL" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
                 </form>
               </Form>
             ) : (

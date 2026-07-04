@@ -24,6 +24,14 @@ export const profileAccountSchema = z
     }
   })
 
+export const profileSocialMediaSchema = z.object({
+  facebook: z.string().max(500, 'Maksimal 500 karakter').optional().or(z.literal('')),
+  instagram: z.string().max(500, 'Maksimal 500 karakter').optional().or(z.literal('')),
+  youtube: z.string().max(500, 'Maksimal 500 karakter').optional().or(z.literal('')),
+  tiktok: z.string().max(500, 'Maksimal 500 karakter').optional().or(z.literal('')),
+  twitter: z.string().max(500, 'Maksimal 500 karakter').optional().or(z.literal('')),
+})
+
 export const profileTeacherSchema = z.object({
   name: z.string().min(1, 'Nama wajib diisi').max(200),
   title: z.string().max(150).optional().or(z.literal('')),
@@ -34,6 +42,7 @@ export const profileTeacherSchema = z.object({
     (val) => !val || z.string().email().safeParse(val).success,
     'Email tidak valid',
   ),
+  social_media: profileSocialMediaSchema.optional(),
 })
 
 export type ProfileAccountValues = z.infer<typeof profileAccountSchema>

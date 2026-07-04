@@ -1,7 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { api, getApiErrorMessage, getAuthToken } from '@/lib/api'
-import { buildQueryParams, queryConfig, publicQueryConfig } from '@/hooks/queryConfig'
+import { buildQueryParams, queryConfig } from '@/hooks/queryConfig'
 import type { ApiResponse, ListFilters, PaginatedResponse } from '@/types'
 import type { VirtualTour, VirtualTourListItem } from '@/types/virtualTour'
 import type { VirtualTourFormValues } from '@/schemas/virtualTour'
@@ -25,7 +25,7 @@ export function usePublicVirtualTours(filters: ListFilters = {}) {
       })
       return data
     },
-    ...publicQueryConfig,
+    ...queryConfig,
   })
 }
 
@@ -37,7 +37,7 @@ export function usePublicVirtualTour(slug: string) {
       return data.data
     },
     enabled: !!slug,
-    ...publicQueryConfig,
+    ...queryConfig,
   })
 }
 

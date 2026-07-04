@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Compass } from 'lucide-react'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,21 +19,16 @@ export function VirtualTourCatalogPage() {
         title="Tur Virtual"
         description="Jelajahi lingkungan Sekolah Islam Nurul Hikmah secara virtual dengan panorama 360 derajat."
       />
-      <div className="section-padding pattern-bg">
-        <div className="container-page">
-          <div className="mx-auto max-w-4xl space-y-8">
-            <div className="space-y-2 text-center">
-              <Button asChild variant="ghost" size="sm" className="mb-2 min-h-11">
-                <Link to="/">← Kembali ke beranda</Link>
-              </Button>
-              <p className="text-sm font-semibold uppercase tracking-wider text-primary">Eksplorasi 360°</p>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Tur Virtual Sekolah</h1>
-              <p className="mx-auto max-w-2xl text-muted-foreground">
-                Jelajahi ruang kelas, fasilitas, dan lingkungan sekolah dari mana saja.
-              </p>
-            </div>
-
-            {isLoading ? (
+      <SubpageHero
+        title="Tur Virtual Sekolah"
+        subtitle="Jelajahi ruang kelas, fasilitas, dan lingkungan sekolah dari mana saja."
+        badge="Eksplorasi 360°"
+        backHref="/"
+        backLabel="Kembali ke beranda"
+      />
+      <div className="container-page section-padding">
+        <div className="mx-auto max-w-4xl space-y-8">
+          {isLoading ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 {Array.from({ length: 2 }).map((_, index) => (
                   <Skeleton key={index} className="h-40 w-full rounded-xl" />
@@ -64,7 +60,6 @@ export function VirtualTourCatalogPage() {
             )}
           </div>
         </div>
-      </div>
     </PublicPageShell>
   )
 }

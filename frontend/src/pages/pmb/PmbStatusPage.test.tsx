@@ -23,7 +23,7 @@ describe('PmbStatusPage', () => {
   it('renders track form', () => {
     renderWithProviders(<PmbStatusPage />, { route: '/pmb/status', path: '/pmb/status' })
 
-    expect(screen.getByText('Cek Status Pendaftaran')).toBeInTheDocument()
+    expect(screen.getByText('Masukkan Token')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Token pelacakan...')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Cek' })).toBeInTheDocument()
   })

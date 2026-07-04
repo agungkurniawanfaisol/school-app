@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Teacher;
 
 use App\Http\Requests\RichContentAdminRequest;
+use App\Models\Teacher;
 use App\Rules\SafeMediaUrl;
 use Illuminate\Validation\Rule;
 
@@ -15,6 +16,7 @@ class UpdateTeacherRequest extends RichContentAdminRequest
 
         return [
             'school_id' => ['sometimes', 'exists:schools,id'],
+            'type' => ['sometimes', 'string', Rule::in(Teacher::TYPES)],
             'name' => ['sometimes', 'string', 'max:200'],
             'slug' => ['sometimes', 'string', 'max:270', Rule::unique('teachers', 'slug')->ignore($teacher?->id)],
             'title' => ['nullable', 'string', 'max:150'],

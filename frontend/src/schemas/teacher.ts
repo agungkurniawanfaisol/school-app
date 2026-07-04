@@ -14,8 +14,18 @@ const contentFields = {
   content_json: editorDocumentSchema.optional().nullable(),
 }
 
+export const TEACHER_TYPES = ['kepala_sekolah', 'guru', 'staff'] as const
+export type TeacherTypeValue = (typeof TEACHER_TYPES)[number]
+
+export const TEACHER_TYPE_LABELS: Record<TeacherTypeValue, string> = {
+  kepala_sekolah: 'Kepala Sekolah',
+  guru: 'Guru',
+  staff: 'Staff',
+}
+
 const teacherBaseSchema = z.object({
   school_id: z.number().int().positive('Sekolah wajib dipilih'),
+  type: z.enum(TEACHER_TYPES).default('guru'),
   name: z.string().min(1, 'Nama wajib diisi').max(200),
   slug: z.string().min(1).max(270),
   title: z.string().max(150).optional().nullable(),

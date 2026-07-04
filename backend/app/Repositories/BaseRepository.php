@@ -66,6 +66,10 @@ abstract class BaseRepository implements RepositoryInterface
             $query->where('category', $filters['category']);
         }
 
+        if (isset($filters['type'])) {
+            $query->where('type', $filters['type']);
+        }
+
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
         }

@@ -10,10 +10,8 @@ mkdir -p "$DEST"
 
 declare -A URLS=(
   ["gerbang-utama.jpg"]="https://pannellum.org/images/alma.jpg"
-  ["halaman-sekolah.jpg"]="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/examples/examplepano.jpg"
   ["ruang-kelas.jpg"]="https://pannellum.org/images/cerro-toco-0.jpg"
   ["perpustakaan.jpg"]="https://pannellum.org/images/cerro-toco-1.jpg"
-  ["musholla.jpg"]="https://www.marzipano.org/media/equirectangular/equirectangular-0.jpg"
 )
 
 for file in "${!URLS[@]}"; do

@@ -2,8 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Footer } from '@/components/layout/Footer'
-import { Header } from '@/components/layout/Header'
+import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SubpageHero } from '@/components/layout/SubpageHero'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -58,9 +58,15 @@ export function PmbRegisterPage() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <Header />
-      <main className="container-page flex-1 section-padding">
+    <PublicPageShell>
+      <SubpageHero
+        title="Formulir Pendaftaran"
+        subtitle={`Daftarkan putra-putri Anda di ${school?.name ?? 'sekolah kami'}.`}
+        badge="PMB"
+        backHref="/pmb"
+        backLabel="Informasi PMB"
+      />
+      <section className="container-page section-padding">
         <Card className="mx-auto max-w-2xl">
           <CardHeader>
             <CardTitle>Formulir Pendaftaran Siswa Baru</CardTitle>
@@ -233,8 +239,7 @@ export function PmbRegisterPage() {
             </Form>
           </CardContent>
         </Card>
-      </main>
-      <Footer />
-    </div>
+      </section>
+    </PublicPageShell>
   )
 }

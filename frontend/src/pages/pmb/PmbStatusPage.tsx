@@ -2,8 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useParams } from 'react-router-dom'
-import { Footer } from '@/components/layout/Footer'
-import { Header } from '@/components/layout/Header'
+import { PublicPageShell } from '@/components/layout/PublicPageShell'
+import { SubpageHero } from '@/components/layout/SubpageHero'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -48,13 +48,19 @@ export function PmbStatusPage() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <Header />
-      <main className="container-page flex-1 section-padding">
+    <PublicPageShell>
+      <SubpageHero
+        title="Cek Status Pendaftaran"
+        subtitle="Lacak status pendaftaran siswa baru Anda."
+        badge="PMB"
+        backHref="/pmb"
+        backLabel="Informasi PMB"
+      />
+      <section className="container-page section-padding">
         <div className="mx-auto max-w-lg">
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Cek Status Pendaftaran</CardTitle>
+              <CardTitle>Masukkan Token</CardTitle>
               <CardDescription>
                 Masukkan token pelacakan yang Anda terima setelah mendaftar.
               </CardDescription>
@@ -124,8 +130,7 @@ export function PmbStatusPage() {
             </Button>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </section>
+    </PublicPageShell>
   )
 }

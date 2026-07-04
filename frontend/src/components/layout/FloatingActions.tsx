@@ -57,7 +57,7 @@ export function FloatingActions() {
 
   return (
     <div
-      className="fixed bottom-5 right-4 z-50 flex flex-col gap-3 sm:bottom-6 sm:right-6"
+      className="fixed bottom-20 right-4 z-50 flex flex-col gap-3 sm:bottom-6 sm:right-6 lg:bottom-6"
       aria-label="Aksi cepat"
     >
       {showScrollTop && (
