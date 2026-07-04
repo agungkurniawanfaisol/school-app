@@ -48,6 +48,11 @@ vi.mock('@/components/i18n', () => ({
   LanguageSwitcher: () => <button type="button" aria-label="Ganti bahasa">Lang</button>,
 }))
 
+vi.mock('@/hooks/useAuth', () => ({
+  useIsAuthenticated: () => false,
+  useAuthMe: () => ({ data: null }),
+}))
+
 describe('Header', () => {
   function renderHeader() {
     return render(<Header />)
@@ -85,7 +90,7 @@ describe('Header', () => {
     const { container } = renderHeader()
     const header = container.querySelector('header')
 
-    expect(header).toHaveClass('bg-background/90')
+    expect(header).toHaveClass('bg-background')
     expect(header).toHaveClass('backdrop-blur-lg')
   })
 
@@ -96,7 +101,7 @@ describe('Header', () => {
 
     expect(header).toHaveClass('sticky')
     expect(header).not.toHaveClass('from-primary/35')
-    expect(header).toHaveClass('bg-background/80')
+    expect(header).toHaveClass('bg-background')
   })
 
   it('renders tree navigation groups and login link', () => {

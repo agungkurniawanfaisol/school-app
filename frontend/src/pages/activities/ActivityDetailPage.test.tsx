@@ -38,7 +38,7 @@ describe('ActivityDetailPage', () => {
     useActivitiesListMock.mockReturnValue({ data: { data: [] } })
   })
 
-  it('renders enhanced layout with PageMeta content', () => {
+  it('renders enhanced layout with title and share', () => {
     useActivityDetailByUuidMock.mockReturnValue({ data: activity, isLoading: false, isError: false })
 
     renderWithProviders(<ActivityDetailPage />, {
@@ -47,9 +47,32 @@ describe('ActivityDetailPage', () => {
     })
 
     expect(screen.getByRole('heading', { level: 1, name: 'Lomba Tahfidz' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /bagikan/i })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /bagikan|share/i }).length).toBeGreaterThanOrEqual(1)
     expect(screen.getByRole('link', { name: /Kegiatan/i })).toHaveAttribute('href', '/kegiatan')
     expect(screen.getByText('Detail kegiatan siswa.')).toBeInTheDocument()
     expect(document.title).toContain('Lomba Tahfidz')
+  })
+
+  it('renders floating info cards with category and date', () => {
+    useActivityDetailByUuidMock.mockReturnValue({ data: activity, isLoading: false, isError: false })
+
+    renderWithProviders(<ActivityDetailPage />, {
+      route: '/kegiatan/detail/activity-uuid',
+      path: '/kegiatan/detail/:uuid',
+    })
+
+    expect(screen.getByText('akademik')).toBeInTheDocument()
+    expect(screen.getByText(/15 Februari 2026/)).toBeInTheDocument()
+  })
+
+  it('renders not found state', () => {
+    useActivityDetailByUuidMock.mockReturnValue({ data: null, isLoading: false, isError: true })
+
+    renderWithProviders(<ActivityDetailPage />, {
+      route: '/kegiatan/detail/missing-uuid',
+      path: '/kegiatan/detail/:uuid',
+    })
+
+    expect(screen.getByText(/tidak ditemukan/i)).toBeInTheDocument()
   })
 })

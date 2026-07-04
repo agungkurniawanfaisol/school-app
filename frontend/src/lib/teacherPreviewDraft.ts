@@ -20,11 +20,11 @@ export interface TeacherPreviewDraft {
 }
 
 export function saveTeacherPreviewDraft(draft: TeacherPreviewDraft): void {
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft))
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(draft))
 }
 
 export function readTeacherPreviewDraft(): TeacherPreviewDraft | null {
-  const raw = sessionStorage.getItem(STORAGE_KEY)
+  const raw = localStorage.getItem(STORAGE_KEY)
   if (!raw) return null
 
   try {
@@ -35,5 +35,5 @@ export function readTeacherPreviewDraft(): TeacherPreviewDraft | null {
 }
 
 export function clearTeacherPreviewDraft(): void {
-  sessionStorage.removeItem(STORAGE_KEY)
+  localStorage.removeItem(STORAGE_KEY)
 }

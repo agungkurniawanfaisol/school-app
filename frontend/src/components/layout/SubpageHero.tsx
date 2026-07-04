@@ -44,8 +44,8 @@ export function SubpageHero({
         aria-hidden
       />
 
-      {/* 35% dark overlay */}
-      <div className="absolute inset-0 bg-black/35" aria-hidden />
+      {/* Dark overlay for text contrast */}
+      <div className="absolute inset-0 bg-black/40" aria-hidden />
 
       <IslamicPattern opacity={0.06} />
 
@@ -59,7 +59,7 @@ export function SubpageHero({
         aria-hidden
       />
 
-      <div className="container-page relative z-10 py-10 text-white sm:py-14">
+      <div className="container-page relative z-10 py-10 sm:py-14">
         {backHref && (
           <Button
             asChild
@@ -77,7 +77,7 @@ export function SubpageHero({
               {badge}
             </p>
           )}
-          <h1 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+          <h1 className="font-heading text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
             {title}
           </h1>
           {subtitle && (

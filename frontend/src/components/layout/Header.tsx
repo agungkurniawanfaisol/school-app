@@ -1,4 +1,4 @@
-import { LogIn, Menu, MessageCircle, Phone } from 'lucide-react'
+import { LayoutDashboard, LogIn, Menu, MessageCircle, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
@@ -10,6 +10,7 @@ import { ThemeToggle } from '@/components/theme'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { useIsAuthenticated } from '@/hooks/useAuth'
 import { useSchool } from '@/hooks/useSchool'
 import { cn } from '@/lib/utils'
 
@@ -22,6 +23,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
   const { data: school } = useSchool()
+  const isLoggedIn = useIsAuthenticated()
 
   const isHome = location.pathname === '/'
   const isHeroOverlay = isHome && !scrolled
@@ -46,8 +48,8 @@ export function Header() {
         isHeroOverlay
           ? 'border-transparent bg-gradient-to-b from-primary/35 via-primary/15 to-transparent backdrop-blur-[2px]'
           : scrolled
-            ? 'border-primary/15 bg-background/90 shadow-md shadow-primary/5 backdrop-blur-lg'
-            : 'border-primary/10 bg-background/80 backdrop-blur-md',
+            ? 'border-primary/15 bg-background shadow-md shadow-primary/5 backdrop-blur-lg'
+            : 'border-primary/10 bg-background backdrop-blur-md',
       )}
     >
       <a
@@ -85,22 +87,41 @@ export function Header() {
         <div className="relative z-10 ms-auto flex shrink-0 items-center gap-2">
           <LanguageSwitcher />
           <ThemeToggle variant="ghost" onHero={isHeroOverlay} />
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            className={cn(
-              'hidden sm:inline-flex',
-              isHeroOverlay
-                ? 'border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white'
-                : 'border-primary/25 text-primary',
-            )}
-          >
-            <Link to="/admin/login">
-              <LogIn className="h-4 w-4" />
-              {t('header.login')}
-            </Link>
-          </Button>
+          {isLoggedIn ? (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className={cn(
+                'hidden sm:inline-flex',
+                isHeroOverlay
+                  ? 'border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white'
+                  : 'border-primary/25 text-primary',
+              )}
+            >
+              <Link to="/admin">
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className={cn(
+                'hidden sm:inline-flex',
+                isHeroOverlay
+                  ? 'border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white'
+                  : 'border-primary/25 text-primary',
+              )}
+            >
+              <Link to="/admin/login">
+                <LogIn className="h-4 w-4" />
+                {t('header.login')}
+              </Link>
+            </Button>
+          )}
           {school?.whatsapp && (
             <Button
               asChild
@@ -191,10 +212,17 @@ export function Header() {
                       school?.whatsapp ? 'w-auto' : 'flex-1',
                     )}
                   >
-                    <Link to="/admin/login" onClick={() => setOpen(false)}>
-                      <LogIn className="h-4 w-4" />
-                      {t('header.login')}
-                    </Link>
+                    {isLoggedIn ? (
+                      <Link to="/admin" onClick={() => setOpen(false)}>
+                        <LayoutDashboard className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    ) : (
+                      <Link to="/admin/login" onClick={() => setOpen(false)}>
+                        <LogIn className="h-4 w-4" />
+                        {t('header.login')}
+                      </Link>
+                    )}
                   </Button>
                 </div>
                 <Separator className="my-3" />

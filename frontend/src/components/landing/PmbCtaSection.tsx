@@ -29,7 +29,7 @@ export function PmbCtaSection() {
                 <Sparkles className="mr-1.5 h-3.5 w-3.5 text-[var(--gold-accent)]" />
                 {t('pmb.badge')}
               </Badge>
-              <h2 className="mb-4 text-3xl font-extrabold leading-tight sm:text-4xl lg:text-[2.75rem]">
+              <h2 className="mb-4 text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-[2.75rem]">
                 {t('pmb.title')}{' '}
                 <span className="text-gradient-gold">{t('pmb.highlight')}</span>
               </h2>

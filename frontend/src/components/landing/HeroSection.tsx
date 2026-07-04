@@ -120,7 +120,7 @@ export function HeroSection() {
                       </StaggerItem>
 
                       <StaggerItem>
-                        <h1 className="max-w-xl text-3xl font-extrabold leading-[1.1] sm:text-4xl lg:text-5xl xl:text-[3.5rem]">
+                        <h1 className="max-w-xl text-3xl font-extrabold leading-[1.1] text-white sm:text-4xl lg:text-5xl xl:text-[3.5rem]">
                           {slide.title.includes('&') ? (
                             <>
                               {slide.title.split('&')[0]}
