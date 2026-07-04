@@ -2,14 +2,20 @@
 
 namespace Database\Seeders;
 
+use App\Models\Achievement;
+use App\Models\AlbumPhoto;
+use App\Models\Announcement;
 use App\Models\Course;
 use App\Models\CourseLesson;
 use App\Models\CourseModule;
 use App\Models\Curriculum;
+use App\Models\Document;
+use App\Models\Event;
 use App\Models\Facility;
 use App\Models\FacilityPhoto;
 use App\Models\HeroSlider;
 use App\Models\News;
+use App\Models\PhotoAlbum;
 use App\Models\PmbDocument;
 use App\Models\PmbRegistration;
 use App\Models\School;
@@ -37,6 +43,11 @@ class DemoContentSeeder extends Seeder
         $this->seedFacilities($school);
         $this->seedNews($school, $admin);
         $this->seedTestimonials($school);
+        $this->seedAchievements($school);
+        $this->seedEvents($school);
+        $this->seedDocuments($school);
+        $this->seedPhotoAlbums($school);
+        $this->seedAnnouncements($school);
         $this->seedCourses($school);
         $this->seedPmb($school);
         $this->seedSettings($school);
@@ -496,6 +507,182 @@ class DemoContentSeeder extends Seeder
                     'is_active' => true,
                     'is_featured' => $i < 3,
                 ],
+            );
+        }
+    }
+
+    private function seedAchievements(School $school): void
+    {
+        $items = [
+            ['title' => 'Juara 1 Olimpiade Tahfidz Nasional', 'description' => 'Kompetisi hafalan Al-Qur\'an tingkat nasional diikuti 500+ pesantren.', 'category' => 'keagamaan', 'level' => 'nasional', 'student_name' => 'Muhammad Rizki Fauzan', 'year' => 2026],
+            ['title' => 'Medali Emas Olimpiade Matematika', 'description' => 'Siswa meraih emas di OSN Matematika tingkat provinsi.', 'category' => 'akademik', 'level' => 'provinsi', 'student_name' => 'Aisyah Putri Ramadhani', 'year' => 2026],
+            ['title' => 'Juara 1 Lomba Pidato Bahasa Arab', 'description' => 'Festival bahasa Arab se-Jawa Barat.', 'category' => 'akademik', 'level' => 'provinsi', 'student_name' => 'Ahmad Dzaky Maulana', 'year' => 2025],
+            ['title' => 'Juara Umum Pramuka Tingkat Kota', 'description' => 'Regu penggalang putra meraih juara umum lomba pramuka.', 'category' => 'olahraga', 'level' => 'kota', 'student_name' => 'Tim Pramuka Nurul Hikmah', 'year' => 2025],
+            ['title' => 'Best Poster Kompetisi Sains', 'description' => 'Proyek STEAM tentang energi terbarukan di kompetisi regional.', 'category' => 'akademik', 'level' => 'kota', 'student_name' => 'Fatimah Azzahra', 'year' => 2026],
+            ['title' => 'Juara 2 Kaligrafi Islam Nasional', 'description' => 'Lomba kaligrafi yang diikuti 200+ peserta dari seluruh Indonesia.', 'category' => 'seni', 'level' => 'nasional', 'student_name' => 'Bilal Hakim Pratama', 'year' => 2025],
+            ['title' => 'Penghargaan Sekolah Adiwiyata', 'description' => 'Penghargaan peduli lingkungan dari Dinas Pendidikan.', 'category' => 'lainnya', 'level' => 'kota', 'student_name' => 'Sekolah Islam Nurul Hikmah', 'year' => 2026],
+        ];
+
+        foreach ($items as $i => $item) {
+            Achievement::query()->updateOrCreate(
+                ['school_id' => $school->id, 'title' => $item['title']],
+                [...$item, 'order' => $i + 1, 'is_active' => true],
+            );
+        }
+    }
+
+    private function seedEvents(School $school): void
+    {
+        $items = [
+            ['title' => 'Ujian Akhir Semester Genap', 'description' => 'Ujian tertulis seluruh mata pelajaran kelas 1-9.', 'location' => 'Ruang Kelas', 'event_date' => now()->addDays(14)->toDateString(), 'event_end_date' => now()->addDays(19)->toDateString(), 'event_time' => '07:30', 'category' => 'akademik'],
+            ['title' => 'Wisuda Khatam Al-Qur\'an', 'description' => 'Acara wisuda 30 siswa yang khatam 30 juz.', 'location' => 'Auditorium Sekolah', 'event_date' => now()->addDays(25)->toDateString(), 'event_end_date' => null, 'event_time' => '09:00', 'category' => 'keagamaan'],
+            ['title' => 'Rapat Orang Tua Semester', 'description' => 'Pertemuan wali murid pembagian rapor dan evaluasi.', 'location' => 'Aula Serbaguna', 'event_date' => now()->addDays(30)->toDateString(), 'event_end_date' => null, 'event_time' => '08:00', 'category' => 'umum'],
+            ['title' => 'Pesantren Kilat Ramadhan', 'description' => 'Program tadarus, shalat tarawih bersama, dan kajian.', 'location' => 'Masjid Nurul Hikmah', 'event_date' => now()->addDays(60)->toDateString(), 'event_end_date' => now()->addDays(63)->toDateString(), 'event_time' => '16:00', 'category' => 'keagamaan'],
+            ['title' => 'Penerimaan Peserta Didik Baru', 'description' => 'Tes seleksi gelombang 2 calon siswa baru.', 'location' => 'Gedung Utama', 'event_date' => now()->addDays(7)->toDateString(), 'event_end_date' => null, 'event_time' => '08:00', 'category' => 'umum'],
+        ];
+
+        foreach ($items as $i => $item) {
+            Event::query()->updateOrCreate(
+                ['school_id' => $school->id, 'title' => $item['title']],
+                [...$item, 'order' => $i + 1, 'is_active' => true],
+            );
+        }
+    }
+
+    private function seedDocuments(School $school): void
+    {
+        $items = [
+            ['title' => 'Brosur Sekolah 2026/2027', 'description' => 'Informasi lengkap program, fasilitas, dan biaya pendidikan.', 'category' => 'brosur', 'file_url' => '/storage/documents/brosur-2026.pdf', 'file_size' => 2048000, 'file_type' => 'pdf'],
+            ['title' => 'Formulir Pendaftaran PMB', 'description' => 'Formulir pendaftaran peserta didik baru tahun ajaran 2026/2027.', 'category' => 'formulir', 'file_url' => '/storage/documents/formulir-pmb-2026.pdf', 'file_size' => 512000, 'file_type' => 'pdf'],
+            ['title' => 'Kalender Akademik 2026/2027', 'description' => 'Jadwal kegiatan, libur, dan ujian selama satu tahun ajaran.', 'category' => 'kalender', 'file_url' => '/storage/documents/kalender-akademik-2026.pdf', 'file_size' => 1024000, 'file_type' => 'pdf'],
+            ['title' => 'Tata Tertib Siswa', 'description' => 'Peraturan dan ketentuan yang berlaku bagi seluruh siswa.', 'category' => 'peraturan', 'file_url' => '/storage/documents/tata-tertib.pdf', 'file_size' => 384000, 'file_type' => 'pdf'],
+            ['title' => 'Panduan Seragam Sekolah', 'description' => 'Ketentuan seragam harian, olahraga, dan acara resmi.', 'category' => 'peraturan', 'file_url' => '/storage/documents/panduan-seragam.pdf', 'file_size' => 768000, 'file_type' => 'pdf'],
+        ];
+
+        foreach ($items as $i => $item) {
+            Document::query()->updateOrCreate(
+                ['school_id' => $school->id, 'title' => $item['title']],
+                [...$item, 'download_count' => rand(10, 150), 'order' => $i + 1, 'is_active' => true],
+            );
+        }
+    }
+
+    private function seedPhotoAlbums(School $school): void
+    {
+        $albums = [
+            [
+                'title' => 'Wisuda Khatam Al-Qur\'an 2026',
+                'slug' => 'wisuda-khatam-2026',
+                'description' => 'Dokumentasi acara wisuda khatam 30 juz angkatan 2026.',
+                'cover_image' => 'https://images.unsplash.com/photo-1609599006353-e6aa9f3f5b4a?w=800&q=80',
+                'event_date' => now()->subDays(15)->toDateString(),
+                'photos' => [
+                    ['url' => 'https://images.unsplash.com/photo-1609599006353-e6aa9f3f5b4a?w=1200&q=80', 'caption' => 'Pembukaan acara wisuda'],
+                    ['url' => 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200&q=80', 'caption' => 'Santri membaca Al-Qur\'an'],
+                    ['url' => 'https://images.unsplash.com/photo-1577896851231-70ef94081756?w=1200&q=80', 'caption' => 'Penyerahan sertifikat'],
+                    ['url' => 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80', 'caption' => 'Foto bersama wisudawan'],
+                ],
+            ],
+            [
+                'title' => 'Festival Seni Islam 2026',
+                'slug' => 'festival-seni-islam-2026',
+                'description' => 'Penampilan nasyid, kaligrafi, dan pidato bahasa Arab.',
+                'cover_image' => 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80',
+                'event_date' => now()->subDays(20)->toDateString(),
+                'photos' => [
+                    ['url' => 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200&q=80', 'caption' => 'Penampilan nasyid'],
+                    ['url' => 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1200&q=80', 'caption' => 'Lomba kaligrafi'],
+                    ['url' => 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200&q=80', 'caption' => 'Pidato bahasa Arab'],
+                ],
+            ],
+            [
+                'title' => 'Perkemahan Pramuka',
+                'slug' => 'perkemahan-pramuka-2026',
+                'description' => 'Kegiatan perkemahan tiga hari penuh tantangan dan kebersamaan.',
+                'cover_image' => 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80',
+                'event_date' => now()->subDays(10)->toDateString(),
+                'photos' => [
+                    ['url' => 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200&q=80', 'caption' => 'Mendirikan tenda'],
+                    ['url' => 'https://images.unsplash.com/photo-1461896836934-ffe607ba7951?w=1200&q=80', 'caption' => 'Upacara pembukaan'],
+                    ['url' => 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1200&q=80', 'caption' => 'Kegiatan outbound'],
+                    ['url' => 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1200&q=80', 'caption' => 'Api unggun'],
+                    ['url' => 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1200&q=80', 'caption' => 'Pentas seni malam'],
+                ],
+            ],
+            [
+                'title' => 'Kegiatan Belajar Mengajar',
+                'slug' => 'kbm-sehari-hari',
+                'description' => 'Suasana pembelajaran di kelas dan laboratorium.',
+                'cover_image' => 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80',
+                'event_date' => now()->subDays(5)->toDateString(),
+                'photos' => [
+                    ['url' => 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200&q=80', 'caption' => 'Belajar di kelas'],
+                    ['url' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&q=80', 'caption' => 'Praktik lab komputer'],
+                    ['url' => 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1200&q=80', 'caption' => 'Membaca di perpustakaan'],
+                ],
+            ],
+        ];
+
+        foreach ($albums as $i => $albumData) {
+            $photos = $albumData['photos'];
+            unset($albumData['photos']);
+
+            $album = PhotoAlbum::query()->updateOrCreate(
+                ['school_id' => $school->id, 'slug' => $albumData['slug']],
+                [...$albumData, 'school_id' => $school->id, 'order' => $i + 1, 'is_active' => true],
+            );
+
+            foreach ($photos as $j => $photo) {
+                AlbumPhoto::query()->updateOrCreate(
+                    ['photo_album_id' => $album->id, 'url' => $photo['url']],
+                    ['caption' => $photo['caption'], 'order' => $j + 1],
+                );
+            }
+        }
+    }
+
+    private function seedAnnouncements(School $school): void
+    {
+        $items = [
+            [
+                'title' => 'Pendaftaran Siswa Baru 2026/2027 Telah Dibuka!',
+                'slug' => 'pmb-2026-dibuka',
+                'content' => 'Segera daftarkan putra-putri Anda. Kuota terbatas untuk setiap jenjang. Dapatkan beasiswa bagi hafidz Qur\'an.',
+                'priority' => 'urgent',
+                'is_pinned' => true,
+                'cta_text' => 'Daftar Sekarang',
+                'cta_url' => 'https://nurulhikmah.sch.id/pmb/daftar',
+                'published_at' => now()->subDays(3),
+                'expires_at' => now()->addDays(30),
+            ],
+            [
+                'title' => 'Jadwal Ujian Akhir Semester Genap',
+                'slug' => 'jadwal-uas-genap-2026',
+                'content' => 'Ujian akhir semester genap akan dilaksanakan tanggal 14-19 Juli 2026. Pastikan siswa mempersiapkan diri dengan baik.',
+                'priority' => 'important',
+                'is_pinned' => false,
+                'cta_text' => null,
+                'cta_url' => null,
+                'published_at' => now()->subDays(1),
+                'expires_at' => now()->addDays(14),
+            ],
+            [
+                'title' => 'Libur Hari Raya Idul Adha 1447 H',
+                'slug' => 'libur-idul-adha-1447h',
+                'content' => 'Sekolah libur dalam rangka Hari Raya Idul Adha. Kegiatan belajar kembali normal pada Senin, 14 Juli 2026.',
+                'priority' => 'normal',
+                'is_pinned' => false,
+                'cta_text' => null,
+                'cta_url' => null,
+                'published_at' => now(),
+                'expires_at' => now()->addDays(7),
+            ],
+        ];
+
+        foreach ($items as $i => $item) {
+            Announcement::query()->updateOrCreate(
+                ['school_id' => $school->id, 'slug' => $item['slug']],
+                [...$item, 'school_id' => $school->id, 'order' => $i + 1, 'is_active' => true],
             );
         }
     }

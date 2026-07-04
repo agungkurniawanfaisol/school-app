@@ -1,6 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\AchievementController as AdminAchievementController;
+use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
 use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
+use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
+use App\Http\Controllers\Admin\EventController as AdminEventController;
+use App\Http\Controllers\Admin\ExtracurricularController as AdminExtracurricularController;
+use App\Http\Controllers\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Admin\GoogleAuthController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Admin\CourseEnrollmentController;
@@ -14,6 +21,7 @@ use App\Http\Controllers\Admin\FacilityPhotoController;
 use App\Http\Controllers\Admin\HeroSliderController as AdminHeroSliderController;
 use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\Admin\PhotoAlbumController as AdminPhotoAlbumController;
 use App\Http\Controllers\Admin\PmbDocumentController;
 use App\Http\Controllers\Admin\PmbRegistrationController as AdminPmbRegistrationController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -24,11 +32,19 @@ use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
 use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UploadController;
+use App\Http\Controllers\Api\V1\AchievementController;
+use App\Http\Controllers\Api\V1\AnnouncementController;
+use App\Http\Controllers\Api\V1\ContactMessageController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\CurriculumController;
+use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\ExtracurricularController;
 use App\Http\Controllers\Api\V1\FacilityController;
+use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\HeroSliderController;
 use App\Http\Controllers\Api\V1\NewsController;
+use App\Http\Controllers\Api\V1\PhotoAlbumController;
 use App\Http\Controllers\Api\V1\PmbRegistrationController;
 use App\Http\Controllers\Api\V1\SchoolController;
 use App\Http\Controllers\Api\V1\SettingController;
@@ -48,7 +64,8 @@ Route::prefix('v1')->middleware(\App\Http\Middleware\TranslateResponse::class)->
 
     Route::get('hero-sliders', [HeroSliderController::class, 'index']);
     Route::get('curriculums', [CurriculumController::class, 'index']);
-    Route::get('curriculums/{slug}', [CurriculumController::class, 'showBySlug']);
+    Route::get('curriculums/{slug}', [CurriculumController::class, 'showBySlug'])
+        ->name('v1.curriculums.showBySlug');
     Route::get('teachers', [TeacherController::class, 'index']);
     Route::get('teachers/uuid/{uuid}', [TeacherController::class, 'showByUuid'])
         ->whereUuid('uuid')
@@ -70,6 +87,19 @@ Route::prefix('v1')->middleware(\App\Http\Middleware\TranslateResponse::class)->
     Route::get('news/{slug}', [NewsController::class, 'showBySlug'])
         ->name('v1.news.showBySlug');
     Route::get('testimonials', [TestimonialController::class, 'index']);
+    Route::get('faqs', [FaqController::class, 'index']);
+    Route::get('achievements', [AchievementController::class, 'index']);
+    Route::get('achievements/{uuid}', [AchievementController::class, 'show'])->whereUuid('uuid');
+    Route::get('extracurriculars', [ExtracurricularController::class, 'index']);
+    Route::get('extracurriculars/{uuid}', [ExtracurricularController::class, 'show'])->whereUuid('uuid');
+    Route::get('announcements', [AnnouncementController::class, 'index']);
+    Route::get('documents', [DocumentController::class, 'index']);
+    Route::get('events', [EventController::class, 'index']);
+    Route::get('events/{uuid}', [EventController::class, 'show'])->whereUuid('uuid');
+    Route::get('photo-albums', [PhotoAlbumController::class, 'index']);
+    Route::get('photo-albums/{uuid}', [PhotoAlbumController::class, 'show'])->whereUuid('uuid');
+    Route::post('contact-messages', [ContactMessageController::class, 'store'])
+        ->middleware('throttle:5,1');
     Route::get('virtual-tours', [VirtualTourController::class, 'index']);
     Route::get('virtual-tours/{slug}', [VirtualTourController::class, 'showBySlug'])
         ->where('slug', '[a-z0-9\-]+')
@@ -117,6 +147,15 @@ Route::prefix('admin')->group(function (): void {
         Route::apiResource('virtual-tours', AdminVirtualTourController::class);
         Route::apiResource('facility-photos', FacilityPhotoController::class);
         Route::apiResource('testimonials', AdminTestimonialController::class);
+        Route::apiResource('faqs', AdminFaqController::class);
+        Route::apiResource('achievements', AdminAchievementController::class);
+        Route::apiResource('extracurriculars', AdminExtracurricularController::class);
+        Route::apiResource('announcements', AdminAnnouncementController::class);
+        Route::apiResource('documents', AdminDocumentController::class);
+        Route::apiResource('events', AdminEventController::class);
+        Route::apiResource('photo-albums', AdminPhotoAlbumController::class);
+        Route::apiResource('contact-messages', AdminContactMessageController::class)->only(['index', 'show', 'destroy']);
+        Route::patch('contact-messages/{contact_message}/read', [AdminContactMessageController::class, 'markAsRead']);
         Route::apiResource('courses', AdminCourseController::class);
         Route::apiResource('course-modules', CourseModuleController::class);
         Route::apiResource('course-lessons', CourseLessonController::class);
