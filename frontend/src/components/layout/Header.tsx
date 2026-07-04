@@ -101,7 +101,7 @@ export function Header() {
             >
               <Link to="/admin">
                 <LayoutDashboard className="h-4 w-4" />
-                Dashboard
+                {t('header.dashboard')}
               </Link>
             </Button>
           ) : (
@@ -215,7 +215,7 @@ export function Header() {
                     {isLoggedIn ? (
                       <Link to="/admin" onClick={() => setOpen(false)}>
                         <LayoutDashboard className="h-4 w-4" />
-                        Dashboard
+                        {t('header.dashboard')}
                       </Link>
                     ) : (
                       <Link to="/admin/login" onClick={() => setOpen(false)}>

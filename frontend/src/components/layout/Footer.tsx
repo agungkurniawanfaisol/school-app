@@ -123,7 +123,7 @@ export function Footer() {
                     rel="noreferrer"
                     className="hover:text-white"
                   >
-                    WA: {school.whatsapp}
+                    {t('footer.waLabel')}: {school.whatsapp}
                   </a>
                 </li>
               )}

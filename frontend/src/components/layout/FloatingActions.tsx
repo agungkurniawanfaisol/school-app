@@ -82,7 +82,7 @@ export function FloatingActions() {
         >
           <a href={waUrl} target="_blank" rel="noreferrer" aria-label={t('floating.whatsapp')}>
             <WhatsAppIcon className="h-5 w-5" />
-            <span className="text-sm font-semibold">Chat WA</span>
+            <span className="text-sm font-semibold">{t('floating.chatWa')}</span>
           </a>
         </Button>
       )}

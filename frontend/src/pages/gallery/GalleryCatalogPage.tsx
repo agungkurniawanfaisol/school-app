@@ -93,7 +93,7 @@ export function GalleryCatalogPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       {album.photos_count != null && (
                         <Badge className="absolute right-2 top-2 bg-black/60 text-white hover:bg-black/70">
-                          {album.photos_count} foto
+                          {album.photos_count} {t('gallery.photoUnit')}
                         </Badge>
                       )}
                       <div className="absolute bottom-0 inset-x-0 p-3">

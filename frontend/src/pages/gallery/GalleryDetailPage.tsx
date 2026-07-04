@@ -92,7 +92,7 @@ export function GalleryDetailPage() {
             )}
             <span className="flex items-center gap-1.5">
               <Images className="h-4 w-4" aria-hidden />
-              {photos.length} foto
+              {photos.length} {t('gallery.photoUnit')}
             </span>
           </div>
 
