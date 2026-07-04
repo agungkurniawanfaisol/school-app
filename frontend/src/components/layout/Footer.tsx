@@ -114,6 +114,19 @@ export function Footer() {
                   </a>
                 </li>
               )}
+              {school?.whatsapp && (
+                <li className="flex gap-2.5">
+                  <Phone className="h-4 w-4 shrink-0 text-[#25D366]" />
+                  <a
+                    href={`https://wa.me/${school.whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-white"
+                  >
+                    WA: {school.whatsapp}
+                  </a>
+                </li>
+              )}
               {school?.email && (
                 <li className="flex gap-2.5">
                   <Mail className="h-4 w-4 shrink-0 text-[var(--gold-accent)]" />

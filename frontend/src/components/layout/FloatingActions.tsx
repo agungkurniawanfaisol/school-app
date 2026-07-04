@@ -78,11 +78,11 @@ export function FloatingActions() {
       {waUrl && (
         <Button
           asChild
-          size="icon"
-          className="h-11 w-11 rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/30 hover:bg-[#20bd5a]"
+          className="h-11 gap-2 rounded-full bg-[#25D366] px-4 text-white shadow-lg shadow-[#25D366]/30 hover:bg-[#20bd5a]"
         >
           <a href={waUrl} target="_blank" rel="noreferrer" aria-label={t('floating.whatsapp')}>
             <WhatsAppIcon className="h-5 w-5" />
+            <span className="text-sm font-semibold">Chat WA</span>
           </a>
         </Button>
       )}
