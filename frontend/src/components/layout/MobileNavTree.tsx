@@ -1,5 +1,5 @@
 import { ChevronRight } from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Accordion,
@@ -9,10 +9,8 @@ import {
 } from '@/components/ui/accordion'
 import { Separator } from '@/components/ui/separator'
 import {
-  isInternalRoute,
   isNavStandalone,
   mainNavTree,
-  resolveNavHref,
   type NavGroup,
   type NavLink,
 } from '@/config/main-nav'
@@ -35,7 +33,7 @@ function MobileNavLink({
   onNavigate?: () => void
 }) {
   const { t } = useTranslation('layout')
-  const href = resolveNavHref(item.href, isHome)
+  const navigate = useNavigate()
   const Icon = item.icon
 
   const inner = (
@@ -69,29 +67,51 @@ function MobileNavLink({
       : 'text-foreground/80 hover:bg-muted/80 hover:text-foreground active:scale-[0.98]',
   )
 
-  if (isInternalRoute(item.href)) {
+  const handleHashClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    onNavigate?.()
+    const id = item.href.replace('/#', '')
+
+    if (isHome) {
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+      }, 300)
+    } else {
+      navigate('/')
+      const start = Date.now()
+      const poll = setInterval(() => {
+        const el = document.getElementById(id)
+        if (el) {
+          clearInterval(poll)
+          el.scrollIntoView({ behavior: 'smooth' })
+        } else if (Date.now() - start > 5000) {
+          clearInterval(poll)
+        }
+      }, 200)
+    }
+  }
+
+  if (item.href.startsWith('/#')) {
     return (
-      <Link to={item.href} onClick={onNavigate} className={className}>
+      <button type="button" onClick={handleHashClick} className={className}>
         {inner}
-      </Link>
+      </button>
     )
   }
 
   return (
-    <a href={href} onClick={onNavigate} className={className}>
+    <Link to={item.href} onClick={onNavigate} className={className}>
       {inner}
-    </a>
+    </Link>
   )
 }
 
 function StandaloneNavLink({
   item,
-  isHome,
   isActive,
   onNavigate,
 }: {
   item: NavLink & { standalone: true }
-  isHome: boolean
   isActive: boolean
   onNavigate?: () => void
 }) {
@@ -196,7 +216,6 @@ export function MobileNavTree({ isHome, onNavigate }: MobileNavTreeProps) {
             <StandaloneNavLink
               key={item.href}
               item={item}
-              isHome={isHome}
               isActive={pathname === item.href}
               onNavigate={onNavigate}
             />

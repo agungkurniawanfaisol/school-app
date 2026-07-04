@@ -10,26 +10,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('achievements', function (Blueprint $table) {
-            $table->uuid('uuid')->nullable()->unique()->after('id');
-        });
+        $tables = ['achievements', 'events', 'extracurriculars', 'photo_albums'];
 
-        Schema::table('events', function (Blueprint $table) {
-            $table->uuid('uuid')->nullable()->unique()->after('id');
-        });
-
-        Schema::table('extracurriculars', function (Blueprint $table) {
-            $table->uuid('uuid')->nullable()->unique()->after('id');
-        });
-
-        Schema::table('photo_albums', function (Blueprint $table) {
-            $table->uuid('uuid')->nullable()->unique()->after('id');
-        });
-
-        $this->backfillUuids('achievements');
-        $this->backfillUuids('events');
-        $this->backfillUuids('extracurriculars');
-        $this->backfillUuids('photo_albums');
+        foreach ($tables as $tbl) {
+            if (!Schema::hasColumn($tbl, 'uuid')) {
+                Schema::table($tbl, function (Blueprint $table) {
+                    $table->uuid('uuid')->nullable()->unique()->after('id');
+                });
+            }
+            $this->backfillUuids($tbl);
+        }
     }
 
     public function down(): void

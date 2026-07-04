@@ -31,6 +31,7 @@ vi.mock('react-router-dom', async () => {
       </a>
     ),
     useLocation: () => useLocationMock(),
+    useNavigate: () => vi.fn(),
   }
 })
 

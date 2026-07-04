@@ -67,6 +67,10 @@ vi.mock('@/components/layout/BottomNav', () => ({
   BottomNav: () => <nav data-testid="bottom-nav">BottomNav</nav>,
 }))
 
+vi.mock('@/hooks/useLandingPrefetch', () => ({
+  useLandingPrefetch: () => ({ isLoading: false }),
+}))
+
 describe('HomePage', () => {
   it('renders main landing sections', () => {
     renderWithProviders(<HomePage />)

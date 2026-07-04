@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
@@ -22,55 +22,92 @@ import { TeachersSection } from '@/components/landing/TeachersSection'
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
 import { useLandingPrefetch } from '@/hooks/useLandingPrefetch'
 
-// #region agent log
-const __dbgHome = (msg: string, data?: Record<string, unknown>) => { fetch('http://127.0.0.1:7357/ingest/9d8959b5-b5eb-49d7-b822-17cfa3051c69',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'30f7f9'},body:JSON.stringify({sessionId:'30f7f9',location:'HomePage.tsx',message:msg,data:data??{},timestamp:Date.now(),hypothesisId:'C,D,E'})}).catch(()=>{}); };
-__dbgHome('HomePage.tsx module evaluated', { timeSinceOrigin: performance.now() });
-// #endregion
+function SplashScreen({ closing }: { closing: boolean }) {
+  return (
+    <div
+      className={`fixed inset-0 z-50 flex min-h-svh flex-col items-center justify-center gap-5 bg-background will-change-[opacity] ${closing ? 'animate-splash-out' : ''}`}
+    >
+      <img
+        src="/logo.png"
+        alt="Logo Sekolah Islam Nurul Hikmah"
+        className={`h-28 w-28 object-contain will-change-transform sm:h-36 sm:w-36 lg:h-44 lg:w-44 ${closing ? 'animate-splash-zoom' : 'animate-splash-in'}`}
+      />
+      <p
+        className={`text-center text-xl font-bold text-primary will-change-transform sm:text-2xl lg:text-3xl ${closing ? 'animate-splash-zoom' : 'animate-splash-text-in'}`}
+      >
+        Sekolah Islam Nurul Hikmah
+      </p>
+    </div>
+  )
+}
+
+const MAX_SPLASH_MS = 2500
 
 export function HomePage() {
-  useLandingPrefetch()
+  const { isLoading } = useLandingPrefetch()
+  const [showSplash, setShowSplash] = useState(isLoading)
+  const [closing, setClosing] = useState(false)
 
-  // #region agent log
-  useEffect(() => { __dbgHome('HomePage mounted', { timeSinceOrigin: performance.now() }); }, []);
-  // #endregion
+  useEffect(() => {
+    if (!isLoading && showSplash && !closing) {
+      setClosing(true)
+      const timer = setTimeout(() => setShowSplash(false), 700)
+      return () => clearTimeout(timer)
+    }
+  }, [isLoading, showSplash, closing])
+
+  useEffect(() => {
+    if (!showSplash) return
+    const safety = setTimeout(() => {
+      setClosing(true)
+      setTimeout(() => setShowSplash(false), 700)
+    }, MAX_SPLASH_MS)
+    return () => clearTimeout(safety)
+  }, [showSplash])
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <Header />
-      <main id="main-content" className="flex-1 pb-16 lg:pb-0">
-        <HeroSection />
-        <SectionDivider />
-        <AboutSection />
-        <PrincipalSection />
-        <SectionDivider />
-        <FeaturedProgramsSection />
-        <SectionDivider />
-        <TeachersSection />
-        <StaffSection />
-        <SectionDivider />
-        <ActivitiesSection />
-        <SectionDivider />
-        <AchievementsSection />
-        <SectionDivider />
-        <FacilitiesSection />
-        <SectionDivider />
-        <GallerySection />
-        <SectionDivider />
-        <AgendaSection />
-        <SectionDivider />
-        <NewsSection />
-        <SectionDivider />
-        <DocumentsSection />
-        <SectionDivider />
-        <TestimonialsSection />
-        <SectionDivider />
-        <SuggestionBoxSection />
-        <SectionDivider />
-        <PmbCtaSection />
-        <ContactSection />
-      </main>
-      <Footer />
-      <BottomNav />
-    </div>
+    <>
+      {showSplash && <SplashScreen closing={closing} />}
+
+      {!showSplash && (
+        <div className="flex min-h-svh flex-col">
+          <Header />
+          <main id="main-content" className="flex-1 pb-16 lg:pb-0">
+            <HeroSection />
+            <SectionDivider />
+            <AboutSection />
+            <PrincipalSection />
+            <SectionDivider />
+            <FeaturedProgramsSection />
+            <SectionDivider />
+            <TeachersSection />
+            <StaffSection />
+            <SectionDivider />
+            <ActivitiesSection />
+            <SectionDivider />
+            <AchievementsSection />
+            <SectionDivider />
+            <FacilitiesSection />
+            <SectionDivider />
+            <GallerySection />
+            <SectionDivider />
+            <AgendaSection />
+            <SectionDivider />
+            <NewsSection />
+            <SectionDivider />
+            <DocumentsSection />
+            <SectionDivider />
+            <TestimonialsSection />
+            <SectionDivider />
+            <SuggestionBoxSection />
+            <SectionDivider />
+            <PmbCtaSection />
+            <ContactSection />
+          </main>
+          <Footer />
+          <BottomNav />
+        </div>
+      )}
+    </>
   )
 }

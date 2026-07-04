@@ -9,6 +9,10 @@ vi.mock('@/hooks/useActivities', () => ({
   useActivitiesList: (filters: unknown) => useActivitiesListMock(filters),
 }))
 
+vi.mock('@/components/i18n/LanguageProvider', () => ({
+  useLanguage: () => ({ locale: 'id', dir: 'ltr', isChangingLocale: false, setLocale: vi.fn() }),
+}))
+
 vi.mock('@/components/layout/PublicPageShell', () => ({
   PublicPageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))

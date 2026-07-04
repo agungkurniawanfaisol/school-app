@@ -1,6 +1,5 @@
-import { HandHeart, Heart, Sparkles, Target } from 'lucide-react'
+import { BookOpen, GraduationCap, HandHeart, Heart, Sparkles, Target, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { SchoolLogo } from '@/components/brand/SchoolLogo'
 import { StaggerChildren, StaggerItem } from '@/components/motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -45,16 +44,32 @@ export function AboutSection() {
 
         <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
           <RevealOnScroll direction="left">
-            <div className="group relative">
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/10 to-[var(--gold-accent)]/10 opacity-60 transition-opacity group-hover:opacity-100" aria-hidden />
-              <div className="relative overflow-hidden rounded-2xl border-2 border-primary/15 bg-secondary/40 shadow-lg shadow-primary/5">
-                <div className="flex aspect-[4/3] items-center justify-center bg-gradient-to-br from-secondary to-accent/50 p-4 transition-transform duration-500 group-hover:scale-[1.02] sm:p-6">
-                  <SchoolLogo
-                    logo={school?.logo}
-                    alt={school?.name ?? 'Nurul Hikmah'}
-                    variant="about"
-                  />
+            <div className="space-y-5">
+              <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/15 shadow-lg shadow-primary/5">
+                <img
+                  src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80"
+                  alt={school?.name ?? 'Nurul Hikmah'}
+                  className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-6">
+                  <p className="text-lg font-bold sm:text-xl">{school?.name ?? 'Nurul Hikmah'}</p>
+                  <p className="text-sm text-white/80">{school?.tagline ?? ''}</p>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { icon: GraduationCap, value: '1998', label: t('about.statSince') },
+                  { icon: Users, value: '500+', label: t('about.statStudents') },
+                  { icon: BookOpen, value: 'TK–SMP', label: t('about.statLevels') },
+                ].map(({ icon: Icon, value, label }) => (
+                  <div key={label} className="flex flex-col items-center gap-1 rounded-xl border border-primary/10 bg-secondary/40 px-2 py-3 text-center">
+                    <Icon className="h-5 w-5 text-primary" />
+                    <span className="text-sm font-bold text-foreground">{value}</span>
+                    <span className="text-xs text-muted-foreground">{label}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </RevealOnScroll>

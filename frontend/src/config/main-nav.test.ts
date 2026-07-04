@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isInternalRoute, isNavStandalone, mainNavTree, resolveNavHref } from '@/config/main-nav'
+import { isNavStandalone, mainNavTree } from '@/config/main-nav'
 
 describe('main-nav', () => {
   it('groups navigation into tree with standalone Tur Virtual', () => {
@@ -25,18 +25,12 @@ describe('main-nav', () => {
     }
   })
 
-  it('resolves home anchor links without leading slash', () => {
-    expect(resolveNavHref('/#tentang', true)).toBe('#tentang')
-    expect(resolveNavHref('/#tentang', false)).toBe('/#tentang')
-  })
-
-  it('identifies internal routes', () => {
-    expect(isInternalRoute('/kursus')).toBe(true)
-    expect(isInternalRoute('/program-unggulan')).toBe(true)
-    expect(isInternalRoute('/fasilitas')).toBe(true)
-    expect(isInternalRoute('/pmb/daftar')).toBe(true)
-    expect(isInternalRoute('/berita')).toBe(true)
-    expect(isInternalRoute('/kegiatan')).toBe(true)
-    expect(isInternalRoute('/#berita')).toBe(false)
+  it('contains hash links for homepage sections', () => {
+    const profile = mainNavTree.find((e) => e.label === 'nav.profile')!
+    if (!isNavStandalone(profile)) {
+      const hashLinks = profile.children.filter((c) => c.href.startsWith('/#'))
+      expect(hashLinks.length).toBeGreaterThan(0)
+      expect(hashLinks[0].href).toBe('/#tentang')
+    }
   })
 })

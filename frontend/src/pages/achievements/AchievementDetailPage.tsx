@@ -73,7 +73,7 @@ export function AchievementDetailPage() {
               <div className="flex flex-wrap gap-3">
                 <Badge variant="outline" className={`text-sm ${levelColors[item.level] ?? ''}`}>
                   <Trophy className="mr-1 h-3.5 w-3.5" aria-hidden />
-                  Tingkat {item.level}
+                  {t('achievements.level')} {item.level}
                 </Badge>
                 <Badge variant="secondary" className="capitalize text-sm">
                   {item.category}

@@ -11,6 +11,10 @@ vi.mock('@/components/layout/Footer', () => ({
   Footer: () => <footer>Footer</footer>,
 }))
 
+vi.mock('@/components/i18n/LanguageProvider', () => ({
+  useLanguage: () => ({ locale: 'id', dir: 'ltr', isChangingLocale: false, setLocale: vi.fn() }),
+}))
+
 vi.mock('@/hooks/usePmb', () => ({
   usePmbTrack: () => ({
     data: undefined,

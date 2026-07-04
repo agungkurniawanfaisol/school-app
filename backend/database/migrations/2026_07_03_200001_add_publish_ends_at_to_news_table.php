@@ -8,6 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasColumn('news', 'publish_ends_at')) {
+            return;
+        }
         Schema::table('news', function (Blueprint $table) {
             $table->timestamp('publish_ends_at')->nullable()->after('published_at')->index();
         });

@@ -8,6 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasColumn('curriculums', 'content_json')) {
+            return;
+        }
         Schema::table('curriculums', function (Blueprint $table) {
             $table->json('content_json')->nullable()->after('content');
         });

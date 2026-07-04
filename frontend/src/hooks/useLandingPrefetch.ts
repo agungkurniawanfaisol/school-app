@@ -1,5 +1,5 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { api, SCHOOL_SLUG } from '@/lib/api'
 import { queryConfig, buildQueryParams } from '@/hooks/queryConfig'
 import { achievementKeys, type Achievement } from '@/hooks/useAchievements'
@@ -62,87 +62,84 @@ function wrapPaginated<T>(items: T[], perPage: number): PaginatedResponse<T> {
   }
 }
 
-// #region agent log
-const __dbgLanding = (msg: string, data?: Record<string, unknown>) => { fetch('http://127.0.0.1:7357/ingest/9d8959b5-b5eb-49d7-b822-17cfa3051c69',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'30f7f9'},body:JSON.stringify({sessionId:'30f7f9',location:'useLandingPrefetch.ts',message:msg,data:data??{},timestamp:Date.now(),hypothesisId:'A,E'})}).catch(()=>{}); };
-// #endregion
+function seedSectionCaches(qc: QueryClient, data: LandingData): void {
+  if (data.school) {
+    qc.setQueryData(schoolKeys.detail(SCHOOL_SLUG), data.school)
+  }
+  qc.setQueryData(['hero-sliders'], data.hero_sliders)
+  qc.setQueryData(
+    teacherKeys.list(buildQueryParams({ per_page: 7, type: 'guru' })),
+    wrapPaginated(data.teachers, 7),
+  )
+  qc.setQueryData(
+    teacherKeys.list(buildQueryParams({ type: 'kepala_sekolah', per_page: 1 })),
+    wrapPaginated(data.principal, 1),
+  )
+  qc.setQueryData(
+    teacherKeys.list(buildQueryParams({ type: 'staff', per_page: 12 })),
+    wrapPaginated(data.staff, 12),
+  )
+  qc.setQueryData(
+    curriculumKeys.list(buildQueryParams({ per_page: 6, featured: true })),
+    wrapPaginated(data.curriculums, 6),
+  )
+  qc.setQueryData(
+    activityKeys.list(buildQueryParams({ per_page: 6, featured: true })),
+    wrapPaginated(data.activities, 6),
+  )
+  qc.setQueryData(
+    achievementKeys.list(buildQueryParams({ per_page: 6 })),
+    wrapPaginated(data.achievements, 6),
+  )
+  qc.setQueryData(
+    facilityKeys.list(buildQueryParams({ per_page: 6, featured: true })),
+    wrapPaginated(data.facilities, 6),
+  )
+  qc.setQueryData(
+    eventKeys.list(buildQueryParams({ per_page: 5 })),
+    wrapPaginated(data.events, 5),
+  )
+  qc.setQueryData(
+    documentKeys.list(buildQueryParams({ per_page: 6 })),
+    wrapPaginated(data.documents, 6),
+  )
+  qc.setQueryData(
+    photoAlbumKeys.list(buildQueryParams({ per_page: 4 })),
+    wrapPaginated(data.photo_albums, 4),
+  )
+  qc.setQueryData(
+    newsKeys.list(buildQueryParams({ per_page: 3, featured: true })),
+    wrapPaginated(data.news, 3),
+  )
+  qc.setQueryData(
+    testimonialKeys.list(buildQueryParams({ per_page: 6, featured: true })),
+    wrapPaginated(data.testimonials, 6),
+  )
+}
+
+const MIN_SPLASH_MS = 1000
 
 export function useLandingPrefetch() {
   const queryClient = useQueryClient()
+  const hasCachedData = !!queryClient.getQueryData(LANDING_KEY)
+  const [minTimeElapsed, setMinTimeElapsed] = useState(hasCachedData)
+
+  useEffect(() => {
+    if (hasCachedData) return
+    const timer = setTimeout(() => setMinTimeElapsed(true), MIN_SPLASH_MS)
+    return () => clearTimeout(timer)
+  }, [hasCachedData])
 
   const { data } = useQuery({
     queryKey: LANDING_KEY,
     queryFn: async () => {
-      // #region agent log
-      const __t0 = performance.now();
-      __dbgLanding('API /v1/landing request START', { timeSinceOrigin: __t0 });
-      // #endregion
       const { data } = await api.get<{ data: LandingData }>('/v1/landing')
-      // #region agent log
-      __dbgLanding('API /v1/landing request END', { timeSinceOrigin: performance.now(), durationMs: performance.now() - __t0 });
-      // #endregion
-      return data.data
+      const landing = data.data
+      seedSectionCaches(queryClient, landing)
+      return landing
     },
     ...queryConfig,
   })
 
-  useEffect(() => {
-    if (!data) return
-
-    if (data.school) {
-      queryClient.setQueryData(schoolKeys.detail(SCHOOL_SLUG), data.school)
-    }
-
-    queryClient.setQueryData(['hero-sliders'], data.hero_sliders)
-
-    queryClient.setQueryData(
-      teacherKeys.list(buildQueryParams({ per_page: 7, type: 'guru' })),
-      wrapPaginated(data.teachers, 7),
-    )
-    queryClient.setQueryData(
-      teacherKeys.list(buildQueryParams({ type: 'kepala_sekolah', per_page: 1 })),
-      wrapPaginated(data.principal, 1),
-    )
-    queryClient.setQueryData(
-      teacherKeys.list(buildQueryParams({ type: 'staff', per_page: 12 })),
-      wrapPaginated(data.staff, 12),
-    )
-    queryClient.setQueryData(
-      curriculumKeys.list(buildQueryParams({ per_page: 6, featured: true })),
-      wrapPaginated(data.curriculums, 6),
-    )
-    queryClient.setQueryData(
-      activityKeys.list(buildQueryParams({ per_page: 6, featured: true })),
-      wrapPaginated(data.activities, 6),
-    )
-    queryClient.setQueryData(
-      achievementKeys.list(buildQueryParams({ per_page: 6 })),
-      wrapPaginated(data.achievements, 6),
-    )
-    queryClient.setQueryData(
-      facilityKeys.list(buildQueryParams({ per_page: 6, featured: true })),
-      wrapPaginated(data.facilities, 6),
-    )
-    queryClient.setQueryData(
-      eventKeys.list(buildQueryParams({ per_page: 5 })),
-      wrapPaginated(data.events, 5),
-    )
-    queryClient.setQueryData(
-      documentKeys.list(buildQueryParams({ per_page: 6 })),
-      wrapPaginated(data.documents, 6),
-    )
-    queryClient.setQueryData(
-      photoAlbumKeys.list(buildQueryParams({ per_page: 4 })),
-      wrapPaginated(data.photo_albums, 4),
-    )
-    queryClient.setQueryData(
-      newsKeys.list(buildQueryParams({ per_page: 3, featured: true })),
-      wrapPaginated(data.news, 3),
-    )
-    queryClient.setQueryData(
-      testimonialKeys.list(buildQueryParams({ per_page: 6, featured: true })),
-      wrapPaginated(data.testimonials, 6),
-    )
-  }, [data, queryClient])
-
-  return { isLoading: !data }
+  return { isLoading: !data || !minTimeElapsed }
 }

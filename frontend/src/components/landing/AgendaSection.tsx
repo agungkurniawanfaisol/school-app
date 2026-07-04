@@ -49,15 +49,20 @@ function MiniCalendar({ events }: { events: Event[] }) {
     return cells
   }, [firstDay, daysInMonth])
 
-  const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
+  const dayNames = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat(dateLocale, { weekday: 'short' })
+    return Array.from({ length: 7 }, (_, i) =>
+      formatter.format(new Date(2023, 11, 31 + i)),
+    )
+  }, [dateLocale])
 
   return (
     <Card className="h-fit">
       <CardContent className="p-4">
         <p className="mb-3 text-center text-sm font-semibold">{monthName}</p>
         <div className="grid grid-cols-7 gap-1 text-center text-xs">
-          {dayNames.map((name) => (
-            <span key={name} className="pb-1 font-medium text-muted-foreground">
+          {dayNames.map((name, idx) => (
+            <span key={idx} className="pb-1 font-medium text-muted-foreground">
               {name}
             </span>
           ))}

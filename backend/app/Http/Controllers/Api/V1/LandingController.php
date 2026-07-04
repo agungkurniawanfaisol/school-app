@@ -70,22 +70,24 @@ class LandingController extends Controller
             $news = $this->newsRepository->paginate(array_merge($baseFilters, ['featured' => true]), 3);
             $testimonials = $this->testimonialRepository->paginate(array_merge($baseFilters, ['featured' => true]), 6);
 
-            return [
+            $payload = response()->json(['data' => [
                 'school' => $school ? new SchoolResource($school) : null,
-                'hero_sliders' => HeroSliderResource::collection($heroSliders)->resolve(),
-                'curriculums' => CurriculumResource::collection($curriculums)->resolve(),
-                'teachers' => TeacherResource::collection($teachers)->resolve(),
-                'principal' => TeacherResource::collection($principal)->resolve(),
-                'staff' => TeacherResource::collection($staff)->resolve(),
-                'activities' => StudentActivityResource::collection($activities)->resolve(),
-                'achievements' => AchievementResource::collection($achievements)->resolve(),
-                'events' => EventResource::collection($events)->resolve(),
-                'documents' => DocumentResource::collection($documents)->resolve(),
-                'photo_albums' => PhotoAlbumResource::collection($photoAlbums)->resolve(),
-                'facilities' => FacilityResource::collection($facilities)->resolve(),
-                'news' => NewsResource::collection($news)->resolve(),
-                'testimonials' => TestimonialResource::collection($testimonials)->resolve(),
-            ];
+                'hero_sliders' => HeroSliderResource::collection($heroSliders),
+                'curriculums' => CurriculumResource::collection($curriculums),
+                'teachers' => TeacherResource::collection($teachers),
+                'principal' => TeacherResource::collection($principal),
+                'staff' => TeacherResource::collection($staff),
+                'activities' => StudentActivityResource::collection($activities),
+                'achievements' => AchievementResource::collection($achievements),
+                'events' => EventResource::collection($events),
+                'documents' => DocumentResource::collection($documents),
+                'photo_albums' => PhotoAlbumResource::collection($photoAlbums),
+                'facilities' => FacilityResource::collection($facilities),
+                'news' => NewsResource::collection($news),
+                'testimonials' => TestimonialResource::collection($testimonials),
+            ]])->content();
+
+            return json_decode($payload, true)['data'];
         });
 
         return response()->json(['data' => $data])

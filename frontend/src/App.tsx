@@ -34,11 +34,6 @@ import { AgendaCatalogPage } from '@/pages/agenda/AgendaCatalogPage'
 import { AgendaDetailPage } from '@/pages/agenda/AgendaDetailPage'
 import { SuggestionBoxPage } from '@/pages/suggestion/SuggestionBoxPage'
 
-// #region agent log
-const __dbgApp = (msg: string, data?: Record<string, unknown>) => { fetch('http://127.0.0.1:7357/ingest/9d8959b5-b5eb-49d7-b822-17cfa3051c69',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'30f7f9'},body:JSON.stringify({sessionId:'30f7f9',location:'App.tsx',message:msg,data:data??{},timestamp:Date.now(),hypothesisId:'C,D'})}).catch(()=>{}); };
-__dbgApp('App.tsx module evaluated (all eager imports done)', { timeSinceOrigin: performance.now() });
-// #endregion
-
 const DashboardPage = lazy(() => import('@/pages/admin/DashboardPage').then((m) => ({ default: m.DashboardPage })))
 const AdminNewsListPage = lazy(() => import('@/pages/admin/NewsListPage').then((m) => ({ default: m.AdminNewsListPage })))
 const NewsFormPage = lazy(() => import('@/pages/admin/NewsFormPage').then((m) => ({ default: m.NewsFormPage })))

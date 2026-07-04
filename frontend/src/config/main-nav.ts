@@ -67,13 +67,3 @@ export const mainNavTree: NavEntry[] = [
   },
 ]
 
-export function resolveNavHref(href: string, isHome: boolean): string {
-  if (isHome && href.startsWith('/#')) {
-    return href.replace('/', '')
-  }
-  return href
-}
-
-export function isInternalRoute(href: string): boolean {
-  return href.startsWith('/') && !href.startsWith('/#')
-}

@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   DropdownMenu,
@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { isInternalRoute, isNavStandalone, mainNavTree, resolveNavHref, type NavLink } from '@/config/main-nav'
+import { isNavStandalone, mainNavTree, type NavLink } from '@/config/main-nav'
 import { cn } from '@/lib/utils'
 
 type MainNavProps = {
@@ -24,25 +24,42 @@ function NavMenuItem({
   isHome: boolean
   onNavigate?: () => void
 }) {
-  const href = resolveNavHref(item.href, isHome)
-
   const { t } = useTranslation('layout')
+  const navigate = useNavigate()
 
-  if (isInternalRoute(item.href)) {
+  if (item.href.startsWith('/#')) {
+    const handleClick = () => {
+      onNavigate?.()
+      const id = item.href.replace('/#', '')
+      if (isHome) {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        navigate('/')
+        const start = Date.now()
+        const poll = setInterval(() => {
+          const el = document.getElementById(id)
+          if (el) {
+            clearInterval(poll)
+            el.scrollIntoView({ behavior: 'smooth' })
+          } else if (Date.now() - start > 5000) {
+            clearInterval(poll)
+          }
+        }, 200)
+      }
+    }
+
     return (
-      <DropdownMenuItem asChild>
-        <Link to={item.href} onClick={onNavigate}>
-          {t(item.label)}
-        </Link>
+      <DropdownMenuItem onClick={handleClick}>
+        {t(item.label)}
       </DropdownMenuItem>
     )
   }
 
   return (
     <DropdownMenuItem asChild>
-      <a href={href} onClick={onNavigate}>
+      <Link to={item.href} onClick={onNavigate}>
         {t(item.label)}
-      </a>
+      </Link>
     </DropdownMenuItem>
   )
 }

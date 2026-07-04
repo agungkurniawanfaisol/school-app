@@ -85,7 +85,7 @@ export function Header() {
         </div>
 
         <div className="relative z-10 ms-auto flex shrink-0 items-center gap-2">
-          <LanguageSwitcher />
+          <LanguageSwitcher onHero={isHeroOverlay} />
           <ThemeToggle variant="ghost" onHero={isHeroOverlay} />
           {isLoggedIn ? (
             <Button

@@ -3,6 +3,8 @@
 namespace Tests\Feature\Api;
 
 use App\Models\School;
+use App\Services\TranslationService;
+use Mockery;
 use Tests\TestCase;
 
 class TranslateResponseMiddlewareTest extends TestCase
@@ -59,6 +61,13 @@ class TranslateResponseMiddlewareTest extends TestCase
 
     public function test_skipped_fields_not_translated(): void
     {
+        $mock = Mockery::mock(TranslationService::class);
+        $mock->shouldReceive('isSupported')->with('en')->andReturn(true);
+        $mock->shouldReceive('translateBatch')->andReturnUsing(function (array $texts) {
+            return array_combine($texts, $texts);
+        });
+        $this->app->instance(TranslationService::class, $mock);
+
         $school = School::factory()->create([
             'slug' => 'my-school',
             'email' => 'info@school.id',
@@ -75,6 +84,13 @@ class TranslateResponseMiddlewareTest extends TestCase
 
     public function test_middleware_accepts_x_locale_header(): void
     {
+        $mock = Mockery::mock(TranslationService::class);
+        $mock->shouldReceive('isSupported')->with('en')->andReturn(true);
+        $mock->shouldReceive('translateBatch')->andReturnUsing(function (array $texts) {
+            return array_combine($texts, $texts);
+        });
+        $this->app->instance(TranslationService::class, $mock);
+
         School::factory()->create();
 
         $response = $this->getJson('/api/v1/schools', ['X-Locale' => 'en']);

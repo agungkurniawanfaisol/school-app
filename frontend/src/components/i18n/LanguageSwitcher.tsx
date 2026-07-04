@@ -17,14 +17,23 @@ const LANGUAGES: { value: Locale; label: string; native: string }[] = [
   { value: 'ja', label: 'Japanese', native: '日本語' },
 ]
 
-export function LanguageSwitcher({ className }: { className?: string }) {
+export function LanguageSwitcher({ className, onHero = false }: { className?: string; onHero?: boolean }) {
   const { t } = useTranslation('layout')
   const { locale, isChangingLocale, setLocale } = useLanguage()
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className={cn('h-9 w-9', className)} aria-label={t('nav.changeLang')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            'h-9 w-9',
+            onHero && 'text-white hover:bg-white/20 hover:text-white',
+            className,
+          )}
+          aria-label={t('nav.changeLang')}
+        >
           {isChangingLocale
             ? <Loader2 className="h-4 w-4 animate-spin" />
             : <Globe className="h-4 w-4" />}
