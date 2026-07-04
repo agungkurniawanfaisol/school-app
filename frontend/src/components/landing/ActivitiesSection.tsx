@@ -1,5 +1,6 @@
 import { ArrowRight, Calendar } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -62,6 +63,7 @@ function ActivityCard({ activity, featured = false }: { activity: StudentActivit
 }
 
 export function ActivitiesSection() {
+  const { t } = useTranslation('landing')
   const { data, isLoading, isFetching } = useActivitiesList({ per_page: 6, featured: true })
   const activities = data?.data ?? []
   const featured = activities[0]
@@ -73,9 +75,9 @@ export function ActivitiesSection() {
       <div className="container-page">
         <div className="mb-10 flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
           <SectionHeader
-            badge="Kegiatan"
-            title="Kegiatan Siswa"
-            description="Berbagai aktivitas yang mengembangkan bakat, kreativitas, dan kepemimpinan siswa."
+            badge={t('activities.badge')}
+            title={t('activities.title')}
+            description={t('activities.desc')}
             align="left"
             className="mb-0 md:mb-0"
           />
@@ -85,7 +87,7 @@ export function ActivitiesSection() {
             className="min-h-11 shrink-0 border-primary text-primary hover:bg-secondary"
           >
             <Link to="/kegiatan">
-              Semua Kegiatan
+              {t('activities.viewAll')}
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           </Button>
@@ -101,7 +103,7 @@ export function ActivitiesSection() {
             </div>
           </div>
         ) : activities.length === 0 ? (
-          <p className="text-center text-muted-foreground">Belum ada data kegiatan.</p>
+          <p className="text-center text-muted-foreground">{t('activities.empty')}</p>
         ) : (
           <RevealOnScroll direction="up">
             <div className={cn('space-y-6', isFetching && 'opacity-70')}>
@@ -129,7 +131,7 @@ export function ActivitiesSection() {
                       </Carousel>
                       {rest.length > 1 && (
                         <p className="mt-2 text-center text-xs text-muted-foreground">
-                          Geser untuk melihat kegiatan lainnya
+                          {t('activities.swipe')}
                         </p>
                       )}
                     </div>
@@ -141,7 +143,7 @@ export function ActivitiesSection() {
                 <div className="text-center lg:hidden">
                   <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
                     <Link to="/kegiatan">
-                      Lihat Semua Kegiatan
+                      {t('activities.viewAllMobile')}
                       <ArrowRight className="h-4 w-4" aria-hidden />
                     </Link>
                   </Button>

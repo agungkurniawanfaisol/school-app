@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -11,23 +12,24 @@ import { formatCurrency } from '@/lib/utils'
 import { useCoursesList } from '@/hooks/useCourses'
 
 export function CourseCatalogPage() {
+  const { t } = useTranslation('pages')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const { data, isLoading, isFetching } = useCoursesList({ page, per_page: 12, search })
 
   return (
     <PublicPageShell>
-      <PageMeta title="Katalog Kursus" description="Temukan kursus online untuk mendukung pembelajaran Anda." />
+      <PageMeta title={t('courseCatalog.title')} description={t('courseCatalog.subtitle')} />
       <SubpageHero
-        title="Katalog Kursus"
-        subtitle="Temukan kursus online untuk mendukung pembelajaran Anda."
-        badge="Kursus Online"
+        title={t('courseCatalog.title')}
+        subtitle={t('courseCatalog.subtitle')}
+        badge={t('courseCatalog.subtitle')}
         backHref="/"
-        backLabel="Kembali ke beranda"
+        backLabel={t('common.backHome')}
       />
       <section className="container-page section-padding">
         <Input
-          placeholder="Cari kursus..."
+          placeholder={t('courseCatalog.search')}
           value={search}
           onChange={(e) => {
             setSearch(e.target.value)
@@ -62,9 +64,9 @@ export function CourseCatalogPage() {
                   {course.excerpt && <CardDescription className="line-clamp-2">{course.excerpt}</CardDescription>}
                 </CardHeader>
                 <CardContent className="flex items-center justify-between">
-                  <span className="font-semibold text-primary">{formatCurrency(course.price)}</span>
+                  <span className="font-semibold text-primary">{formatCurrency(course.price, t('courseDetail.free'))}</span>
                   {course.duration_minutes && (
-                    <span className="text-xs text-muted-foreground">{course.duration_minutes} menit</span>
+                    <span className="text-xs text-muted-foreground">{course.duration_minutes} {t('courseCatalog.minutes')}</span>
                   )}
                 </CardContent>
               </Card>
@@ -78,20 +80,20 @@ export function CourseCatalogPage() {
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((p) => p - 1)}
-              className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
+              className="rounded-md border bg-background px-4 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
             >
-              Sebelumnya
+              {t('courseCatalog.prev')}
             </button>
             <span className="flex items-center px-4 text-sm text-muted-foreground">
-              Halaman {page} dari {data.meta.last_page}
+              {t('courseCatalog.pageOf', { page, total: data.meta.last_page })}
             </span>
             <button
               type="button"
               disabled={page >= data.meta.last_page}
               onClick={() => setPage((p) => p + 1)}
-              className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
+              className="rounded-md border bg-background px-4 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
             >
-              Berikutnya
+              {t('courseCatalog.next')}
             </button>
           </div>
         )}

@@ -40,7 +40,9 @@ use App\Http\Middleware\EnsurePanelUser;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->group(function (): void {
+Route::prefix('v1')->middleware(\App\Http\Middleware\TranslateResponse::class)->group(function (): void {
+    Route::get('landing', \App\Http\Controllers\Api\V1\LandingController::class);
+
     Route::get('schools', [SchoolController::class, 'index']);
     Route::get('schools/{slug}', [SchoolController::class, 'show']);
 

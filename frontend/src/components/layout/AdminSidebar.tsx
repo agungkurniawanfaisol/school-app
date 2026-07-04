@@ -63,7 +63,7 @@ function AdminSidebarRail() {
         <Button
           variant="ghost"
           size="icon"
-          className="size-10 text-[var(--sidebar-muted)] hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-200"
+          className="size-10 text-[var(--sidebar-muted)] hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-300"
           aria-label="Keluar"
           onClick={() => logout.mutate()}
           disabled={logout.isPending}

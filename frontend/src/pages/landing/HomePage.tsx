@@ -15,8 +15,11 @@ import { PmbCtaSection } from '@/components/landing/PmbCtaSection'
 import { SectionDivider } from '@/components/landing/SectionDivider'
 import { TeachersSection } from '@/components/landing/TeachersSection'
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
+import { useLandingPrefetch } from '@/hooks/useLandingPrefetch'
 
 export function HomePage() {
+  useLandingPrefetch()
+
   return (
     <div className="flex min-h-svh flex-col">
       <Header />

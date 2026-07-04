@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Calendar, Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { PublicCatalogPagination } from '@/components/content/PublicCatalogPagination'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
@@ -15,6 +16,7 @@ import { formatDate } from '@/lib/utils'
 const PER_PAGE = 12
 
 export function ActivitiesCatalogPage() {
+  const { t } = useTranslation('pages')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const { data, isLoading, isFetching } = useActivitiesList({
@@ -28,14 +30,14 @@ export function ActivitiesCatalogPage() {
   return (
     <PublicPageShell>
       <PageMeta
-        title="Kegiatan Siswa"
-        description="Berbagai aktivitas yang mengembangkan bakat, kreativitas, dan kepemimpinan siswa Nurul Hikmah."
+        title={t('activitiesCatalog.title')}
+        description={t('activitiesCatalog.metaDesc')}
       />
       <SubpageHero
-        title="Kegiatan Siswa"
-        subtitle="Berbagai aktivitas yang mengembangkan bakat, kreativitas, dan kepemimpinan siswa."
+        title={t('activitiesCatalog.title')}
+        subtitle={t('activitiesCatalog.subtitle')}
         backHref="/#kegiatan"
-        backLabel="Kembali ke beranda"
+        backLabel={t('activitiesCatalog.backHome')}
       />
       <div className="container-page section-padding">
         <div className="mx-auto max-w-6xl space-y-8">
@@ -50,9 +52,9 @@ export function ActivitiesCatalogPage() {
                 setSearch(e.target.value)
                 setPage(1)
               }}
-              placeholder="Cari kegiatan..."
+              placeholder={t('activitiesCatalog.search')}
               className="h-11 pl-9"
-              aria-label="Cari kegiatan"
+              aria-label={t('activitiesCatalog.searchAria')}
             />
           </div>
 
@@ -64,7 +66,7 @@ export function ActivitiesCatalogPage() {
             </div>
           ) : activities.length === 0 ? (
             <p className="text-center text-muted-foreground">
-              {search ? 'Tidak ada kegiatan yang cocok dengan pencarian.' : 'Belum ada data kegiatan.'}
+              {search ? t('activitiesCatalog.empty') : t('activitiesCatalog.noData')}
             </p>
           ) : (
             <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${isFetching ? 'opacity-70' : ''}`}>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
+  ArrowLeft,
   Camera,
   ExternalLink,
   Facebook,
@@ -636,6 +637,12 @@ export function TeacherFormPage() {
 
   return (
     <div className="admin-page admin-fade-in space-y-4 pb-24 lg:pb-8">
+      <Button asChild variant="ghost" size="sm" className="min-h-11 -ml-2 gap-2 px-0 hover:bg-transparent">
+        <Link to="/admin/teachers">
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Kembali ke daftar guru
+        </Link>
+      </Button>
       <Card className="border-primary/10 bg-gradient-to-br from-card via-card to-primary/5">
         <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div className="space-y-1">

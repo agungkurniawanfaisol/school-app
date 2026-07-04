@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { PublicCatalogPagination } from '@/components/content/PublicCatalogPagination'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
@@ -15,6 +16,7 @@ import { formatDate } from '@/lib/utils'
 const PER_PAGE = 12
 
 export function NewsCatalogPage() {
+  const { t } = useTranslation('pages')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const { data, isLoading, isFetching } = useNewsList({
@@ -28,14 +30,14 @@ export function NewsCatalogPage() {
   return (
     <PublicPageShell>
       <PageMeta
-        title="Berita & Artikel"
-        description="Informasi terbaru seputar kegiatan dan prestasi Sekolah Islam Nurul Hikmah."
+        title={t('newsCatalog.title')}
+        description={t('newsCatalog.metaDesc')}
       />
       <SubpageHero
-        title="Berita & Artikel"
-        subtitle="Informasi terbaru seputar kegiatan dan prestasi sekolah."
+        title={t('newsCatalog.title')}
+        subtitle={t('newsCatalog.subtitle')}
         backHref="/#berita"
-        backLabel="Kembali ke beranda"
+        backLabel={t('newsCatalog.backHome')}
       />
       <div className="container-page section-padding">
         <div className="mx-auto max-w-6xl space-y-8">
@@ -50,9 +52,9 @@ export function NewsCatalogPage() {
                 setSearch(e.target.value)
                 setPage(1)
               }}
-              placeholder="Cari berita..."
+              placeholder={t('newsCatalog.search')}
               className="h-11 pl-9"
-              aria-label="Cari berita"
+              aria-label={t('newsCatalog.searchAria')}
             />
           </div>
 
@@ -64,7 +66,7 @@ export function NewsCatalogPage() {
             </div>
           ) : items.length === 0 ? (
             <p className="text-center text-muted-foreground">
-              {search ? 'Tidak ada berita yang cocok dengan pencarian.' : 'Belum ada berita.'}
+              {search ? t('newsCatalog.empty') : t('newsCatalog.noNews')}
             </p>
           ) : (
             <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${isFetching ? 'opacity-70' : ''}`}>

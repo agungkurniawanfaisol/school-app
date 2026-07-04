@@ -1,4 +1,5 @@
 import { Quote, Star } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
 import { Carousel, CarouselContent, CarouselDots, CarouselItem } from '@/components/ui/carousel'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -8,8 +9,9 @@ import { useTestimonialsList } from '@/hooks/useTestimonials'
 import type { Testimonial } from '@/types'
 
 function GoldStars({ rating }: { rating: number }) {
+  const { t } = useTranslation('landing')
   return (
-    <div className="flex gap-0.5" aria-label={`Rating ${rating} dari 5`}>
+    <div className="flex gap-0.5" aria-label={t('testimonials.ratingAria', { rating })}>
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
@@ -56,6 +58,7 @@ function TestimonialSlide({ item }: { item: Testimonial }) {
 }
 
 export function TestimonialsSection() {
+  const { t } = useTranslation('landing')
   const { data, isLoading, isFetching } = useTestimonialsList({ per_page: 6, featured: true })
   const items = data?.data ?? []
 
@@ -63,15 +66,15 @@ export function TestimonialsSection() {
     <section id="testimoni" className="section-padding bg-secondary/30 pattern-bg">
       <div className="container-page">
         <SectionHeader
-          badge="Testimoni"
-          title="Apa Kata Mereka"
-          description="Pengalaman orang tua dan alumni tentang pendidikan di Nurul Hikmah."
+          badge={t('testimonials.badge')}
+          title={t('testimonials.title')}
+          description={t('testimonials.desc')}
         />
 
         {isLoading ? (
           <Skeleton className="mx-auto h-56 max-w-2xl rounded-2xl" />
         ) : items.length === 0 ? (
-          <p className="text-center text-muted-foreground">Belum ada testimoni.</p>
+          <p className="text-center text-muted-foreground">{t('testimonials.empty')}</p>
         ) : (
           <RevealOnScroll direction="up">
             <div className={`mx-auto max-w-4xl ${isFetching ? 'opacity-70' : ''}`}>

@@ -1,8 +1,10 @@
 import { WifiOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 
 export function OfflineIndicator() {
+  const { t } = useTranslation('layout')
   const [isOffline, setIsOffline] = useState(!navigator.onLine)
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export function OfflineIndicator() {
       aria-live="polite"
     >
       <WifiOff className="h-4 w-4" />
-      Anda sedang offline. Beberapa data mungkin tidak terbaru.
+      {t('offline.message')}
     </div>
   )
 }

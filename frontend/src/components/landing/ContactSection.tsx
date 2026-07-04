@@ -1,4 +1,5 @@
 import { Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -6,6 +7,7 @@ import { SectionHeader } from '@/components/landing/SectionHeader'
 import { useSchool } from '@/hooks/useSchool'
 
 export function ContactSection() {
+  const { t } = useTranslation('landing')
   const { data: school, isLoading } = useSchool()
 
   if (isLoading) {
@@ -21,20 +23,20 @@ export function ContactSection() {
   const contactItems = [
     school?.address && {
       icon: MapPin,
-      label: 'Alamat',
+      label: t('contact.address'),
       content: [school.address, school.city, school.province, school.postal_code]
         .filter(Boolean)
         .join(', '),
     },
     school?.phone && {
       icon: Phone,
-      label: 'Telepon',
+      label: t('contact.phone'),
       content: school.phone,
       href: `tel:${school.phone}`,
     },
     school?.email && {
       icon: Mail,
-      label: 'Email',
+      label: t('contact.email'),
       content: school.email,
       href: `mailto:${school.email}`,
     },
@@ -49,9 +51,9 @@ export function ContactSection() {
     <section id="kontak" className="section-padding bg-secondary/20">
       <div className="container-page">
         <SectionHeader
-          badge="Kontak"
-          title="Hubungi Kami"
-          description="Ada pertanyaan? Tim kami siap membantu Anda melalui berbagai saluran komunikasi."
+          badge={t('contact.badge')}
+          title={t('contact.title')}
+          description={t('contact.desc')}
         />
 
         <div className="grid gap-8 lg:grid-cols-2">
@@ -83,7 +85,7 @@ export function ContactSection() {
                     rel="noreferrer"
                   >
                     <MessageCircle className="h-5 w-5" />
-                    Chat via WhatsApp
+                    {t('contact.whatsapp')}
                   </a>
                 </Button>
               )}
@@ -94,7 +96,7 @@ export function ContactSection() {
             <div className="overflow-hidden rounded-2xl border border-primary/15 shadow-lg shadow-primary/5">
               <iframe
                 src={school.map_embed_url}
-                title="Peta Lokasi Sekolah"
+                title={t('contact.mapTitle')}
                 className="h-80 w-full lg:h-full lg:min-h-[320px]"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -103,8 +105,8 @@ export function ContactSection() {
           ) : (
             <div className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-primary/20 bg-card p-8 text-center">
               <MapPin className="mb-3 h-10 w-10 text-primary/40" />
-              <p className="font-medium text-foreground">Peta lokasi</p>
-              <p className="mt-1 text-sm text-muted-foreground">Peta embed akan ditampilkan di sini.</p>
+              <p className="font-medium text-foreground">{t('contact.mapAria')}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t('contact.mapFallback')}</p>
             </div>
           )}
         </div>

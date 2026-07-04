@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RevealOnScroll } from '@/components/landing/RevealOnScroll'
@@ -36,6 +37,7 @@ function StaffCard({ staff }: { staff: Teacher }) {
 }
 
 export function StaffSection() {
+  const { t } = useTranslation('landing')
   const { data, isLoading } = useTeachersList({ type: 'staff', per_page: 12 })
   const staff = data?.data ?? []
 
@@ -47,9 +49,9 @@ export function StaffSection() {
     <section id="staff" className="section-padding">
       <div className="container-page">
         <SectionHeader
-          badge="Tenaga Kependidikan"
-          title="Staff & Tata Usaha"
-          description="Tim administrasi yang mendukung kelancaran operasional sekolah."
+          badge={t('staff.badge')}
+          title={t('staff.title')}
+          description={t('staff.desc')}
         />
 
         {isLoading ? (

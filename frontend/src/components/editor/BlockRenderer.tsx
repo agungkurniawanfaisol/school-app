@@ -15,24 +15,22 @@ function resolveHtml(
   contentJson?: EditorDocument | Record<string, unknown> | null,
   contentHtml?: string | null,
 ): string {
+  if (contentJson) {
+    const doc = parseEditorDocument(contentJson)
+    if (doc.content?.length) {
+      try {
+        return generateHTML(doc as JSONContent, rendererExtensions)
+      } catch {
+        // fall through to contentHtml
+      }
+    }
+  }
+
   if (contentHtml?.trim()) {
     return contentHtml
   }
 
-  if (!contentJson) {
-    return ''
-  }
-
-  const doc = parseEditorDocument(contentJson)
-  if (!doc.content?.length) {
-    return ''
-  }
-
-  try {
-    return generateHTML(doc as JSONContent, rendererExtensions)
-  } catch {
-    return ''
-  }
+  return ''
 }
 
 export function BlockRenderer({ contentJson, contentHtml, className }: BlockRendererProps) {

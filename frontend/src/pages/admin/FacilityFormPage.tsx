@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { ImagePlus, Loader2, Maximize2, Save } from 'lucide-react'
+import { ArrowLeft, ImagePlus, Loader2, Maximize2, Save } from 'lucide-react'
 import { FacilityPhotoGalleryEditor } from '@/components/admin/FacilityPhotoGalleryEditor'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { RichPageEditor } from '@/components/editor/RichPageEditor'
@@ -271,6 +271,12 @@ export function FacilityFormPage() {
 
   return (
     <div className="space-y-4">
+      <Button asChild variant="ghost" size="sm" className="min-h-11 -ml-2 gap-2 px-0 hover:bg-transparent">
+        <Link to="/admin/facilities">
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Kembali ke daftar fasilitas
+        </Link>
+      </Button>
       <Card className="border-primary/10">
         <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>

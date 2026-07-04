@@ -44,6 +44,10 @@ vi.mock('@/components/theme/ThemeToggle', () => ({
   ThemeToggle: () => <button type="button" aria-label="Ubah tema tampilan">Tema</button>,
 }))
 
+vi.mock('@/components/i18n', () => ({
+  LanguageSwitcher: () => <button type="button" aria-label="Ganti bahasa">Lang</button>,
+}))
+
 describe('Header', () => {
   function renderHeader() {
     return render(<Header />)
@@ -101,6 +105,6 @@ describe('Header', () => {
     expect(screen.getByRole('button', { name: 'Profil' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Konten' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'PMB' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Login' })).toHaveAttribute('href', '/admin/login')
+    expect(screen.getByRole('link', { name: /Login/ })).toHaveAttribute('href', '/admin/login')
   })
 })

@@ -15,8 +15,8 @@ export function formatDate(date: string | null | undefined, options?: Intl.DateT
   }).format(new Date(date))
 }
 
-export function formatCurrency(amount: number | null | undefined) {
-  if (amount == null) return 'Gratis'
+export function formatCurrency(amount: number | null | undefined, freeLabel = 'Gratis') {
+  if (amount == null) return freeLabel
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',

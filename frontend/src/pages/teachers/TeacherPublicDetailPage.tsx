@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { ExternalLink, Facebook, Instagram, Mail, Share2, Youtube } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
@@ -52,11 +53,12 @@ function SocialLinks({ social }: { social: SocialMedia | null }) {
 }
 
 function TeacherProfile({ teacher }: { teacher: Teacher }) {
+  const { t } = useTranslation('pages')
   const sharePath = buildTeacherSharePath(teacher.uuid)
   const pageUrl =
     typeof window !== 'undefined' ? `${window.location.origin}${sharePath}` : sharePath
   const mailto = teacher.email ? resolveMailto(teacher.email) : null
-  const metaDescription = teacher.bio ?? `${teacher.name} — ${teacher.title ?? teacher.subject ?? 'Guru Nurul Hikmah'}`
+  const metaDescription = teacher.bio ?? `${teacher.name} — ${teacher.title ?? teacher.subject ?? t('teacherDetail.defaultRole')}`
 
   return (
     <PublicPageShell>
@@ -65,7 +67,7 @@ function TeacherProfile({ teacher }: { teacher: Teacher }) {
         title={teacher.name}
         subtitle={[teacher.title, teacher.subject].filter(Boolean).join(' · ') || undefined}
         backHref="/guru"
-        backLabel="Semua guru"
+        backLabel={t('teacherDetail.allTeachers')}
       />
       <article className="container-page section-padding">
         <div className="mx-auto max-w-4xl space-y-8">
@@ -75,10 +77,10 @@ function TeacherProfile({ teacher }: { teacher: Teacher }) {
               variant="outline"
               size="sm"
               className="min-h-11 gap-2"
-              onClick={() => openWhatsAppShare(`Kenali ${teacher.name}, guru di Nurul Hikmah`, pageUrl)}
+              onClick={() => openWhatsAppShare(t('teacherDetail.shareText', { name: teacher.name }), pageUrl)}
             >
               <Share2 className="h-4 w-4" aria-hidden />
-              Bagikan
+              {t('teacherDetail.share')}
             </Button>
           </div>
 
@@ -87,7 +89,7 @@ function TeacherProfile({ teacher }: { teacher: Teacher }) {
             <div className="min-w-0 flex-1 space-y-3">
               <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                 <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{teacher.name}</h2>
-                {teacher.is_featured && <Badge>Unggulan</Badge>}
+                {teacher.is_featured && <Badge>{t('teacherDetail.featured')}</Badge>}
               </div>
               {(teacher.title || teacher.subject) && (
                 <p className="text-lg text-muted-foreground">
@@ -123,6 +125,7 @@ function TeacherProfile({ teacher }: { teacher: Teacher }) {
 }
 
 export function TeacherPublicDetailPage() {
+  const { t } = useTranslation('pages')
   const { slug, uuid } = useParams<{ slug?: string; uuid?: string }>()
   const bySlug = useTeacherDetail(slug ?? '')
   const byUuid = useTeacherDetailByUuid(uuid ?? '')
@@ -151,9 +154,9 @@ export function TeacherPublicDetailPage() {
     return (
       <PublicPageShell>
         <div className="container-page section-padding text-center">
-          <p className="text-muted-foreground">Profil guru tidak ditemukan.</p>
+          <p className="text-muted-foreground">{t('teacherDetail.notFound')}</p>
           <Button asChild className="mt-4 min-h-11">
-            <Link to="/guru">Lihat semua guru</Link>
+            <Link to="/guru">{t('teacherDetail.viewAll')}</Link>
           </Button>
         </div>
       </PublicPageShell>

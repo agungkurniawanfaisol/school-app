@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { Badge } from '@/components/ui/badge'
@@ -15,14 +16,6 @@ import { usePmbTrack } from '@/hooks/usePmb'
 import { pmbTrackSchema, type PmbTrackFormValues } from '@/schemas/pmb'
 import type { PmbStatus } from '@/types'
 
-const statusLabels: Record<PmbStatus, string> = {
-  pending: 'Menunggu Verifikasi',
-  review: 'Sedang Ditinjau',
-  accepted: 'Diterima',
-  rejected: 'Ditolak',
-  paid: 'Sudah Bayar',
-}
-
 const statusVariants: Record<PmbStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   pending: 'secondary',
   review: 'outline',
@@ -32,6 +25,7 @@ const statusVariants: Record<PmbStatus, 'default' | 'secondary' | 'destructive' 
 }
 
 export function PmbStatusPage() {
+  const { t } = useTranslation('pages')
   const { token: urlToken } = useParams()
   const [activeToken, setActiveToken] = useState(urlToken ?? '')
   const { data: registration, isLoading, isError } = usePmbTrack(activeToken)
@@ -43,6 +37,14 @@ export function PmbStatusPage() {
     defaultValues: { token: urlToken ?? '' },
   })
 
+  const statusLabels: Record<PmbStatus, string> = {
+    pending: t('pmbStatus.waiting'),
+    review: t('pmbStatus.reviewing'),
+    accepted: t('pmbStatus.accepted'),
+    rejected: t('pmbStatus.rejected'),
+    paid: t('pmbStatus.enrolled'),
+  }
+
   const onSubmit = (values: PmbTrackFormValues) => {
     setActiveToken(values.token)
   }
@@ -50,25 +52,25 @@ export function PmbStatusPage() {
   return (
     <PublicPageShell>
       <SubpageHero
-        title="Cek Status Pendaftaran"
-        subtitle="Lacak status pendaftaran siswa baru Anda."
-        badge="PMB"
+        title={t('pmbStatus.title')}
+        subtitle={t('pmbStatus.subtitle')}
+        badge={t('pmbStatus.badge')}
         backHref="/pmb"
-        backLabel="Informasi PMB"
+        backLabel={t('pmbStatus.backHome')}
       />
       <section className="container-page section-padding">
         <div className="mx-auto max-w-lg">
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Masukkan Token</CardTitle>
+              <CardTitle>{t('pmbStatus.enterToken')}</CardTitle>
               <CardDescription>
-                Masukkan token pelacakan yang Anda terima setelah mendaftar.
+                {t('pmbStatus.tokenDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {savedRegNumber && (
                 <p className="mb-4 rounded-md bg-secondary/50 p-3 text-sm">
-                  Nomor pendaftaran terakhir: <strong>{savedRegNumber}</strong>
+                  {t('pmbStatus.lastRegNumber')} <strong>{savedRegNumber}</strong>
                 </p>
               )}
               <Form {...form}>
@@ -78,15 +80,15 @@ export function PmbStatusPage() {
                     name="token"
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel className="sr-only">Token Pelacakan</FormLabel>
+                        <FormLabel className="sr-only">{t('pmbStatus.trackingLabel')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Token pelacakan..." {...field} />
+                          <Input placeholder={t('pmbStatus.tokenPlaceholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="self-end">Cek</Button>
+                  <Button type="submit" className="self-end">{t('pmbStatus.check')}</Button>
                 </form>
               </Form>
             </CardContent>
@@ -97,7 +99,7 @@ export function PmbStatusPage() {
           {activeToken && !isLoading && isError && (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                Pendaftaran tidak ditemukan. Periksa kembali token Anda.
+                {t('pmbStatus.notFoundMsg')}
               </CardContent>
             </Card>
           )}
@@ -111,14 +113,14 @@ export function PmbStatusPage() {
                     {statusLabels[registration.status]}
                   </Badge>
                 </div>
-                <CardDescription>No. Pendaftaran: {registration.registration_number}</CardDescription>
+                <CardDescription>{t('pmbStatus.regNumber')}: {registration.registration_number}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
-                <p><span className="text-muted-foreground">Jenjang:</span> {registration.grade_applied}</p>
-                <p><span className="text-muted-foreground">Orang Tua:</span> {registration.parent_name}</p>
-                <p><span className="text-muted-foreground">Telepon:</span> {registration.parent_phone}</p>
+                <p><span className="text-muted-foreground">{t('pmbStatus.grade')}:</span> {registration.grade_applied}</p>
+                <p><span className="text-muted-foreground">{t('pmbStatus.parentName')}:</span> {registration.parent_name}</p>
+                <p><span className="text-muted-foreground">{t('pmbStatus.phone')}:</span> {registration.parent_phone}</p>
                 {registration.created_at && (
-                  <p><span className="text-muted-foreground">Tanggal Daftar:</span> {formatDate(registration.created_at)}</p>
+                  <p><span className="text-muted-foreground">{t('pmbStatus.regDate')}:</span> {formatDate(registration.created_at)}</p>
                 )}
               </CardContent>
             </Card>
@@ -126,7 +128,7 @@ export function PmbStatusPage() {
 
           <div className="mt-6 text-center">
             <Button asChild variant="link">
-              <Link to="/pmb/daftar">Belum mendaftar? Daftar sekarang</Link>
+              <Link to="/pmb/daftar">{t('pmbStatus.notRegistered')} {t('pmbStatus.registerNow')}</Link>
             </Button>
           </div>
         </div>

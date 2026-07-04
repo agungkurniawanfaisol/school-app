@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Maximize2, Save } from 'lucide-react'
+import { ArrowLeft, Maximize2, Save } from 'lucide-react'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { RichPageEditor } from '@/components/editor/RichPageEditor'
 import { Button } from '@/components/ui/button'
@@ -211,6 +211,12 @@ export function NewsFormPage() {
 
   return (
     <div className="space-y-4">
+      <Button asChild variant="ghost" size="sm" className="min-h-11 -ml-2 gap-2 px-0 hover:bg-transparent">
+        <Link to="/admin/news">
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Kembali ke daftar berita
+        </Link>
+      </Button>
       <Card className="border-primary/10">
         <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -295,7 +301,7 @@ export function NewsFormPage() {
       </div>
 
       <Dialog open={fullscreenOpen} onOpenChange={setFullscreenOpen}>
-        <DialogContent className="fixed inset-0 flex h-dvh max-h-none w-screen max-w-none flex-col rounded-none border-0 p-0">
+        <DialogContent className="fixed inset-0 flex h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 flex-col rounded-none border-0 p-0">
           <DialogHeader className="border-b px-4 py-3">
             <DialogTitle>Pratinjau fullscreen</DialogTitle>
           </DialogHeader>

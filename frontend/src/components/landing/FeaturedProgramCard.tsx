@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { resolveProgramIcon } from '@/lib/lucide-icon-map'
 import { cn } from '@/lib/utils'
 import type { Curriculum } from '@/types'
 
 export function FeaturedProgramCard({ item }: { item: Curriculum }) {
+  const { t } = useTranslation('landing')
   const Icon = resolveProgramIcon(item.icon)
 
   return (
@@ -45,7 +47,7 @@ export function FeaturedProgramCard({ item }: { item: Curriculum }) {
             <p className="mt-1 line-clamp-2 text-sm text-primary-foreground/85">{item.excerpt}</p>
           )}
           <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium">
-            Selengkapnya
+            {t('programs.viewMore')}
             <ChevronRight className="h-3.5 w-3.5" aria-hidden />
           </span>
         </div>
@@ -57,7 +59,7 @@ export function FeaturedProgramCard({ item }: { item: Curriculum }) {
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{item.excerpt}</p>
         )}
         <span className="mt-3 inline-flex min-h-11 items-center gap-1 text-sm font-medium text-primary">
-          Selengkapnya
+          {t('programs.viewMore')}
           <ChevronRight className="h-4 w-4" aria-hidden />
         </span>
       </div>

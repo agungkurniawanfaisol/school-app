@@ -28,7 +28,7 @@ export function IslamicPattern({ className, opacity = 0.05 }: IslamicPatternProp
           />
         </pattern>
       </defs>
-      <rect width="100%" height="100%" fill="url(#islamic-star)" className="text-primary-foreground" />
+      <rect width="100%" height="100%" fill="url(#islamic-star)" className="text-white" />
     </svg>
   )
 }

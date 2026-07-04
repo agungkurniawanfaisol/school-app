@@ -26,36 +26,36 @@ export function isNavStandalone(entry: NavEntry): entry is NavStandalone {
 
 export const mainNavTree: NavEntry[] = [
   {
-    label: 'Profil',
+    label: 'nav.profile',
     icon: Info,
     children: [
-      { label: 'Tentang', href: '/#tentang', icon: Info },
-      { label: 'Program Unggulan', href: '/program-unggulan', icon: Star },
-      { label: 'Guru', href: '/#guru', icon: Users },
-      { label: 'Fasilitas', href: '/fasilitas', icon: Building2 },
+      { label: 'nav.about', href: '/#tentang', icon: Info },
+      { label: 'nav.featuredPrograms', href: '/program-unggulan', icon: Star },
+      { label: 'nav.teachers', href: '/#guru', icon: Users },
+      { label: 'nav.facilities', href: '/fasilitas', icon: Building2 },
     ],
   },
   {
-    label: 'Tur Virtual',
+    label: 'nav.virtualTour',
     href: '/tur-virtual',
     icon: Compass,
     standalone: true,
   },
   {
-    label: 'Konten',
+    label: 'nav.content',
     icon: Newspaper,
     children: [
-      { label: 'Kegiatan', href: '/kegiatan', icon: Sparkles },
-      { label: 'Berita', href: '/berita', icon: Newspaper },
+      { label: 'nav.activities', href: '/kegiatan', icon: Sparkles },
+      { label: 'nav.news', href: '/berita', icon: Newspaper },
     ],
   },
   {
-    label: 'PMB',
+    label: 'nav.pmb',
     icon: GraduationCap,
     children: [
-      { label: 'Informasi PMB', href: '/pmb', icon: GraduationCap },
-      { label: 'Daftar Siswa Baru', href: '/pmb/daftar', icon: ClipboardList },
-      { label: 'Cek Status', href: '/pmb/status', icon: Search },
+      { label: 'nav.pmbInfo', href: '/pmb', icon: GraduationCap },
+      { label: 'nav.registerNew', href: '/pmb/daftar', icon: ClipboardList },
+      { label: 'nav.checkStatus', href: '/pmb/status', icon: Search },
     ],
   },
 ]

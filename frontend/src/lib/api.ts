@@ -18,6 +18,11 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     config.headers.Authorization = `Bearer ${token}`
   }
 
+  const lang = localStorage.getItem('nurul-hikmah-lang')
+  if (lang && lang !== 'id') {
+    config.headers['X-Locale'] = lang
+  }
+
   // Let the browser set multipart boundary — never force Content-Type on FormData.
   if (config.data instanceof FormData) {
     delete config.headers['Content-Type']

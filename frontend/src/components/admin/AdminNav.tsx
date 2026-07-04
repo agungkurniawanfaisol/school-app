@@ -113,7 +113,7 @@ export function AdminNav({
 
           <Button
             variant="ghost"
-            className="min-h-10 justify-start gap-2 border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.04)] text-[var(--sidebar-muted)] hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-200"
+            className="min-h-10 justify-start gap-2 border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.04)] text-[var(--sidebar-muted)] hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-300"
             onClick={() => logout.mutate()}
             disabled={logout.isPending}
           >

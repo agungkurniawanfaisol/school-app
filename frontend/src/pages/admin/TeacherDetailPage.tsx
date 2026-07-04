@@ -165,7 +165,7 @@ export function AdminTeacherDetailPage() {
       </div>
 
       {teacher.has_linked_user && (
-        <Card className="border-amber-500/30 bg-amber-500/5">
+        <Card className="border-amber-500/30 bg-amber-500/5 dark:border-amber-400/30 dark:bg-amber-400/10">
           <CardContent className="p-4 text-sm text-muted-foreground">
             Guru ini terhubung dengan akun login. Menghapus profil akan melepas kaitan akun guru.
           </CardContent>

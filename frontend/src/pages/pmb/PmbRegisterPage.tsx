@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ import { useSchool } from '@/hooks/useSchool'
 import { pmbRegisterSchema, type PmbRegisterFormValues } from '@/schemas/pmb'
 
 export function PmbRegisterPage() {
+  const { t } = useTranslation('pages')
   const navigate = useNavigate()
   const { data: school } = useSchool()
   const register = usePmbRegister()
@@ -44,7 +46,7 @@ export function PmbRegisterPage() {
   const onSubmit = (values: PmbRegisterFormValues) => {
     register.mutate(values, {
       onSuccess: (response) => {
-        toast.success(response.message ?? 'Pendaftaran berhasil dikirim')
+        toast.success(response.message ?? t('pmbRegister.successMsg'))
         const reg = response.data
         if (reg.registration_number) {
           sessionStorage.setItem('pmb_registration_number', reg.registration_number)
@@ -52,7 +54,7 @@ export function PmbRegisterPage() {
         navigate('/pmb/status')
       },
       onError: (error) => {
-        toast.error(getApiErrorMessage(error, 'Pendaftaran gagal'))
+        toast.error(getApiErrorMessage(error, t('pmbRegister.failedMsg')))
       },
     })
   }
@@ -60,18 +62,18 @@ export function PmbRegisterPage() {
   return (
     <PublicPageShell>
       <SubpageHero
-        title="Formulir Pendaftaran"
-        subtitle={`Daftarkan putra-putri Anda di ${school?.name ?? 'sekolah kami'}.`}
-        badge="PMB"
+        title={t('pmbRegister.title')}
+        subtitle={t('pmbRegister.subtitle')}
+        badge={t('pmbRegister.badge')}
         backHref="/pmb"
-        backLabel="Informasi PMB"
+        backLabel={t('pmbRegister.backHome')}
       />
       <section className="container-page section-padding">
         <Card className="mx-auto max-w-2xl">
           <CardHeader>
-            <CardTitle>Formulir Pendaftaran Siswa Baru</CardTitle>
+            <CardTitle>{t('pmbRegister.formTitle')}</CardTitle>
             <CardDescription>
-              Lengkapi data berikut untuk mendaftarkan putra-putri Anda di {school?.name ?? 'sekolah kami'}.
+              {t('pmbRegister.formDesc', { school: school?.name ?? t('pmbRegister.defaultSchool') })}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -82,9 +84,9 @@ export function PmbRegisterPage() {
                   name="student_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nama Siswa</FormLabel>
+                      <FormLabel>{t('pmbRegister.childName')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nama lengkap siswa" {...field} />
+                        <Input placeholder={t('pmbRegister.childNamePlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -97,9 +99,9 @@ export function PmbRegisterPage() {
                     name="birth_place"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tempat Lahir</FormLabel>
+                        <FormLabel>{t('pmbRegister.birthPlace')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Kota kelahiran" {...field} value={field.value ?? ''} />
+                          <Input placeholder={t('pmbRegister.birthPlacePlaceholder')} {...field} value={field.value ?? ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -110,7 +112,7 @@ export function PmbRegisterPage() {
                     name="birth_date"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tanggal Lahir</FormLabel>
+                        <FormLabel>{t('pmbRegister.birthDate')}</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} value={field.value ?? ''} />
                         </FormControl>
@@ -125,16 +127,16 @@ export function PmbRegisterPage() {
                   name="gender"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Jenis Kelamin</FormLabel>
+                      <FormLabel>{t('pmbRegister.gender')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value ?? ''}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Pilih jenis kelamin" />
+                            <SelectValue placeholder={t('pmbRegister.selectGender')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="L">Laki-laki</SelectItem>
-                          <SelectItem value="P">Perempuan</SelectItem>
+                          <SelectItem value="L">{t('pmbRegister.male')}</SelectItem>
+                          <SelectItem value="P">{t('pmbRegister.female')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -147,9 +149,9 @@ export function PmbRegisterPage() {
                   name="grade_applied"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Jenjang Pendaftaran</FormLabel>
+                      <FormLabel>{t('pmbRegister.gradeApplied')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Contoh: Kelas 1 SD" {...field} />
+                        <Input placeholder={t('pmbRegister.gradeAppliedPlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -161,9 +163,9 @@ export function PmbRegisterPage() {
                   name="previous_school"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Sekolah Sebelumnya</FormLabel>
+                      <FormLabel>{t('pmbRegister.prevSchool')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nama sekolah sebelumnya (opsional)" {...field} value={field.value ?? ''} />
+                        <Input placeholder={t('pmbRegister.prevSchoolPlaceholder')} {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -175,9 +177,9 @@ export function PmbRegisterPage() {
                   name="parent_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nama Orang Tua/Wali</FormLabel>
+                      <FormLabel>{t('pmbRegister.parentName')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Nama lengkap orang tua" {...field} />
+                        <Input placeholder={t('pmbRegister.parentNamePlaceholder')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -190,9 +192,9 @@ export function PmbRegisterPage() {
                     name="parent_phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nomor Telepon</FormLabel>
+                        <FormLabel>{t('pmbRegister.parentPhone')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="08xxxxxxxxxx" {...field} />
+                          <Input placeholder={t('pmbRegister.parentPhonePlaceholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -203,9 +205,9 @@ export function PmbRegisterPage() {
                     name="parent_email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email (Opsional)</FormLabel>
+                        <FormLabel>{t('pmbRegister.parentEmail')}</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="email@contoh.com" {...field} value={field.value ?? ''} />
+                          <Input type="email" placeholder={t('pmbRegister.parentEmailPlaceholder')} {...field} value={field.value ?? ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -218,9 +220,9 @@ export function PmbRegisterPage() {
                   name="address"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Alamat</FormLabel>
+                      <FormLabel>{t('pmbRegister.address')}</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Alamat lengkap" {...field} value={field.value ?? ''} />
+                        <Textarea placeholder={t('pmbRegister.addressPlaceholder')} {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -229,10 +231,10 @@ export function PmbRegisterPage() {
 
                 <div className="flex flex-wrap gap-3 pt-2">
                   <Button type="submit" disabled={register.isPending}>
-                    {register.isPending ? 'Mengirim...' : 'Kirim Pendaftaran'}
+                    {register.isPending ? t('pmbRegister.submitting') : t('pmbRegister.submit')}
                   </Button>
                   <Button asChild variant="outline">
-                    <Link to="/pmb">Batal</Link>
+                    <Link to="/pmb">{t('pmbRegister.cancel')}</Link>
                   </Button>
                 </div>
               </form>

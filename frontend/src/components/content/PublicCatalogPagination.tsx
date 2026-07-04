@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import {
   Pagination,
   PaginationContent,
@@ -14,12 +15,13 @@ interface PublicCatalogPaginationProps {
 }
 
 export function PublicCatalogPagination({ page, lastPage, onPageChange }: PublicCatalogPaginationProps) {
+  const { t } = useTranslation('layout')
   if (lastPage <= 1) return null
 
   return (
     <div className="space-y-3">
       <p className="text-center text-sm text-muted-foreground md:hidden">
-        Halaman {page} dari {lastPage}
+        {t('pagination.pageOf', { page, total: lastPage })}
       </p>
       <Pagination>
         <PaginationContent className="flex-wrap justify-center gap-1">

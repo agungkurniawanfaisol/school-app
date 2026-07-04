@@ -30,7 +30,6 @@ describe('PmbInfoPage', () => {
     renderWithProviders(<PmbInfoPage />)
 
     expect(screen.getByRole('heading', { level: 1, name: 'Penerimaan Murid Baru' })).toBeInTheDocument()
-    expect(screen.getByText(/Nurul Hikmah School/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Daftar Sekarang' })).toHaveAttribute('href', '/pmb/daftar')
   })
 })

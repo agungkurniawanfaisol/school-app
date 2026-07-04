@@ -1,5 +1,6 @@
 import { Clock } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
@@ -11,13 +12,14 @@ import { formatCurrency } from '@/lib/utils'
 import { useCourseDetail } from '@/hooks/useCourses'
 
 export function CourseDetailPage() {
+  const { t } = useTranslation('pages')
   const { slug = '' } = useParams()
   const { data: course, isLoading } = useCourseDetail(slug)
 
   if (isLoading) {
     return (
       <PublicPageShell>
-        <SubpageHero title="Memuat kursus..." backHref="/kursus" backLabel="Katalog Kursus" />
+        <SubpageHero title={t('courseDetail.loading')} backHref="/kursus" backLabel={t('courseDetail.catalog')} />
         <div className="container-page section-padding">
           <Skeleton className="mb-6 h-64 w-full" />
           <Skeleton className="h-8 w-1/2" />
@@ -29,10 +31,10 @@ export function CourseDetailPage() {
   if (!course) {
     return (
       <PublicPageShell>
-        <SubpageHero title="Kursus tidak ditemukan" backHref="/kursus" backLabel="Katalog Kursus" />
+        <SubpageHero title={t('courseDetail.notFound')} backHref="/kursus" backLabel={t('courseDetail.catalog')} />
         <div className="container-page section-padding text-center">
           <Button asChild className="mt-4">
-            <Link to="/kursus">Kembali ke Katalog</Link>
+            <Link to="/kursus">{t('courseDetail.backToCatalog')}</Link>
           </Button>
         </div>
       </PublicPageShell>
@@ -46,7 +48,7 @@ export function CourseDetailPage() {
         subtitle={course.excerpt}
         badge={course.category}
         backHref="/kursus"
-        backLabel="Katalog Kursus"
+        backLabel={t('courseDetail.catalog')}
       />
       <section className="container-page section-padding">
         <div className="grid gap-8 lg:grid-cols-3">
@@ -65,7 +67,7 @@ export function CourseDetailPage() {
 
             {course.modules && course.modules.length > 0 && (
               <div>
-                <h2 className="mb-4 text-xl font-semibold">Materi Kursus</h2>
+                <h2 className="mb-4 text-xl font-semibold">{t('courseDetail.materials')}</h2>
                 <Accordion type="single" collapsible className="w-full">
                   {course.modules.map((mod) => (
                     <AccordionItem key={mod.id} value={`mod-${mod.id}`}>
@@ -77,9 +79,9 @@ export function CourseDetailPage() {
                             <li key={lesson.id} className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
                               <span>{lesson.title}</span>
                               <div className="flex items-center gap-2">
-                                {lesson.is_free_preview && <Badge variant="outline">Preview</Badge>}
+                                {lesson.is_free_preview && <Badge variant="outline">{t('courseDetail.preview')}</Badge>}
                                 {lesson.duration_minutes && (
-                                  <span className="text-xs text-muted-foreground">{lesson.duration_minutes} mnt</span>
+                                  <span className="text-xs text-muted-foreground">{lesson.duration_minutes} {t('courseDetail.min')}</span>
                                 )}
                               </div>
                             </li>
@@ -96,20 +98,20 @@ export function CourseDetailPage() {
           <div>
             <Card className="sticky top-20">
               <CardHeader>
-                <CardTitle className="text-2xl text-primary">{formatCurrency(course.price)}</CardTitle>
+                <CardTitle className="text-2xl text-primary">{formatCurrency(course.price, t('courseDetail.free'))}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {course.duration_minutes && (
                   <p className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-4 w-4" />
-                    Total {course.duration_minutes} menit
+                    {t('courseCatalog.minutes')}: {course.duration_minutes}
                   </p>
                 )}
                 <Button className="w-full" disabled>
-                  Daftar Kursus (Segera)
+                  {t('courseDetail.enrollSoon')}
                 </Button>
                 <Button asChild variant="outline" className="w-full">
-                  <Link to="/kursus">Kembali ke Katalog</Link>
+                  <Link to="/kursus">{t('courseDetail.backToCatalog')}</Link>
                 </Button>
               </CardContent>
             </Card>

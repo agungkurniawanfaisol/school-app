@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { StaggerChildren, StaggerItem } from '@/components/motion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,6 +15,7 @@ import { cn } from '@/lib/utils'
 import type { News } from '@/types'
 
 function NewsCard({ item }: { item: News }) {
+  const { t } = useTranslation('landing')
   return (
     <Link
       to={`/berita/detail/${item.uuid}`}
@@ -43,7 +45,7 @@ function NewsCard({ item }: { item: News }) {
           {item.excerpt && <CardDescription className="line-clamp-2">{item.excerpt}</CardDescription>}
         </CardHeader>
         {item.author && (
-          <CardContent className="pt-0 text-xs text-muted-foreground">Oleh {item.author.name}</CardContent>
+          <CardContent className="pt-0 text-xs text-muted-foreground">{t('news.by')} {item.author.name}</CardContent>
         )}
       </Card>
     </Link>
@@ -51,6 +53,7 @@ function NewsCard({ item }: { item: News }) {
 }
 
 export function NewsSection() {
+  const { t } = useTranslation('landing')
   const { data, isLoading, isFetching } = useNewsList({ per_page: 3, featured: true })
   const items = data?.data ?? []
   const hasMore = (data?.meta?.total ?? 0) > items.length
@@ -60,9 +63,9 @@ export function NewsSection() {
       <div className="container-page">
         <div className="mb-10 flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
           <SectionHeader
-            badge="Berita"
-            title="Berita & Artikel"
-            description="Informasi terbaru seputar kegiatan dan prestasi sekolah."
+            badge={t('news.badge')}
+            title={t('news.title')}
+            description={t('news.desc')}
             align="left"
             className="mb-0 md:mb-0"
           />
@@ -72,7 +75,7 @@ export function NewsSection() {
             className="min-h-11 shrink-0 border-primary text-primary hover:bg-secondary"
           >
             <Link to="/berita">
-              Semua Berita
+              {t('news.viewAll')}
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           </Button>
@@ -85,7 +88,7 @@ export function NewsSection() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <p className="text-center text-muted-foreground">Belum ada berita.</p>
+          <p className="text-center text-muted-foreground">{t('news.empty')}</p>
         ) : (
           <>
             <StaggerChildren
@@ -114,7 +117,7 @@ export function NewsSection() {
               </Carousel>
               {items.length > 1 && (
                 <p className="mt-2 text-center text-xs text-muted-foreground">
-                  Geser untuk melihat berita lainnya
+                  {t('news.swipe')}
                 </p>
               )}
             </div>
@@ -123,7 +126,7 @@ export function NewsSection() {
               <div className="mt-8 text-center md:hidden">
                 <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
                   <Link to="/berita">
-                    Lihat Semua Berita
+                    {t('news.viewAllMobile')}
                     <ArrowRight className="h-4 w-4" aria-hidden />
                   </Link>
                 </Button>

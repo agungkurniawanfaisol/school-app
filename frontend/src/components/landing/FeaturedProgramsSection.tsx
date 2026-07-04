@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Carousel, CarouselContent, CarouselDots, CarouselItem } from '@/components/ui/carousel'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,6 +13,7 @@ import { cn } from '@/lib/utils'
 export const LANDING_PROGRAM_LIMIT = 6
 
 export function FeaturedProgramsSection() {
+  const { t } = useTranslation('landing')
   const { data, isLoading, isFetching } = useCurriculumsList({
     per_page: LANDING_PROGRAM_LIMIT,
     featured: true,
@@ -24,16 +26,16 @@ export function FeaturedProgramsSection() {
       <div className="container-page">
         <div className="mb-10 flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
           <SectionHeader
-            badge="Program Unggulan"
-            title="Program Pembelajaran Unggulan"
-            description="Program terintegrasi yang mengembangkan potensi akademik dan karakter Islami siswa."
+            badge={t('programs.badge')}
+            title={t('programs.title')}
+            description={t('programs.desc')}
             align="left"
             className="mb-0"
           />
           {hasMore && !isLoading && (
             <Button asChild className="min-h-11 shrink-0 shadow-md shadow-primary/20">
               <Link to="/program-unggulan">
-                Lihat Selengkapnya
+                {t('programs.viewAll')}
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </Button>
@@ -47,7 +49,7 @@ export function FeaturedProgramsSection() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <p className="text-center text-muted-foreground">Belum ada program unggulan.</p>
+          <p className="text-center text-muted-foreground">{t('programs.empty')}</p>
         ) : (
           <>
             <StaggerChildren
@@ -76,7 +78,7 @@ export function FeaturedProgramsSection() {
               </Carousel>
               {items.length > 1 && (
                 <p className="mt-2 text-center text-xs text-muted-foreground">
-                  Geser untuk melihat program lainnya
+                  {t('programs.swipe')}
                 </p>
               )}
             </div>
@@ -85,7 +87,7 @@ export function FeaturedProgramsSection() {
               <div className="mt-8 text-center md:hidden">
                 <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
                   <Link to="/program-unggulan">
-                    Lihat Semua Program
+                    {t('programs.viewAllMobile')}
                     <ArrowRight className="h-4 w-4" aria-hidden />
                   </Link>
                 </Button>

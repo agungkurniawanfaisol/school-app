@@ -24,13 +24,13 @@ export function SectionHeader({
     <div
       className={cn(
         'mb-10 md:mb-12',
-        align === 'center' ? 'text-center' : 'text-left',
+        align === 'center' ? 'text-center' : 'text-start',
         className,
       )}
     >
       {badge && (
         <span className="section-badge">
-          <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[var(--gold-accent)]" />
+          <span className="me-1.5 inline-block h-1.5 w-1.5 rounded-full bg-[var(--gold-accent)]" />
           {badge}
         </span>
       )}

@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,25 +22,28 @@ interface RelatedContentCardsProps {
 }
 
 export function RelatedContentCards({
-  title = 'Baca juga',
+  title,
   items,
   viewAllHref,
-  viewAllLabel = 'Lihat semua',
+  viewAllLabel,
 }: RelatedContentCardsProps) {
+  const { t } = useTranslation('layout')
+  const resolvedTitle = title ?? t('article.relatedTitle')
+  const resolvedViewAllLabel = viewAllLabel ?? t('article.viewAll')
   if (items.length === 0) return null
 
   return (
     <section className="mt-10 space-y-4" aria-labelledby="related-content-heading">
       <div className="flex items-center justify-between gap-3">
         <h2 id="related-content-heading" className="text-lg font-semibold">
-          {title}
+          {resolvedTitle}
         </h2>
         {viewAllHref && (
           <Link
             to={viewAllHref}
             className="inline-flex min-h-11 items-center gap-1 text-sm font-medium text-primary hover:underline"
           >
-            {viewAllLabel}
+            {resolvedViewAllLabel}
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
         )}

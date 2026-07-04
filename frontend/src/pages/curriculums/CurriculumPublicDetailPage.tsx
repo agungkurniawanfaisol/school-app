@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import {
   ArticleDetailLayout,
@@ -12,6 +13,7 @@ import { useCurriculumDetail } from '@/hooks/useCurriculums'
 import type { EditorDocument } from '@/schemas/editor'
 
 export function CurriculumPublicDetailPage() {
+  const { t } = useTranslation('pages')
   const { slug } = useParams<{ slug: string }>()
   const { data: program, isLoading, isError } = useCurriculumDetail(slug ?? '')
 
@@ -27,9 +29,9 @@ export function CurriculumPublicDetailPage() {
     return (
       <PublicPageShell>
         <div className="container-page section-padding text-center">
-          <p className="text-muted-foreground">Program unggulan tidak ditemukan.</p>
+          <p className="text-muted-foreground">{t('programDetail.notFound')}</p>
           <Button asChild className="mt-4 min-h-11">
-            <Link to="/program-unggulan">Kembali ke daftar program</Link>
+            <Link to="/program-unggulan">{t('programDetail.backToList')}</Link>
           </Button>
         </div>
       </PublicPageShell>
@@ -43,11 +45,11 @@ export function CurriculumPublicDetailPage() {
     <PublicPageShell>
       <PageMeta
         title={program.title}
-        description={program.excerpt ?? `Program unggulan ${program.title} — Nurul Hikmah`}
+        description={program.excerpt ?? t('programDetail.metaDesc', { name: program.title })}
       />
       <ArticleDetailLayout
         backHref="/program-unggulan"
-        backLabel="Program Unggulan"
+        backLabel={t('programDetail.backLabel')}
         title={program.title}
         excerpt={program.excerpt}
         thumbnail={program.thumbnail}
@@ -56,7 +58,7 @@ export function CurriculumPublicDetailPage() {
         shareTitle={program.title}
         footer={
           program.is_featured ? (
-            <Badge className="mt-2">Program Unggulan</Badge>
+            <Badge className="mt-2">{t('programDetail.badge')}</Badge>
           ) : undefined
         }
       >

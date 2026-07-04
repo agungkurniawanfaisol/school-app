@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
@@ -16,6 +17,7 @@ function photoSrc(photo: FacilityPhoto) {
 }
 
 export function FacilityPublicDetailPage() {
+  const { t } = useTranslation('pages')
   const { slug } = useParams<{ slug: string }>()
   const { data: facility, isLoading, isError } = useFacilityDetail(slug ?? '')
   const [activePhoto, setActivePhoto] = useState(0)
@@ -36,9 +38,9 @@ export function FacilityPublicDetailPage() {
     return (
       <PublicPageShell>
         <div className="container-page section-padding text-center">
-          <p className="text-muted-foreground">Fasilitas tidak ditemukan.</p>
+          <p className="text-muted-foreground">{t('facilityDetail.notFound')}</p>
           <Button asChild className="mt-4 min-h-11">
-            <Link to="/fasilitas">Kembali ke daftar fasilitas</Link>
+            <Link to="/fasilitas">{t('facilityDetail.backToList')}</Link>
           </Button>
         </div>
       </PublicPageShell>
@@ -52,14 +54,14 @@ export function FacilityPublicDetailPage() {
     <PublicPageShell>
       <PageMeta
         title={facility.name}
-        description={facility.description ?? `Fasilitas ${facility.name} di Nurul Hikmah`}
+        description={facility.description ?? t('facilityDetail.metaDesc', { name: facility.name })}
       />
       <SubpageHero
         title={facility.name}
         subtitle={facility.description}
         badge={facility.category}
         backHref="/fasilitas"
-        backLabel="Kembali ke Fasilitas"
+        backLabel={t('facilityDetail.backBtn')}
       />
       <article className="container-page section-padding">
         <div className="mx-auto max-w-4xl space-y-8">
@@ -78,7 +80,7 @@ export function FacilityPublicDetailPage() {
 
           {photos.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Galeri Foto</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t('facilityDetail.gallery')}</h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {photos.map((photo, index) => (
                   <button
@@ -88,7 +90,7 @@ export function FacilityPublicDetailPage() {
                     className={`min-h-11 overflow-hidden rounded-xl border-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                       activePhoto === index ? 'border-primary' : 'border-transparent hover:border-primary/30'
                     }`}
-                    aria-label={photo.caption ?? `Foto ${index + 1}`}
+                    aria-label={photo.caption ?? t('facilityDetail.photoAria', { index: index + 1 })}
                     aria-pressed={activePhoto === index}
                   >
                     <img

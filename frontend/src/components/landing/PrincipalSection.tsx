@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RevealOnScroll } from '@/components/landing/RevealOnScroll'
@@ -7,6 +8,7 @@ import { TeacherAvatar } from '@/components/teachers/TeacherAvatar'
 import { useTeachersList } from '@/hooks/useTeachers'
 
 export function PrincipalSection() {
+  const { t } = useTranslation('landing')
   const { data, isLoading } = useTeachersList({ type: 'kepala_sekolah', per_page: 1 })
   const principal = data?.data?.[0]
 
@@ -18,9 +20,9 @@ export function PrincipalSection() {
     <section id="kepala-sekolah" className="section-padding">
       <div className="container-page">
         <SectionHeader
-          badge="Kepala Sekolah"
-          title="Pimpinan Kami"
-          description="Memimpin dengan visi dan dedikasi untuk pendidikan berkualitas."
+          badge={t('principal.badge')}
+          title={t('principal.title')}
+          description={t('principal.desc')}
         />
 
         {isLoading ? (
@@ -40,7 +42,7 @@ export function PrincipalSection() {
                 </div>
                 <div className="flex-1 text-center sm:text-left">
                   <p className="text-xs font-semibold uppercase tracking-wider text-primary">
-                    Kepala Sekolah
+                    {t('principal.label')}
                   </p>
                   <h3 className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">
                     {principal.name}

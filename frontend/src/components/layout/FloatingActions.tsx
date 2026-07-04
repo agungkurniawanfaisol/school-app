@@ -1,6 +1,7 @@
 import { ArrowUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { useSchool } from '@/hooks/useSchool'
@@ -21,6 +22,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 export function FloatingActions() {
+  const { t } = useTranslation('layout')
   const location = useLocation()
   const { data: school } = useSchool()
   const prefersReducedMotion = usePrefersReducedMotion()
@@ -58,7 +60,7 @@ export function FloatingActions() {
   return (
     <div
       className="fixed bottom-20 right-4 z-50 flex flex-col gap-3 sm:bottom-6 sm:right-6 lg:bottom-6"
-      aria-label="Aksi cepat"
+      aria-label={t('floating.quickActions')}
     >
       {showScrollTop && (
         <Button
@@ -66,7 +68,7 @@ export function FloatingActions() {
           size="icon"
           variant="secondary"
           onClick={scrollToTop}
-          aria-label="Kembali ke atas"
+          aria-label={t('floating.scrollTop')}
           className="h-11 w-11 rounded-full border border-primary/15 bg-background/95 shadow-lg shadow-primary/10 backdrop-blur-sm transition-[opacity,transform] duration-200 ease-out hover:bg-secondary animate-in fade-in zoom-in-95"
         >
           <ArrowUp className="h-5 w-5 text-primary" />
@@ -79,7 +81,7 @@ export function FloatingActions() {
           size="icon"
           className="h-11 w-11 rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/30 hover:bg-[#20bd5a]"
         >
-          <a href={waUrl} target="_blank" rel="noreferrer" aria-label="Chat WhatsApp">
+          <a href={waUrl} target="_blank" rel="noreferrer" aria-label={t('floating.whatsapp')}>
             <WhatsAppIcon className="h-5 w-5" />
           </a>
         </Button>

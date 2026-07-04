@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Carousel, CarouselContent, CarouselDots, CarouselItem } from '@/components/ui/carousel'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -12,6 +13,7 @@ import { cn } from '@/lib/utils'
 export const LANDING_FACILITY_LIMIT = 6
 
 export function FacilitiesSection() {
+  const { t } = useTranslation('landing')
   const { data, isLoading, isFetching } = useFacilitiesList({
     per_page: LANDING_FACILITY_LIMIT,
     featured: true,
@@ -24,16 +26,16 @@ export function FacilitiesSection() {
       <div className="container-page">
         <div className="mb-10 flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
           <SectionHeader
-            badge="Sarana Prasarana"
-            title="Fasilitas Sekolah"
-            description="Sarana dan prasarana modern untuk mendukung proses belajar mengajar yang optimal."
+            badge={t('facilities.badge')}
+            title={t('facilities.title')}
+            description={t('facilities.desc')}
             align="left"
             className="mb-0"
           />
           {hasMore && !isLoading && (
             <Button asChild className="min-h-11 shrink-0 shadow-md shadow-primary/20">
               <Link to="/fasilitas">
-                Lihat Selengkapnya
+                {t('facilities.viewAll')}
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </Button>
@@ -47,7 +49,7 @@ export function FacilitiesSection() {
             ))}
           </div>
         ) : facilities.length === 0 ? (
-          <p className="text-center text-muted-foreground">Belum ada data fasilitas.</p>
+          <p className="text-center text-muted-foreground">{t('facilities.empty')}</p>
         ) : (
           <>
             <StaggerChildren
@@ -76,7 +78,7 @@ export function FacilitiesSection() {
               </Carousel>
               {facilities.length > 1 && (
                 <p className="mt-2 text-center text-xs text-muted-foreground">
-                  Geser untuk melihat fasilitas lainnya
+                  {t('facilities.swipe')}
                 </p>
               )}
             </div>
@@ -85,7 +87,7 @@ export function FacilitiesSection() {
               <div className="mt-8 text-center md:hidden">
                 <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
                   <Link to="/fasilitas">
-                    Lihat Semua Fasilitas
+                    {t('facilities.viewAllMobile')}
                     <ArrowRight className="h-4 w-4" aria-hidden />
                   </Link>
                 </Button>

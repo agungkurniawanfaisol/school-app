@@ -1,7 +1,10 @@
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { StrictMode, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
+import '@/lib/i18n'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { MotionProvider } from '@/components/motion'
+import { LanguageProvider } from '@/components/i18n'
 import { ThemeProvider, useTheme } from '@/components/theme'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
@@ -49,12 +52,16 @@ function AppShell() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <MotionProvider>
-          <AppShell />
-        </MotionProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <LanguageProvider>
+            <MotionProvider>
+              <AppShell />
+            </MotionProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )

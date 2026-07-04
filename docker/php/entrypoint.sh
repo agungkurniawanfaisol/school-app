@@ -96,7 +96,12 @@ if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
 fi
 
 if [ "${RUN_SEED_IF_EMPTY:-true}" = "true" ]; then
-  USER_COUNT=$(php artisan tinker --execute="echo \\App\\Models\\User::count();" 2>/dev/null | tail -n 1 | tr -d '\r')
+  USER_COUNT=$(php -r '
+    require "vendor/autoload.php";
+    $app = require "bootstrap/app.php";
+    $app->make("Illuminate\Contracts\Console\Kernel")->bootstrap();
+    echo \App\Models\User::count();
+  ' 2>/dev/null || echo "0")
   if [ "${USER_COUNT:-0}" = "0" ]; then
     log "Database kosong — menjalankan db:seed..."
     php artisan db:seed --force --no-interaction

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -10,9 +11,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTeachersList } from '@/hooks/useTeachers'
-import { TEACHER_TYPE_LABELS, type TeacherTypeValue } from '@/schemas/teacher'
+import type { TeacherTypeValue } from '@/schemas/teacher'
 
 export function TeachersCatalogPage() {
+  const { t } = useTranslation('pages')
   const [search, setSearch] = useState('')
   const { data, isLoading } = useTeachersList({ per_page: 48, search: search || undefined })
 
@@ -21,14 +23,14 @@ export function TeachersCatalogPage() {
   return (
     <PublicPageShell>
       <PageMeta
-        title="Guru & Tenaga Pendidik"
-        description="Kenali tim pengajar profesional Sekolah Islam Nurul Hikmah."
+        title={t('teachersCatalog.title')}
+        description={t('teachersCatalog.metaDesc')}
       />
       <SubpageHero
-        title="Guru & Tenaga Pendidik"
-        subtitle="Tim pengajar berdedikasi yang membimbing siswa menuju kesuksesan akademik dan karakter."
+        title={t('teachersCatalog.title')}
+        subtitle={t('teachersCatalog.subtitle')}
         backHref="/"
-        backLabel="Kembali ke beranda"
+        backLabel={t('teachersCatalog.backHome')}
       />
       <div className="container-page section-padding">
         <div className="mx-auto max-w-6xl space-y-8">
@@ -37,9 +39,9 @@ export function TeachersCatalogPage() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Cari nama guru..."
+              placeholder={t('teachersCatalog.search')}
               className="h-11 pl-9"
-              aria-label="Cari guru"
+              aria-label={t('teachersCatalog.searchAria')}
             />
           </div>
 
@@ -50,7 +52,7 @@ export function TeachersCatalogPage() {
               ))}
             </div>
           ) : teachers.length === 0 ? (
-            <p className="text-center text-muted-foreground">Tidak ada guru ditemukan.</p>
+            <p className="text-center text-muted-foreground">{t('teachersCatalog.empty')}</p>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {teachers.map((teacher) => (
@@ -71,11 +73,11 @@ export function TeachersCatalogPage() {
                       <div className="absolute left-2 top-2 flex flex-col gap-1">
                         {teacher.type && teacher.type !== 'guru' && (
                           <Badge variant="secondary">
-                            {TEACHER_TYPE_LABELS[teacher.type as TeacherTypeValue] ?? teacher.type}
+                            {t(`teachersCatalog.type_${teacher.type}`)}
                           </Badge>
                         )}
                         {teacher.is_featured && (
-                          <Badge>Unggulan</Badge>
+                          <Badge>{t('teachersCatalog.featured')}</Badge>
                         )}
                       </div>
                     </div>

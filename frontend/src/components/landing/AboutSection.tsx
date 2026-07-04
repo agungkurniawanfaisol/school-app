@@ -1,4 +1,5 @@
 import { HandHeart, Heart, Sparkles, Target } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { SchoolLogo } from '@/components/brand/SchoolLogo'
 import { StaggerChildren, StaggerItem } from '@/components/motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,15 +9,16 @@ import { SectionHeader } from '@/components/landing/SectionHeader'
 import { useSchool } from '@/hooks/useSchool'
 import { cn } from '@/lib/utils'
 
-const values = [
-  { icon: Heart, title: 'Akhlak', desc: 'Membentuk karakter mulia', color: 'hover:border-rose-300/50' },
-  { icon: Sparkles, title: 'Ilmu', desc: 'Pembelajaran berkualitas', color: 'hover:border-amber-300/50' },
-  { icon: HandHeart, title: 'Amal', desc: 'Peduli sesama & lingkungan', color: 'hover:border-emerald-300/50' },
-  { icon: Target, title: 'Ukhuwah', desc: 'Persaudaraan Islami', color: 'hover:border-primary/40' },
-]
-
 export function AboutSection() {
+  const { t } = useTranslation('landing')
   const { data: school, isLoading } = useSchool()
+
+  const values = [
+    { icon: Heart, title: t('about.akhlak'), desc: t('about.akhlakDesc'), color: 'hover:border-rose-300/50 dark:hover:border-rose-500/40' },
+    { icon: Sparkles, title: t('about.ilmu'), desc: t('about.ilmuDesc'), color: 'hover:border-amber-300/50 dark:hover:border-amber-500/40' },
+    { icon: HandHeart, title: t('about.amal'), desc: t('about.amalDesc'), color: 'hover:border-emerald-300/50 dark:hover:border-emerald-500/40' },
+    { icon: Target, title: t('about.ukhuwah'), desc: t('about.ukhuwahDesc'), color: 'hover:border-primary/40' },
+  ]
 
   if (isLoading) {
     return (
@@ -33,11 +35,11 @@ export function AboutSection() {
     <section id="tentang" className="landing-section section-padding pattern-bg pattern-islamic">
       <div className="container-page">
         <SectionHeader
-          badge="Tentang Kami"
-          title="Mengenal Nurul Hikmah Lebih Dekat"
+          badge={t('about.badge')}
+          title={t('about.title')}
           description={
             school?.description ??
-            'Kami berkomitmen memberikan pendidikan terbaik dengan landasan nilai-nilai Islami.'
+            t('about.fallbackDesc')
           }
         />
 
@@ -64,7 +66,7 @@ export function AboutSection() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-primary">
                       <Target className="h-5 w-5 text-[var(--gold-accent)]" />
-                      Visi
+                      {t('about.vision')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -77,7 +79,7 @@ export function AboutSection() {
               <RevealOnScroll direction="right" delay={200}>
                 <Card className="card-hover border-primary/10 bg-secondary/30">
                   <CardHeader>
-                    <CardTitle className="text-primary">Misi</CardTitle>
+                    <CardTitle className="text-primary">{t('about.mission')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
@@ -92,7 +94,7 @@ export function AboutSection() {
 
         <RevealOnScroll direction="up" delay={150}>
           <div className="mt-14">
-            <h3 className="mb-8 text-center text-xl font-bold text-primary">Nilai-nilai Kami</h3>
+            <h3 className="mb-8 text-center text-xl font-bold text-primary">{t('about.values')}</h3>
             <StaggerChildren className="grid grid-cols-2 gap-4 md:grid-cols-4">
               {values.map(({ icon: Icon, title, desc, color }) => (
                 <StaggerItem key={title}>

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { IslamicPattern } from '@/components/landing/IslamicPattern'
 import { Button } from '@/components/ui/button'
@@ -28,6 +29,7 @@ export function SubpageHero({
   children,
   className,
 }: SubpageHeroProps) {
+  const { t } = useTranslation('layout')
   return (
     <section
       className={cn(
@@ -57,15 +59,15 @@ export function SubpageHero({
         aria-hidden
       />
 
-      <div className="container-page relative z-10 py-10 sm:py-14">
+      <div className="container-page relative z-10 py-10 text-white sm:py-14">
         {backHref && (
           <Button
             asChild
             variant="outline"
             size="sm"
-            className="mb-6 border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
+            className="mb-6 border-white/30 bg-white/10 text-white hover:bg-white/20"
           >
-            <Link to={backHref}>← {backLabel ?? 'Kembali'}</Link>
+            <Link to={backHref}>← {backLabel ?? t('nav.back')}</Link>
           </Button>
         )}
 
@@ -75,11 +77,11 @@ export function SubpageHero({
               {badge}
             </p>
           )}
-          <h1 className="font-heading text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl lg:text-5xl">
+          <h1 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
             {title}
           </h1>
           {subtitle && (
-            <p className="max-w-2xl text-base text-primary-foreground/80 sm:text-lg">
+            <p className="max-w-2xl text-base text-white/80 sm:text-lg">
               {subtitle}
             </p>
           )}

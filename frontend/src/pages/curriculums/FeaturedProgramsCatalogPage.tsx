@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { FeaturedProgramCard } from '@/components/landing/FeaturedProgramCard'
@@ -9,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useCurriculumsList } from '@/hooks/useCurriculums'
 
 export function FeaturedProgramsCatalogPage() {
+  const { t } = useTranslation('pages')
   const [search, setSearch] = useState('')
   const { data, isLoading, isFetching } = useCurriculumsList({
     per_page: 48,
@@ -21,15 +23,15 @@ export function FeaturedProgramsCatalogPage() {
   return (
     <PublicPageShell>
       <PageMeta
-        title="Program Unggulan"
-        description="Program pembelajaran unggulan Sekolah Islam Nurul Hikmah yang mengembangkan potensi akademik dan karakter Islami siswa."
+        title={t('programsCatalog.metaTitle')}
+        description={t('programsCatalog.metaDesc')}
       />
       <SubpageHero
-        title="Program Pembelajaran Unggulan"
-        subtitle="Program terintegrasi yang mengembangkan potensi akademik dan karakter Islami siswa."
-        badge="Program Unggulan"
+        title={t('programsCatalog.title')}
+        subtitle={t('programsCatalog.subtitle')}
+        badge={t('programsCatalog.badge')}
         backHref="/"
-        backLabel="Kembali ke beranda"
+        backLabel={t('programsCatalog.backHome')}
       />
       <div className="container-page section-padding">
         <div className="mx-auto max-w-6xl space-y-8">
@@ -41,9 +43,9 @@ export function FeaturedProgramsCatalogPage() {
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Cari program..."
+                  placeholder={t('programsCatalog.search')}
                   className="h-11 pl-9"
-                  aria-label="Cari program unggulan"
+                  aria-label={t('programsCatalog.searchAria')}
                 />
               </div>
 
@@ -55,7 +57,7 @@ export function FeaturedProgramsCatalogPage() {
                 </div>
               ) : programs.length === 0 ? (
                 <p className="text-center text-muted-foreground">
-                  {search ? 'Tidak ada program ditemukan.' : 'Belum ada program unggulan.'}
+                  {search ? t('programsCatalog.empty') : t('programsCatalog.noData')}
                 </p>
               ) : (
                 <div className={`grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${isFetching ? 'opacity-70' : ''}`}>

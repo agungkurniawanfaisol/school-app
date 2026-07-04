@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Carousel, CarouselContent, CarouselDots, CarouselItem } from '@/components/ui/carousel'
@@ -14,6 +15,7 @@ import { cn } from '@/lib/utils'
 export const LANDING_TEACHER_LIMIT = 7
 
 function TeacherCard({ teacher, featured = false }: { teacher: Teacher; featured?: boolean }) {
+  const { t } = useTranslation('landing')
   const detailHref = `/guru/${teacher.slug}`
 
   if (featured) {
@@ -28,7 +30,7 @@ function TeacherCard({ teacher, featured = false }: { teacher: Teacher; featured
               <TeacherAvatar teacher={teacher} size="lg" className="h-32 w-32" />
             </div>
             <div className="text-center sm:text-left">
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary">Guru Unggulan</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-primary">{t('teachers.featured')}</p>
               <h3 className="mt-1 text-2xl font-bold text-foreground">{teacher.name}</h3>
               {teacher.title && (
                 <p className="mt-1 text-sm text-muted-foreground">{teacher.title}</p>
@@ -44,7 +46,7 @@ function TeacherCard({ teacher, featured = false }: { teacher: Teacher; featured
                 </p>
               )}
               <p className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-primary">
-                Lihat profil lengkap →
+                {t('teachers.viewProfile')}
               </p>
             </div>
           </div>
@@ -78,6 +80,7 @@ function TeacherCard({ teacher, featured = false }: { teacher: Teacher; featured
 }
 
 export function TeachersSection() {
+  const { t } = useTranslation('landing')
   const { data, isLoading, isFetching } = useTeachersList({ per_page: LANDING_TEACHER_LIMIT, type: 'guru' })
   const teachers = data?.data ?? []
   const featured = teachers.find((t) => t.is_featured) ?? teachers[0]
@@ -89,16 +92,16 @@ export function TeachersSection() {
       <div className="container-page">
         <div className="mb-10 flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
           <SectionHeader
-            badge="Tenaga Pendidik"
-            title="Guru & Tenaga Pendidik"
-            description="Tim pengajar profesional yang berdedikasi membimbing siswa menuju kesuksesan."
+            badge={t('teachers.badge')}
+            title={t('teachers.title')}
+            description={t('teachers.desc')}
             align="left"
             className="mb-0"
           />
           {hasMore && !isLoading && (
             <Button asChild className="min-h-11 shrink-0 shadow-md shadow-primary/20">
               <Link to="/guru">
-                Lihat Selengkapnya
+                {t('teachers.viewAll')}
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </Button>
@@ -112,7 +115,7 @@ export function TeachersSection() {
             ))}
           </div>
         ) : teachers.length === 0 ? (
-          <p className="text-center text-muted-foreground">Belum ada data guru.</p>
+          <p className="text-center text-muted-foreground">{t('teachers.empty')}</p>
         ) : (
           <RevealOnScroll direction="up">
             <div className={cn('space-y-6', isFetching && 'opacity-70')}>
@@ -142,7 +145,7 @@ export function TeachersSection() {
                     </Carousel>
                     {rest.length > 1 && (
                       <p className="mt-2 text-center text-xs text-muted-foreground">
-                        Geser untuk melihat guru lainnya
+                        {t('teachers.swipe')}
                       </p>
                     )}
                   </div>
@@ -153,7 +156,7 @@ export function TeachersSection() {
                 <div className="text-center md:hidden">
                   <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
                     <Link to="/guru">
-                      Lihat Semua Guru
+                      {t('teachers.viewAllMobile')}
                       <ArrowRight className="h-4 w-4" aria-hidden />
                     </Link>
                   </Button>

@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PannellumViewer } from '@/components/virtual-tour/PannellumViewer'
@@ -7,21 +8,22 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { usePublicVirtualTour } from '@/hooks/useVirtualTours'
 
 export function VirtualTourViewerPage() {
+  const { t } = useTranslation('pages')
   const { slug } = useParams<{ slug: string }>()
   const { data: tour, isLoading, isError } = usePublicVirtualTour(slug ?? '')
 
   return (
     <PublicPageShell>
       <PageMeta
-        title={tour ? `Tur Virtual — ${tour.title}` : 'Tur Virtual'}
-        description={tour?.description ?? 'Jelajahi sekolah secara virtual dengan panorama 360 derajat.'}
+        title={tour ? `${t('virtualTourViewer.fallbackTitle')} — ${tour.title}` : t('virtualTourViewer.fallbackTitle')}
+        description={tour?.description ?? t('virtualTourViewer.metaDesc')}
       />
       <SubpageHero
-        title={tour?.title ?? 'Tur Virtual'}
+        title={tour?.title ?? t('virtualTourViewer.fallbackTitle')}
         subtitle={tour?.description}
-        badge="Eksplorasi 360°"
+        badge={t('virtualTourViewer.badge')}
         backHref="/tur-virtual"
-        backLabel="Daftar tur virtual"
+        backLabel={t('virtualTourViewer.allTours')}
       />
       <div className="section-padding">
         <div className="container-page">
@@ -31,7 +33,7 @@ export function VirtualTourViewerPage() {
               <Skeleton className="min-h-[60vh] w-full rounded-xl" />
             ) : isError || !tour?.pannellum ? (
               <div className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">
-                Tur virtual tidak ditemukan atau belum memiliki panorama.
+                {t('virtualTourViewer.notFound')}
               </div>
             ) : (
               <PannellumViewer config={tour.pannellum} className="min-h-[65vh] sm:min-h-[70vh]" />

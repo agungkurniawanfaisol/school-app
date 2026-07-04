@@ -242,8 +242,8 @@ const CarouselDots = React.forwardRef<HTMLDivElement, CarouselDotsProps>(
               className={cn(
                 'block h-2.5 rounded-full transition-all',
                 selectedIndex === index
-                  ? 'w-6 bg-primary-foreground'
-                  : 'w-2.5 bg-primary-foreground/40 hover:bg-primary-foreground/70',
+                  ? 'w-6 bg-primary'
+                  : 'w-2.5 bg-primary/40 hover:bg-primary/70',
               )}
             />
           </button>

@@ -1,5 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   Accordion,
   AccordionContent,
@@ -33,6 +34,7 @@ function MobileNavLink({
   isActive: boolean
   onNavigate?: () => void
 }) {
+  const { t } = useTranslation('layout')
   const href = resolveNavHref(item.href, isHome)
   const Icon = item.icon
 
@@ -50,7 +52,7 @@ function MobileNavLink({
           <Icon className="h-4 w-4" />
         </span>
       )}
-      <span className="flex-1 truncate">{item.label}</span>
+      <span className="flex-1 truncate">{t(item.label)}</span>
       <ChevronRight
         className={cn(
           'h-4 w-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5',
@@ -93,6 +95,7 @@ function StandaloneNavLink({
   isActive: boolean
   onNavigate?: () => void
 }) {
+  const { t } = useTranslation('layout')
   const Icon = item.icon
 
   return (
@@ -118,7 +121,7 @@ function StandaloneNavLink({
           <Icon className="h-4 w-4" />
         </span>
       )}
-      <span className="flex-1 truncate">{item.label}</span>
+      <span className="flex-1 truncate">{t(item.label)}</span>
       <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5" />
     </Link>
   )
@@ -135,6 +138,7 @@ function NavGroupSection({
   pathname: string
   onNavigate?: () => void
 }) {
+  const { t } = useTranslation('layout')
   const GroupIcon = group.icon
   const hasActiveChild = group.children.some((c) => pathname === c.href)
 
@@ -161,10 +165,10 @@ function NavGroupSection({
               <GroupIcon className="h-4 w-4" />
             </span>
           )}
-          <span className="truncate">{group.label}</span>
+          <span className="truncate">{t(group.label)}</span>
         </span>
       </AccordionTrigger>
-      <AccordionContent className="space-y-0.5 pb-1 pl-2 pt-1">
+      <AccordionContent className="space-y-0.5 pb-1 ps-2 pt-1">
         {group.children.map((child) => (
           <MobileNavLink
             key={child.href}

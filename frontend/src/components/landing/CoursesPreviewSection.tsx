@@ -1,5 +1,6 @@
 import { ArrowRight, Clock, PlayCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,6 +11,7 @@ import { formatCurrency } from '@/lib/utils'
 import { useCoursesList } from '@/hooks/useCourses'
 
 export function CoursesPreviewSection() {
+  const { t } = useTranslation('landing')
   const { data, isLoading, isFetching } = useCoursesList({ per_page: 6, featured: true })
   const courses = data?.data ?? []
 
@@ -18,15 +20,15 @@ export function CoursesPreviewSection() {
       <div className="container-page">
         <div className="mb-10 flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
           <SectionHeader
-            badge="E-Learning"
-            title="Kursus Online"
-            description="Belajar kapan saja dengan materi berkualitas dari pengajar terbaik."
+            badge={t('courses.badge')}
+            title={t('courses.title')}
+            description={t('courses.desc')}
             align="left"
             className="mb-0"
           />
           <Button asChild className="min-h-11 shrink-0 shadow-md shadow-primary/20">
             <Link to="/kursus">
-              Lihat Katalog Kursus
+              {t('courses.viewCatalog')}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
@@ -39,7 +41,7 @@ export function CoursesPreviewSection() {
             ))}
           </div>
         ) : courses.length === 0 ? (
-          <p className="text-center text-muted-foreground">Belum ada kursus tersedia.</p>
+          <p className="text-center text-muted-foreground">{t('courses.noData')}</p>
         ) : (
           <StaggerChildren
             className={`-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 scrollbar-thin sm:-mx-6 sm:px-6 ${isFetching ? 'opacity-70' : ''}`}
@@ -63,9 +65,9 @@ export function CoursesPreviewSection() {
                       </div>
                     )}
                     <Badge
-                      className={`absolute left-3 top-3 border-0 ${isFree ? 'bg-primary text-primary-foreground' : 'bg-[var(--gold-accent)] text-primary-foreground'}`}
+                      className={`absolute left-3 top-3 border-0 ${isFree ? 'bg-primary text-primary-foreground' : 'bg-[var(--gold-accent)] text-foreground dark:text-background'}`}
                     >
-                      {isFree ? 'Gratis' : 'Premium'}
+                      {isFree ? t('courses.free') : t('courses.premium')}
                     </Badge>
                   </div>
                   <CardHeader className="pb-2">
@@ -92,12 +94,12 @@ export function CoursesPreviewSection() {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="font-semibold text-primary">
-                        {isFree ? 'Gratis' : formatCurrency(course.price)}
+                        {isFree ? t('courses.free') : formatCurrency(course.price)}
                       </span>
                       {course.duration_minutes != null && course.duration_minutes > 0 && (
                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="h-3.5 w-3.5" />
-                          {course.duration_minutes} menit
+                          {course.duration_minutes} {t('courses.minutes')}
                         </span>
                       )}
                     </div>

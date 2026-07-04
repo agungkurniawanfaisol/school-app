@@ -1,5 +1,6 @@
 import { Compass, GraduationCap, Home, Menu, Newspaper } from 'lucide-react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { MobileNavTree } from '@/components/layout/MobileNavTree'
 import { SchoolLogo } from '@/components/brand/SchoolLogo'
@@ -14,17 +15,17 @@ import { useSchool } from '@/hooks/useSchool'
 import { cn } from '@/lib/utils'
 
 type NavItem = {
-  label: string
+  labelKey: string
   href: string
   icon: typeof Home
   matchPaths?: string[]
 }
 
 const navItems: NavItem[] = [
-  { label: 'Beranda', href: '/', icon: Home },
-  { label: 'PMB', href: '/pmb', icon: GraduationCap, matchPaths: ['/pmb'] },
-  { label: 'Tur Virtual', href: '/tur-virtual', icon: Compass },
-  { label: 'Berita', href: '/berita', icon: Newspaper },
+  { labelKey: 'nav.home', href: '/', icon: Home },
+  { labelKey: 'nav.pmb', href: '/pmb', icon: GraduationCap, matchPaths: ['/pmb'] },
+  { labelKey: 'nav.virtualTour', href: '/tur-virtual', icon: Compass },
+  { labelKey: 'nav.news', href: '/berita', icon: Newspaper },
 ]
 
 function isItemActive(item: NavItem, pathname: string): boolean {
@@ -36,6 +37,7 @@ function isItemActive(item: NavItem, pathname: string): boolean {
 }
 
 export function BottomNav() {
+  const { t } = useTranslation('layout')
   const { pathname } = useLocation()
   const { data: school } = useSchool()
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -49,7 +51,7 @@ export function BottomNav() {
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 lg:hidden"
-      aria-label="Navigasi utama mobile"
+      aria-label={t('nav.mobileNav')}
     >
       <div className="relative">
         <div
@@ -100,7 +102,7 @@ export function BottomNav() {
                       active ? 'font-semibold' : 'font-medium group-hover:text-foreground/80',
                     )}
                   >
-                    {item.label}
+                    {t(item.labelKey)}
                   </span>
                 </Link>
               )
@@ -128,7 +130,7 @@ export function BottomNav() {
                       sheetOpen && 'font-semibold text-primary',
                     )}
                   >
-                    Lainnya
+                    {t('nav.more')}
                   </span>
                 </button>
               </SheetTrigger>
@@ -152,7 +154,7 @@ export function BottomNav() {
                         {school?.name ?? 'Nurul Hikmah'}
                       </SheetTitle>
                       <p className="text-xs text-muted-foreground">
-                        Menu Navigasi
+                        {t('nav.menuNav')}
                       </p>
                     </div>
                   </div>

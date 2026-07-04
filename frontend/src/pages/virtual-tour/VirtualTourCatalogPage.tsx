@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Compass } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'
 import { PageMeta } from '@/components/seo/PageMeta'
@@ -9,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { usePublicVirtualTours } from '@/hooks/useVirtualTours'
 
 export function VirtualTourCatalogPage() {
+  const { t } = useTranslation('pages')
   const { data, isLoading } = usePublicVirtualTours({ per_page: 24 })
 
   const tours = data?.data ?? []
@@ -16,15 +18,15 @@ export function VirtualTourCatalogPage() {
   return (
     <PublicPageShell>
       <PageMeta
-        title="Tur Virtual"
-        description="Jelajahi lingkungan Sekolah Islam Nurul Hikmah secara virtual dengan panorama 360 derajat."
+        title={t('virtualTourCatalog.metaTitle')}
+        description={t('virtualTourCatalog.metaDesc')}
       />
       <SubpageHero
-        title="Tur Virtual Sekolah"
-        subtitle="Jelajahi ruang kelas, fasilitas, dan lingkungan sekolah dari mana saja."
-        badge="Eksplorasi 360°"
+        title={t('virtualTourCatalog.title')}
+        subtitle={t('virtualTourCatalog.subtitle')}
+        badge={t('virtualTourCatalog.badge')}
         backHref="/"
-        backLabel="Kembali ke beranda"
+        backLabel={t('virtualTourCatalog.backHome')}
       />
       <div className="container-page section-padding">
         <div className="mx-auto max-w-4xl space-y-8">
@@ -35,7 +37,7 @@ export function VirtualTourCatalogPage() {
                 ))}
               </div>
             ) : tours.length === 0 ? (
-              <p className="text-center text-muted-foreground">Tur virtual belum tersedia.</p>
+              <p className="text-center text-muted-foreground">{t('virtualTourCatalog.empty')}</p>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
                 {tours.map((tour) => (
@@ -51,7 +53,7 @@ export function VirtualTourCatalogPage() {
                         <p className="line-clamp-3 text-sm text-muted-foreground">{tour.description}</p>
                       ) : null}
                       <Button asChild className="min-h-11 w-full">
-                        <Link to={`/tur-virtual/${tour.slug}`}>Mulai Tur</Link>
+                        <Link to={`/tur-virtual/${tour.slug}`}>{t('virtualTourCatalog.start')}</Link>
                       </Button>
                     </CardContent>
                   </Card>

@@ -1,6 +1,7 @@
 import { Award, BookOpen, GraduationCap, Sparkles, Users } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { StaggerChildren, StaggerItem } from '@/components/motion'
 import { Button } from '@/components/ui/button'
 import { Carousel, CarouselContent, CarouselDots, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
@@ -14,21 +15,8 @@ import { useSchool } from '@/hooks/useSchool'
 import type { HeroSlider, PaginatedResponse } from '@/types'
 import { cn } from '@/lib/utils'
 
-const trustStats = [
-  { icon: Users, value: 500, suffix: '+', label: 'Siswa Aktif' },
-  { icon: Award, value: 15, suffix: '+', label: 'Tahun Berdiri' },
-  { icon: BookOpen, value: null as number | null, suffix: '', label: 'Program Tahfidz' },
-  { icon: GraduationCap, value: null as number | null, suffix: '', label: 'Terakreditasi A' },
-]
-
-const collageItems = [
-  { label: 'Tahfidz', color: 'from-primary/30 to-primary/10' },
-  { label: 'Akademik', color: 'from-[#2d7a3e]/40 to-primary/10' },
-  { label: 'Karakter', color: 'from-[var(--gold-accent)]/30 to-primary/10' },
-  { label: 'Kegiatan', color: 'from-primary/25 to-accent/40' },
-]
-
 export function HeroSection() {
+  const { t } = useTranslation('landing')
   const { data: school, isLoading: schoolLoading } = useSchool()
   const { data: sliders, isLoading: slidersLoading } = useQuery({
     queryKey: ['hero-sliders'],
@@ -47,15 +35,29 @@ export function HeroSection() {
     : [
         {
           id: 0,
-          title: 'Membentuk Generasi Qurani & Berakhlak Mulia',
-          subtitle: school?.tagline ?? 'Sekolah Islam Terpadu',
+          title: t('hero.defaultTitle'),
+          subtitle: school?.tagline ?? t('hero.defaultSubtitle'),
           image: null,
-          cta_text: 'Daftar PMB',
+          cta_text: t('hero.defaultCta'),
           cta_url: '/pmb/daftar',
         } as HeroSlider,
       ]
 
   const autoplayPlugins = useCarouselAutoplayPlugins(slides.length)
+
+  const trustStats = [
+    { icon: Users, value: 500, suffix: '+', label: t('hero.activeStudents') },
+    { icon: Award, value: 15, suffix: '+', label: t('hero.yearEstablished') },
+    { icon: BookOpen, value: null as number | null, suffix: '', label: t('hero.programTahfidz') },
+    { icon: GraduationCap, value: null as number | null, suffix: '', label: t('hero.accreditedA') },
+  ]
+
+  const collageItems = [
+    { label: t('hero.tahfidz'), color: 'from-primary/30 to-primary/10' },
+    { label: t('hero.academic'), color: 'from-primary/40 to-primary/10' },
+    { label: t('hero.character'), color: 'from-[var(--gold-accent)]/30 to-primary/10' },
+    { label: t('hero.activity'), color: 'from-primary/25 to-accent/40' },
+  ]
 
   if (isLoading) {
     return (
@@ -95,7 +97,7 @@ export function HeroSection() {
 
                 {/* Animated blobs */}
                 <div
-                  className="animate-float absolute -right-24 top-[15%] h-80 w-80 rounded-full bg-primary-foreground/8 blur-3xl"
+                  className="animate-float absolute -right-24 top-[15%] h-80 w-80 rounded-full bg-white/8 blur-3xl"
                   aria-hidden
                 />
                 <div
@@ -107,18 +109,18 @@ export function HeroSection() {
                   aria-hidden
                 />
 
-                <div className="container-page relative z-10 flex min-h-[75vh] flex-col justify-center py-20 lg:min-h-[90vh] lg:py-24">
+                <div className="container-page relative z-10 flex min-h-[75vh] flex-col justify-center py-20 text-white lg:min-h-[90vh] lg:py-24">
                   <div className="grid items-center gap-12 lg:grid-cols-2">
                     <StaggerChildren className="space-y-6">
                       <StaggerItem>
-                        <p className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/25 bg-primary-foreground/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary-foreground backdrop-blur-sm">
+                        <p className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest backdrop-blur-sm">
                           <Sparkles className="h-3.5 w-3.5 text-[var(--gold-accent)]" />
-                          Selamat Datang di {school?.name?.split(' ').slice(-2).join(' ') ?? 'Nurul Hikmah'}
+                          {t('hero.welcome')} {school?.name?.split(' ').slice(-2).join(' ') ?? t('hero.schoolName')}
                         </p>
                       </StaggerItem>
 
                       <StaggerItem>
-                        <h1 className="max-w-xl text-3xl font-extrabold leading-[1.1] text-primary-foreground sm:text-4xl lg:text-5xl xl:text-[3.5rem]">
+                        <h1 className="max-w-xl text-3xl font-extrabold leading-[1.1] sm:text-4xl lg:text-5xl xl:text-[3.5rem]">
                           {slide.title.includes('&') ? (
                             <>
                               {slide.title.split('&')[0]}
@@ -133,7 +135,7 @@ export function HeroSection() {
 
                       {slide.subtitle && (
                         <StaggerItem>
-                          <p className="max-w-lg text-base leading-relaxed text-primary-foreground/90 sm:text-lg">
+                          <p className="max-w-lg text-base leading-relaxed text-white/90 sm:text-lg">
                             {slide.subtitle}
                           </p>
                         </StaggerItem>
@@ -144,7 +146,7 @@ export function HeroSection() {
                           <Button
                             asChild
                             size="lg"
-                            className="btn-shine h-12 bg-primary-foreground px-7 text-primary shadow-xl shadow-black/25 transition-transform hover:scale-[1.02] hover:bg-primary-foreground/95"
+                            className="btn-shine h-12 bg-white px-7 text-primary shadow-xl shadow-black/25 transition-transform hover:scale-[1.02] hover:bg-white/95"
                           >
                             <Link
                               to={
@@ -153,26 +155,26 @@ export function HeroSection() {
                                   : `/${slide.cta_url ?? 'pmb/daftar'}`
                               }
                             >
-                              {slide.cta_text ?? 'Daftar PMB'}
+                              {slide.cta_text ?? t('hero.registerPmb')}
                             </Link>
                           </Button>
                           <Button
                             asChild
                             size="lg"
                             variant="outline"
-                            className="h-12 border-primary-foreground/50 bg-primary-foreground/5 px-7 text-primary-foreground backdrop-blur-sm transition-transform hover:scale-[1.02] hover:bg-primary-foreground/15"
+                            className="h-12 border-white/50 bg-white/5 px-7 text-white backdrop-blur-sm transition-transform hover:scale-[1.02] hover:bg-white/15"
                           >
-                            <a href="#tentang">Jelajahi Sekolah</a>
+                            <a href="#tentang">{t('hero.explore')}</a>
                           </Button>
                         </div>
                       </StaggerItem>
                     </StaggerChildren>
 
                     <div className="hidden lg:block" aria-hidden>
-                      <div className="animate-float relative ml-auto w-full max-w-md">
+                      <div className="animate-float relative ms-auto w-full max-w-md">
                         <div className="absolute -inset-6 rounded-[2rem] bg-[var(--gold-accent)]/10 blur-2xl" />
                         <div className="card-glass relative overflow-hidden rounded-3xl p-6 shadow-2xl">
-                          <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full border border-primary-foreground/20" />
+                          <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full border border-white/20" />
                           <div className="absolute -bottom-4 -left-4 h-16 w-16 rounded-full border border-[var(--gold-accent)]/30" />
                           <div className="grid grid-cols-2 gap-3">
                             {collageItems.map((item, i) => (
@@ -184,17 +186,17 @@ export function HeroSection() {
                                   i % 2 === 0 ? 'animate-float' : 'animate-float-delayed',
                                 )}
                               >
-                                <span className="text-2xl font-bold text-primary-foreground/90">
+                                <span className="text-2xl font-bold text-white/90">
                                   {item.label.charAt(0)}
                                 </span>
-                                <span className="mt-1 text-xs font-semibold text-primary-foreground/75">
+                                <span className="mt-1 text-xs font-semibold text-white/75">
                                   {item.label}
                                 </span>
                               </div>
                             ))}
                           </div>
-                          <p className="mt-5 text-center text-sm font-medium text-primary-foreground/85">
-                            Lingkungan belajar yang hangat & inspiratif
+                          <p className="mt-5 text-center text-sm font-medium text-white/85">
+                            {t('hero.subtitle')}
                           </p>
                         </div>
                       </div>
@@ -215,8 +217,8 @@ export function HeroSection() {
 
         {slides.length > 1 && (
           <>
-            <CarouselPrevious className="left-4 border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground backdrop-blur-sm transition-transform hover:scale-105 hover:bg-primary-foreground/25" />
-            <CarouselNext className="right-4 border-primary-foreground/30 bg-primary-foreground/10 text-primary-foreground backdrop-blur-sm transition-transform hover:scale-105 hover:bg-primary-foreground/25" />
+            <CarouselPrevious className="left-4 border-white/30 bg-white/10 text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white/25" />
+            <CarouselNext className="right-4 border-white/30 bg-white/10 text-white backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white/25" />
             <CarouselDots
               count={slides.length}
               className="absolute bottom-20 left-1/2 z-20 -translate-x-1/2 lg:bottom-24"

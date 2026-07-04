@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { ArticleDetailLayout, ArticleDetailSkeleton } from '@/components/content/ArticleDetailLayout'
 import { RelatedContentCards } from '@/components/content/RelatedContentCards'
@@ -9,6 +10,7 @@ import { useNewsDetailByUuid, useNewsList } from '@/hooks/useNews'
 import { formatDate } from '@/lib/utils'
 
 export function NewsDetailPage() {
+  const { t } = useTranslation('pages')
   const { uuid } = useParams<{ uuid: string }>()
   const { data: news, isLoading, isError } = useNewsDetailByUuid(uuid ?? '')
   const { data: relatedData } = useNewsList({
@@ -28,12 +30,12 @@ export function NewsDetailPage() {
     return (
       <PublicPageShell>
         <div className="container-page section-padding text-center">
-          <h1 className="text-2xl font-bold">Berita tidak ditemukan</h1>
+          <h1 className="text-2xl font-bold">{t('newsDetail.notFound')}</h1>
           <p className="mt-2 text-muted-foreground">
-            Artikel mungkin sudah dihapus atau tautan tidak valid.
+            {t('newsDetail.removed')}
           </p>
           <Button asChild className="mt-6 min-h-11">
-            <Link to="/berita">Kembali ke daftar berita</Link>
+            <Link to="/berita">{t('newsDetail.backToList')}</Link>
           </Button>
         </div>
       </PublicPageShell>
@@ -58,7 +60,7 @@ export function NewsDetailPage() {
       <PageMeta title={news.title} description={news.excerpt ?? undefined} />
       <ArticleDetailLayout
         backHref="/berita"
-        backLabel="Berita"
+        backLabel={t('newsDetail.backLabel')}
         title={news.title}
         excerpt={news.excerpt}
         thumbnail={news.thumbnail}
@@ -71,7 +73,7 @@ export function NewsDetailPage() {
           <RelatedContentCards
             items={related}
             viewAllHref="/berita"
-            viewAllLabel="Semua berita"
+            viewAllLabel={t('newsDetail.allNews')}
           />
         }
       >

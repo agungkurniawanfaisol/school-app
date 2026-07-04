@@ -206,21 +206,21 @@ export function SchoolFormPage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="facebook" className="flex items-center gap-2">
-              <Facebook className="h-4 w-4 text-blue-600" aria-hidden />
+              <Facebook className="h-4 w-4 text-blue-600 dark:text-blue-400" aria-hidden />
               Facebook
             </Label>
             <Input id="facebook" placeholder="https://facebook.com/nurulhikmah" value={facebook} onChange={(e) => setFacebook(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="instagram" className="flex items-center gap-2">
-              <Instagram className="h-4 w-4 text-pink-500" aria-hidden />
+              <Instagram className="h-4 w-4 text-pink-500 dark:text-pink-400" aria-hidden />
               Instagram
             </Label>
             <Input id="instagram" placeholder="https://instagram.com/nurulhikmah atau @nurulhikmah" value={instagram} onChange={(e) => setInstagram(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="youtube" className="flex items-center gap-2">
-              <Youtube className="h-4 w-4 text-red-600" aria-hidden />
+              <Youtube className="h-4 w-4 text-red-600 dark:text-red-400" aria-hidden />
               YouTube
             </Label>
             <Input id="youtube" placeholder="https://youtube.com/@nurulhikmah" value={youtube} onChange={(e) => setYoutube(e.target.value)} className="h-11" />

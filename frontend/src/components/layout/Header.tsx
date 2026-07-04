@@ -1,7 +1,9 @@
 import { LogIn, Menu, MessageCircle, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { SchoolLogo } from '@/components/brand/SchoolLogo'
+import { LanguageSwitcher } from '@/components/i18n'
 import { MainNav } from '@/components/layout/MainNav'
 import { MobileNavTree } from '@/components/layout/MobileNavTree'
 import { ThemeToggle } from '@/components/theme'
@@ -14,6 +16,7 @@ import { cn } from '@/lib/utils'
 const SCROLL_THRESHOLD = 32
 
 export function Header() {
+  const { t } = useTranslation('layout')
   const [open, setOpen] = useState(false)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [scrolled, setScrolled] = useState(false)
@@ -49,9 +52,9 @@ export function Header() {
     >
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
       >
-        Lewati ke konten
+        {t('header.skipToContent')}
       </a>
 
       <div className="container-page relative flex h-16 items-center lg:h-[4.25rem]">
@@ -59,7 +62,7 @@ export function Header() {
           to="/"
           className={cn(
             'relative z-10 flex shrink-0 items-center gap-2.5 font-semibold transition-opacity hover:opacity-90',
-            isHeroOverlay ? 'text-primary-foreground' : 'text-primary',
+            isHeroOverlay ? 'text-white' : 'text-primary',
           )}
         >
           <SchoolLogo
@@ -69,7 +72,7 @@ export function Header() {
             className={cn(isHeroOverlay && 'drop-shadow-md')}
           />
           <span className="font-heading text-lg font-bold tracking-tight">
-            Nurul Hikmah
+            {t('header.brand')}
           </span>
         </Link>
 
@@ -79,7 +82,8 @@ export function Header() {
           </div>
         </div>
 
-        <div className="relative z-10 ml-auto flex shrink-0 items-center gap-2">
+        <div className="relative z-10 ms-auto flex shrink-0 items-center gap-2">
+          <LanguageSwitcher />
           <ThemeToggle variant="ghost" onHero={isHeroOverlay} />
           <Button
             asChild
@@ -88,13 +92,13 @@ export function Header() {
             className={cn(
               'hidden sm:inline-flex',
               isHeroOverlay
-                ? 'border-primary-foreground/40 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground'
+                ? 'border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white'
                 : 'border-primary/25 text-primary',
             )}
           >
             <Link to="/admin/login">
               <LogIn className="h-4 w-4" />
-              Login
+              {t('header.login')}
             </Link>
           </Button>
           {school?.whatsapp && (
@@ -104,7 +108,7 @@ export function Header() {
               className={cn(
                 'hidden shadow-md sm:inline-flex',
                 isHeroOverlay
-                  ? 'bg-primary-foreground text-primary shadow-primary-foreground/20 hover:bg-primary-foreground/90'
+                  ? 'bg-white text-primary shadow-white/20 hover:bg-white/90'
                   : 'shadow-primary/20',
               )}
             >
@@ -114,7 +118,7 @@ export function Header() {
                 rel="noreferrer"
               >
                 <Phone className="h-4 w-4" />
-                Hubungi Kami
+                {t('header.contactUs')}
               </a>
             </Button>
           )}
@@ -127,12 +131,12 @@ export function Header() {
                 className={cn(
                   'h-11 w-11 lg:hidden',
                   isHeroOverlay
-                    ? 'border-primary-foreground/35 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20'
+                    ? 'border-white/35 bg-white/10 text-white hover:bg-white/20'
                     : 'border-primary/20',
                 )}
               >
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Buka menu</span>
+                <span className="sr-only">{t('header.openMenu')}</span>
               </Button>
             </SheetTrigger>
             <SheetContent
@@ -150,18 +154,18 @@ export function Header() {
                       className="drop-shadow-lg"
                     />
                     <div className="min-w-0">
-                      <SheetTitle className="truncate text-lg font-bold text-primary-foreground">
+                      <SheetTitle className="truncate text-lg font-bold text-white">
                         {school?.name ?? 'Nurul Hikmah'}
                       </SheetTitle>
-                      <p className="text-xs text-primary-foreground/70">
-                        Pesantren Modern
+                      <p className="text-xs text-white/70">
+                        {t('header.subtitle')}
                       </p>
                     </div>
                   </div>
                 </SheetHeader>
               </div>
 
-              <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Navigasi mobile">
+              <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label={t('header.mobileNav')}>
                 <MobileNavTree isHome={isHome} onNavigate={() => setOpen(false)} />
               </nav>
 
@@ -175,7 +179,7 @@ export function Header() {
                         rel="noreferrer"
                       >
                         <MessageCircle className="h-4 w-4" />
-                        WhatsApp
+                        {t('header.whatsapp')}
                       </a>
                     </Button>
                   )}
@@ -189,14 +193,17 @@ export function Header() {
                   >
                     <Link to="/admin/login" onClick={() => setOpen(false)}>
                       <LogIn className="h-4 w-4" />
-                      Login
+                      {t('header.login')}
                     </Link>
                   </Button>
                 </div>
                 <Separator className="my-3" />
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Tema</span>
-                  <ThemeToggle variant="outline" />
+                  <span className="text-xs text-muted-foreground">{t('header.theme')}</span>
+                  <div className="flex items-center gap-1">
+                    <LanguageSwitcher />
+                    <ThemeToggle variant="outline" />
+                  </div>
                 </div>
               </div>
             </SheetContent>
@@ -207,7 +214,7 @@ export function Header() {
       <div
         className={cn(
           'h-0.5',
-          isHeroOverlay ? 'bg-primary-foreground/15' : 'bg-primary/10',
+          isHeroOverlay ? 'bg-white/15' : 'bg-primary/10',
         )}
         role="presentation"
         aria-hidden

@@ -8,7 +8,11 @@ describe('cn', () => {
 })
 
 describe('formatCurrency', () => {
-  it('returns Gratis for null', () => {
+  it('returns default free label for null', () => {
     expect(formatCurrency(null)).toBe('Gratis')
+  })
+
+  it('returns custom free label for null', () => {
+    expect(formatCurrency(null, 'Free')).toBe('Free')
   })
 })

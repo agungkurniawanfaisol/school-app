@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
+import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -94,6 +95,12 @@ export function UserFormPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
+      <Button asChild variant="ghost" size="sm" className="min-h-11 -ml-2 gap-2 px-0 hover:bg-transparent">
+        <Link to="/admin/users">
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Kembali ke daftar pengguna
+        </Link>
+      </Button>
       <Card>
         <CardHeader>
           <CardTitle>{isEdit ? 'Edit Pengguna' : 'Tambah Pengguna'}</CardTitle>
