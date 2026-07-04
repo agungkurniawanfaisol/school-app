@@ -215,6 +215,7 @@
   "gallery.empty": "No albums found.",
   "gallery.noAlbums": "No photo albums yet.",
   "gallery.noPhotos": "No photos in this album yet.",
+  "gallery.photoUnit": "photos",
   "gallery.notFound": "Album not found",
   "gallery.notFoundDesc": "The album may have been deleted or the URL is invalid.",
   "extracurricular.title": "Extracurricular",

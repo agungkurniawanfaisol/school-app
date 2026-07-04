@@ -215,6 +215,7 @@
   "gallery.empty": "لم يتم العثور على ألبومات.",
   "gallery.noAlbums": "لا توجد ألبومات صور بعد.",
   "gallery.noPhotos": "لا توجد صور في هذا الألبوم بعد.",
+  "gallery.photoUnit": "صورة",
   "gallery.notFound": "الألبوم غير موجود",
   "gallery.notFoundDesc": "ربما تم حذف الألبوم أو الرابط غير صالح.",
   "extracurricular.title": "الأنشطة اللامنهجية",
