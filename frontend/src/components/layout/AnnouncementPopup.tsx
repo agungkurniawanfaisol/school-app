@@ -15,20 +15,34 @@ import { useAnnouncementsList } from '@/hooks/useAnnouncements'
 import type { Announcement } from '@/types'
 
 const POPUP_DISMISSED_KEY = 'nh-dismissed-popups'
+const POPUP_SESSION_KEY = 'nh-session-dismissed-popups'
 
 function getDismissedPopups(): string[] {
   try {
-    return JSON.parse(localStorage.getItem(POPUP_DISMISSED_KEY) ?? '[]')
+    const permanent = JSON.parse(localStorage.getItem(POPUP_DISMISSED_KEY) ?? '[]')
+    const session = JSON.parse(sessionStorage.getItem(POPUP_SESSION_KEY) ?? '[]')
+    return [...new Set([...permanent, ...session])]
   } catch {
     return []
   }
 }
 
-function dismissPopup(uuid: string) {
-  const current = getDismissedPopups()
-  if (!current.includes(uuid)) {
-    localStorage.setItem(POPUP_DISMISSED_KEY, JSON.stringify([...current, uuid]))
-  }
+function dismissPopupPermanently(uuid: string) {
+  try {
+    const current: string[] = JSON.parse(localStorage.getItem(POPUP_DISMISSED_KEY) ?? '[]')
+    if (!current.includes(uuid)) {
+      localStorage.setItem(POPUP_DISMISSED_KEY, JSON.stringify([...current, uuid]))
+    }
+  } catch { /* ignore */ }
+}
+
+function dismissPopupForSession(uuid: string) {
+  try {
+    const current: string[] = JSON.parse(sessionStorage.getItem(POPUP_SESSION_KEY) ?? '[]')
+    if (!current.includes(uuid)) {
+      sessionStorage.setItem(POPUP_SESSION_KEY, JSON.stringify([...current, uuid]))
+    }
+  } catch { /* ignore */ }
 }
 
 const priorityIcons = {
@@ -78,9 +92,10 @@ export function AnnouncementPopup() {
 
   function handleClose() {
     if (dontShow) {
-      dismissPopup(popup!.uuid)
-      setDismissed(getDismissedPopups())
+      dismissPopupPermanently(popup!.uuid)
     }
+    dismissPopupForSession(popup!.uuid)
+    setDismissed(getDismissedPopups())
     setOpen(false)
   }
 
