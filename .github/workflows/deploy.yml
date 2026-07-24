@@ -81,19 +81,24 @@ jobs:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
       - name: Add host to known_hosts
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '65002' }}
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+          # Hostinger shared hosting SSH port is usually 65002 (not 22)
+          ssh-keyscan -p "${DEPLOY_PORT}" -H "${DEPLOY_HOST}" >> ~/.ssh/known_hosts
 
       - name: Rsync frontend → public_html (do not delete backend/)
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '65002' }}
         run: |
           rsync -az --delete \
             --exclude='backend/' \
-            -e ssh \
+            -e "ssh -p ${DEPLOY_PORT}" \
             /tmp/frontend-deploy/ \
             "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
@@ -102,6 +107,7 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '65002' }}
         run: |
           # --filter protect remote storage and .env from --delete
           rsync -az --delete \
@@ -111,7 +117,7 @@ jobs:
             --exclude='storage/' \
             --exclude='.env' \
             --exclude='.env.*' \
-            -e ssh \
+            -e "ssh -p ${DEPLOY_PORT}" \
             /tmp/backend-deploy/ \
             "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/backend/"
 
@@ -120,9 +126,10 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '65002' }}
           DEPLOY_PHP: ${{ secrets.DEPLOY_PHP || 'php' }}
         run: |
-          ssh "${DEPLOY_USER}@${DEPLOY_HOST}" bash -s <<EOF
+          ssh -p "${DEPLOY_PORT}" "${DEPLOY_USER}@${DEPLOY_HOST}" bash -s <<EOF
           set -euo pipefail
           cd "${DEPLOY_PATH}/backend"
           mkdir -p storage/app/public storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
