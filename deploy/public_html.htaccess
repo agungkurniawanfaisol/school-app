@@ -1,0 +1,39 @@
+# Nurul Hikmah — public_html root (.htaccess)
+# Deployed automatically as public_html/.htaccess
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # --- Protect Laravel internals ---
+  RewriteRule ^backend/\.env - [F,L]
+  RewriteRule ^backend/\.env\..*$ - [F,L]
+  RewriteRule ^backend/(app|bootstrap|config|database|resources|routes|storage|tests|vendor)(/|$) - [F,L]
+  RewriteRule ^backend/artisan$ - [F,L]
+  RewriteRule ^backend/composer\.(json|lock)$ - [F,L]
+  RewriteRule ^backend/phpunit\.xml.*$ - [F,L]
+
+  # --- Public uploads (Laravel storage:link) ---
+  RewriteRule ^storage/(.*)$ backend/public/storage/$1 [L]
+
+  # --- API → Laravel (URI tetap /api/...) ---
+  RewriteCond %{REQUEST_URI} ^/api(/|$)
+  RewriteRule ^ backend/public/index.php [L]
+
+  # --- Let /backend/* be handled by backend/.htaccess → public/ ---
+  RewriteRule ^backend(/|$) - [L]
+
+  # --- Static frontend assets ---
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # --- SPA (React Router) ---
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+Options -Indexes
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+</IfModule>

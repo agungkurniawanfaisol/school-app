@@ -3,18 +3,18 @@
 > **Read after [`AGENTS.md`](AGENTS.md)** when starting a new session or switching AI/model.  
 > This file tracks recent work and follow-ups — not a substitute for rules or skills.
 
-**Last updated:** 2026-07-03 (skills expansion)
+**Last updated:** 2026-07-24 (Hostinger SSH deploy)
 
 ---
 
 ## 1. Quick start
 
-| Priority | Source |
-|----------|--------|
-| Architecture & commands | [`AGENTS.md`](AGENTS.md) |
-| Skills index | [`skills.md`](skills.md) |
-| Feature workflow | `.cursor/skills/nurul-hikmah-stack/SKILL.md` |
-| Cursor rules | `.cursor/rules/` |
+| Priority                | Source                                       |
+| ----------------------- | -------------------------------------------- |
+| Architecture & commands | [`AGENTS.md`](AGENTS.md)                     |
+| Skills index            | [`skills.md`](skills.md)                     |
+| Feature workflow        | `.cursor/skills/nurul-hikmah-stack/SKILL.md` |
+| Cursor rules            | `.cursor/rules/`                             |
 
 ---
 
@@ -30,6 +30,15 @@
 ---
 
 ## 3. Completed (recent sessions)
+
+### 2026-07-24 — Hostinger auto-deploy
+
+- GitHub Actions: `.github/workflows/deploy.yml` (SSH + rsync on push `main`)
+- `deploy/public_html.htaccess` → SPA + `/api` → Laravel + block `storage`/`.env`/vendor
+- `deploy/backend.htaccess` → funnel ke `public/`
+- Frontend prod: `frontend/.env.production` (`VITE_API_URL=/api`)
+- Docs: `deploy/README.md`, spec `docs/superpowers/specs/2026-07-24-hostinger-deploy-design.md`
+- **Next for user:** isi GitHub secrets (`DEPLOY_HOST/USER/SSH_KEY/PATH`), buat `.env` di server sekali
 
 ### 2026-07-03 — Superpowers + testing
 
@@ -108,12 +117,12 @@ See [`skills.md`](skills.md) for full index.
 
 ## 5. Decisions log
 
-| Date | Decision | Rationale |
-|------|----------|-----------|
-| 2026-07-03 | File cache only, no Redis | Shared hosting limitation |
-| 2026-07-03 | Repository + `HasCache` trait | Consistent caching on all reads |
-| 2026-07-03 | Composite DB indexes per filter pattern | Match `applyFilters()` query shapes |
-| 2026-07-03 | Offline-first PWA | Compensate for no server-side Redis |
+| Date       | Decision                                       | Rationale                                     |
+| ---------- | ---------------------------------------------- | --------------------------------------------- |
+| 2026-07-03 | File cache only, no Redis                      | Shared hosting limitation                     |
+| 2026-07-03 | Repository + `HasCache` trait                  | Consistent caching on all reads               |
+| 2026-07-03 | Composite DB indexes per filter pattern        | Match `applyFilters()` query shapes           |
+| 2026-07-03 | Offline-first PWA                              | Compensate for no server-side Redis           |
 | 2026-07-03 | skills.sh at project level (`.agents/skills/`) | Team-shared, versioned via `skills-lock.json` |
 
 ---
@@ -126,4 +135,4 @@ See [`skills.md`](skills.md) for full index.
 
 ---
 
-*Update §3–§4 when finishing meaningful work. Keep §5 for architectural decisions only.*
+_Update §3–§4 when finishing meaningful work. Keep §5 for architectural decisions only._

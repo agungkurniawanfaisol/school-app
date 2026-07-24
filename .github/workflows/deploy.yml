@@ -1,0 +1,139 @@
+name: Deploy Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-hostinger
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, curl, zip, pdo_mysql, gd, intl
+          coverage: none
+          tools: composer:v2
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+        env:
+          VITE_API_URL: /api
+          VITE_SCHOOL_SLUG: nurul-hikmah
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare frontend staging (keep backend/ on server)
+        run: |
+          mkdir -p /tmp/frontend-deploy
+          cp -a frontend/dist/. /tmp/frontend-deploy/
+          cp deploy/public_html.htaccess /tmp/frontend-deploy/.htaccess
+
+      - name: Prepare backend staging (exclude storage + .env)
+        run: |
+          mkdir -p /tmp/backend-deploy
+          rsync -a \
+            --exclude='storage/' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            --exclude='tests/' \
+            --exclude='.phpunit.result.cache' \
+            --exclude='.phpunit.cache' \
+            backend/ /tmp/backend-deploy/
+          cp deploy/backend.htaccess /tmp/backend-deploy/.htaccess
+          # Keep empty storage skeleton so first deploy can create dirs without wiping server storage
+          mkdir -p \
+            /tmp/backend-deploy/storage/app/public \
+            /tmp/backend-deploy/storage/framework/{cache,sessions,views} \
+            /tmp/backend-deploy/storage/logs
+          touch /tmp/backend-deploy/storage/app/.gitignore \
+            /tmp/backend-deploy/storage/app/public/.gitignore \
+            /tmp/backend-deploy/storage/logs/.gitignore
+
+      - name: Start SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Add host to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Rsync frontend → public_html (do not delete backend/)
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          rsync -az --delete \
+            --exclude='backend/' \
+            -e ssh \
+            /tmp/frontend-deploy/ \
+            "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
+
+      - name: Rsync backend → public_html/backend (preserve remote storage + .env)
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          # --filter protect remote storage and .env from --delete
+          rsync -az --delete \
+            --filter='P storage/' \
+            --filter='P storage/***' \
+            --filter='P .env' \
+            --exclude='storage/' \
+            --exclude='.env' \
+            --exclude='.env.*' \
+            -e ssh \
+            /tmp/backend-deploy/ \
+            "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/backend/"
+
+      - name: Post-deploy Artisan
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_PHP: ${{ secrets.DEPLOY_PHP || 'php' }}
+        run: |
+          ssh "${DEPLOY_USER}@${DEPLOY_HOST}" bash -s <<EOF
+          set -euo pipefail
+          cd "${DEPLOY_PATH}/backend"
+          mkdir -p storage/app/public storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
+          chmod -R ug+rwx storage bootstrap/cache || true
+          if [ ! -f .env ]; then
+            echo "WARNING: backend/.env missing — skip artisan. Create .env on server once."
+            exit 0
+          fi
+          ${DEPLOY_PHP} artisan storage:link --force || true
+          ${DEPLOY_PHP} artisan migrate --force --no-interaction
+          ${DEPLOY_PHP} artisan config:cache
+          ${DEPLOY_PHP} artisan route:cache
+          ${DEPLOY_PHP} artisan view:cache
+          EOF

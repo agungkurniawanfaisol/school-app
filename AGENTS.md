@@ -4,16 +4,16 @@
 
 School website & admin portal: **Laravel 12 API** + **React PWA** (public content, PMB registration, courses, admin CRUD).
 
-| Layer | Path | Stack |
-|-------|------|-------|
-| Backend | `backend/` | PHP 8.3+, Laravel 12, Sanctum, MySQL 8.0, **file cache (NO Redis)** |
-| Frontend | `frontend/` | React 19, TypeScript, Vite, Radix/shadcn, TanStack Query v5, Zod, Tailwind v4, Workbox PWA |
-| Cursor rules | `.cursor/rules/` | Always-on / glob-scoped constraints |
-| Project skills | `.cursor/skills/` | End-to-end workflows |
-| External skills | `.agents/skills/` | Installed from [skills.sh](https://skills.sh) |
-| Skills index | [`skills.md`](skills.md) | What to load per task |
-| Session handoff | [`memory.md`](memory.md) | Recent work & follow-ups — read when resuming |
-| **Harness** | [`HARNESS.md`](HARNESS.md) | Run, test, verify — start here for Docker + tests |
+| Layer           | Path                       | Stack                                                                                      |
+| --------------- | -------------------------- | ------------------------------------------------------------------------------------------ |
+| Backend         | `backend/`                 | PHP 8.3+, Laravel 12, Sanctum, MySQL 8.0, **file cache (NO Redis)**                        |
+| Frontend        | `frontend/`                | React 19, TypeScript, Vite, Radix/shadcn, TanStack Query v5, Zod, Tailwind v4, Workbox PWA |
+| Cursor rules    | `.cursor/rules/`           | Always-on / glob-scoped constraints                                                        |
+| Project skills  | `.cursor/skills/`          | End-to-end workflows                                                                       |
+| External skills | `.agents/skills/`          | Installed from [skills.sh](https://skills.sh)                                              |
+| Skills index    | [`skills.md`](skills.md)   | What to load per task                                                                      |
+| Session handoff | [`memory.md`](memory.md)   | Recent work & follow-ups — read when resuming                                              |
+| **Harness**     | [`HARNESS.md`](HARNESS.md) | Run, test, verify — start here for Docker + tests                                          |
 
 ---
 
@@ -65,24 +65,24 @@ nurul-hikmah-app/
 
 ## 3. Non-negotiable conventions
 
-| Topic | Rule | Reference |
-|-------|------|-----------|
-| **Cache** | File driver only — never Redis | `CACHE_STORE=file`, `.cursor/rules/backend-cache-performance.mdc` |
-| **Backend reads** | `Cache::remember()` via `HasCache` in repositories | `BaseRepository` |
-| **Backend writes** | `clearCache()` after every CUD | `HasCache` trait |
-| **Queries** | `select()` + `with()`, no N+1, paginate max 50 | `.cursor/rules/database-indexing-queries.mdc` |
-| **Indexes** | FK indexed; composite indexes match filter/sort | migrations + `database-indexing-queries.mdc` |
-| **Forms** | Zod in `src/schemas/`, errors in Bahasa Indonesia | `.cursor/rules/zod-input-validation.mdc` |
-| **API calls** | TanStack Query in `src/hooks/` only | `.cursor/rules/react-query-api.mdc` |
-| **UI** | Radix via shadcn, mobile-first, UI text Bahasa Indonesia | `.cursor/rules/frontend-patterns.mdc` |
-| **Responsive** | Mobile + desktop layouts, touch targets, dual table/card | `.cursor/rules/responsive-mobile-web.mdc` + skill `tailwindcss-mobile-first` |
-| **Animation** | Motion spring, tiered by route; no motion on tables/forms | `.cursor/rules/motion-animation.mdc` |
-| **PWA** | Offline-first, Workbox for static + public GET | `.cursor/rules/pwa-offline-first.mdc` |
-| **Security** | OWASP always on; Form Request + Zod; no raw SQL | `.cursor/rules/owasp-security.mdc` |
-| **Tests** | PHPUnit + Vitest required on behavior changes | `.cursor/rules/tests-required.mdc` |
-| **Workflow** | Brainstorm → plan → TDD → verify | `.cursor/rules/superpowers-workflow.mdc` |
-| **URLs** | Detail routes use UUID, never numeric `id` | `.cursor/rules/uuid-urls.mdc` |
-| **Tables** | `id`, `timestamps()`, `softDeletes()` on every table | `.cursorrules` |
+| Topic              | Rule                                                      | Reference                                                                    |
+| ------------------ | --------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **Cache**          | File driver only — never Redis                            | `CACHE_STORE=file`, `.cursor/rules/backend-cache-performance.mdc`            |
+| **Backend reads**  | `Cache::remember()` via `HasCache` in repositories        | `BaseRepository`                                                             |
+| **Backend writes** | `clearCache()` after every CUD                            | `HasCache` trait                                                             |
+| **Queries**        | `select()` + `with()`, no N+1, paginate max 50            | `.cursor/rules/database-indexing-queries.mdc`                                |
+| **Indexes**        | FK indexed; composite indexes match filter/sort           | migrations + `database-indexing-queries.mdc`                                 |
+| **Forms**          | Zod in `src/schemas/`, errors in Bahasa Indonesia         | `.cursor/rules/zod-input-validation.mdc`                                     |
+| **API calls**      | TanStack Query in `src/hooks/` only                       | `.cursor/rules/react-query-api.mdc`                                          |
+| **UI**             | Radix via shadcn, mobile-first, UI text Bahasa Indonesia  | `.cursor/rules/frontend-patterns.mdc`                                        |
+| **Responsive**     | Mobile + desktop layouts, touch targets, dual table/card  | `.cursor/rules/responsive-mobile-web.mdc` + skill `tailwindcss-mobile-first` |
+| **Animation**      | Motion spring, tiered by route; no motion on tables/forms | `.cursor/rules/motion-animation.mdc`                                         |
+| **PWA**            | Offline-first, Workbox for static + public GET            | `.cursor/rules/pwa-offline-first.mdc`                                        |
+| **Security**       | OWASP always on; Form Request + Zod; no raw SQL           | `.cursor/rules/owasp-security.mdc`                                           |
+| **Tests**          | PHPUnit + Vitest required on behavior changes             | `.cursor/rules/tests-required.mdc`                                           |
+| **Workflow**       | Brainstorm → plan → TDD → verify                          | `.cursor/rules/superpowers-workflow.mdc`                                     |
+| **URLs**           | Detail routes use UUID, never numeric `id`                | `.cursor/rules/uuid-urls.mdc`                                                |
+| **Tables**         | `id`, `timestamps()`, `softDeletes()` on every table      | `.cursorrules`                                                               |
 
 ---
 
@@ -156,6 +156,9 @@ make prod-build               # build frontend/dist
 make prod                     # nginx static + php-fpm + mysql
 ```
 
+**Hostinger auto-deploy (SSH):** push ke `main` → `.github/workflows/deploy.yml`.  
+Setup secrets & `.env` server: [`deploy/README.md`](deploy/README.md).
+
 See `docker-compose.yml` and `Makefile` for full options.
 
 ---
@@ -175,24 +178,24 @@ See `docker-compose.yml` and `Makefile` for full options.
 
 ### Skills to load by task
 
-| Task | Skill / rule |
-|------|----------------|
-| Full feature | `superpowers-workflow` → `nurul-hikmah-stack` + `laravel-development` |
-| Brainstorm / design | `brainstorming`, `writing-plans` |
-| TDD / tests | `test-driven-development`, `laravel-testing`, `vitest` |
-| Before done | `verification-before-completion` |
-| Laravel backend | `laravel-specialist`, `laravel-11-12-app-guidelines`, `laravel-patterns` |
-| Backend tests | `pest-testing` |
-| API security | `laravel-security`, `owasp-security-check`, `security-audit` |
-| shadcn / Radix | `shadcn`, `radix-ui-design-system` |
-| Form + validation | `zod`, `react-hook-form-zod-shadcn` |
-| API hooks | `tanstack-query-best-practices` |
-| React / Vite | `vercel-react-best-practices`, `react-vite-best-practices` |
-| UI design | `frontend-design`, `web-design-guidelines` |
-| Tailwind / responsive | `responsive-mobile-web.mdc` + `tailwind-css-patterns` + `tailwindcss-mobile-first` (also in `frontend-patterns.mdc`) |
-| Motion / spring animation | `motion-animation.mdc` — `FadeInView`, `PageEnter`, tier policy |
-| MySQL / indexes | `mysql`, `database-indexing-strategy` |
-| PWA / offline | `pwa-development` |
+| Task                      | Skill / rule                                                                                                         |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Full feature              | `superpowers-workflow` → `nurul-hikmah-stack` + `laravel-development`                                                |
+| Brainstorm / design       | `brainstorming`, `writing-plans`                                                                                     |
+| TDD / tests               | `test-driven-development`, `laravel-testing`, `vitest`                                                               |
+| Before done               | `verification-before-completion`                                                                                     |
+| Laravel backend           | `laravel-specialist`, `laravel-11-12-app-guidelines`, `laravel-patterns`                                             |
+| Backend tests             | `pest-testing`                                                                                                       |
+| API security              | `laravel-security`, `owasp-security-check`, `security-audit`                                                         |
+| shadcn / Radix            | `shadcn`, `radix-ui-design-system`                                                                                   |
+| Form + validation         | `zod`, `react-hook-form-zod-shadcn`                                                                                  |
+| API hooks                 | `tanstack-query-best-practices`                                                                                      |
+| React / Vite              | `vercel-react-best-practices`, `react-vite-best-practices`                                                           |
+| UI design                 | `frontend-design`, `web-design-guidelines`                                                                           |
+| Tailwind / responsive     | `responsive-mobile-web.mdc` + `tailwind-css-patterns` + `tailwindcss-mobile-first` (also in `frontend-patterns.mdc`) |
+| Motion / spring animation | `motion-animation.mdc` — `FadeInView`, `PageEnter`, tier policy                                                      |
+| MySQL / indexes           | `mysql`, `database-indexing-strategy`                                                                                |
+| PWA / offline             | `pwa-development`                                                                                                    |
 
 Full list: [`skills.md`](skills.md).
 
@@ -208,4 +211,4 @@ Full list: [`skills.md`](skills.md).
 
 ---
 
-*When in doubt: read the domain's Repository + migration, follow `.cursor/rules/`, check `memory.md` for recent context.*
+_When in doubt: read the domain's Repository + migration, follow `.cursor/rules/`, check `memory.md` for recent context._

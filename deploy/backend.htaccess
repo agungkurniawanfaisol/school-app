@@ -1,0 +1,9 @@
+# Deny direct access to Laravel root; only public/ should be reachable.
+# Deployed as public_html/backend/.htaccess
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+Options -Indexes
