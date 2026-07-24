@@ -7,6 +7,9 @@ describe('curriculumSchema', () => {
       school_id: 1,
       title: 'Program Tahfidz',
       slug: 'program-tahfidz',
+      order: 0,
+      is_active: true,
+      is_featured: true,
     })
 
     expect(result.success).toBe(true)
