@@ -117,7 +117,7 @@ export function CurriculumPublicDetailPage() {
               <Card className="border-primary/10">
                 <CardContent className="p-4 sm:p-6">
                   {hasRichContent ? (
-                    <BlockRenderer document={program.content_json as EditorDocument} />
+                    <BlockRenderer contentJson={program.content_json as EditorDocument} />
                   ) : (
                     <div className="prose prose-neutral max-w-none whitespace-pre-line dark:prose-invert">
                       {program.content}

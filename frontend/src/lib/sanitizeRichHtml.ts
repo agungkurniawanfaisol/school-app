@@ -69,7 +69,7 @@ function registerHooks() {
     }
   })
 
-  DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+  DOMPurify.addHook('uponSanitizeAttribute', (_node, data) => {
     if (data.attrName === 'href') {
       const value = String(data.attrValue ?? '').trim().toLowerCase()
       if (value.startsWith('javascript:') || value.startsWith('data:')) {

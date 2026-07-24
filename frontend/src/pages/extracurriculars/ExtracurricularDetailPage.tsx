@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { CalendarClock, Dumbbell, User } from 'lucide-react'
+import { CalendarClock, User } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'
 import { SubpageHero } from '@/components/layout/SubpageHero'

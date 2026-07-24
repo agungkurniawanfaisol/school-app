@@ -11,7 +11,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTeachersList } from '@/hooks/useTeachers'
-import type { TeacherTypeValue } from '@/schemas/teacher'
 
 export function TeachersCatalogPage() {
   const { t } = useTranslation('pages')

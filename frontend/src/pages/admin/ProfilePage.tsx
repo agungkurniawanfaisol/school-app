@@ -71,11 +71,11 @@ export function ProfilePage() {
     if (teacherValues?.social_media) {
       const sm = teacherValues.social_media
       const cleaned = {
-        facebook: sm.facebook || null,
-        instagram: sm.instagram || null,
-        youtube: sm.youtube || null,
-        tiktok: sm.tiktok || null,
-        twitter: sm.twitter || null,
+        facebook: sm.facebook || undefined,
+        instagram: sm.instagram || undefined,
+        youtube: sm.youtube || undefined,
+        tiktok: sm.tiktok || undefined,
+        twitter: sm.twitter || undefined,
       }
       teacherValues.social_media = Object.values(cleaned).some(Boolean) ? cleaned : undefined
     }

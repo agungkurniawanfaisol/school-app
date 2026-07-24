@@ -91,8 +91,8 @@ function wrapResizableNodeView(
 
   return {
     dom: container,
-    update: (updatedNode) => {
-      const result = baseUpdate(updatedNode)
+    update: (updatedNode, decorations, innerDecorations) => {
+      const result = baseUpdate(updatedNode, decorations, innerDecorations)
       if (result) {
         const align = (updatedNode.attrs.align as ImageAlign | undefined) ?? 'left'
         syncImageAlign(container, align)

@@ -21,7 +21,9 @@ const CATEGORY_OPTIONS = [
   { value: 'akademik', label: 'Akademik' },
   { value: 'keagamaan', label: 'Keagamaan' },
   { value: 'lainnya', label: 'Lainnya' },
-]
+] as const
+
+type ExtracurricularCategory = (typeof CATEGORY_OPTIONS)[number]['value']
 
 export function ExtracurricularFormPage() {
   const { id } = useParams<{ id: string }>()
@@ -35,7 +37,7 @@ export function ExtracurricularFormPage() {
 
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
-  const [category, setCategory] = useState('lainnya')
+  const [category, setCategory] = useState<ExtracurricularCategory>('lainnya')
   const [schedule, setSchedule] = useState('')
   const [instructor, setInstructor] = useState('')
   const [image, setImage] = useState('')
@@ -46,7 +48,7 @@ export function ExtracurricularFormPage() {
     if (!existing) return
     setName(existing.name)
     setDescription(existing.description ?? '')
-    setCategory(existing.category)
+    setCategory(existing.category as ExtracurricularCategory)
     setSchedule(existing.schedule ?? '')
     setInstructor(existing.instructor ?? '')
     setImage(existing.image ?? '')
@@ -98,7 +100,7 @@ export function ExtracurricularFormPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="category">Kategori</Label>
-              <Select value={category} onValueChange={setCategory}>
+              <Select value={category} onValueChange={(v) => setCategory(v as ExtracurricularCategory)}>
                 <SelectTrigger id="category" className="h-11">
                   <SelectValue placeholder="Pilih kategori" />
                 </SelectTrigger>

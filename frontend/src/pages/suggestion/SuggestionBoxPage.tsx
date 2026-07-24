@@ -15,8 +15,8 @@ import { useSubmitContactMessage } from '@/hooks/useContactMessages'
 
 function createSuggestionSchema(t: (key: string) => string) {
   return z.object({
-    name: z.string().max(200).optional().default(''),
-    email: z.string().max(200).optional().default(''),
+    name: z.string().max(200),
+    email: z.string().max(200),
     subject: z.string().min(1, t('suggestion.subjectRequired')).max(300),
     message: z.string().min(1, t('suggestion.messageRequired')).max(5000),
   })

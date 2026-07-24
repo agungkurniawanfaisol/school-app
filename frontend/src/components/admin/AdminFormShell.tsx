@@ -15,6 +15,8 @@ interface AdminFormShellProps {
   submitLabel?: string
   isSubmitting?: boolean
   isDisabled?: boolean
+  isLoading?: boolean
+  actions?: ReactNode
   footerExtra?: ReactNode
   className?: string
 }
@@ -30,22 +32,35 @@ export function AdminFormShell({
   submitLabel = 'Simpan',
   isSubmitting,
   isDisabled,
+  isLoading,
+  actions,
   footerExtra,
   className,
 }: AdminFormShellProps) {
+  if (isLoading) {
+    return (
+      <div className={cn('admin-page admin-fade-in', className)}>
+        <p className="text-sm text-muted-foreground">Memuat data...</p>
+      </div>
+    )
+  }
+
   return (
     <div className={cn('admin-page admin-fade-in', className)}>
-      <div className="mb-6 space-y-3">
-        <Button asChild variant="ghost" size="sm" className="min-h-11 gap-2 px-0 hover:bg-transparent">
-          <Link to={backHref}>
-            <ArrowLeft className="h-4 w-4" aria-hidden />
-            {backLabel}
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-xl font-bold sm:text-2xl">{title}</h1>
-          {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-3">
+          <Button asChild variant="ghost" size="sm" className="min-h-11 gap-2 px-0 hover:bg-transparent">
+            <Link to={backHref}>
+              <ArrowLeft className="h-4 w-4" aria-hidden />
+              {backLabel}
+            </Link>
+          </Button>
+          <div>
+            <h1 className="text-xl font-bold sm:text-2xl">{title}</h1>
+            {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+          </div>
         </div>
+        {actions}
       </div>
 
       <div className="space-y-6">{children}</div>

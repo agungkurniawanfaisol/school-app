@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, CalendarDays, ChevronLeft, Images, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CalendarDays, Images, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { PublicPageShell } from '@/components/layout/PublicPageShell'

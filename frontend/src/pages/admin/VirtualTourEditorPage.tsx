@@ -141,11 +141,12 @@ export function VirtualTourEditorPage() {
     for (const file of Array.from(files)) {
       try {
         const uploaded = await uploadMedia.mutateAsync(file)
+        if (!uploaded?.url) continue
         const scene = newScene(uploaded.url, sceneTitleFromFile(file), scenes.length)
         setScenes((prev) => [...prev, scene])
-        setActiveSceneUuid(scene.uuid)
+        setActiveSceneUuid(scene.uuid ?? null)
         if (!startSceneUuid) {
-          setStartSceneUuid(scene.uuid)
+          setStartSceneUuid(scene.uuid ?? null)
         }
       } catch {
         // toast handled in hook

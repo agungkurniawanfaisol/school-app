@@ -7,7 +7,7 @@ export type UploadMediaKind = 'image' | 'video'
 export function validateUploadFile(file: File, kind: UploadMediaKind): string | null {
   const allowed = kind === 'image' ? ALLOWED_UPLOAD_IMAGE_TYPES : ALLOWED_UPLOAD_VIDEO_TYPES
 
-  if (!allowed.includes(file.type as (typeof allowed)[number])) {
+  if (!(allowed as readonly string[]).includes(file.type)) {
     return kind === 'image'
       ? 'Format gambar harus JPG, PNG, atau WebP.'
       : 'Format video harus MP4 atau WebM.'

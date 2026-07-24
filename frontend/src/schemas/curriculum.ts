@@ -14,9 +14,9 @@ export const featuredProgramSchema = z.object({
   icon: z.string().max(100).optional().nullable(),
   thumbnail: z.string().max(500).optional().nullable(),
   category: z.string().max(100).optional().nullable(),
-  order: z.number().int().min(0).default(0),
-  is_active: z.boolean().default(true),
-  is_featured: z.boolean().default(true),
+  order: z.number().int().min(0),
+  is_active: z.boolean(),
+  is_featured: z.boolean(),
   ...contentFields,
 })
 

@@ -230,7 +230,11 @@ export function TeacherFormPage() {
         bio: (created.bio ?? bio) || null,
         photo: created.photo,
         email: created.email,
-        social_media: payload.social_media,
+        social_media: {
+          facebook: payload.social_media?.facebook || undefined,
+          instagram: payload.social_media?.instagram || undefined,
+          youtube: payload.social_media?.youtube || undefined,
+        },
         content: payload.content,
         content_json: payload.content_json,
         is_active: created.is_active,
