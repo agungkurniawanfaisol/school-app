@@ -154,4 +154,4 @@ public_html/           ← website (Document Root Hostinger)
 
 - Document root **tidak bisa diganti** dari `public_html` → makanya frontend di root, Laravel di `public_html/backend/`.
 - Fitur **Git** di hPanel **tidak** dipakai di setup ini (kita pakai GitHub Actions + SSH, lebih cocok untuk build React).
-- Pastikan PHP **8.3+** di hPanel → **Advanced → PHP Configuration**.
+- Pastikan PHP **8.4+** di hPanel → **Advanced → PHP Configuration** (project Laravel ini butuh PHP 8.4).
