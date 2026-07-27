@@ -164,6 +164,15 @@ jobs:
             exit 0
           fi
           ${DEPLOY_PHP} artisan storage:link --force || true
+          if [ ! -d storage/app/public ]; then
+            echo "ERROR: storage/app/public missing after deploy"
+            exit 1
+          fi
+          if [ ! -w storage/app/public ]; then
+            echo "ERROR: storage/app/public is not writable by web user"
+            exit 1
+          fi
+          mkdir -p storage/app/public/uploads
           ${DEPLOY_PHP} artisan migrate --force --no-interaction
           ${DEPLOY_PHP} artisan config:cache
           ${DEPLOY_PHP} artisan route:cache

@@ -117,6 +117,36 @@ php artisan migrate --force
 
 `.env` dan `storage/` **tidak** dihapus saat deploy berikutnya.
 
+### Upload gambar / file (admin)
+
+File disimpan di `backend/storage/app/public/uploads/...` dan diakses lewat URL:
+
+`https://namadomain.com/storage/uploads/{collection}/{file}`
+
+`.htaccess` di `public_html/` menyajikan `/storage/*` langsung dari `backend/storage/app/public/` (tidak wajib andalkan symlink).
+
+Setelah `.env` dibuat, pastikan:
+
+```bash
+cd ~/domains/namadomain.com/public_html/backend
+grep APP_URL .env
+# harus: APP_URL=https://namadomain.com  (tanpa /backend)
+
+chmod -R ug+rwx storage bootstrap/cache
+mkdir -p storage/app/public/uploads
+php artisan config:clear
+php artisan config:cache
+```
+
+Uji satu file upload:
+
+```bash
+curl -I "https://namadomain.com/storage/uploads/general/NAMA_FILE.jpg"
+# harus HTTP/1.1 200
+```
+
+Kalau preview admin kosong tapi URL terisi, biasanya penyebabnya: folder `storage/app/public` tidak writable atau `APP_URL` salah.
+
 ---
 
 ## Alur tiap push

@@ -13,8 +13,9 @@
   RewriteRule ^backend/composer\.(json|lock)$ - [F,L]
   RewriteRule ^backend/phpunit\.xml.*$ - [F,L]
 
-  # --- Public uploads (Laravel storage:link) ---
-  RewriteRule ^storage/(.*)$ backend/public/storage/$1 [L]
+  # --- Public uploads (serve directly from storage/app/public; no symlink required) ---
+  RewriteCond %{DOCUMENT_ROOT}/backend/storage/app/public/$1 -f
+  RewriteRule ^storage/(.*)$ backend/storage/app/public/$1 [END]
 
   # --- API → Laravel (URI tetap /api/...) ---
   RewriteCond %{REQUEST_URI} ^/api(/|$)
