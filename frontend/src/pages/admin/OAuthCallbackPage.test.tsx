@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { LanguageProvider } from '@/components/i18n/LanguageProvider'
 import { OAuthCallbackPage } from '@/pages/admin/OAuthCallbackPage'
 
 const { mutateMock } = vi.hoisted(() => ({
@@ -28,13 +29,15 @@ vi.mock('sonner', () => ({
 
 function renderOAuthCallback(initialEntry: string) {
   return render(
-    <MemoryRouter initialEntries={[initialEntry]}>
-      <Routes>
-        <Route path="/admin/login/oauth" element={<OAuthCallbackPage />} />
-        <Route path="/admin/login" element={<div>Login</div>} />
-        <Route path="/admin" element={<div>Dashboard</div>} />
-      </Routes>
-    </MemoryRouter>,
+    <LanguageProvider>
+      <MemoryRouter initialEntries={[initialEntry]}>
+        <Routes>
+          <Route path="/admin/login/oauth" element={<OAuthCallbackPage />} />
+          <Route path="/admin/login" element={<div>Login</div>} />
+          <Route path="/admin" element={<div>Dashboard</div>} />
+        </Routes>
+      </MemoryRouter>
+    </LanguageProvider>,
   )
 }
 

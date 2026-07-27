@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   ExternalLink,
   Facebook,
@@ -33,6 +34,7 @@ interface PreviewData {
 }
 
 function SocialLinks({ social }: { social: SocialMedia | null | undefined }) {
+  const { t } = useTranslation('admin')
   if (!social) return null
 
   const links = [
@@ -45,7 +47,9 @@ function SocialLinks({ social }: { social: SocialMedia | null | undefined }) {
 
   return (
     <div className="space-y-2">
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Media Sosial</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        {t('pages.teachers.preview.socialMedia')}
+      </h2>
       <div className="flex flex-wrap gap-2">
         {links.map((link) => (
           <a
@@ -66,15 +70,16 @@ function SocialLinks({ social }: { social: SocialMedia | null | undefined }) {
 }
 
 function TeacherPreviewContent({ data }: { data: PreviewData }) {
+  const { t } = useTranslation('admin')
   const hasContent = data.content_json || data.content
 
   return (
     <>
       <div className="mb-6 flex flex-wrap items-center gap-2">
-        {data.is_featured && <Badge>Unggulan</Badge>}
-        {!data.is_active && <Badge variant="outline">Nonaktif</Badge>}
+        {data.is_featured && <Badge>{t('status.featured')}</Badge>}
+        {!data.is_active && <Badge variant="outline">{t('status.inactive')}</Badge>}
         {!data.is_active && (
-          <span className="text-sm text-muted-foreground">Tidak tampil di halaman publik</span>
+          <span className="text-sm text-muted-foreground">{t('pages.teachers.preview.notPublic')}</span>
         )}
       </div>
 
@@ -121,6 +126,7 @@ function TeacherPreviewContent({ data }: { data: PreviewData }) {
 }
 
 export function TeacherPreviewPage() {
+  const { t } = useTranslation('admin')
   const { uuid } = useParams<{ uuid: string }>()
   const draft = readTeacherPreviewDraft()
   const preferDraft = !!draft && (!uuid || draft.uuid === uuid)
@@ -129,11 +135,11 @@ export function TeacherPreviewPage() {
   if (!uuid) {
     if (!draft) {
       return (
-        <PreviewFrame title="Pratinjau Guru">
+        <PreviewFrame title={t('pages.teachers.preview.title')}>
           <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <p className="text-muted-foreground">Tidak ada data pratinjau. Buka pratinjau dari form tambah/edit guru.</p>
+            <p className="text-muted-foreground">{t('pages.teachers.preview.noData')}</p>
             <Button asChild variant="outline">
-              <Link to="/admin/teachers">Kembali ke daftar guru</Link>
+              <Link to="/admin/teachers">{t('pages.teachers.preview.backToList')}</Link>
             </Button>
           </div>
         </PreviewFrame>
@@ -146,7 +152,7 @@ export function TeacherPreviewPage() {
         isDraft={!draft.is_active}
         toolbar={
           <Button asChild variant="outline" size="sm">
-            <Link to={draft.returnTo}>Kembali ke form</Link>
+            <Link to={draft.returnTo}>{t('pages.teachers.preview.backToForm')}</Link>
           </Button>
         }
       >
@@ -162,7 +168,7 @@ export function TeacherPreviewPage() {
         isDraft={!draft.is_active}
         toolbar={
           <Button asChild variant="outline" size="sm">
-            <Link to={draft.returnTo}>Kembali ke form</Link>
+            <Link to={draft.returnTo}>{t('pages.teachers.preview.backToForm')}</Link>
           </Button>
         }
       >
@@ -173,8 +179,8 @@ export function TeacherPreviewPage() {
 
   if (isLoading || !teacher) {
     return (
-      <PreviewFrame title="Memuat pratinjau…">
-        <p className="text-muted-foreground">Memuat data guru…</p>
+      <PreviewFrame title={t('common.loadingPreview')}>
+        <p className="text-muted-foreground">{t('common.loadingTeacher')}</p>
       </PreviewFrame>
     )
   }
@@ -202,10 +208,10 @@ export function TeacherPreviewPage() {
       toolbar={
         <>
           <Button asChild variant="outline" size="sm">
-            <Link to={`/admin/teachers/${teacher.uuid}/edit`}>Edit</Link>
+            <Link to={`/admin/teachers/${teacher.uuid}/edit`}>{t('common.edit')}</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
-            <Link to="/admin/teachers">Daftar guru</Link>
+            <Link to="/admin/teachers">{t('pages.teachers.preview.teacherList')}</Link>
           </Button>
         </>
       }

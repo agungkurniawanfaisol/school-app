@@ -5,15 +5,12 @@ import { AdminActiveBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { useAdminFaqsList, useDeleteFaq } from '@/hooks/useFaqs'
 import type { Faq } from '@/hooks/useFaqs'
+import { useTranslation } from 'react-i18next'
 
-const categoryLabels: Record<string, string> = {
-  pmb: 'PMB',
-  akademik: 'Akademik',
-  biaya: 'Biaya',
-  umum: 'Umum',
-}
+const faqCategories = ['pmb', 'akademik', 'biaya', 'umum'] as const
 
 export function FaqsListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Faq | null>(null)
@@ -23,8 +20,8 @@ export function FaqsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola FAQ"
-        description="Pertanyaan yang sering diajukan"
+        title={t('pages.faqs.listTitle')}
+        description={t('pages.faqs.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -38,9 +35,9 @@ export function FaqsListPage() {
         }}
         createHref="/admin/faqs/create"
         columns={[
-          { key: 'question', header: 'Pertanyaan', cell: (item) => item.question },
-          { key: 'category', header: 'Kategori', cell: (item) => categoryLabels[item.category] ?? item.category },
-          { key: 'active', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'question', header: t('table.question'), cell: (item) => item.question },
+          { key: 'category', header: t('table.category'), cell: (item) => t(`faqCategory.${item.category}`) },
+          { key: 'active', header: t('table.status'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions

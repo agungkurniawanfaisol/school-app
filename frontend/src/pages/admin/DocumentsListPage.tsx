@@ -5,6 +5,7 @@ import { AdminActiveBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { useAdminDocumentsList, useDeleteDocument } from '@/hooks/useDocuments'
 import type { Document } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 function formatFileSize(bytes: number | null): string {
   if (!bytes) return '—'
@@ -13,15 +14,8 @@ function formatFileSize(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-const categoryLabel: Record<Document['category'], string> = {
-  brosur: 'Brosur',
-  formulir: 'Formulir',
-  peraturan: 'Peraturan',
-  kalender: 'Kalender',
-  lainnya: 'Lainnya',
-}
-
 export function DocumentsListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Document | null>(null)
@@ -31,8 +25,8 @@ export function DocumentsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Dokumen"
-        description="Dokumen yang dapat diunduh pengunjung"
+        title={t('pages.documents.listTitle')}
+        description={t('pages.documents.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -46,30 +40,30 @@ export function DocumentsListPage() {
         }}
         createHref="/admin/documents/create"
         columns={[
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
+          { key: 'title', header: t('table.title'), cell: (item) => item.title },
           {
             key: 'category',
-            header: 'Kategori',
-            cell: (item) => categoryLabel[item.category],
+            header: t('table.category'),
+            cell: (item) => t(`documentCategory.${item.category}`),
           },
           {
             key: 'file_type',
-            header: 'Tipe File',
+            header: t('table.fileType'),
             cell: (item) => item.file_type ?? '—',
           },
           {
             key: 'file_size',
-            header: 'Ukuran',
+            header: t('table.size'),
             cell: (item) => formatFileSize(item.file_size),
           },
           {
             key: 'download_count',
-            header: 'Unduhan',
+            header: t('table.downloads'),
             cell: (item) => item.download_count,
           },
           {
             key: 'active',
-            header: 'Status',
+            header: t('table.status'),
             cell: (item) => <AdminActiveBadge isActive={item.is_active} />,
           },
         ]}

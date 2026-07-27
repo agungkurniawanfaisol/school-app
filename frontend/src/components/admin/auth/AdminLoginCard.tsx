@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { SchoolLogo } from '@/components/brand/SchoolLogo'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -10,6 +11,8 @@ type AdminLoginCardProps = {
 }
 
 export function AdminLoginCard({ children, footer, className }: AdminLoginCardProps) {
+  const { t } = useTranslation('admin')
+
   return (
     <Card
       className={cn(
@@ -27,10 +30,8 @@ export function AdminLoginCard({ children, footer, className }: AdminLoginCardPr
       </div>
 
       <CardHeader className="space-y-1.5 px-4 pb-2 pt-5 text-center sm:px-6">
-        <CardTitle className="text-xl text-primary sm:text-2xl">Panel Admin</CardTitle>
-        <CardDescription className="text-pretty text-sm sm:text-base">
-          Masuk dengan akun Google sekolah atau email yang sudah didaftarkan admin
-        </CardDescription>
+        <CardTitle className="text-xl text-primary sm:text-2xl">{t('auth.title')}</CardTitle>
+        <CardDescription className="text-pretty text-sm sm:text-base">{t('auth.description')}</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4 px-4 pb-6 sm:px-6">

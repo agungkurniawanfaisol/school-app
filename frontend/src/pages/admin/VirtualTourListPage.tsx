@@ -5,8 +5,10 @@ import { AdminActiveBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { useAdminVirtualToursList, useDeleteVirtualTour } from '@/hooks/useVirtualTours'
 import type { VirtualTour } from '@/types/virtualTour'
+import { useTranslation } from 'react-i18next'
 
 export function VirtualTourListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<VirtualTour | null>(null)
@@ -16,8 +18,8 @@ export function VirtualTourListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Tur Virtual"
-        description="Unggah panorama 360° dan hubungkan lokasi dengan pin navigasi"
+        title={t('pages.virtualTour.listTitle')}
+        description={t('pages.virtualTour.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -31,15 +33,15 @@ export function VirtualTourListPage() {
         }}
         createHref="/admin/virtual-tours/create"
         columns={[
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
-          { key: 'slug', header: 'Slug', cell: (item) => item.slug },
+          { key: 'title', header: t('table.title'), cell: (item) => item.title },
+          { key: 'slug', header: t('table.slug'), cell: (item) => item.slug },
           {
             key: 'scenes',
-            header: 'Panorama',
+            header: t('table.panorama'),
             cell: (item) => item.scenes?.length ?? '—',
           },
-          { key: 'order', header: 'Urutan', cell: (item) => item.order },
-          { key: 'active', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'order', header: t('table.order'), cell: (item) => item.order },
+          { key: 'active', header: t('table.status'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions
@@ -51,8 +53,8 @@ export function VirtualTourListPage() {
       <AdminDeleteDialog
         open={!!deleteTarget}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
-        title="Hapus tur virtual?"
-        description={`"${deleteTarget?.title}" dan semua panoramanya akan dihapus permanen.`}
+        title={t('pages.virtualTour.deleteTitle')}
+        description={t('pages.virtualTour.deleteDesc', { title: deleteTarget?.title ?? '' })}
         onConfirm={() => {
           if (!deleteTarget) return
           deleteItem.mutate(deleteTarget.uuid, { onSuccess: () => setDeleteTarget(null) })

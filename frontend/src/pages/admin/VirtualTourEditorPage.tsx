@@ -1,6 +1,7 @@
 import { toast } from 'sonner'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { MapPin, Plus, Save, Trash2, Upload } from 'lucide-react'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { PannellumViewer } from '@/components/virtual-tour/PannellumViewer'
@@ -33,11 +34,11 @@ import {
 } from '@/hooks/useVirtualTours'
 import { buildPannellumConfig } from '@/lib/virtualTourPannellum'
 import { slugify } from '@/lib/utils'
-import { virtualTourFormSchema, type VirtualTourFormValues } from '@/schemas/virtualTour'
+import { createVirtualTourFormSchema, type VirtualTourFormValues } from '@/schemas/virtualTour'
 import type { VirtualTourHotspot, VirtualTourScene } from '@/types/virtualTour'
 
-function sceneTitleFromFile(file: File): string {
-  return file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim() || 'Lokasi Baru'
+function sceneTitleFromFile(file: File, fallback: string): string {
+  return file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim() || fallback
 }
 
 function newScene(image: string, title: string, order: number): VirtualTourScene {
@@ -53,6 +54,7 @@ function newScene(image: string, title: string, order: number): VirtualTourScene
 }
 
 export function VirtualTourEditorPage() {
+  const { t } = useTranslation('admin')
   const { uuid } = useParams<{ uuid: string }>()
   const isCreate = !uuid
   const navigate = useNavigate()
@@ -62,6 +64,8 @@ export function VirtualTourEditorPage() {
   const createTour = useCreateVirtualTour()
   const updateTour = useUpdateVirtualTour(uuid ?? '')
   const uploadMedia = useMediaUpload('virtual-tour')
+
+  const virtualTourFormSchema = useMemo(() => createVirtualTourFormSchema(t), [t])
 
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
@@ -120,7 +124,7 @@ export function VirtualTourEditorPage() {
     const payload = buildPayload()
     const parsed = virtualTourFormSchema.safeParse(payload)
     if (!parsed.success) {
-      const firstError = parsed.error.issues[0]?.message ?? 'Periksa kembali formulir.'
+      const firstError = parsed.error.issues[0]?.message ?? t('validation.checkForm')
       toast.error(firstError)
       return
     }
@@ -142,7 +146,7 @@ export function VirtualTourEditorPage() {
       try {
         const uploaded = await uploadMedia.mutateAsync(file)
         if (!uploaded?.url) continue
-        const scene = newScene(uploaded.url, sceneTitleFromFile(file), scenes.length)
+        const scene = newScene(uploaded.url, sceneTitleFromFile(file, t('pages.virtualTour.newLocation')), scenes.length)
         setScenes((prev) => [...prev, scene])
         setActiveSceneUuid(scene.uuid ?? null)
         if (!startSceneUuid) {
@@ -160,7 +164,7 @@ export function VirtualTourEditorPage() {
 
   const handleCoordsPick = (coords: { pitch: number; yaw: number }) => {
     if (!placementMode || otherScenes.length === 0) {
-      toast.error('Tambahkan minimal satu panorama lain sebelum meletakkan pin navigasi.')
+      toast.error(t('pages.virtualTour.needMorePanorama'))
       return
     }
     setPendingCoords(coords)
@@ -228,14 +232,14 @@ export function VirtualTourEditorPage() {
 
   return (
     <AdminFormShell
-      title={isCreate ? 'Buat Tur Virtual' : 'Edit Tur Virtual'}
-      description="Unggah foto 360°, letakkan pin navigasi ke lokasi berikutnya"
+      title={isCreate ? t('pages.virtualTour.createTitle') : t('pages.virtualTour.editTitle')}
+      description={t('pages.virtualTour.editorDesc')}
       backHref="/admin/virtual-tours"
       isLoading={!isCreate && isLoading}
       actions={
         <Button onClick={handleSave} disabled={!canSave || isSaving} className="min-h-11">
           <Save className="mr-2 h-4 w-4" aria-hidden />
-          {isSaving ? 'Menyimpan...' : 'Simpan'}
+          {isSaving ? t('common.saving') : t('common.save')}
         </Button>
       }
     >
@@ -243,43 +247,43 @@ export function VirtualTourEditorPage() {
         <div className="space-y-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Informasi</CardTitle>
+              <CardTitle className="text-base">{t('pages.virtualTour.infoTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="vt-title">Judul</Label>
+                <Label htmlFor="vt-title">{t('form.title')}</Label>
                 <Input
                   id="vt-title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Tur Sekolah Nurul Hikmah"
+                  placeholder={t('pages.virtualTour.titlePlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="vt-slug">Slug URL</Label>
+                <Label htmlFor="vt-slug">{t('form.slugUrl')}</Label>
                 <Input
                   id="vt-slug"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  placeholder={slugify(title) || 'tur-sekolah'}
+                  placeholder={slugify(title) || t('pages.virtualTour.slugPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="vt-desc">Deskripsi</Label>
+                <Label htmlFor="vt-desc">{t('form.description')}</Label>
                 <Textarea
                   id="vt-desc"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
-                  placeholder="Jelajahi lingkungan sekolah secara virtual..."
+                  placeholder={t('pages.virtualTour.descriptionPlaceholder')}
                 />
               </div>
               <div className="flex items-center justify-between gap-3">
-                <Label htmlFor="vt-active">Aktif</Label>
+                <Label htmlFor="vt-active">{t('form.active')}</Label>
                 <Switch id="vt-active" checked={isActive} onCheckedChange={setIsActive} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="vt-order">Urutan</Label>
+                <Label htmlFor="vt-order">{t('form.order')}</Label>
                 <Input
                   id="vt-order"
                   type="number"
@@ -293,7 +297,7 @@ export function VirtualTourEditorPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-3">
-              <CardTitle className="text-base">Panorama</CardTitle>
+              <CardTitle className="text-base">{t('pages.virtualTour.panoramaTitle')}</CardTitle>
               <Button
                 type="button"
                 size="sm"
@@ -303,7 +307,7 @@ export function VirtualTourEditorPage() {
                 disabled={uploadMedia.isPending}
               >
                 <Plus className="mr-1 h-4 w-4" aria-hidden />
-                Tambah
+                {t('common.add')}
               </Button>
               <input
                 ref={fileInputRef}
@@ -316,7 +320,7 @@ export function VirtualTourEditorPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               {scenes.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Belum ada panorama. Unggah foto 360° equirectangular.</p>
+                <p className="text-sm text-muted-foreground">{t('pages.virtualTour.noPanorama')}</p>
               ) : (
                 scenes.map((scene) => (
                   <div
@@ -331,7 +335,7 @@ export function VirtualTourEditorPage() {
                       onClick={() => setActiveSceneUuid(scene.uuid ?? null)}
                     >
                       <p className="truncate text-sm font-medium">{scene.title}</p>
-                      <p className="text-xs text-muted-foreground">{scene.hotspots.length} pin</p>
+                      <p className="text-xs text-muted-foreground">{t('pages.virtualTour.pinCount', { count: scene.hotspots.length })}</p>
                     </button>
                     <div className="flex shrink-0 flex-col gap-1">
                       <Button
@@ -339,7 +343,7 @@ export function VirtualTourEditorPage() {
                         size="icon"
                         variant={startSceneUuid === scene.uuid ? 'default' : 'ghost'}
                         className="h-8 w-8"
-                        title="Jadikan lokasi awal"
+                        title={t('pages.virtualTour.setStartLocation')}
                         onClick={() => setStartSceneUuid(scene.uuid ?? null)}
                       >
                         <MapPin className="h-4 w-4" aria-hidden />
@@ -365,11 +369,11 @@ export function VirtualTourEditorPage() {
           <Card>
             <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <CardTitle className="text-base">{activeScene?.title ?? 'Pratinjau Panorama'}</CardTitle>
+                <CardTitle className="text-base">{activeScene?.title ?? t('pages.virtualTour.previewPanorama')}</CardTitle>
                 <p className="text-sm text-muted-foreground">
                   {placementMode
-                    ? 'Klik pada panorama untuk meletakkan pin navigasi'
-                    : 'Geser untuk melihat sekeliling, gunakan pin untuk pindah lokasi'}
+                    ? t('pages.virtualTour.placementModeHint')
+                    : t('pages.virtualTour.viewModeHint')}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -381,7 +385,7 @@ export function VirtualTourEditorPage() {
                   onClick={() => setPlacementMode((value) => !value)}
                 >
                   <MapPin className="mr-2 h-4 w-4" aria-hidden />
-                  {placementMode ? 'Mode Pin Aktif' : 'Letakkan Pin'}
+                  {placementMode ? t('pages.virtualTour.placementModeActive') : t('pages.virtualTour.placePin')}
                 </Button>
                 <Button
                   type="button"
@@ -391,7 +395,7 @@ export function VirtualTourEditorPage() {
                   disabled={uploadMedia.isPending}
                 >
                   <Upload className="mr-2 h-4 w-4" aria-hidden />
-                  {uploadMedia.isPending ? 'Mengunggah...' : 'Unggah 360°'}
+                  {uploadMedia.isPending ? t('common.uploading') : t('pages.virtualTour.upload360')}
                 </Button>
               </div>
             </CardHeader>
@@ -409,7 +413,7 @@ export function VirtualTourEditorPage() {
           {activeScene && activeScene.hotspots.length > 0 && (
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-base">Pin di lokasi ini</CardTitle>
+                <CardTitle className="text-base">{t('pages.virtualTour.pinsAtLocation')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {activeScene.hotspots.map((hotspot, index) => {
@@ -421,7 +425,7 @@ export function VirtualTourEditorPage() {
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">{hotspot.label}</p>
-                        <p className="text-xs text-muted-foreground">→ {target?.title ?? 'Lokasi'}</p>
+                        <p className="text-xs text-muted-foreground">→ {target?.title ?? t('pages.virtualTour.locationFallback')}</p>
                       </div>
                       <Button
                         type="button"
@@ -444,23 +448,23 @@ export function VirtualTourEditorPage() {
       <Dialog open={hotspotDialogOpen} onOpenChange={setHotspotDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Tambah Pin Navigasi</DialogTitle>
+            <DialogTitle>{t('pages.virtualTour.addNavPin')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="hotspot-label">Label pin</Label>
+              <Label htmlFor="hotspot-label">{t('pages.virtualTour.pinLabel')}</Label>
               <Input
                 id="hotspot-label"
                 value={hotspotLabel}
                 onChange={(e) => setHotspotLabel(e.target.value)}
-                placeholder="Ke ruang kelas"
+                placeholder={t('pages.virtualTour.pinLabelPlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label>Lokasi tujuan</Label>
+              <Label>{t('pages.virtualTour.destinationLocation')}</Label>
               <Select value={hotspotTarget} onValueChange={setHotspotTarget}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih lokasi" />
+                  <SelectValue placeholder={t('pages.virtualTour.selectLocation')} />
                 </SelectTrigger>
                 <SelectContent>
                   {otherScenes.map((scene) => (
@@ -474,10 +478,10 @@ export function VirtualTourEditorPage() {
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setHotspotDialogOpen(false)}>
-              Batal
+              {t('common.cancel')}
             </Button>
             <Button type="button" onClick={addHotspot} disabled={!hotspotLabel.trim() || !hotspotTarget}>
-              Tambah Pin
+              {t('pages.virtualTour.addPin')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,6 +1,7 @@
 import { AdminDataTable, type AdminTableColumn } from '@/components/admin/AdminDataTable'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import type { PaginationMeta } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 export type { AdminTableColumn }
 
@@ -25,6 +26,7 @@ interface AdminPaginatedTableProps<T extends { id: number }> {
 }
 
 export function AdminPaginatedTable<T extends { id: number }>(props: AdminPaginatedTableProps<T>) {
+  const { t } = useTranslation('admin')
   const {
     title,
     description,
@@ -53,7 +55,7 @@ export function AdminPaginatedTable<T extends { id: number }>(props: AdminPagina
         createHref={createHref}
         createLabel={createLabel}
         totalCount={meta?.total}
-        totalLabel="item"
+        totalLabel={t('common.item')}
       />
       <AdminDataTable
         columns={columns}

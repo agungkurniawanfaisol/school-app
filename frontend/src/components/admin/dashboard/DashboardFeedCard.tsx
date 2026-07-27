@@ -2,6 +2,7 @@ import type { LucideIcon } from 'lucide-react'
 import { ArrowRight } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminEmptyState } from '@/components/admin/AdminEmptyState'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -23,7 +24,7 @@ interface DashboardFeedCardProps {
 export function DashboardFeedCard({
   title,
   viewAllHref,
-  viewAllLabel = 'Lihat semua',
+  viewAllLabel,
   isLoading,
   isEmpty,
   emptyIcon,
@@ -33,6 +34,9 @@ export function DashboardFeedCard({
   emptyActionLabel,
   children,
 }: DashboardFeedCardProps) {
+  const { t } = useTranslation('admin')
+  const resolvedViewAllLabel = viewAllLabel ?? t('common.viewAll')
+
   return (
     <Card className="admin-card border-primary/10">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
@@ -42,7 +46,7 @@ export function DashboardFeedCard({
             to={viewAllHref}
             className="inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-sm font-medium text-primary transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {viewAllLabel}
+            {resolvedViewAllLabel}
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
         )}

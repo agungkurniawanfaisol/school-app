@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
   ArrowLeft,
@@ -45,7 +46,8 @@ import { useUnsavedChanges } from '@/hooks/useUnsavedChanges'
 import { saveTeacherPreviewDraft } from '@/lib/teacherPreviewDraft'
 import { slugify } from '@/lib/utils'
 import { EMPTY_EDITOR_DOC, type EditorDocument } from '@/schemas/editor'
-import { TEACHER_TYPE_LABELS, TEACHER_TYPES, teacherSchema, type TeacherFormValues } from '@/schemas/teacher'
+import { TEACHER_TYPES, createTeacherSchema, type TeacherFormValues } from '@/schemas/teacher'
+import { useTeacherTypeLabels } from '@/hooks/useTeacherTypeLabels'
 import type { SocialMedia, TeacherType } from '@/types'
 
 type SocialFields = Pick<SocialMedia, 'facebook' | 'instagram' | 'youtube'>
@@ -119,6 +121,9 @@ function SwitchRow({
 }
 
 export function TeacherFormPage() {
+  const { t } = useTranslation('admin')
+  const teacherTypeLabels = useTeacherTypeLabels()
+  const teacherSchema = useMemo(() => createTeacherSchema(t), [t])
   const { uuid } = useParams<{ uuid: string }>()
   const isEdit = !!uuid
   const navigate = useNavigate()
@@ -175,7 +180,7 @@ export function TeacherFormPage() {
     const result = teacherSchema.safeParse(payload)
     if (!result.success) {
       const first = result.error.issues[0]
-      toast.error(first?.message ?? 'Data tidak valid.')
+      toast.error(first?.message ?? t('validation.invalidData'))
       return null
     }
     return result.data
@@ -263,7 +268,7 @@ export function TeacherFormPage() {
   const openPreview = () => {
     saveTeacherPreviewDraft({
       uuid,
-      name: name || 'Nama Guru',
+      name: name || t('pages.teachers.form.defaultName'),
       title: title || null,
       subject: subject || null,
       bio: bio || null,
@@ -287,7 +292,7 @@ export function TeacherFormPage() {
   const canSave = !!name.trim() && !!(school?.id ?? existing?.school_id)
 
   const previewTeacher = {
-    name: name || 'Nama Guru',
+    name: name || t('pages.teachers.form.defaultName'),
     photo: photo || null,
     title: title || null,
     subject: subject || null,
@@ -297,12 +302,12 @@ export function TeacherFormPage() {
   const identityFields = (
     <SectionCard
       icon={<UserRound className="h-5 w-5" />}
-      title="Identitas Guru"
-      description="Nama dan informasi dasar yang tampil di profil."
+      title={t('pages.teachers.form.identityTitle')}
+      description={t('pages.teachers.form.identityDesc')}
     >
       <div className="space-y-2">
         <Label htmlFor="name">
-          Nama Lengkap <span className="text-destructive">*</span>
+          {t('pages.teachers.form.fullName')} <span className="text-destructive">*</span>
         </Label>
         <Input
           id="name"
@@ -312,13 +317,13 @@ export function TeacherFormPage() {
             markDirty()
             if (!isEdit && !slug) setSlug(slugify(e.target.value))
           }}
-          placeholder="Contoh: Ustadz Ahmad Fauzi"
+          placeholder={t('pages.teachers.form.namePlaceholder')}
           className="h-11"
           autoComplete="name"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="slug">Slug URL</Label>
+        <Label htmlFor="slug">{t('form.slugUrl')}</Label>
         <Input
           id="slug"
           value={slug}
@@ -329,10 +334,10 @@ export function TeacherFormPage() {
           placeholder="ustadz-ahmad-fauzi"
           className="h-11 font-mono text-sm"
         />
-        <p className="text-xs text-muted-foreground">Digunakan di alamat halaman publik guru.</p>
+        <p className="text-xs text-muted-foreground">{t('pages.teachers.form.slugHint')}</p>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="type">Tipe</Label>
+        <Label htmlFor="type">{t('form.type')}</Label>
         <Select
           value={type}
           onValueChange={(v) => {
@@ -341,23 +346,23 @@ export function TeacherFormPage() {
           }}
         >
           <SelectTrigger id="type" className="h-11">
-            <SelectValue placeholder="Pilih tipe" />
+            <SelectValue placeholder={t('form.selectType')} />
           </SelectTrigger>
           <SelectContent>
-            {TEACHER_TYPES.map((t) => (
-              <SelectItem key={t} value={t}>
-                {TEACHER_TYPE_LABELS[t]}
+            {TEACHER_TYPES.map((teacherType) => (
+              <SelectItem key={teacherType} value={teacherType}>
+                {teacherTypeLabels[teacherType]}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground">
-          Menentukan kategori: Kepala Sekolah, Guru, atau Staff.
+          {t('pages.teachers.form.typeHint')}
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="title">Gelar / Jabatan</Label>
+          <Label htmlFor="title">{t('pages.teachers.form.position')}</Label>
           <Input
             id="title"
             value={title}
@@ -365,12 +370,12 @@ export function TeacherFormPage() {
               setTitle(e.target.value)
               markDirty()
             }}
-            placeholder="Guru Mata Pelajaran"
+            placeholder={t('pages.teachers.form.positionPlaceholder')}
             className="h-11"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="subject">Mata Pelajaran</Label>
+          <Label htmlFor="subject">{t('form.subject')}</Label>
           <Input
             id="subject"
             value={subject}
@@ -378,13 +383,13 @@ export function TeacherFormPage() {
               setSubject(e.target.value)
               markDirty()
             }}
-            placeholder="Pendidikan Agama Islam"
+            placeholder={t('pages.teachers.form.subjectPlaceholder')}
             className="h-11"
           />
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email">Email Kontak</Label>
+        <Label htmlFor="email">{t('pages.teachers.form.contactEmail')}</Label>
         <Input
           id="email"
           type="email"
@@ -405,8 +410,8 @@ export function TeacherFormPage() {
   const photoField = (
     <SectionCard
       icon={<Camera className="h-5 w-5" />}
-      title="Foto Profil"
-      description="Foto persegi atau portrait, minimal 400×400 px."
+      title={t('pages.teachers.form.photoTitle')}
+      description={t('pages.teachers.form.photoDesc')}
     >
       <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start lg:flex-col lg:items-stretch">
         <div className="relative mx-auto shrink-0 lg:mx-0">
@@ -427,7 +432,7 @@ export function TeacherFormPage() {
               onClick={() => photoInputRef.current?.click()}
             >
               <ImagePlus className="h-4 w-4" aria-hidden />
-              Ganti Foto
+              {t('common.replacePhoto')}
             </Button>
           ) : (
             <Button
@@ -442,16 +447,16 @@ export function TeacherFormPage() {
               ) : (
                 <ImagePlus className="h-4 w-4" aria-hidden />
               )}
-              Unggah Foto Profil
+              {t('pages.teachers.form.uploadPhoto')}
             </Button>
           )}
           {photo && (
             <Button type="button" variant="ghost" size="sm" className="text-muted-foreground" onClick={() => setPhoto('')}>
-              Hapus foto
+              {t('pages.teachers.form.removePhoto')}
             </Button>
           )}
           <Input
-            placeholder="atau tempel URL foto"
+            placeholder={t('pages.teachers.form.photoUrlPlaceholder')}
             value={photo}
             onChange={(e) => {
               setPhoto(e.target.value)
@@ -466,7 +471,7 @@ export function TeacherFormPage() {
         type="file"
         accept="image/jpeg,image/png,image/webp"
         className="sr-only"
-        aria-label="Unggah foto profil guru"
+        aria-label={t('form.uploadTeacherPhoto')}
         onChange={(e) => {
           const file = e.target.files?.[0]
           if (file) void handlePhotoUpload(file)
@@ -478,8 +483,8 @@ export function TeacherFormPage() {
   const socialFields = (
     <SectionCard
       icon={<Facebook className="h-5 w-5" />}
-      title="Media Sosial"
-      description="Tautan profil resmi guru (opsional)."
+      title={t('form.socialMedia')}
+      description={t('pages.teachers.form.socialDesc')}
     >
       <div className="space-y-3">
         <div className="space-y-2">
@@ -534,11 +539,11 @@ export function TeacherFormPage() {
   const settingsFields = (
     <SectionCard
       icon={<Settings2 className="h-5 w-5" />}
-      title="Pengaturan Tampilan"
-      description="Urutan dan visibilitas di situs."
+      title={t('pages.teachers.form.displaySettingsTitle')}
+      description={t('pages.teachers.form.displaySettingsDesc')}
     >
       <div className="space-y-2">
-        <Label htmlFor="order">Urutan Tampil</Label>
+        <Label htmlFor="order">{t('pages.teachers.form.displayOrder')}</Label>
         <Input
           id="order"
           type="number"
@@ -551,13 +556,13 @@ export function TeacherFormPage() {
           }}
           className="h-11"
         />
-        <p className="text-xs text-muted-foreground">Angka lebih kecil tampil lebih dulu di daftar guru.</p>
+        <p className="text-xs text-muted-foreground">{t('pages.teachers.form.displayOrderHint')}</p>
       </div>
       <Separator />
       <SwitchRow
         id="is_active"
-        label="Status Aktif"
-        description="Guru nonaktif tidak tampil di halaman publik."
+        label={t('pages.teachers.form.activeStatus')}
+        description={t('pages.teachers.form.activeStatusDesc')}
         checked={isActive}
         onCheckedChange={(v) => {
           setIsActive(v)
@@ -566,8 +571,8 @@ export function TeacherFormPage() {
       />
       <SwitchRow
         id="is_featured"
-        label="Tampilkan di Beranda"
-        description="Guru unggulan ditampilkan di section guru beranda."
+        label={t('pages.teachers.form.featuredHome')}
+        description={t('pages.teachers.form.featuredHomeDesc')}
         checked={isFeatured}
         onCheckedChange={(v) => {
           setIsFeatured(v)
@@ -579,7 +584,7 @@ export function TeacherFormPage() {
 
   const bioField = (
     <div className="space-y-2">
-      <Label htmlFor="bio">Ringkasan Singkat</Label>
+      <Label htmlFor="bio">{t('pages.teachers.form.bioSummary')}</Label>
       <Textarea
         id="bio"
         value={bio}
@@ -588,11 +593,11 @@ export function TeacherFormPage() {
           markDirty()
         }}
         rows={3}
-        placeholder="Deskripsi singkat untuk kartu guru di beranda (1–2 kalimat)"
+        placeholder={t('pages.teachers.form.bioPlaceholder')}
         className="min-h-[88px] resize-y"
       />
       <p className="text-xs text-muted-foreground">
-        Konten lengkap ditulis di editor di bawah. Ringkasan ini untuk kartu beranda.
+        {t('pages.teachers.form.bioHint')}
       </p>
     </div>
   )
@@ -610,9 +615,9 @@ export function TeacherFormPage() {
     <div className="space-y-4">
       <Card className="border-primary/10">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Konten Profil Lengkap</CardTitle>
+          <CardTitle className="text-base">{t('pages.teachers.form.fullProfileTitle')}</CardTitle>
           <CardDescription>
-            Biografi, prestasi, dan informasi detail guru menggunakan editor visual.
+            {t('pages.teachers.form.fullProfileDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -644,27 +649,27 @@ export function TeacherFormPage() {
       <Button asChild variant="ghost" size="sm" className="min-h-11 -ml-2 gap-2 px-0 hover:bg-transparent">
         <Link to="/admin/teachers">
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          Kembali ke daftar guru
+          {t('pages.teachers.listTitle')}
         </Link>
       </Button>
       <Card className="border-primary/10 bg-gradient-to-br from-card via-card to-primary/5">
         <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div className="space-y-1">
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {isEdit ? 'Edit Profil' : 'Profil Baru'}
+              {isEdit ? t('pages.teachers.form.editProfile') : t('pages.teachers.form.newProfile')}
             </p>
-            <h1 className="text-xl font-bold sm:text-2xl">{isEdit ? 'Edit Data Guru' : 'Tambah Guru'}</h1>
+            <h1 className="text-xl font-bold sm:text-2xl">{isEdit ? t('pages.teachers.editTitle') : t('pages.teachers.createTitle')}</h1>
             <p className="text-sm text-muted-foreground">
-              Lengkapi profil, foto, dan konten detail guru.
+              {t('pages.teachers.form.formDesc')}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="outline" className="min-h-11" asChild>
-              <Link to={isEdit ? `/admin/teachers/${uuid}` : '/admin/teachers'}>Batal</Link>
+              <Link to={isEdit ? `/admin/teachers/${uuid}` : '/admin/teachers'}>{t('common.cancel')}</Link>
             </Button>
             <Button type="button" variant="outline" className="min-h-11" onClick={openPreview}>
               <ExternalLink className="h-4 w-4" aria-hidden />
-              Pratinjau
+              {t('common.preview')}
             </Button>
             <Button
               type="button"
@@ -678,7 +683,7 @@ export function TeacherFormPage() {
               ) : (
                 <ExternalLink className="h-4 w-4" aria-hidden />
               )}
-              Simpan & Pratinjau
+              {t('common.save')} & {t('common.preview')}
             </Button>
             <Button
               type="button"
@@ -691,7 +696,7 @@ export function TeacherFormPage() {
               ) : (
                 <Save className="h-4 w-4" aria-hidden />
               )}
-              Simpan
+              {t('common.save')}
             </Button>
           </div>
         </CardContent>
@@ -706,10 +711,10 @@ export function TeacherFormPage() {
               {isFeatured && (
                 <Badge variant="secondary" className="gap-1">
                   <Star className="h-3 w-3 fill-gold text-gold" aria-hidden />
-                  Unggulan
+                  {t('status.featured')}
                 </Badge>
               )}
-              <Badge variant={isActive ? 'default' : 'outline'}>{isActive ? 'Aktif' : 'Nonaktif'}</Badge>
+              <Badge variant={isActive ? 'default' : 'outline'}>{isActive ? t('status.active') : t('status.inactive')}</Badge>
             </div>
             {(title || subject) && (
               <p className="text-sm text-muted-foreground">
@@ -724,10 +729,10 @@ export function TeacherFormPage() {
       <Tabs defaultValue="content" className="lg:hidden">
         <TabsList className="grid h-11 w-full grid-cols-2">
           <TabsTrigger value="settings" className="min-h-10">
-            Pengaturan
+            {t('pages.teachers.form.settingsTab')}
           </TabsTrigger>
           <TabsTrigger value="content" className="min-h-10">
-            Konten
+            {t('pages.teachers.form.contentTab')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="settings" className="mt-4 space-y-4">
@@ -751,7 +756,7 @@ export function TeacherFormPage() {
           onClick={() => void handleSave()}
         >
           {isSaving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-          Simpan Data Guru
+          {t('pages.teachers.form.saveTeacher')}
         </Button>
       </div>
     </div>

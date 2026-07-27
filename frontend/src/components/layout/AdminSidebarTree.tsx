@@ -1,5 +1,6 @@
 import { type MouseEvent, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAdminSidebar, type AdminFlyoutTarget } from '@/components/admin/AdminSidebarContext'
 import {
   Accordion,
@@ -46,6 +47,7 @@ function AdminNavLink({
   nested?: boolean
 }) {
   const location = useLocation()
+  const { t } = useTranslation('admin')
   const active = isAdminNavActive(location.pathname, item.href, item.exact)
   const Icon = item.icon
 
@@ -63,7 +65,7 @@ function AdminNavLink({
       <NavIcon active={active}>
         <Icon className="size-4" />
       </NavIcon>
-      <span className="flex-1 truncate">{item.label}</span>
+      <span className="flex-1 truncate">{t(item.labelKey)}</span>
     </Link>
   )
 }
@@ -71,6 +73,7 @@ function AdminNavLink({
 function AdminSidebarIcons({ onNavigate, className }: AdminSidebarTreeProps) {
   const location = useLocation()
   const navigate = useNavigate()
+  const { t } = useTranslation('admin')
   const { data: user } = useAuthMe()
   const navConfig = getAdminNavForRole(user?.role ?? 'admin')
   const { openFlyout, scheduleCloseFlyout, cancelCloseFlyout } = useAdminSidebar()
@@ -100,7 +103,7 @@ function AdminSidebarIcons({ onNavigate, className }: AdminSidebarTreeProps) {
           variant="ghost"
           size="icon"
           className={iconBtnClass(profileActive)}
-          aria-label={guruProfileItem.label}
+          aria-label={t(guruProfileItem.labelKey)}
           aria-current={profileActive ? 'page' : undefined}
           onClick={() => {
             navigate(guruProfileItem.href)
@@ -121,7 +124,7 @@ function AdminSidebarIcons({ onNavigate, className }: AdminSidebarTreeProps) {
           variant="ghost"
           size="icon"
           className={iconBtnClass(dashboardActive)}
-          aria-label={adminDashboardItem.label}
+          aria-label={t(adminDashboardItem.labelKey)}
           aria-current={dashboardActive ? 'page' : undefined}
           onMouseEnter={(e) => handleIconHover('dashboard', e)}
           onMouseLeave={scheduleCloseFlyout}
@@ -136,18 +139,18 @@ function AdminSidebarIcons({ onNavigate, className }: AdminSidebarTreeProps) {
 
       {navConfig.groups.map((group) => {
         const GroupIcon = group.icon
-        const groupActive = activeGroup === group.label
+        const groupActive = activeGroup === group.labelKey
 
         return (
           <Button
-            key={group.label}
+            key={group.labelKey}
             type="button"
             variant="ghost"
             size="icon"
             className={iconBtnClass(groupActive)}
-            aria-label={group.label}
+            aria-label={t(group.labelKey)}
             aria-current={groupActive ? 'page' : undefined}
-            onMouseEnter={(e) => handleIconHover(group.label, e)}
+            onMouseEnter={(e) => handleIconHover(group.labelKey, e)}
             onMouseLeave={scheduleCloseFlyout}
             onClick={() => {
               navigate(group.defaultHref)
@@ -164,6 +167,7 @@ function AdminSidebarIcons({ onNavigate, className }: AdminSidebarTreeProps) {
 
 export function AdminSidebarTree({ mode = 'full', onNavigate, className }: AdminSidebarTreeProps) {
   const location = useLocation()
+  const { t } = useTranslation('admin')
   const { data: user } = useAuthMe()
   const navConfig = getAdminNavForRole(user?.role ?? 'admin')
   const activeGroup = findActiveAdminNavGroup(location.pathname)
@@ -183,8 +187,8 @@ export function AdminSidebarTree({ mode = 'full', onNavigate, className }: Admin
   }
 
   const defaultOpen = navConfig.groups
-    .filter((g) => g.label === activeGroup)
-    .map((g) => g.label)
+    .filter((g) => g.labelKey === activeGroup)
+    .map((g) => g.labelKey)
 
   return (
     <nav className={cn('space-y-1', className)} aria-label="Navigasi admin">
@@ -201,23 +205,23 @@ export function AdminSidebarTree({ mode = 'full', onNavigate, className }: Admin
           <NavIcon active={dashboardActive}>
             <DashboardIcon className="size-4" />
           </NavIcon>
-          {adminDashboardItem.label}
+          {t(adminDashboardItem.labelKey)}
         </Link>
       )}
 
       {navConfig.groups.length > 0 && (
         <p className="admin-nav-section-label mb-2 px-2 text-[10px] font-bold uppercase">
-          Menu Utama
+          {t('nav.mainMenu')}
         </p>
       )}
 
       <Accordion type="multiple" defaultValue={defaultOpen} key={location.pathname} className="space-y-1">
         {navConfig.groups.map((group) => {
           const GroupIcon = group.icon
-          const groupActive = activeGroup === group.label
+          const groupActive = activeGroup === group.labelKey
 
           return (
-            <AccordionItem key={group.label} value={group.label} className="border-none">
+            <AccordionItem key={group.labelKey} value={group.labelKey} className="border-none">
               <AccordionTrigger
                 className={cn(
                   'admin-nav-group-trigger min-h-10 rounded-lg px-2.5 py-2 text-sm font-medium hover:no-underline [&>svg]:text-[var(--sidebar-muted)]',
@@ -234,12 +238,12 @@ export function AdminSidebarTree({ mode = 'full', onNavigate, className }: Admin
                   >
                     <GroupIcon className="size-3.5" />
                   </span>
-                  {group.label}
+                  {t(group.labelKey)}
                 </span>
               </AccordionTrigger>
               <AccordionContent className="space-y-0.5 border-l border-[rgb(255_255_255/0.1)] pb-1 pl-2 pt-0.5">
                 {group.children.map((item) => (
-                  <AdminNavLink key={`${group.label}-${item.label}`} item={item} onNavigate={onNavigate} nested />
+                  <AdminNavLink key={`${group.labelKey}-${item.labelKey}`} item={item} onNavigate={onNavigate} nested />
                 ))}
               </AccordionContent>
             </AccordionItem>
@@ -249,7 +253,7 @@ export function AdminSidebarTree({ mode = 'full', onNavigate, className }: Admin
 
       {navConfig.profileItem && (
         <div className="mt-4 border-t border-[var(--sidebar-border)] pt-3">
-          <p className="admin-nav-section-label mb-2 px-2 text-[10px] font-bold uppercase">Akun</p>
+          <p className="admin-nav-section-label mb-2 px-2 text-[10px] font-bold uppercase">{t('nav.account')}</p>
           <AdminNavLink item={navConfig.profileItem} onNavigate={onNavigate} />
         </div>
       )}

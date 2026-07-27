@@ -1,8 +1,10 @@
 import { CalendarDays, Plus, School, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/components/i18n/LanguageProvider'
 import { formatDate } from '@/lib/utils'
 
 interface DashboardWelcomeHeroProps {
@@ -10,12 +12,12 @@ interface DashboardWelcomeHeroProps {
   pendingPmbCount?: number
 }
 
-function getGreeting(): string {
+function getGreetingKey(): string {
   const hour = new Date().getHours()
-  if (hour < 11) return 'Selamat pagi'
-  if (hour < 15) return 'Selamat siang'
-  if (hour < 18) return 'Selamat sore'
-  return 'Selamat malam'
+  if (hour < 11) return 'dashboard.goodMorning'
+  if (hour < 15) return 'dashboard.goodAfternoon'
+  if (hour < 18) return 'dashboard.goodEvening'
+  return 'dashboard.goodNight'
 }
 
 function getUserInitials(name: string): string {
@@ -27,19 +29,21 @@ function getUserInitials(name: string): string {
     .join('')
 }
 
-const quickLinks = [
-  { label: 'Tambah Berita', href: '/admin/news/create', icon: Plus },
-  { label: 'Carousel Beranda', href: '/admin/hero-sliders', icon: Sparkles },
-  { label: 'Profil Sekolah', href: '/admin/vision-mission', icon: School },
+const quickLinkKeys = [
+  { labelKey: 'dashboard.quickAddNews', href: '/admin/news/create', icon: Plus },
+  { labelKey: 'dashboard.quickCarousel', href: '/admin/hero-sliders', icon: Sparkles },
+  { labelKey: 'dashboard.quickSchoolProfile', href: '/admin/vision-mission', icon: School },
 ] as const
 
 export function DashboardWelcomeHero({ userName, pendingPmbCount = 0 }: DashboardWelcomeHeroProps) {
+  const { t } = useTranslation('admin')
+  const { locale } = useLanguage()
   const today = formatDate(new Date().toISOString(), {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-  })
+  }, locale)
 
   return (
     <section
@@ -48,7 +52,7 @@ export function DashboardWelcomeHero({ userName, pendingPmbCount = 0 }: Dashboar
         backgroundColor: '#1a5f2a',
         backgroundImage: 'linear-gradient(135deg, #1a5f2a 0%, #2d7a3e 50%, #14532d 100%)',
       }}
-      aria-label="Selamat datang"
+      aria-label={t('dashboard.welcome')}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-40"
@@ -67,20 +71,20 @@ export function DashboardWelcomeHero({ userName, pendingPmbCount = 0 }: Dashboar
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-white/90">{getGreeting()}</p>
+              <p className="text-sm font-medium text-white/90">{t(getGreetingKey())}</p>
               <h1 className="mt-0.5 truncate text-2xl font-bold !text-white sm:text-3xl">{userName}</h1>
               <p className="mt-2 flex max-w-xl items-center gap-2 text-sm text-white/85">
                 <CalendarDays className="h-4 w-4 shrink-0 text-white/85" aria-hidden />
                 <span>{today}</span>
               </p>
               <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80">
-                Kelola konten website, profil sekolah, kursus, dan pendaftaran siswa baru dari satu tempat.
+                {t('dashboard.heroDescription')}
               </p>
             </div>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:min-w-[14rem] lg:flex-col xl:flex-row">
-            {quickLinks.map((item) => {
+            {quickLinkKeys.map((item) => {
               const Icon = item.icon
               return (
                 <Button
@@ -91,7 +95,7 @@ export function DashboardWelcomeHero({ userName, pendingPmbCount = 0 }: Dashboar
                 >
                   <Link to={item.href}>
                     <Icon className="mr-2 h-4 w-4 shrink-0" aria-hidden />
-                    {item.label}
+                    {t(item.labelKey)}
                   </Link>
                 </Button>
               )
@@ -99,7 +103,7 @@ export function DashboardWelcomeHero({ userName, pendingPmbCount = 0 }: Dashboar
             {pendingPmbCount > 0 && (
               <Button asChild className="min-h-11 border-0 bg-[#c9a227] font-semibold text-[#1a2e1f] hover:bg-[#d4b84a]">
                 <Link to="/admin/pmb-registrations">
-                  Review PMB
+                  {t('common.reviewPmb')}
                   <Badge className="ml-2 border-0 bg-white/90 text-[#1a2e1f]">{pendingPmbCount}</Badge>
                 </Link>
               </Button>

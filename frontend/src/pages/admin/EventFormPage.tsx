@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -15,6 +16,7 @@ import {
 import { useSchool } from '@/hooks/useSchool'
 
 export function EventFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -47,7 +49,7 @@ export function EventFormPage() {
     setIsActive(existing.is_active)
   }, [existing])
 
-  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
 
   const payload = {
     school_id: school?.id ?? existing?.school_id ?? 0,
@@ -72,7 +74,7 @@ export function EventFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Agenda' : 'Tambah Agenda'}
+      title={isEdit ? t('pages.events.editTitle') : t('pages.events.createTitle')}
       backHref="/admin/events"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/events')}
@@ -82,53 +84,53 @@ export function EventFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Judul</Label>
+            <Label htmlFor="title">{t('form.title')}</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="location">Lokasi</Label>
+            <Label htmlFor="location">{t('form.location')}</Label>
             <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} className="h-11" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="event_date">Tanggal Mulai</Label>
+              <Label htmlFor="event_date">{t('form.eventDate')}</Label>
               <Input id="event_date" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="event_end_date">Tanggal Selesai</Label>
+              <Label htmlFor="event_end_date">{t('form.eventEndDate')}</Label>
               <Input id="event_end_date" type="date" value={eventEndDate} onChange={(e) => setEventEndDate(e.target.value)} className="h-11" />
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="event_time">Waktu</Label>
-              <Input id="event_time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} placeholder="Contoh: 08:00-12:00" className="h-11" />
+              <Label htmlFor="event_time">{t('form.eventTime')}</Label>
+              <Input id="event_time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} placeholder={t('form.eventTimePlaceholder')} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="category">Kategori</Label>
+              <Label htmlFor="category">{t('form.category')}</Label>
               <Select value={category} onValueChange={(v) => setCategory(v as typeof category)}>
                 <SelectTrigger id="category" className="h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="akademik">Akademik</SelectItem>
-                  <SelectItem value="keagamaan">Keagamaan</SelectItem>
-                  <SelectItem value="olahraga">Olahraga</SelectItem>
-                  <SelectItem value="umum">Umum</SelectItem>
+                  <SelectItem value="akademik">{t('category.akademik')}</SelectItem>
+                  <SelectItem value="keagamaan">{t('category.keagamaan')}</SelectItem>
+                  <SelectItem value="olahraga">{t('category.olahraga')}</SelectItem>
+                  <SelectItem value="umum">{t('category.umum')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="order">Urutan</Label>
+            <Label htmlFor="order">{t('form.order')}</Label>
             <Input id="order" type="number" min={0} value={order} onChange={(e) => setOrder(Number(e.target.value))} className="h-11" />
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </CardContent>

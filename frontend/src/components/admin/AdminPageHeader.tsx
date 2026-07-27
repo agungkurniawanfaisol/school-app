@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
@@ -23,12 +24,16 @@ export function AdminPageHeader({
   description,
   badge,
   totalCount,
-  totalLabel = 'item',
+  totalLabel,
   createHref,
-  createLabel = 'Tambah Baru',
+  createLabel,
   actions,
   className,
 }: AdminPageHeaderProps) {
+  const { t } = useTranslation('admin')
+  const resolvedTotalLabel = totalLabel ?? t('common.item')
+  const resolvedCreateLabel = createLabel ?? t('common.addNew')
+
   return (
     <div className={cn('admin-page-header admin-card admin-fade-in', className)}>
       <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-6">
@@ -42,7 +47,7 @@ export function AdminPageHeader({
             )}
             {totalCount != null && (
               <Badge variant="secondary" className="tabular-nums">
-                {totalCount} {totalLabel}
+                {totalCount} {resolvedTotalLabel}
               </Badge>
             )}
           </div>
@@ -54,7 +59,7 @@ export function AdminPageHeader({
             <Button asChild className="min-h-11 w-full sm:w-auto">
               <Link to={createHref}>
                 <Plus className="h-4 w-4" aria-hidden />
-                {createLabel}
+                {resolvedCreateLabel}
               </Link>
             </Button>
           )}

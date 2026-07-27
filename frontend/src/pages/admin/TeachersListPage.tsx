@@ -33,8 +33,10 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAdminTeachersList, useDeleteTeacher, useUpdateTeacher } from '@/hooks/useTeachers'
-import { TEACHER_TYPE_LABELS, type TeacherTypeValue } from '@/schemas/teacher'
+import { useTeacherTypeLabels } from '@/hooks/useTeacherTypeLabels'
+import type { TeacherTypeValue } from '@/schemas/teacher'
 import type { Teacher } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 function TeacherListCard({
   teacher,
@@ -47,20 +49,23 @@ function TeacherListCard({
   onDelete: (teacher: Teacher) => void
   isToggling: boolean
 }) {
+  const { t } = useTranslation('admin')
+  const teacherTypeLabels = useTeacherTypeLabels()
+
   return (
     <Card className="group overflow-hidden border-primary/10 transition-all duration-200 hover:border-primary/25 hover:shadow-md motion-reduce:transition-none">
       <CardContent className="p-0">
         <Link
           to={`/admin/teachers/${teacher.uuid}`}
           className="flex cursor-pointer flex-col sm:flex-row"
-          aria-label={`Lihat detail ${teacher.name}`}
+          aria-label={t('pages.teachers.viewDetailAria', { name: teacher.name })}
         >
           <div className="relative shrink-0 bg-muted sm:w-28">
             <TeacherAvatar teacher={teacher} size="lg" className="h-28 w-full rounded-none sm:h-full sm:w-28 sm:rounded-none" />
             {teacher.is_featured && (
               <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
                 <Star className="h-3 w-3 fill-current" aria-hidden />
-                Unggulan
+                {t('status.featured')}
               </span>
             )}
           </div>
@@ -71,7 +76,7 @@ function TeacherListCard({
                 <h2 className="truncate text-base font-semibold text-foreground group-hover:text-primary">{teacher.name}</h2>
                 {teacher.type && teacher.type !== 'guru' && (
                   <Badge variant={teacher.type === 'kepala_sekolah' ? 'default' : 'secondary'} className="shrink-0 text-[10px]">
-                    {TEACHER_TYPE_LABELS[teacher.type as TeacherTypeValue] ?? teacher.type}
+                    {teacherTypeLabels[teacher.type as TeacherTypeValue] ?? teacher.type}
                   </Badge>
                 )}
               </div>
@@ -85,10 +90,10 @@ function TeacherListCard({
 
             <div className="flex items-center justify-between gap-2">
               <Badge variant={teacher.is_active ? 'default' : 'secondary'}>
-                {teacher.is_active ? 'Aktif' : 'Nonaktif'}
+                {teacher.is_active ? t('status.active') : t('status.inactive')}
               </Badge>
               <span className="inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 motion-reduce:opacity-100">
-                Detail
+                {t('common.detail')}
                 <ChevronRight className="h-3.5 w-3.5" aria-hidden />
               </span>
             </div>
@@ -104,33 +109,33 @@ function TeacherListCard({
                     to={`/admin/teachers/${teacher.uuid}/preview`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`Pratinjau ${teacher.name}`}
+                    aria-label={t('pages.teachers.previewAria', { name: teacher.name })}
                   >
                     <ExternalLink className="h-4 w-4" />
                   </Link>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Pratinjau</TooltipContent>
+              <TooltipContent>{t('common.preview')}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
-                  <Link to={`/admin/teachers/${teacher.uuid}/edit`} aria-label={`Edit ${teacher.name}`}>
+                  <Link to={`/admin/teachers/${teacher.uuid}/edit`} aria-label={t('pages.teachers.editAria', { name: teacher.name })}>
                     <Pencil className="h-4 w-4" />
                   </Link>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Edit</TooltipContent>
+              <TooltipContent>{t('common.edit')}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
-                  <Link to={`/admin/teachers/${teacher.uuid}`} aria-label={`Detail ${teacher.name}`}>
+                  <Link to={`/admin/teachers/${teacher.uuid}`} aria-label={t('pages.teachers.detailAria', { name: teacher.name })}>
                     <Eye className="h-4 w-4" />
                   </Link>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Detail</TooltipContent>
+              <TooltipContent>{t('common.detail')}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -140,13 +145,17 @@ function TeacherListCard({
                   variant="ghost"
                   className="min-h-11 min-w-11"
                   disabled={isToggling}
-                  aria-label={teacher.is_active ? `Nonaktifkan ${teacher.name}` : `Aktifkan ${teacher.name}`}
+                  aria-label={
+                    teacher.is_active
+                      ? t('pages.teachers.deactivateAria', { name: teacher.name })
+                      : t('pages.teachers.activateAria', { name: teacher.name })
+                  }
                   onClick={onToggleActive}
                 >
                   <Power className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{teacher.is_active ? 'Nonaktifkan' : 'Aktifkan'}</TooltipContent>
+              <TooltipContent>{teacher.is_active ? t('common.deactivate') : t('common.activate')}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -155,13 +164,13 @@ function TeacherListCard({
                   size="sm"
                   variant="ghost"
                   className="min-h-11 min-w-11 text-destructive hover:text-destructive"
-                  aria-label={`Hapus ${teacher.name}`}
+                  aria-label={t('pages.teachers.deleteAria', { name: teacher.name })}
                   onClick={() => onDelete(teacher)}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Hapus</TooltipContent>
+              <TooltipContent>{t('common.delete')}</TooltipContent>
             </Tooltip>
           </div>
         </TooltipProvider>
@@ -184,7 +193,7 @@ function ListPagination({
   return (
     <div className="space-y-3">
       <p className="text-center text-sm text-muted-foreground md:hidden">
-        Halaman {page} dari {lastPage}
+        {t('common.pageOf', { page, lastPage })}
       </p>
       <Pagination>
         <PaginationContent className="flex-wrap justify-center gap-1">
@@ -236,6 +245,8 @@ function ListPagination({
 }
 
 export function AdminTeachersListPage() {
+  const { t } = useTranslation('admin')
+  const teacherTypeLabels = useTeacherTypeLabels()
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -265,24 +276,24 @@ export function AdminTeachersListPage() {
   return (
     <div className="admin-fade-in space-y-4 sm:space-y-6">
       <AdminPageHeader
-        title="Kelola Guru"
-        description="Direktori tenaga pendidik sekolah — kelola profil, status, dan konten publik."
+        title={t('pages.teachers.listTitle')}
+        description={t('pages.teachers.listDesc')}
         totalCount={data?.meta.total}
-        totalLabel="guru"
+        totalLabel={t('common.teachers')}
         createHref="/admin/teachers/create"
-        createLabel="Tambah Guru"
+        createLabel={t('pages.teachers.createLabel')}
       />
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <AdminMiniStat label="Total Guru" value={data?.meta.total ?? '—'} icon={Users} />
+        <AdminMiniStat label={t('pages.teachers.list.totalTeachers')} value={data?.meta.total ?? '—'} icon={Users} />
         <AdminMiniStat
-          label="Aktif (halaman ini)"
+          label={t('pages.teachers.list.activeOnPage')}
           value={isLoading ? '—' : activeCount}
           icon={Users}
           tone="success"
         />
         <AdminMiniStat
-          label="Unggulan (halaman ini)"
+          label={t('pages.teachers.list.featuredOnPage')}
           value={isLoading ? '—' : featuredCount}
           icon={Star}
           tone="gold"
@@ -295,14 +306,14 @@ export function AdminTeachersListPage() {
             <div className="relative w-full sm:max-w-md">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
               <Input
-                placeholder="Cari nama atau slug guru..."
+                placeholder={t('pages.teachers.list.searchPlaceholder')}
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value)
                   setPage(1)
                 }}
                 className="h-11 pl-9"
-                aria-label="Cari guru"
+                aria-label={t('common.searchTeacher')}
               />
             </div>
             <Select
@@ -312,13 +323,13 @@ export function AdminTeachersListPage() {
                 setPage(1)
               }}
             >
-              <SelectTrigger className="h-11 w-full sm:w-40" aria-label="Filter status">
-                <SelectValue placeholder="Status" />
+              <SelectTrigger className="h-11 w-full sm:w-40" aria-label={t('common.filterStatus')}>
+                <SelectValue placeholder={t('form.status')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua status</SelectItem>
-                <SelectItem value="active">Aktif</SelectItem>
-                <SelectItem value="inactive">Nonaktif</SelectItem>
+                <SelectItem value="all">{t('common.allStatus')}</SelectItem>
+                <SelectItem value="active">{t('status.active')}</SelectItem>
+                <SelectItem value="inactive">{t('status.inactive')}</SelectItem>
               </SelectContent>
             </Select>
             <Select
@@ -328,12 +339,12 @@ export function AdminTeachersListPage() {
                 setPage(1)
               }}
             >
-              <SelectTrigger className="h-11 w-full sm:w-44" aria-label="Filter unggulan">
-                <SelectValue placeholder="Unggulan" />
+              <SelectTrigger className="h-11 w-full sm:w-44" aria-label={t('common.filterFeatured')}>
+                <SelectValue placeholder={t('form.featured')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua guru</SelectItem>
-                <SelectItem value="featured">Unggulan saja</SelectItem>
+                <SelectItem value="all">{t('common.allTeachers')}</SelectItem>
+                <SelectItem value="featured">{t('common.featuredOnly')}</SelectItem>
               </SelectContent>
             </Select>
             <Select
@@ -343,14 +354,14 @@ export function AdminTeachersListPage() {
                 setPage(1)
               }}
             >
-              <SelectTrigger className="h-11 w-full sm:w-44" aria-label="Filter tipe">
-                <SelectValue placeholder="Tipe" />
+              <SelectTrigger className="h-11 w-full sm:w-44" aria-label={t('common.filterType')}>
+                <SelectValue placeholder={t('form.type')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua tipe</SelectItem>
-                <SelectItem value="kepala_sekolah">Kepala Sekolah</SelectItem>
-                <SelectItem value="guru">Guru</SelectItem>
-                <SelectItem value="staff">Staff</SelectItem>
+                <SelectItem value="all">{t('common.allTypes')}</SelectItem>
+                <SelectItem value="kepala_sekolah">{teacherTypeLabels.kepala_sekolah}</SelectItem>
+                <SelectItem value="guru">{teacherTypeLabels.guru}</SelectItem>
+                <SelectItem value="staff">{teacherTypeLabels.staff}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -384,11 +395,11 @@ export function AdminTeachersListPage() {
             <CardContent className="flex flex-col items-center gap-3 py-12 text-center">
               <Users className="h-10 w-10 text-muted-foreground/50" aria-hidden />
               <p className="text-sm text-muted-foreground">
-                {search ? 'Tidak ada guru yang cocok dengan pencarian.' : 'Belum ada data guru.'}
+                {search ? t('pages.teachers.list.noMatch') : t('pages.teachers.list.empty')}
               </p>
               {!search && (
                 <Button asChild size="sm">
-                  <Link to="/admin/teachers/create">Tambah Guru Pertama</Link>
+                  <Link to="/admin/teachers/create">{t('pages.teachers.list.addFirst')}</Link>
                 </Button>
               )}
             </CardContent>
@@ -406,16 +417,16 @@ export function AdminTeachersListPage() {
       <Dialog open={!!toggleTarget} onOpenChange={(open) => !open && setToggleTarget(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{toggleTarget?.is_active ? 'Nonaktifkan guru?' : 'Aktifkan guru?'}</DialogTitle>
+            <DialogTitle>{toggleTarget?.is_active ? t('pages.teachers.deactivateTitle') : t('pages.teachers.activateTitle')}</DialogTitle>
             <DialogDescription>
               {toggleTarget?.is_active
-                ? `Guru "${toggleTarget?.name}" tidak akan tampil di halaman publik. Data tetap tersimpan dan bisa diaktifkan kembali.`
-                : `Guru "${toggleTarget?.name}" akan tampil kembali di situs publik.`}
+                ? t('pages.teachers.list.deactivateConfirmDesc', { name: toggleTarget?.name ?? '' })
+                : t('pages.teachers.list.activateConfirmDesc', { name: toggleTarget?.name ?? '' })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setToggleTarget(null)}>
-              Batal
+              {t('common.cancel')}
             </Button>
             <ToggleConfirmButton teacher={toggleTarget} onDone={() => setToggleTarget(null)} />
           </DialogFooter>
@@ -425,15 +436,15 @@ export function AdminTeachersListPage() {
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Hapus guru?</DialogTitle>
+            <DialogTitle>{t('pages.teachers.deleteTitle')}</DialogTitle>
             <DialogDescription>
-              Guru &quot;{deleteTarget?.name}&quot; akan dihapus permanen.
-              {deleteTarget?.has_linked_user && ' Akun guru terkait akan dilepas dari profil ini.'}
+              {t('pages.teachers.list.deleteSimpleDesc', { name: deleteTarget?.name ?? '' })}
+              {deleteTarget?.has_linked_user && t('pages.teachers.list.unlinkWarning')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
-              Batal
+              {t('common.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -445,7 +456,7 @@ export function AdminTeachersListPage() {
                 navigate('/admin/teachers')
               }}
             >
-              Hapus
+              {t('common.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -455,6 +466,7 @@ export function AdminTeachersListPage() {
 }
 
 function ToggleConfirmButton({ teacher, onDone }: { teacher: Teacher | null; onDone: () => void }) {
+  const { t } = useTranslation('admin')
   const updateTeacher = useUpdateTeacher(teacher?.uuid ?? '')
   if (!teacher) return null
   return (
@@ -465,7 +477,7 @@ function ToggleConfirmButton({ teacher, onDone }: { teacher: Teacher | null; onD
         onDone()
       }}
     >
-      {teacher.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+      {teacher.is_active ? t('common.deactivate') : t('common.activate')}
     </Button>
   )
 }

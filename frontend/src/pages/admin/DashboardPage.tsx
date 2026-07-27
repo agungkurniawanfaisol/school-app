@@ -1,5 +1,6 @@
 import { Building2, GraduationCap, Newspaper, Sparkles, Users, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { DashboardFeedCard } from '@/components/admin/dashboard/DashboardFeedCard'
 import { DashboardModuleGrid } from '@/components/admin/dashboard/DashboardModuleGrid'
 import { DashboardStatCard } from '@/components/admin/dashboard/DashboardStatCard'
@@ -15,53 +16,54 @@ import { useAdminPmbRegistrationsList } from '@/hooks/usePmb'
 import { useAdminTeachersList } from '@/hooks/useTeachers'
 import { formatDate } from '@/lib/utils'
 
-const statCards = [
+const statCardKeys = [
   {
     key: 'news',
-    label: 'Berita',
+    labelKey: 'dashboard.stat.news',
     icon: Newspaper,
     href: '/admin/news',
-    hint: 'Artikel & pengumuman publik',
+    hintKey: 'dashboard.stat.newsHint',
   },
   {
     key: 'activities',
-    label: 'Kegiatan',
+    labelKey: 'dashboard.stat.activities',
     icon: Zap,
     href: '/admin/student-activities',
-    hint: 'Kegiatan siswa di website',
+    hintKey: 'dashboard.stat.activitiesHint',
   },
   {
     key: 'teachers',
-    label: 'Guru',
+    labelKey: 'dashboard.stat.teachers',
     icon: Users,
     href: '/admin/teachers',
-    hint: 'Profil tenaga pendidik',
+    hintKey: 'dashboard.stat.teachersHint',
   },
   {
     key: 'facilities',
-    label: 'Fasilitas',
+    labelKey: 'dashboard.stat.facilities',
     icon: Building2,
     href: '/admin/facilities',
-    hint: 'Sarana & prasarana sekolah',
+    hintKey: 'dashboard.stat.facilitiesHint',
   },
   {
     key: 'curriculums',
-    label: 'Program Unggulan',
+    labelKey: 'dashboard.stat.programs',
     icon: Sparkles,
     href: '/admin/program-unggulan',
-    hint: 'Program unggulan sekolah',
+    hintKey: 'dashboard.stat.programsHint',
   },
   {
     key: 'pmb',
-    label: 'PMB Pending',
+    labelKey: 'dashboard.stat.pmbPending',
     icon: GraduationCap,
     href: '/admin/pmb-registrations',
-    hint: 'Menunggu verifikasi admin',
+    hintKey: 'dashboard.stat.pmbPendingHint',
     highlight: true,
   },
 ] as const
 
 export function DashboardPage() {
+  const { t } = useTranslation('admin')
   const { data: user } = useAuthMe()
   const { data: newsData, isLoading: newsLoading } = useAdminNewsList({ per_page: 1 })
   const { data: activitiesData, isLoading: activitiesLoading } = useAdminActivitiesList({ per_page: 1 })
@@ -93,7 +95,7 @@ export function DashboardPage() {
   return (
     <div className="space-y-6 admin-fade-in sm:space-y-8">
       <DashboardWelcomeHero
-        userName={user?.name ?? 'Administrator'}
+        userName={user?.name ?? t('common.administrator')}
         pendingPmbCount={pmbData?.meta.total ?? 0}
       />
 
@@ -101,21 +103,21 @@ export function DashboardPage() {
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
             <h2 id="dashboard-stats-heading" className="text-lg font-semibold tracking-tight">
-              Ringkasan Konten
+              {t('dashboard.contentSummary')}
             </h2>
-            <p className="text-sm text-muted-foreground">Ketuk kartu untuk membuka modul terkait</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard.contentSummaryHint')}</p>
           </div>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-6">
-          {statCards.map((stat, index) => (
+          {statCardKeys.map((stat, index) => (
             <DashboardStatCard
               key={stat.key}
-              label={stat.label}
+              label={t(stat.labelKey)}
               href={stat.href}
               icon={stat.icon}
               count={counts[stat.key]}
               isLoading={loadingMap[stat.key]}
-              hint={stat.hint}
+              hint={t(stat.hintKey)}
               highlight={'highlight' in stat && stat.highlight}
               delayMs={index * 50}
             />
@@ -127,9 +129,9 @@ export function DashboardPage() {
         <section className="xl:col-span-3" aria-labelledby="dashboard-modules-heading">
           <div className="mb-4">
             <h2 id="dashboard-modules-heading" className="text-lg font-semibold tracking-tight">
-              Akses Modul
+              {t('dashboard.moduleAccess')}
             </h2>
-            <p className="text-sm text-muted-foreground">Navigasi cepat ke semua area admin</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard.moduleAccessHint')}</p>
           </div>
           <DashboardModuleGrid groups={adminNavTree} />
         </section>
@@ -137,21 +139,21 @@ export function DashboardPage() {
         <section className="space-y-6 xl:col-span-2" aria-labelledby="dashboard-activity-heading">
           <div>
             <h2 id="dashboard-activity-heading" className="text-lg font-semibold tracking-tight">
-              Aktivitas Terbaru
+              {t('dashboard.recentActivity')}
             </h2>
-            <p className="text-sm text-muted-foreground">Perlu tindakan atau ditinjau ulang</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard.recentActivityHint')}</p>
           </div>
 
           <DashboardFeedCard
-            title="Berita Terbaru"
+            title={t('dashboard.feed.latestNews')}
             viewAllHref="/admin/news"
             isLoading={recentLoading}
             isEmpty={!recentNews?.data.length}
             emptyIcon={Newspaper}
-            emptyTitle="Belum ada berita"
-            emptyDescription="Mulai publikasikan pengumuman dan artikel sekolah."
+            emptyTitle={t('dashboard.empty.newsTitle')}
+            emptyDescription={t('dashboard.empty.newsDesc')}
             emptyActionHref="/admin/news/create"
-            emptyActionLabel="Tambah Berita"
+            emptyActionLabel={t('dashboard.empty.newsAction')}
           >
             {recentNews?.data.map((article) => (
               <Link
@@ -162,7 +164,7 @@ export function DashboardPage() {
                 <div className="min-w-0">
                   <p className="truncate font-medium">{article.title}</p>
                   <p className="text-xs text-muted-foreground sm:text-sm">
-                    {[article.category ?? 'Umum', article.published_at ? formatDate(article.published_at) : null]
+                    {[article.category ?? t('dashboard.category.general'), article.published_at ? formatDate(article.published_at) : null]
                       .filter(Boolean)
                       .join(' · ')}
                   </p>
@@ -173,15 +175,15 @@ export function DashboardPage() {
           </DashboardFeedCard>
 
           <DashboardFeedCard
-            title="PMB Menunggu Review"
+            title={t('dashboard.feed.pmbReview')}
             viewAllHref="/admin/pmb-registrations"
             isLoading={pendingPmbLoading}
             isEmpty={!pendingPmb?.data.length}
             emptyIcon={GraduationCap}
-            emptyTitle="Tidak ada pendaftaran menunggu"
-            emptyDescription="Semua pendaftaran siswa baru sudah diproses."
+            emptyTitle={t('dashboard.empty.pmbTitle')}
+            emptyDescription={t('dashboard.empty.pmbDesc')}
             emptyActionHref="/admin/pmb-registrations"
-            emptyActionLabel="Lihat Semua PMB"
+            emptyActionLabel={t('dashboard.empty.pmbAction')}
           >
             {pendingPmb?.data.map((reg) => (
               <Link

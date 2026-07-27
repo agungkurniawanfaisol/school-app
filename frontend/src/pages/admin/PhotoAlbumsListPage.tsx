@@ -5,8 +5,10 @@ import { AdminActiveBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { useAdminPhotoAlbumsList, useDeletePhotoAlbum } from '@/hooks/usePhotoAlbums'
 import type { PhotoAlbum } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 export function PhotoAlbumsListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<PhotoAlbum | null>(null)
@@ -21,8 +23,8 @@ export function PhotoAlbumsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Galeri Foto"
-        description="Album foto kegiatan sekolah"
+        title={t('pages.photoAlbums.listTitle')}
+        description={t('pages.photoAlbums.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -36,10 +38,10 @@ export function PhotoAlbumsListPage() {
         }}
         createHref="/admin/photo-albums/create"
         columns={[
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
-          { key: 'event_date', header: 'Tanggal', cell: (item) => formatDate(item.event_date) },
-          { key: 'photos_count', header: 'Jumlah Foto', cell: (item) => item.photos_count ?? 0 },
-          { key: 'status', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'title', header: t('table.title'), cell: (item) => item.title },
+          { key: 'event_date', header: t('table.date'), cell: (item) => formatDate(item.event_date) },
+          { key: 'photos_count', header: t('table.photoCount'), cell: (item) => item.photos_count ?? 0 },
+          { key: 'status', header: t('table.status'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions

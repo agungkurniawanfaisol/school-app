@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ImagePlus, Loader2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,6 +24,7 @@ export function AdminImageField({
   className,
   hint,
 }: AdminImageFieldProps) {
+  const { t } = useTranslation('admin')
   const inputRef = useRef<HTMLInputElement>(null)
   const upload = useMediaUpload(collection)
 
@@ -46,7 +48,7 @@ export function AdminImageField({
               variant="secondary"
               className="absolute right-2 top-2 h-8 w-8"
               onClick={() => onChange('')}
-              aria-label="Hapus gambar"
+              aria-label={t('components.adminImage.removeImageAria')}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -63,12 +65,12 @@ export function AdminImageField({
             ) : (
               <ImagePlus className="h-6 w-6" />
             )}
-            Unggah gambar
+            {t('components.adminImage.uploadImage')}
           </button>
         )}
         <div className="min-w-0 flex-1 space-y-2">
           <Input
-            placeholder="atau tempel URL gambar"
+            placeholder={t('components.adminImage.urlPlaceholder')}
             value={value}
             onChange={(e) => onChange(e.target.value)}
           />
@@ -79,7 +81,7 @@ export function AdminImageField({
             onClick={() => inputRef.current?.click()}
             disabled={upload.isPending}
           >
-            Pilih file
+            {t('components.adminImage.selectFile')}
           </Button>
         </div>
       </div>

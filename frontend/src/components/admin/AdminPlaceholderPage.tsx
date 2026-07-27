@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 import { Construction } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -12,9 +13,11 @@ type AdminPlaceholderPageProps = {
 
 export function AdminPlaceholderPage({
   title,
-  description = 'Modul ini sedang dalam pengembangan dan akan segera tersedia.',
+  description,
   icon: Icon = Construction,
 }: AdminPlaceholderPageProps) {
+  const { t } = useTranslation('admin')
+
   return (
     <div className="flex min-h-[50vh] items-center justify-center">
       <Card className="w-full max-w-lg border-primary/10 shadow-sm">
@@ -23,11 +26,11 @@ export function AdminPlaceholderPage({
             <Icon className="h-8 w-8 text-primary" aria-hidden />
           </div>
           <CardTitle className="text-xl">{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          <CardDescription>{description ?? t('placeholder.developing')}</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center">
           <Button asChild variant="outline">
-            <Link to="/admin">Kembali ke Dashboard</Link>
+            <Link to="/admin">{t('placeholder.backDashboard')}</Link>
           </Button>
         </CardContent>
       </Card>

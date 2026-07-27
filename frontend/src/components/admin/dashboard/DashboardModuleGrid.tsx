@@ -1,5 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { AdminNavGroup } from '@/config/admin-nav'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
@@ -9,6 +10,7 @@ interface DashboardModuleGridProps {
 }
 
 function ModuleLink({ item }: { item: AdminNavGroup['children'][number] }) {
+  const { t } = useTranslation('admin')
   const Icon = item.icon
 
   return (
@@ -22,7 +24,7 @@ function ModuleLink({ item }: { item: AdminNavGroup['children'][number] }) {
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
         <Icon className="h-4 w-4" aria-hidden />
       </span>
-      <span className="min-w-0 flex-1 truncate text-sm font-medium">{item.label}</span>
+      <span className="min-w-0 flex-1 truncate text-sm font-medium">{t(item.labelKey)}</span>
       <ChevronRight
         className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
         aria-hidden
@@ -32,26 +34,30 @@ function ModuleLink({ item }: { item: AdminNavGroup['children'][number] }) {
 }
 
 export function DashboardModuleGrid({ groups }: DashboardModuleGridProps) {
+  const { t } = useTranslation('admin')
+
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {groups.map((group) => {
         const GroupIcon = group.icon
         return (
-          <Card key={group.label} className="admin-card border-primary/10">
+          <Card key={group.labelKey} className="admin-card border-primary/10">
             <CardHeader className="pb-2">
               <div className="flex items-center gap-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                   <GroupIcon className="h-5 w-5" aria-hidden />
                 </span>
                 <div>
-                  <CardTitle className="text-base">{group.label}</CardTitle>
-                  <CardDescription>{group.children.length} modul tersedia</CardDescription>
+                  <CardTitle className="text-base">{t(group.labelKey)}</CardTitle>
+                  <CardDescription>
+                    {t('common.modulesAvailable', { count: group.children.length })}
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-0.5 pt-0">
               {group.children.map((item) => (
-                <ModuleLink key={`${group.label}-${item.label}`} item={item} />
+                <ModuleLink key={`${group.labelKey}-${item.labelKey}`} item={item} />
               ))}
             </CardContent>
           </Card>

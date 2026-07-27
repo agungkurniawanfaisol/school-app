@@ -1,17 +1,21 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AdminPaginatedTable } from '@/components/admin/AdminPaginatedTable'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAdminCourseEnrollmentsList } from '@/hooks/useCourseEnrollments'
-
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'Semua status' },
-  { value: 'active', label: 'Aktif' },
-  { value: 'completed', label: 'Selesai' },
-  { value: 'cancelled', label: 'Dibatalkan' },
-]
+import { useTranslation } from 'react-i18next'
 
 export function CourseEnrollmentsListPage() {
+  const { t } = useTranslation('admin')
+  const statusOptions = useMemo(
+    () => [
+      { value: 'all', label: t('common.allStatus') },
+      { value: 'active', label: t('status.active') },
+      { value: 'completed', label: t('status.completed') },
+      { value: 'cancelled', label: t('status.cancelled') },
+    ],
+    [t],
+  )
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('all')
@@ -24,8 +28,8 @@ export function CourseEnrollmentsListPage() {
 
   return (
     <AdminPaginatedTable
-      title="Pendaftaran Kursus"
-      description="Daftar siswa terdaftar di kursus"
+      title={t('pages.courses.enrollmentsTitle')}
+      description={t('pages.courses.enrollmentsDesc')}
       data={data?.data}
       meta={data?.meta}
       isLoading={isLoading}
@@ -40,10 +44,10 @@ export function CourseEnrollmentsListPage() {
       toolbarFilters={
         <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1) }}>
           <SelectTrigger className="h-11 w-full sm:w-44">
-            <SelectValue placeholder="Filter status" />
+            <SelectValue placeholder={t('common.filterStatus')} />
           </SelectTrigger>
           <SelectContent>
-            {STATUS_OPTIONS.map((opt) => (
+            {statusOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
                 {opt.label}
               </SelectItem>
@@ -52,10 +56,10 @@ export function CourseEnrollmentsListPage() {
         </Select>
       }
       columns={[
-        { key: 'student', header: 'Siswa', cell: (item) => item.student_name },
-        { key: 'email', header: 'Email', cell: (item) => item.student_email },
-        { key: 'course', header: 'Kursus', cell: (item) => item.course?.title ?? '—' },
-        { key: 'status', header: 'Status', cell: (item) => <AdminStatusBadge status={item.status} /> },
+        { key: 'student', header: t('table.student'), cell: (item) => item.student_name },
+        { key: 'email', header: t('table.email'), cell: (item) => item.student_email },
+        { key: 'course', header: t('table.course'), cell: (item) => item.course?.title ?? '—' },
+        { key: 'status', header: t('table.status'), cell: (item) => <AdminStatusBadge status={item.status} /> },
       ]}
     />
   )

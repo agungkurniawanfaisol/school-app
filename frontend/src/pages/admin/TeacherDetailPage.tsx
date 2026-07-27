@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -45,6 +46,7 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
 }
 
 function SocialLinks({ social }: { social: SocialMedia | null }) {
+  const { t } = useTranslation('admin')
   if (!social) return null
 
   const links = [
@@ -58,7 +60,7 @@ function SocialLinks({ social }: { social: SocialMedia | null }) {
   return (
     <Card className="border-primary/10">
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">Media Sosial</CardTitle>
+        <CardTitle className="text-base">{t('form.socialMedia')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         {links.map((link) => (
@@ -89,6 +91,7 @@ function DetailSkeleton() {
 }
 
 export function AdminTeacherDetailPage() {
+  const { t } = useTranslation('admin')
   const { uuid } = useParams<{ uuid: string }>()
   const navigate = useNavigate()
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -104,9 +107,9 @@ export function AdminTeacherDetailPage() {
   if (isError || !teacher) {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <p className="text-muted-foreground">Guru tidak ditemukan.</p>
+        <p className="text-muted-foreground">{t('pages.teachers.notFound')}</p>
         <Button asChild variant="outline">
-          <Link to="/admin/teachers">Kembali ke daftar</Link>
+          <Link to="/admin/teachers">{t('pages.teachers.detail.backToList')}</Link>
         </Button>
       </div>
     )
@@ -120,7 +123,7 @@ export function AdminTeacherDetailPage() {
         <Button asChild variant="ghost" size="sm" className="min-h-11 -ml-2 gap-2 self-start">
           <Link to="/admin/teachers">
             <ArrowLeft className="h-4 w-4" aria-hidden />
-            Kembali ke daftar guru
+            {t('common.back')}
           </Link>
         </Button>
         <div className="flex flex-wrap gap-2">
@@ -131,13 +134,13 @@ export function AdminTeacherDetailPage() {
               rel="noopener noreferrer"
             >
               <ExternalLink className="mr-2 h-4 w-4" aria-hidden />
-              Pratinjau
+              {t('common.preview')}
             </Link>
           </Button>
           <Button asChild variant="outline" size="sm" className="min-h-11">
             <Link to={`/admin/teachers/${teacher.uuid}/edit`}>
               <Pencil className="mr-2 h-4 w-4" aria-hidden />
-              Edit
+              {t('common.edit')}
             </Link>
           </Button>
           <Button
@@ -149,7 +152,7 @@ export function AdminTeacherDetailPage() {
             onClick={() => setToggleOpen(true)}
           >
             <Power className="mr-2 h-4 w-4" aria-hidden />
-            {teacher.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+            {teacher.is_active ? t('common.deactivate') : t('common.activate')}
           </Button>
           <Button
             type="button"
@@ -159,7 +162,7 @@ export function AdminTeacherDetailPage() {
             onClick={() => setDeleteOpen(true)}
           >
             <Trash2 className="mr-2 h-4 w-4" aria-hidden />
-            Hapus
+            {t('common.delete')}
           </Button>
         </div>
       </div>
@@ -167,7 +170,7 @@ export function AdminTeacherDetailPage() {
       {teacher.has_linked_user && (
         <Card className="border-amber-500/30 bg-amber-500/5 dark:border-amber-400/30 dark:bg-amber-400/10">
           <CardContent className="p-4 text-sm text-muted-foreground">
-            Guru ini terhubung dengan akun login. Menghapus profil akan melepas kaitan akun guru.
+            {t('pages.teachers.detail.linkedUserWarning')}
           </CardContent>
         </Card>
       )}
@@ -181,7 +184,7 @@ export function AdminTeacherDetailPage() {
             {teacher.is_featured && (
               <span className="absolute -right-2 -top-2 inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground shadow-sm">
                 <Star className="h-3.5 w-3.5 fill-current" aria-hidden />
-                Unggulan
+                {t('status.featured')}
               </span>
             )}
           </div>
@@ -189,7 +192,7 @@ export function AdminTeacherDetailPage() {
           <div className="min-w-0 flex-1 text-center sm:text-left">
             <div className="mb-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <Badge variant={teacher.is_active ? 'default' : 'secondary'}>
-                {teacher.is_active ? 'Aktif' : 'Nonaktif'}
+                {teacher.is_active ? t('status.active') : t('status.inactive')}
               </Badge>
               {teacher.subject && (
                 <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary">
@@ -221,7 +224,7 @@ export function AdminTeacherDetailPage() {
           {teacher.bio && (
             <Card className="border-primary/10">
               <CardHeader>
-                <CardTitle className="text-base">Ringkasan</CardTitle>
+                <CardTitle className="text-base">{t('form.excerpt')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{teacher.bio}</p>
@@ -231,13 +234,13 @@ export function AdminTeacherDetailPage() {
 
           <Card className="border-primary/10">
             <CardHeader>
-              <CardTitle className="text-base">Profil Lengkap</CardTitle>
+              <CardTitle className="text-base">{t('pages.teachers.detail.fullProfile')}</CardTitle>
             </CardHeader>
             <CardContent>
               {hasContent ? (
                 <BlockRenderer contentJson={teacher.content_json} contentHtml={teacher.content} />
               ) : (
-                <p className="text-sm italic text-muted-foreground">Belum ada konten detail.</p>
+                <p className="text-sm italic text-muted-foreground">{t('pages.teachers.detail.noDetailContent')}</p>
               )}
             </CardContent>
           </Card>
@@ -246,20 +249,20 @@ export function AdminTeacherDetailPage() {
         <div className="space-y-6">
           <Card className="border-primary/10">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Informasi</CardTitle>
+              <CardTitle className="text-base">{t('pages.teachers.detail.info')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex justify-between gap-4">
-                <span className="text-muted-foreground">Slug</span>
+                <span className="text-muted-foreground">{t('form.slug')}</span>
                 <span className="font-medium">{teacher.slug}</span>
               </div>
               <div className="flex justify-between gap-4">
-                <span className="text-muted-foreground">Urutan tampil</span>
+                <span className="text-muted-foreground">{t('pages.teachers.detail.displayOrder')}</span>
                 <span className="font-medium tabular-nums">{teacher.order}</span>
               </div>
               <div className="flex justify-between gap-4">
-                <span className="text-muted-foreground">Status unggulan</span>
-                <span className="font-medium">{teacher.is_featured ? 'Ya' : 'Tidak'}</span>
+                <span className="text-muted-foreground">{t('pages.teachers.detail.featuredStatus')}</span>
+                <span className="font-medium">{teacher.is_featured ? t('common.yes') : t('common.no')}</span>
               </div>
             </CardContent>
           </Card>
@@ -270,7 +273,7 @@ export function AdminTeacherDetailPage() {
             <Button asChild variant="outline" className="w-full min-h-11">
               <a href="/#guru" target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-2 h-4 w-4" aria-hidden />
-                Lihat di beranda
+                {t('pages.teachers.detail.viewOnHomepage')}
               </a>
             </Button>
           )}
@@ -280,16 +283,16 @@ export function AdminTeacherDetailPage() {
       <Dialog open={toggleOpen} onOpenChange={setToggleOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{teacher.is_active ? 'Nonaktifkan guru?' : 'Aktifkan guru?'}</DialogTitle>
+            <DialogTitle>{teacher.is_active ? t('pages.teachers.deactivateTitle') : t('pages.teachers.activateTitle')}</DialogTitle>
             <DialogDescription>
               {teacher.is_active
-                ? 'Guru tidak akan tampil di halaman publik. Data tetap tersimpan.'
-                : 'Guru akan tampil kembali di situs publik.'}
+                ? t('pages.teachers.detail.deactivateConfirmShort')
+                : t('pages.teachers.detail.activateConfirmShort')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setToggleOpen(false)}>
-              Batal
+              {t('common.cancel')}
             </Button>
             <Button
               disabled={updateTeacher.isPending}
@@ -298,7 +301,7 @@ export function AdminTeacherDetailPage() {
                 setToggleOpen(false)
               }}
             >
-              {teacher.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+              {teacher.is_active ? t('common.deactivate') : t('common.activate')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -307,15 +310,15 @@ export function AdminTeacherDetailPage() {
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Hapus guru?</DialogTitle>
+            <DialogTitle>{t('pages.teachers.deleteTitle')}</DialogTitle>
             <DialogDescription>
-              Guru &quot;{teacher.name}&quot; akan dihapus permanen.
-              {teacher.has_linked_user && ' Akun guru terkait akan dilepas dari profil ini.'}
+              {t('pages.teachers.deleteDesc', { name: teacher.name })}
+              {teacher.has_linked_user && t('pages.teachers.detail.unlinkOnDelete')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteOpen(false)}>
-              Batal
+              {t('common.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -325,7 +328,7 @@ export function AdminTeacherDetailPage() {
                 navigate('/admin/teachers')
               }}
             >
-              Hapus
+              {t('common.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

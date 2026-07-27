@@ -1,5 +1,6 @@
 import { ExternalLink, LogOut, PanelLeftClose, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { SchoolLogo } from '@/components/brand/SchoolLogo'
 import { AdminSidebarTree } from '@/components/layout/AdminSidebarTree'
 import { ThemeToggle } from '@/components/theme'
@@ -8,8 +9,9 @@ import { findAdminNavItem } from '@/config/admin-nav'
 import { useAuthMe, useLogout } from '@/hooks/useAuth'
 import { cn } from '@/lib/utils'
 
-export function getAdminPageTitle(pathname: string): string {
-  return findAdminNavItem(pathname)?.label ?? 'Panel Admin'
+export function getAdminPageTitle(pathname: string, t: (key: string) => string): string {
+  const item = findAdminNavItem(pathname)
+  return item ? t(item.labelKey) : t('nav.panelAdmin')
 }
 
 function getUserInitials(name: string): string {
@@ -34,6 +36,7 @@ export function AdminNav({
   onCollapse,
   onNavigate,
 }: AdminNavProps) {
+  const { t } = useTranslation('admin')
   const { data: user } = useAuthMe()
   const logout = useLogout()
   const displayName = user?.name ?? 'Administrator'
@@ -56,7 +59,7 @@ export function AdminNav({
               </p>
               <Sparkles className="size-3.5 shrink-0 text-[var(--sidebar-accent)]" aria-hidden />
             </div>
-            <p className="text-xs text-[var(--sidebar-muted)]">Panel Administrasi</p>
+            <p className="text-xs text-[var(--sidebar-muted)]">{t('nav.panelAdministration')}</p>
           </div>
           {showCollapse && (
             <Button
@@ -65,7 +68,7 @@ export function AdminNav({
               size="icon"
               className="size-8 shrink-0 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
               onClick={onCollapse}
-              aria-label="Ciutkan sidebar"
+              aria-label={t('nav.collapseSidebar')}
             >
               <PanelLeftClose className="size-4" aria-hidden />
             </Button>
@@ -95,7 +98,7 @@ export function AdminNav({
 
       <div className="admin-sidebar-footer relative shrink-0 space-y-2 p-3">
         <div className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5">
-          <span className="text-xs font-medium text-[var(--sidebar-muted)]">Tampilan</span>
+          <span className="text-xs font-medium text-[var(--sidebar-muted)]">{t('nav.theme')}</span>
           <ThemeToggle variant="outline" className="border-[rgb(255_255_255/0.15)] bg-[rgb(255_255_255/0.06)] text-[var(--sidebar-text)] hover:bg-[rgb(255_255_255/0.12)]" />
         </div>
 
@@ -107,7 +110,7 @@ export function AdminNav({
           >
             <Link to="/" onClick={onNavigate}>
               <ExternalLink className="size-4" aria-hidden />
-              Situs
+              {t('nav.website')}
             </Link>
           </Button>
 
@@ -118,7 +121,7 @@ export function AdminNav({
             disabled={logout.isPending}
           >
             <LogOut className="size-4" aria-hidden />
-            {logout.isPending ? '...' : 'Keluar'}
+            {logout.isPending ? '...' : t('nav.logout')}
           </Button>
         </div>
       </div>

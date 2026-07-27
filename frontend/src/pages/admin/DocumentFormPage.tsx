@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -23,6 +24,7 @@ import { useSchool } from '@/hooks/useSchool'
 type DocumentCategory = 'brosur' | 'formulir' | 'peraturan' | 'kalender' | 'lainnya'
 
 export function DocumentFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -53,7 +55,7 @@ export function DocumentFormPage() {
     setIsActive(existing.is_active)
   }, [existing])
 
-  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
 
   const payload = {
     school_id: school?.id ?? existing?.school_id ?? 0,
@@ -77,7 +79,7 @@ export function DocumentFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Dokumen' : 'Tambah Dokumen'}
+      title={isEdit ? t('pages.documents.editTitle') : t('pages.documents.createTitle')}
       backHref="/admin/documents"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/documents')}
@@ -87,51 +89,51 @@ export function DocumentFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Judul</Label>
+            <Label htmlFor="title">{t('form.title')}</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="category">Kategori</Label>
+              <Label htmlFor="category">{t('form.category')}</Label>
               <Select value={category} onValueChange={(v) => setCategory(v as DocumentCategory)}>
                 <SelectTrigger id="category" className="h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="brosur">Brosur</SelectItem>
-                  <SelectItem value="formulir">Formulir</SelectItem>
-                  <SelectItem value="peraturan">Peraturan</SelectItem>
-                  <SelectItem value="kalender">Kalender Akademik</SelectItem>
-                  <SelectItem value="lainnya">Lainnya</SelectItem>
+                  <SelectItem value="brosur">{t('documentCategory.brosur')}</SelectItem>
+                  <SelectItem value="formulir">{t('documentCategory.formulir')}</SelectItem>
+                  <SelectItem value="peraturan">{t('documentCategory.peraturan')}</SelectItem>
+                  <SelectItem value="kalender">{t('documentCategory.kalender')}</SelectItem>
+                  <SelectItem value="lainnya">{t('category.lainnya')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="order">Urutan</Label>
+              <Label htmlFor="order">{t('form.order')}</Label>
               <Input id="order" type="number" min={0} value={order} onChange={(e) => setOrder(Number(e.target.value))} className="h-11" />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="file_url">URL File</Label>
+            <Label htmlFor="file_url">{t('form.fileUrl')}</Label>
             <Input id="file_url" value={fileUrl} onChange={(e) => setFileUrl(e.target.value)} className="h-11" />
-            <p className="text-xs text-muted-foreground">Gunakan Media Library untuk mengunggah file terlebih dahulu, lalu salin URL-nya ke sini.</p>
+            <p className="text-xs text-muted-foreground">{t('form.fileUrlHint')}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="file_type">Tipe File</Label>
+              <Label htmlFor="file_type">{t('form.fileType')}</Label>
               <Input id="file_type" value={fileType} onChange={(e) => setFileType(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="file_size">Ukuran File (bytes)</Label>
+              <Label htmlFor="file_size">{t('form.fileSize')}</Label>
               <Input id="file_size" type="number" min={0} value={fileSize} onChange={(e) => setFileSize(e.target.value === '' ? '' : Number(e.target.value))} className="h-11" />
             </div>
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </CardContent>

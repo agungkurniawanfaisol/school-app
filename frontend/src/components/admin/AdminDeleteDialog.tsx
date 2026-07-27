@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,21 +25,23 @@ interface AdminDeleteDialogProps {
 export function AdminDeleteDialog({
   open,
   onOpenChange,
-  title = 'Hapus data?',
-  description = 'Tindakan ini tidak dapat dibatalkan. Data akan dihapus permanen.',
-  confirmLabel = 'Hapus',
+  title,
+  description,
+  confirmLabel,
   onConfirm,
   isLoading,
 }: AdminDeleteDialogProps) {
+  const { t } = useTranslation('admin')
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogTitle>{title ?? t('dialog.deleteTitle')}</AlertDialogTitle>
+          <AlertDialogDescription>{description ?? t('dialog.deleteDescription')}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Batal</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>{t('common.cancel')}</AlertDialogCancel>
           <AlertDialogAction
             disabled={isLoading}
             onClick={(e) => {
@@ -47,7 +50,7 @@ export function AdminDeleteDialog({
             }}
             className={cn(buttonVariants({ variant: 'destructive' }))}
           >
-            {isLoading ? 'Menghapus...' : confirmLabel}
+            {isLoading ? t('common.deleting') : (confirmLabel ?? t('common.delete'))}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

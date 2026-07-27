@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { AdminImageField } from '@/components/admin/AdminImageField'
 import { Card, CardContent } from '@/components/ui/card'
@@ -15,17 +16,16 @@ import {
 } from '@/hooks/useExtracurriculars'
 import { useSchool } from '@/hooks/useSchool'
 
-const CATEGORY_OPTIONS = [
-  { value: 'olahraga', label: 'Olahraga' },
-  { value: 'seni', label: 'Seni' },
-  { value: 'akademik', label: 'Akademik' },
-  { value: 'keagamaan', label: 'Keagamaan' },
-  { value: 'lainnya', label: 'Lainnya' },
-] as const
+const CATEGORY_VALUES = ['olahraga', 'seni', 'akademik', 'keagamaan', 'lainnya'] as const
 
-type ExtracurricularCategory = (typeof CATEGORY_OPTIONS)[number]['value']
+type ExtracurricularCategory = (typeof CATEGORY_VALUES)[number]
 
 export function ExtracurricularFormPage() {
+  const { t } = useTranslation('admin')
+  const categoryOptions = useMemo(
+    () => CATEGORY_VALUES.map((value) => ({ value, label: t(`category.${value}`) })),
+    [t],
+  )
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -56,7 +56,7 @@ export function ExtracurricularFormPage() {
     setIsActive(existing.is_active)
   }, [existing])
 
-  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
 
   const payload = {
     school_id: school?.id ?? existing?.school_id ?? 0,
@@ -80,7 +80,7 @@ export function ExtracurricularFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Ekstrakurikuler' : 'Tambah Ekstrakurikuler'}
+      title={isEdit ? t('pages.extracurriculars.editTitle') : t('pages.extracurriculars.createTitle')}
       backHref="/admin/extracurriculars"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/extracurriculars')}
@@ -90,22 +90,22 @@ export function ExtracurricularFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Nama</Label>
+            <Label htmlFor="name">{t('form.name')}</Label>
             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="category">Kategori</Label>
+              <Label htmlFor="category">{t('form.category')}</Label>
               <Select value={category} onValueChange={(v) => setCategory(v as ExtracurricularCategory)}>
                 <SelectTrigger id="category" className="h-11">
-                  <SelectValue placeholder="Pilih kategori" />
+                  <SelectValue placeholder={t('form.selectCategory')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORY_OPTIONS.map((opt) => (
+                  {categoryOptions.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
                     </SelectItem>
@@ -114,29 +114,29 @@ export function ExtracurricularFormPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="schedule">Jadwal</Label>
+              <Label htmlFor="schedule">{t('form.schedule')}</Label>
               <Input
                 id="schedule"
                 value={schedule}
                 onChange={(e) => setSchedule(e.target.value)}
-                placeholder="Contoh: Senin & Rabu, 14:00-16:00"
+                placeholder={t('form.schedulePlaceholder')}
                 className="h-11"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="instructor">Pembina</Label>
+            <Label htmlFor="instructor">{t('form.instructor')}</Label>
             <Input id="instructor" value={instructor} onChange={(e) => setInstructor(e.target.value)} className="h-11" />
           </div>
-          <AdminImageField label="Gambar" value={image} onChange={setImage} />
+          <AdminImageField label={t('form.image')} value={image} onChange={setImage} />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="order">Urutan</Label>
+              <Label htmlFor="order">{t('form.order')}</Label>
               <Input id="order" type="number" min={0} value={order} onChange={(e) => setOrder(Number(e.target.value))} className="h-11" />
             </div>
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </CardContent>

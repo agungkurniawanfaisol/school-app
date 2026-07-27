@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { AdminImageField } from '@/components/admin/AdminImageField'
 import { Card, CardContent } from '@/components/ui/card'
@@ -23,6 +24,7 @@ interface PhotoEntry {
 }
 
 export function PhotoAlbumFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -57,7 +59,7 @@ export function PhotoAlbumFormPage() {
     )
   }, [existing])
 
-  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
 
   const payload = {
     school_id: school?.id ?? existing?.school_id ?? 0,
@@ -98,7 +100,7 @@ export function PhotoAlbumFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Album Foto' : 'Tambah Album Foto'}
+      title={isEdit ? t('pages.photoAlbums.editTitle') : t('pages.photoAlbums.createTitle')}
       backHref="/admin/photo-albums"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/photo-albums')}
@@ -108,26 +110,26 @@ export function PhotoAlbumFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Judul</Label>
+            <Label htmlFor="title">{t('form.title')}</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
           </div>
-          <AdminImageField label="Cover Album" value={coverImage} onChange={setCoverImage} />
+          <AdminImageField label={t('form.albumCover')} value={coverImage} onChange={setCoverImage} />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="event_date">Tanggal Kegiatan</Label>
+              <Label htmlFor="event_date">{t('form.activityDate')}</Label>
               <Input id="event_date" type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="order">Urutan</Label>
+              <Label htmlFor="order">{t('form.order')}</Label>
               <Input id="order" type="number" min={0} value={order} onChange={(e) => setOrder(Number(e.target.value))} className="h-11" />
             </div>
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </CardContent>
@@ -136,10 +138,10 @@ export function PhotoAlbumFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="flex items-center justify-between">
-            <Label className="text-base font-semibold">Foto Album</Label>
+            <Label className="text-base font-semibold">{t('form.albumPhotos')}</Label>
             <Button type="button" variant="outline" size="sm" onClick={addPhoto}>
               <Plus className="mr-1 h-4 w-4" />
-              Tambah Foto
+              {t('form.addPhoto')}
             </Button>
           </div>
 
@@ -158,13 +160,13 @@ export function PhotoAlbumFormPage() {
                       )}
                       <div className="flex-1 space-y-2">
                         <Input
-                          placeholder="URL foto"
+                          placeholder={t('form.photoUrl')}
                           value={photo.url}
                           onChange={(e) => updatePhoto(index, 'url', e.target.value)}
                           className="h-9"
                         />
                         <Input
-                          placeholder="Caption (opsional)"
+                          placeholder={t('form.captionOptional')}
                           value={photo.caption}
                           onChange={(e) => updatePhoto(index, 'caption', e.target.value)}
                           className="h-9"
@@ -188,7 +190,7 @@ export function PhotoAlbumFormPage() {
 
           {photos.length === 0 && (
             <p className="text-center text-sm text-muted-foreground py-4">
-              Belum ada foto. Klik &quot;Tambah Foto&quot; untuk menambahkan.
+              {t('form.noPhotosYet')}
             </p>
           )}
         </CardContent>

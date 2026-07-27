@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { ArrowLeft, ImagePlus, Loader2, Maximize2, Save } from 'lucide-react'
 import { FacilityPhotoGalleryEditor } from '@/components/admin/FacilityPhotoGalleryEditor'
@@ -27,9 +28,10 @@ import { useSchool } from '@/hooks/useSchool'
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges'
 import { slugify } from '@/lib/utils'
 import { EMPTY_EDITOR_DOC, type EditorDocument } from '@/schemas/editor'
-import { facilitySchema, type FacilityFormValues, type FacilityPhotoFormValues } from '@/schemas/facility'
+import { createFacilitySchema, type FacilityFormValues, type FacilityPhotoFormValues } from '@/schemas/facility'
 
 export function FacilityFormPage() {
+  const { t } = useTranslation('admin')
   const { uuid } = useParams<{ uuid: string }>()
   const isEdit = !!uuid
   const navigate = useNavigate()
@@ -39,6 +41,8 @@ export function FacilityFormPage() {
   const updateFacility = useUpdateFacility(uuid ?? '')
   const thumbnailUpload = useMediaUpload('facilities')
   const thumbnailInputRef = useRef<HTMLInputElement>(null)
+
+  const facilitySchema = useMemo(() => createFacilitySchema(t), [t])
 
   const [fullscreenOpen, setFullscreenOpen] = useState(false)
   const [dirty, setDirty] = useState(false)
@@ -98,7 +102,7 @@ export function FacilityFormPage() {
     const payload = buildPayload()
     const parsed = facilitySchema.safeParse(payload)
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? 'Data tidak valid.')
+      toast.error(parsed.error.issues[0]?.message ?? t('validation.invalidData'))
       return
     }
     if (!parsed.data.school_id) return
@@ -131,7 +135,7 @@ export function FacilityFormPage() {
   const metaFields = (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name">Nama Fasilitas</Label>
+        <Label htmlFor="name">{t('form.facilityName')}</Label>
         <Input
           id="name"
           value={name}
@@ -144,7 +148,7 @@ export function FacilityFormPage() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="slug">Slug</Label>
+        <Label htmlFor="slug">{t('form.slug')}</Label>
         <Input
           id="slug"
           value={slug}
@@ -156,7 +160,7 @@ export function FacilityFormPage() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="category">Kategori</Label>
+        <Label htmlFor="category">{t('form.category')}</Label>
         <Input
           id="category"
           value={category}
@@ -164,12 +168,12 @@ export function FacilityFormPage() {
             setCategory(e.target.value)
             setDirty(true)
           }}
-          placeholder="Contoh: akademik, olahraga"
+          placeholder={t('form.categoryPlaceholder')}
           className="h-11"
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="description">Ringkasan Singkat</Label>
+        <Label htmlFor="description">{t('form.shortSummary')}</Label>
         <Textarea
           id="description"
           value={description}
@@ -178,14 +182,14 @@ export function FacilityFormPage() {
             setDirty(true)
           }}
           rows={3}
-          placeholder="Deskripsi singkat untuk kartu di beranda"
+          placeholder={t('form.shortSummaryPlaceholder')}
         />
       </div>
       <div className="space-y-2">
-        <Label>Thumbnail</Label>
+        <Label>{t('form.thumbnail')}</Label>
         {thumbnail ? (
           <div className="relative overflow-hidden rounded-xl border border-primary/10">
-            <img src={thumbnail} alt="Thumbnail fasilitas" className="aspect-video w-full object-cover" />
+            <img src={thumbnail} alt={t('form.thumbnail')} className="aspect-video w-full object-cover" />
             <Button
               type="button"
               variant="secondary"
@@ -193,7 +197,7 @@ export function FacilityFormPage() {
               className="absolute bottom-2 right-2"
               onClick={() => thumbnailInputRef.current?.click()}
             >
-              Ganti
+              {t('common.replace')}
             </Button>
           </div>
         ) : (
@@ -209,7 +213,7 @@ export function FacilityFormPage() {
             ) : (
               <ImagePlus className="h-4 w-4" aria-hidden />
             )}
-            Unggah Thumbnail
+            {t('form.uploadThumbnail')}
           </Button>
         )}
         <input
@@ -217,7 +221,7 @@ export function FacilityFormPage() {
           type="file"
           accept="image/jpeg,image/png,image/webp"
           className="sr-only"
-          aria-label="Unggah thumbnail"
+          aria-label={t('form.uploadThumbnailAria')}
           onChange={(e) => {
             const file = e.target.files?.[0]
             if (file) void handleThumbnailUpload(file)
@@ -225,7 +229,7 @@ export function FacilityFormPage() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="order">Urutan Tampil</Label>
+        <Label htmlFor="order">{t('form.displayOrder')}</Label>
         <Input
           id="order"
           type="number"
@@ -248,7 +252,7 @@ export function FacilityFormPage() {
           }}
           className="h-4 w-4"
         />
-        Tampilkan di beranda
+        {t('form.showOnHomepageLabel')}
       </label>
       <label className="flex min-h-11 items-center gap-2 text-sm">
         <input
@@ -260,13 +264,13 @@ export function FacilityFormPage() {
           }}
           className="h-4 w-4"
         />
-        Aktif
+        {t('form.active')}
       </label>
     </div>
   )
 
   if (isEdit && isLoading) {
-    return <div className="p-6 text-muted-foreground">Memuat…</div>
+    return <div className="p-6 text-muted-foreground">{t('common.loading')}</div>
   }
 
   return (
@@ -274,24 +278,24 @@ export function FacilityFormPage() {
       <Button asChild variant="ghost" size="sm" className="min-h-11 -ml-2 gap-2 px-0 hover:bg-transparent">
         <Link to="/admin/facilities">
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          Kembali ke daftar fasilitas
+          {t('pages.facilities.listTitle')}
         </Link>
       </Button>
       <Card className="border-primary/10">
         <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-xl font-bold">{isEdit ? 'Edit Fasilitas' : 'Tambah Fasilitas'}</h1>
-            <p className="text-sm text-muted-foreground">Galeri foto + editor konten detail</p>
+            <h1 className="text-xl font-bold">{isEdit ? t('pages.facilities.editTitle') : t('pages.facilities.createTitle')}</h1>
+            <p className="text-sm text-muted-foreground">{t('pages.facilities.formDesc')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="outline" onClick={() => setFullscreenOpen(true)}>
               <Maximize2 className="h-4 w-4" />
-              Fullscreen
+              {t('common.fullscreen')}
             </Button>
             {isEdit && uuid && (
               <Button asChild variant="outline">
                 <Link to={`/admin/facilities/${uuid}/preview`} target="_blank" rel="noopener noreferrer">
-                  Pratinjau
+                  {t('common.preview')}
                 </Link>
               </Button>
             )}
@@ -301,7 +305,7 @@ export function FacilityFormPage() {
               onClick={() => void handleSave(false)}
             >
               <Save className="h-4 w-4" />
-              Simpan
+              {t('common.save')}
             </Button>
             <Button
               type="button"
@@ -315,7 +319,7 @@ export function FacilityFormPage() {
                 }
               }}
             >
-              Simpan & Pratinjau
+              {t('common.save')} & {t('common.preview')}
             </Button>
           </div>
         </CardContent>
@@ -323,9 +327,9 @@ export function FacilityFormPage() {
 
       <Tabs defaultValue="content" className="lg:hidden">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="content">Konten</TabsTrigger>
-          <TabsTrigger value="gallery">Galeri</TabsTrigger>
-          <TabsTrigger value="settings">Pengaturan</TabsTrigger>
+          <TabsTrigger value="content">{t('form.content')}</TabsTrigger>
+          <TabsTrigger value="gallery">{t('common.gallery')}</TabsTrigger>
+          <TabsTrigger value="settings">{t('common.settings')}</TabsTrigger>
         </TabsList>
         <TabsContent value="settings" className="mt-4">
           <Card>
@@ -381,10 +385,10 @@ export function FacilityFormPage() {
       <Dialog open={fullscreenOpen} onOpenChange={setFullscreenOpen}>
         <DialogContent className="fixed inset-0 flex h-dvh max-h-none w-screen max-w-none flex-col rounded-none border-0 p-0">
           <DialogHeader className="border-b px-4 py-3">
-            <DialogTitle>Pratinjau konten</DialogTitle>
+            <DialogTitle>{t('form.previewContent')}</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto p-6">
-            <h2 className="mb-4 text-2xl font-bold">{name || 'Tanpa judul'}</h2>
+            <h2 className="mb-4 text-2xl font-bold">{name || t('common.untitled')}</h2>
             {description && <p className="mb-6 text-lg text-muted-foreground">{description}</p>}
             <BlockRenderer contentJson={contentJson} contentHtml={contentHtml} />
           </div>

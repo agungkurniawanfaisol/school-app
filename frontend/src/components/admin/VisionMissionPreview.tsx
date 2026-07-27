@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { CheckCircle2, Target } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -14,35 +15,34 @@ function parseMissionLines(mission: string): string[] {
 }
 
 export function VisionMissionPreview({ vision, mission }: VisionMissionPreviewProps) {
+  const { t } = useTranslation('admin')
   const visionTrimmed = vision?.trim()
   const missionTrimmed = mission?.trim()
   const missionItems = missionTrimmed ? parseMissionLines(missionTrimmed) : []
 
   return (
-    <div className="space-y-4" role="region" aria-live="polite" aria-label="Pratinjau visi dan misi">
+    <div className="space-y-4" role="region" aria-live="polite" aria-label={t('components.visionMission.previewRegion')}>
       <Card className="border-primary/10 bg-secondary/30">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-primary">
             <Target className="h-5 w-5 text-[var(--gold-accent)]" aria-hidden />
-            Visi
+            {t('form.vision')}
           </CardTitle>
-          <CardDescription>Pratinjau tampilan di beranda</CardDescription>
+          <CardDescription>{t('components.visionMission.homePreviewDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           {visionTrimmed ? (
             <p className="leading-relaxed text-muted-foreground">{visionTrimmed}</p>
           ) : (
-            <p className="text-sm italic text-muted-foreground">Visi belum diisi — akan disembunyikan di beranda.</p>
+            <p className="text-sm italic text-muted-foreground">{t('components.visionMission.visionEmpty')}</p>
           )}
         </CardContent>
       </Card>
 
       <Card className="border-primary/10 bg-secondary/30">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-primary">
-            Misi
-          </CardTitle>
-          <CardDescription>Pratinjau tampilan di beranda</CardDescription>
+          <CardTitle className="flex items-center gap-2 text-primary">{t('form.mission')}</CardTitle>
+          <CardDescription>{t('components.visionMission.homePreviewDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           {missionItems.length > 0 ? (
@@ -55,7 +55,7 @@ export function VisionMissionPreview({ vision, mission }: VisionMissionPreviewPr
               ))}
             </ol>
           ) : (
-            <p className="text-sm italic text-muted-foreground">Misi belum diisi — akan disembunyikan di beranda.</p>
+            <p className="text-sm italic text-muted-foreground">{t('components.visionMission.missionEmpty')}</p>
           )}
         </CardContent>
       </Card>

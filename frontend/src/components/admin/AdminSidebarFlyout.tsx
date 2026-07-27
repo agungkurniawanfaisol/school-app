@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAdminSidebar } from '@/components/admin/AdminSidebarContext'
 import {
   adminDashboardItem,
@@ -14,6 +15,7 @@ type AdminSidebarFlyoutProps = {
 
 function FlyoutNavLink({ item, onNavigate }: { item: AdminNavItem; onNavigate?: () => void }) {
   const location = useLocation()
+  const { t } = useTranslation('admin')
   const active = isAdminNavActive(location.pathname, item.href, item.exact)
   const Icon = item.icon
 
@@ -28,7 +30,7 @@ function FlyoutNavLink({ item, onNavigate }: { item: AdminNavItem; onNavigate?: 
       )}
     >
       <Icon className="size-4 shrink-0" aria-hidden />
-      <span className="truncate">{item.label}</span>
+      <span className="truncate">{t(item.labelKey)}</span>
     </Link>
   )
 }
@@ -45,6 +47,7 @@ function FlyoutGroupHeader({ icon: Icon, label }: { icon: React.ComponentType<{ 
 }
 
 function AdminSidebarFlyoutPanel({ onNavigate }: AdminSidebarFlyoutProps) {
+  const { t } = useTranslation('admin')
   const { flyoutTarget } = useAdminSidebar()
 
   if (!flyoutTarget) {
@@ -55,7 +58,7 @@ function AdminSidebarFlyoutPanel({ onNavigate }: AdminSidebarFlyoutProps) {
     const DashboardIcon = adminDashboardItem.icon
     return (
       <div>
-        <FlyoutGroupHeader icon={DashboardIcon} label={adminDashboardItem.label} />
+        <FlyoutGroupHeader icon={DashboardIcon} label={t(adminDashboardItem.labelKey)} />
         <div className="p-3">
           <FlyoutNavLink item={adminDashboardItem} onNavigate={onNavigate} />
         </div>
@@ -63,15 +66,17 @@ function AdminSidebarFlyoutPanel({ onNavigate }: AdminSidebarFlyoutProps) {
     )
   }
 
-  const group = adminNavTree.find((g) => g.label === flyoutTarget)
+  const group = adminNavTree.find((g) => g.labelKey === flyoutTarget)
   if (!group) {
     return null
   }
 
+  const groupLabel = t(group.labelKey)
+
   return (
     <div>
-      <FlyoutGroupHeader icon={group.icon} label={group.label} />
-      <nav className="max-h-80 space-y-0.5 overflow-y-auto p-3" aria-label={`Menu ${group.label}`}>
+      <FlyoutGroupHeader icon={group.icon} label={groupLabel} />
+      <nav className="max-h-80 space-y-0.5 overflow-y-auto p-3" aria-label={`Menu ${groupLabel}`}>
         {group.children.map((item) => (
           <FlyoutNavLink key={item.href} item={item} onNavigate={onNavigate} />
         ))}

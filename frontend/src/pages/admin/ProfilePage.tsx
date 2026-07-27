@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { Facebook, Instagram, Youtube } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -12,20 +13,29 @@ import { useAuthMe } from '@/hooks/useAuth'
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile'
 import { isGuruRole } from '@/hooks/useUsers'
 import { getApiErrorMessage } from '@/lib/api'
-import { profileAccountSchema, profileTeacherSchema, type ProfileAccountValues, type ProfileTeacherValues } from '@/schemas/profile'
+import {
+  createProfileAccountSchema,
+  createProfileTeacherSchema,
+  type ProfileAccountValues,
+  type ProfileTeacherValues,
+} from '@/schemas/profile'
 
 export function ProfilePage() {
+  const { t } = useTranslation('admin')
   const { data: authUser } = useAuthMe()
   const { data: profile, isLoading } = useProfile()
   const updateProfile = useUpdateProfile()
 
+  const accountSchema = useMemo(() => createProfileAccountSchema(t), [t])
+  const teacherSchema = useMemo(() => createProfileTeacherSchema(t), [t])
+
   const accountForm = useForm<ProfileAccountValues>({
-    resolver: zodResolver(profileAccountSchema),
+    resolver: zodResolver(accountSchema),
     defaultValues: { name: '', email: '', password: '', password_confirmation: '' },
   })
 
   const teacherForm = useForm<ProfileTeacherValues>({
-    resolver: zodResolver(profileTeacherSchema),
+    resolver: zodResolver(teacherSchema),
     defaultValues: {
       name: '', title: '', subject: '', bio: '', photo: '', email: '',
       social_media: { facebook: '', instagram: '', youtube: '', tiktok: '', twitter: '' },
@@ -87,20 +97,20 @@ export function ProfilePage() {
       },
       {
         onSuccess: () => {
-          toast.success('Profil berhasil diperbarui')
+          toast.success(t('toast.profileUpdated'))
           accountForm.reset({
             ...accountForm.getValues(),
             password: '',
             password_confirmation: '',
           })
         },
-        onError: (error) => toast.error(getApiErrorMessage(error, 'Gagal memperbarui profil')),
+        onError: (error) => toast.error(getApiErrorMessage(error, t('toast.profileUpdateFailed'))),
       },
     )
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Memuat profil...</p>
+    return <p className="text-sm text-muted-foreground">{t('common.loadingProfile')}</p>
   }
 
   const showTeacherSection = isGuruRole(authUser?.role) || profile?.teacher
@@ -108,14 +118,14 @@ export function ProfilePage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-xl font-bold sm:text-2xl">Profil Saya</h1>
-        <p className="text-sm text-muted-foreground">Kelola akun login dan profil guru publik</p>
+        <h1 className="text-xl font-bold sm:text-2xl">{t('pages.profile.title')}</h1>
+        <p className="text-sm text-muted-foreground">{t('pages.profile.desc')}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Akun Login</CardTitle>
-          <CardDescription>Nama, email, dan kata sandi untuk masuk panel</CardDescription>
+          <CardTitle>{t('pages.profile.accountTitle')}</CardTitle>
+          <CardDescription>{t('pages.profile.accountDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...accountForm}>
@@ -125,7 +135,7 @@ export function ProfilePage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nama</FormLabel>
+                    <FormLabel>{t('form.name')}</FormLabel>
                     <FormControl>
                       <Input {...field} className="h-11" />
                     </FormControl>
@@ -138,7 +148,7 @@ export function ProfilePage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email Login</FormLabel>
+                    <FormLabel>{t('form.loginEmail')}</FormLabel>
                     <FormControl>
                       <Input type="email" {...field} className="h-11" />
                     </FormControl>
@@ -151,7 +161,7 @@ export function ProfilePage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kata Sandi Baru (opsional)</FormLabel>
+                    <FormLabel>{t('form.newPassword')}</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} className="h-11" autoComplete="new-password" />
                     </FormControl>
@@ -164,7 +174,7 @@ export function ProfilePage() {
                 name="password_confirmation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Konfirmasi Kata Sandi</FormLabel>
+                    <FormLabel>{t('form.passwordConfirm')}</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} className="h-11" autoComplete="new-password" />
                     </FormControl>
@@ -180,11 +190,11 @@ export function ProfilePage() {
       {showTeacherSection && (
         <Card>
           <CardHeader>
-            <CardTitle>Profil Guru</CardTitle>
+            <CardTitle>{t('pages.profile.teacherTitle')}</CardTitle>
             <CardDescription>
               {profile?.teacher
-                ? 'Informasi yang ditampilkan di halaman guru publik'
-                : 'Profil guru belum ditautkan. Hubungi admin untuk menghubungkan akun Anda.'}
+                ? t('pages.profile.teacherDescLinked')
+                : t('pages.profile.teacherDescUnlinked')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -196,7 +206,7 @@ export function ProfilePage() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nama Tampilan</FormLabel>
+                        <FormLabel>{t('form.displayName')}</FormLabel>
                         <FormControl>
                           <Input {...field} className="h-11" />
                         </FormControl>
@@ -210,7 +220,7 @@ export function ProfilePage() {
                       name="title"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Jabatan</FormLabel>
+                          <FormLabel>{t('form.position')}</FormLabel>
                           <FormControl>
                             <Input {...field} className="h-11" />
                           </FormControl>
@@ -223,7 +233,7 @@ export function ProfilePage() {
                       name="subject"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Mata Pelajaran</FormLabel>
+                          <FormLabel>{t('form.subject')}</FormLabel>
                           <FormControl>
                             <Input {...field} className="h-11" />
                           </FormControl>
@@ -237,7 +247,7 @@ export function ProfilePage() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email Publik</FormLabel>
+                        <FormLabel>{t('form.publicEmail')}</FormLabel>
                         <FormControl>
                           <Input type="email" {...field} className="h-11" />
                         </FormControl>
@@ -250,9 +260,9 @@ export function ProfilePage() {
                     name="photo"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>URL Foto</FormLabel>
+                        <FormLabel>{t('form.photoUrl')}</FormLabel>
                         <FormControl>
-                          <Input {...field} className="h-11" placeholder="https://..." />
+                          <Input {...field} className="h-11" placeholder={t('form.photoUrlPlaceholder')} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -263,7 +273,7 @@ export function ProfilePage() {
                     name="bio"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Bio</FormLabel>
+                        <FormLabel>{t('form.bio')}</FormLabel>
                         <FormControl>
                           <Textarea {...field} rows={4} />
                         </FormControl>
@@ -273,7 +283,7 @@ export function ProfilePage() {
                   />
 
                   <div className="space-y-3 rounded-lg border p-4">
-                    <p className="text-sm font-medium">Media Sosial</p>
+                    <p className="text-sm font-medium">{t('form.socialMedia')}</p>
                     <div className="grid gap-4 sm:grid-cols-2">
                       <FormField
                         control={teacherForm.control}
@@ -299,7 +309,7 @@ export function ProfilePage() {
                               <Instagram className="h-4 w-4" /> Instagram
                             </FormLabel>
                             <FormControl>
-                              <Input {...field} className="h-11" placeholder="@username atau URL" />
+                              <Input {...field} className="h-11" placeholder={t('form.socialUsernameOrUrl')} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -327,7 +337,7 @@ export function ProfilePage() {
                           <FormItem>
                             <FormLabel>TikTok</FormLabel>
                             <FormControl>
-                              <Input {...field} className="h-11" placeholder="@username atau URL" />
+                              <Input {...field} className="h-11" placeholder={t('form.socialUsernameOrUrl')} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -340,7 +350,7 @@ export function ProfilePage() {
                           <FormItem>
                             <FormLabel>X / Twitter</FormLabel>
                             <FormControl>
-                              <Input {...field} className="h-11" placeholder="@username atau URL" />
+                              <Input {...field} className="h-11" placeholder={t('form.socialUsernameOrUrl')} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -352,7 +362,7 @@ export function ProfilePage() {
               </Form>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Akun guru Anda belum terhubung ke data guru di website.
+                {t('pages.profile.teacherNotConnected')}
               </p>
             )}
           </CardContent>
@@ -360,7 +370,7 @@ export function ProfilePage() {
       )}
 
       <Button className="min-h-11 w-full sm:w-auto" onClick={onSubmit} disabled={updateProfile.isPending}>
-        {updateProfile.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
+        {updateProfile.isPending ? t('common.saving') : t('common.saveChanges')}
       </Button>
     </div>
   )

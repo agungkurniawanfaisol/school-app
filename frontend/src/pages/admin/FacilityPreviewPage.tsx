@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { PreviewFrame } from '@/components/editor/PreviewFrame'
 import { Badge } from '@/components/ui/badge'
@@ -14,12 +15,13 @@ function photoSrc(photo: FacilityPhoto) {
 }
 
 export function FacilityPreviewPage() {
+  const { t } = useTranslation('admin')
   const { uuid } = useParams<{ uuid: string }>()
   const { data: facility, isLoading } = useAdminFacilityDetail(uuid ?? '')
   const [activePhoto, setActivePhoto] = useState(0)
 
   if (isLoading || !facility) {
-    return <div className="p-6 text-muted-foreground">Memuat pratinjau…</div>
+    return <div className="p-6 text-muted-foreground">{t('common.loadingPreview')}</div>
   }
 
   const photos = facility.photos ?? []
@@ -34,11 +36,11 @@ export function FacilityPreviewPage() {
       toolbar={
         <>
           <Button asChild variant="outline" size="sm">
-            <Link to={`/admin/facilities/${facility.uuid}/edit`}>Edit</Link>
+            <Link to={`/admin/facilities/${facility.uuid}/edit`}>{t('common.edit')}</Link>
           </Button>
           {facility.is_active && (
             <Button asChild variant="outline" size="sm">
-              <Link to="/fasilitas">Lihat semua fasilitas</Link>
+              <Link to="/fasilitas">{t('pages.facilities.viewAllFacilities')}</Link>
             </Button>
           )}
         </>
@@ -46,8 +48,8 @@ export function FacilityPreviewPage() {
     >
       <div className="mb-6 flex flex-wrap items-center gap-2">
         {facility.category && <Badge variant="secondary">{facility.category}</Badge>}
-        {facility.is_featured && <Badge>Unggulan</Badge>}
-        {!facility.is_active && <Badge variant="outline">Nonaktif</Badge>}
+        {facility.is_featured && <Badge>{t('status.featured')}</Badge>}
+        {!facility.is_active && <Badge variant="outline">{t('status.inactive')}</Badge>}
       </div>
 
       {heroSrc && (
@@ -64,7 +66,7 @@ export function FacilityPreviewPage() {
 
       {photos.length > 0 && (
         <div className="mb-8 space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Galeri Foto</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">{t('pages.facilities.photoGallery')}</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {photos.map((photo, index) => (
               <button

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { getGoogleOAuthStartUrl } from '@/lib/oauth'
 import { cn } from '@/lib/utils'
@@ -33,6 +34,7 @@ type GoogleSignInButtonProps = {
 }
 
 export function GoogleSignInButton({ className, disabled }: GoogleSignInButtonProps) {
+  const { t } = useTranslation('admin')
   const [isRedirecting, setIsRedirecting] = useState(false)
 
   const handleClick = () => {
@@ -51,14 +53,14 @@ export function GoogleSignInButton({ className, disabled }: GoogleSignInButtonPr
       disabled={disabled || isRedirecting}
       onClick={handleClick}
       aria-busy={isRedirecting}
-      aria-label="Masuk dengan Google"
+      aria-label={t('auth.googleSignIn')}
     >
       {isRedirecting ? (
         <Loader2 className="h-5 w-5 shrink-0 animate-spin" aria-hidden />
       ) : (
         <GoogleIcon className="h-5 w-5 shrink-0" />
       )}
-      {isRedirecting ? 'Mengalihkan ke Google...' : 'Masuk dengan Google'}
+      {isRedirecting ? t('auth.redirectingGoogle') : t('auth.googleSignIn')}
     </Button>
   )
 }

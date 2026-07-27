@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { AdminImageField } from '@/components/admin/AdminImageField'
 import { Card, CardContent } from '@/components/ui/card'
@@ -15,24 +16,19 @@ import {
 } from '@/hooks/useAchievements'
 import { useSchool } from '@/hooks/useSchool'
 
-const CATEGORY_OPTIONS = [
-  { value: 'akademik', label: 'Akademik' },
-  { value: 'olahraga', label: 'Olahraga' },
-  { value: 'seni', label: 'Seni' },
-  { value: 'keagamaan', label: 'Keagamaan' },
-  { value: 'lainnya', label: 'Lainnya' },
-]
-
-const LEVEL_OPTIONS = [
-  { value: 'sekolah', label: 'Sekolah' },
-  { value: 'kecamatan', label: 'Kecamatan' },
-  { value: 'kota', label: 'Kota/Kabupaten' },
-  { value: 'provinsi', label: 'Provinsi' },
-  { value: 'nasional', label: 'Nasional' },
-  { value: 'internasional', label: 'Internasional' },
-]
+const CATEGORY_VALUES = ['akademik', 'olahraga', 'seni', 'keagamaan', 'lainnya'] as const
+const LEVEL_VALUES = ['sekolah', 'kecamatan', 'kota', 'provinsi', 'nasional', 'internasional'] as const
 
 export function AchievementFormPage() {
+  const { t } = useTranslation('admin')
+  const categoryOptions = useMemo(
+    () => CATEGORY_VALUES.map((value) => ({ value, label: t(`category.${value}`) })),
+    [t],
+  )
+  const levelOptions = useMemo(
+    () => LEVEL_VALUES.map((value) => ({ value, label: t(`level.${value}`) })),
+    [t],
+  )
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -65,7 +61,7 @@ export function AchievementFormPage() {
     setIsActive(existing.is_active)
   }, [existing])
 
-  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
 
   const payload = {
     school_id: school?.id ?? existing?.school_id ?? 0,
@@ -90,7 +86,7 @@ export function AchievementFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Prestasi' : 'Tambah Prestasi'}
+      title={isEdit ? t('pages.achievements.editTitle') : t('pages.achievements.createTitle')}
       backHref="/admin/achievements"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/achievements')}
@@ -100,35 +96,35 @@ export function AchievementFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Judul</Label>
+            <Label htmlFor="title">{t('form.title')}</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="category">Kategori</Label>
+              <Label htmlFor="category">{t('form.category')}</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger id="category" className="h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORY_OPTIONS.map((opt) => (
+                  {categoryOptions.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="level">Tingkat</Label>
+              <Label htmlFor="level">{t('form.level')}</Label>
               <Select value={level} onValueChange={setLevel}>
                 <SelectTrigger id="level" className="h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {LEVEL_OPTIONS.map((opt) => (
+                  {levelOptions.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                   ))}
                 </SelectContent>
@@ -137,11 +133,11 @@ export function AchievementFormPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="student_name">Nama Siswa</Label>
+              <Label htmlFor="student_name">{t('form.studentName')}</Label>
               <Input id="student_name" value={studentName} onChange={(e) => setStudentName(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="year">Tahun</Label>
+              <Label htmlFor="year">{t('form.year')}</Label>
               <Input
                 id="year"
                 type="number"
@@ -153,13 +149,13 @@ export function AchievementFormPage() {
               />
             </div>
           </div>
-          <AdminImageField label="Gambar" value={image} onChange={setImage} />
+          <AdminImageField label={t('form.image')} value={image} onChange={setImage} />
           <div className="space-y-2">
-            <Label htmlFor="order">Urutan</Label>
+            <Label htmlFor="order">{t('form.order')}</Label>
             <Input id="order" type="number" min={0} value={order} onChange={(e) => setOrder(Number(e.target.value))} className="h-11" />
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </CardContent>

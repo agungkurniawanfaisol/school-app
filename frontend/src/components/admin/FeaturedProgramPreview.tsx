@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { resolveProgramIcon } from '@/lib/lucide-icon-map'
@@ -21,11 +22,12 @@ export function FeaturedProgramPreview({
   category,
   isFeatured = true,
 }: FeaturedProgramPreviewProps) {
+  const { t } = useTranslation('admin')
   const Icon = resolveProgramIcon(icon)
   const previewItem: Curriculum = {
     id: 0,
     school_id: 0,
-    title: title || 'Judul program',
+    title: title || t('components.featuredProgram.defaultTitle'),
     slug: 'preview',
     excerpt: excerpt ?? null,
     icon: icon ?? null,
@@ -38,8 +40,8 @@ export function FeaturedProgramPreview({
   }
 
   return (
-    <div role="region" aria-live="polite" aria-label="Pratinjau program unggulan di beranda">
-      <p className="mb-3 text-sm font-medium text-muted-foreground">Pratinjau Beranda</p>
+    <div role="region" aria-live="polite" aria-label={t('components.featuredProgram.previewRegion')}>
+      <p className="mb-3 text-sm font-medium text-muted-foreground">{t('components.featuredProgram.homePreview')}</p>
       <Card className="card-hover overflow-hidden border-primary/10">
         {previewItem.thumbnail ? (
           <img
@@ -66,12 +68,10 @@ export function FeaturedProgramPreview({
           )}
         </CardHeader>
         <CardContent className="pt-0">
-          <p className="text-xs text-muted-foreground">
-            Kartu ini akan tampil di beranda jika status aktif dan &quot;Tampil di Beranda&quot; diaktifkan.
-          </p>
+          <p className="text-xs text-muted-foreground">{t('components.featuredProgram.cardHint')}</p>
           {previewItem.slug !== 'preview' && (
             <Link to={`/program/${previewItem.slug}`} className="sr-only">
-              Lihat detail
+              {t('common.viewDetail')}
             </Link>
           )}
         </CardContent>

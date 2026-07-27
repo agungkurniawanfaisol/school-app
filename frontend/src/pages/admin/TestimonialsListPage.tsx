@@ -5,8 +5,10 @@ import { AdminActiveBadge, AdminFeaturedBadge } from '@/components/admin/AdminSt
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { useAdminTestimonialsList, useDeleteTestimonial } from '@/hooks/useTestimonials'
 import type { Testimonial } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 export function TestimonialsListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Testimonial | null>(null)
@@ -16,8 +18,8 @@ export function TestimonialsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Testimoni"
-        description="Ulasan dari orang tua dan alumni"
+        title={t('pages.testimonials.listTitle')}
+        description={t('pages.testimonials.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -31,11 +33,11 @@ export function TestimonialsListPage() {
         }}
         createHref="/admin/testimonials/create"
         columns={[
-          { key: 'name', header: 'Nama', cell: (item) => item.name },
-          { key: 'role', header: 'Peran', cell: (item) => item.role ?? '—' },
-          { key: 'rating', header: 'Rating', cell: (item) => item.rating ?? '—' },
-          { key: 'featured', header: 'Unggulan', cell: (item) => <AdminFeaturedBadge isFeatured={item.is_featured} /> },
-          { key: 'active', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'name', header: t('table.name'), cell: (item) => item.name },
+          { key: 'role', header: t('table.role'), cell: (item) => item.role ?? '—' },
+          { key: 'rating', header: t('table.rating'), cell: (item) => item.rating ?? '—' },
+          { key: 'featured', header: t('table.featured'), cell: (item) => <AdminFeaturedBadge isFeatured={item.is_featured} /> },
+          { key: 'active', header: t('table.status'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions

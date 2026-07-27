@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -24,9 +25,10 @@ import {
   isAdminRole,
 } from '@/hooks/useUsers'
 import { getApiErrorMessage } from '@/lib/api'
-import { createUserSchema, userFormSchema, type CreateUserFormValues, type UserFormValues } from '@/schemas/user'
+import { createCreateUserSchema, createUserFormSchema, type CreateUserFormValues, type UserFormValues } from '@/schemas/user'
 
 export function UserFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams()
   const userId = id ? Number(id) : 0
   const isEdit = userId > 0
@@ -41,8 +43,13 @@ export function UserFormPage() {
     return <Navigate to="/admin/profile" replace />
   }
 
+  const userSchema = useMemo(
+    () => (isEdit ? createUserFormSchema(t) : createCreateUserSchema(t)),
+    [t, isEdit],
+  )
+
   const form = useForm<UserFormValues>({
-    resolver: zodResolver(isEdit ? userFormSchema : createUserSchema),
+    resolver: zodResolver(userSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -73,11 +80,11 @@ export function UserFormPage() {
   const onSubmit = (values: UserFormValues) => {
     const handlers = {
       onSuccess: () => {
-        toast.success(isEdit ? 'Pengguna berhasil diperbarui' : 'Pengguna berhasil ditambahkan')
+        toast.success(isEdit ? t('toast.userUpdated') : t('toast.userCreated'))
         navigate('/admin/users')
       },
       onError: (error: unknown) => {
-        toast.error(getApiErrorMessage(error, 'Gagal menyimpan pengguna'))
+        toast.error(getApiErrorMessage(error, t('toast.userSaveFailed')))
       },
     }
 
@@ -90,7 +97,7 @@ export function UserFormPage() {
   }
 
   if (isEdit && isLoading) {
-    return <p className="text-sm text-muted-foreground">Memuat data pengguna...</p>
+    return <p className="text-sm text-muted-foreground">{t('common.loadingUser')}</p>
   }
 
   return (
@@ -98,14 +105,14 @@ export function UserFormPage() {
       <Button asChild variant="ghost" size="sm" className="min-h-11 -ml-2 gap-2 px-0 hover:bg-transparent">
         <Link to="/admin/users">
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          Kembali ke daftar pengguna
+          {t('pages.users.backToList')}
         </Link>
       </Button>
       <Card>
         <CardHeader>
-          <CardTitle>{isEdit ? 'Edit Pengguna' : 'Tambah Pengguna'}</CardTitle>
+          <CardTitle>{isEdit ? t('pages.users.editTitle') : t('pages.users.createTitle')}</CardTitle>
           <CardDescription>
-            {isEdit ? 'Perbarui data akun pengguna' : 'Buat akun admin atau guru baru'}
+            {isEdit ? t('pages.users.formEditDesc') : t('pages.users.formCreateDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -116,7 +123,7 @@ export function UserFormPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nama</FormLabel>
+                    <FormLabel>{t('form.name')}</FormLabel>
                     <FormControl>
                       <Input {...field} className="h-11" />
                     </FormControl>
@@ -130,7 +137,7 @@ export function UserFormPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t('form.email')}</FormLabel>
                     <FormControl>
                       <Input type="email" {...field} className="h-11" />
                     </FormControl>
@@ -144,7 +151,7 @@ export function UserFormPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{isEdit ? 'Kata Sandi Baru (opsional)' : 'Kata Sandi'}</FormLabel>
+                    <FormLabel>{isEdit ? t('form.newPassword') : t('form.password')}</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} className="h-11" autoComplete="new-password" />
                     </FormControl>
@@ -158,7 +165,7 @@ export function UserFormPage() {
                 name="password_confirmation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Konfirmasi Kata Sandi</FormLabel>
+                    <FormLabel>{t('form.passwordConfirm')}</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} className="h-11" autoComplete="new-password" />
                     </FormControl>
@@ -172,16 +179,16 @@ export function UserFormPage() {
                 name="role"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Role</FormLabel>
+                    <FormLabel>{t('form.role')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="h-11">
-                          <SelectValue placeholder="Pilih role" />
+                          <SelectValue placeholder={t('form.selectRole')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="guru">Guru</SelectItem>
+                        <SelectItem value="admin">{t('pages.users.roleAdmin')}</SelectItem>
+                        <SelectItem value="guru">{t('pages.users.roleGuru')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -195,18 +202,18 @@ export function UserFormPage() {
                   name="teacher_id"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Profil Guru (opsional)</FormLabel>
+                      <FormLabel>{t('pages.users.teacherProfileOptional')}</FormLabel>
                       <Select
                         onValueChange={(v) => field.onChange(v === 'none' ? null : Number(v))}
                         value={field.value ? String(field.value) : 'none'}
                       >
                         <FormControl>
                           <SelectTrigger className="h-11">
-                            <SelectValue placeholder="Pilih profil guru" />
+                            <SelectValue placeholder={t('pages.users.selectTeacherProfile')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="none">Buat profil guru otomatis</SelectItem>
+                          <SelectItem value="none">{t('pages.users.autoCreateTeacher')}</SelectItem>
                           {teachersData?.data.map((teacher) => (
                             <SelectItem key={teacher.id} value={String(teacher.id)}>
                               {teacher.name}
@@ -233,17 +240,17 @@ export function UserFormPage() {
                         className="size-4 rounded border border-input"
                       />
                     </FormControl>
-                    <FormLabel className="font-normal">Akun aktif</FormLabel>
+                    <FormLabel className="font-normal">{t('pages.users.accountActive')}</FormLabel>
                   </FormItem>
                 )}
               />
 
               <div className="flex flex-col gap-2 pt-2 sm:flex-row">
                 <Button type="submit" className="min-h-11" disabled={createUser.isPending || updateUser.isPending}>
-                  {createUser.isPending || updateUser.isPending ? 'Menyimpan...' : 'Simpan'}
+                  {createUser.isPending || updateUser.isPending ? t('common.saving') : t('common.save')}
                 </Button>
                 <Button type="button" variant="outline" className="min-h-11" asChild>
-                  <Link to="/admin/users">Batal</Link>
+                  <Link to="/admin/users">{t('common.cancel')}</Link>
                 </Button>
               </div>
             </form>

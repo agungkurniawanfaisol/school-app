@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { PreviewFrame } from '@/components/editor/PreviewFrame'
 import { Button } from '@/components/ui/button'
@@ -7,11 +8,12 @@ import { formatDate } from '@/lib/utils'
 import { useAdminActivityDetail } from '@/hooks/useActivities'
 
 export function ActivityPreviewPage() {
+  const { t } = useTranslation('admin')
   const { uuid } = useParams<{ uuid: string }>()
   const { data: activity, isLoading } = useAdminActivityDetail(uuid ?? '')
 
   if (isLoading || !activity) {
-    return <div className="p-6 text-muted-foreground">Memuat pratinjau…</div>
+    return <div className="p-6 text-muted-foreground">{t('common.loadingPreview')}</div>
   }
 
   const isDraft = activity.status !== 'published'
@@ -23,11 +25,11 @@ export function ActivityPreviewPage() {
       toolbar={
         <>
           <Button asChild variant="outline" size="sm">
-            <Link to={`/admin/student-activities/${activity.uuid}/edit`}>Edit</Link>
+            <Link to={`/admin/student-activities/${activity.uuid}/edit`}>{t('common.edit')}</Link>
           </Button>
           {!isDraft && (
             <Button asChild variant="outline" size="sm">
-              <Link to={`/kegiatan/detail/${activity.uuid}`}>Lihat publik</Link>
+              <Link to={`/kegiatan/detail/${activity.uuid}`}>{t('common.viewPublic')}</Link>
             </Button>
           )}
         </>

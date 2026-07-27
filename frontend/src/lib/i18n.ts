@@ -1,6 +1,7 @@
 import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
+import idAdmin from '@/locales/id/admin.json'
 import idLanding from '@/locales/id/landing.json'
 import idLayout from '@/locales/id/layout.json'
 import idPages from '@/locales/id/pages.json'
@@ -9,7 +10,7 @@ const LANG_KEY = 'nurul-hikmah-lang'
 const SUPPORTED_LOCALES = ['id', 'en', 'ar', 'ja'] as const
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
 
-const NAMESPACES = ['landing', 'layout', 'pages'] as const
+const NAMESPACES = ['landing', 'layout', 'pages', 'admin'] as const
 
 function getStoredLang(): SupportedLocale {
   if (typeof window === 'undefined') return 'id'
@@ -22,12 +23,15 @@ const localeLoaders: Record<string, () => Promise<Record<string, unknown>>> = {
   'en/landing': () => import('@/locales/en/landing.json').then(m => m.default),
   'en/layout': () => import('@/locales/en/layout.json').then(m => m.default),
   'en/pages': () => import('@/locales/en/pages.json').then(m => m.default),
+  'en/admin': () => import('@/locales/en/admin.json').then(m => m.default),
   'ar/landing': () => import('@/locales/ar/landing.json').then(m => m.default),
   'ar/layout': () => import('@/locales/ar/layout.json').then(m => m.default),
   'ar/pages': () => import('@/locales/ar/pages.json').then(m => m.default),
+  'ar/admin': () => import('@/locales/ar/admin.json').then(m => m.default),
   'ja/landing': () => import('@/locales/ja/landing.json').then(m => m.default),
   'ja/layout': () => import('@/locales/ja/layout.json').then(m => m.default),
   'ja/pages': () => import('@/locales/ja/pages.json').then(m => m.default),
+  'ja/admin': () => import('@/locales/ja/admin.json').then(m => m.default),
 }
 
 const loadedLocales = new Set<string>(['id'])
@@ -48,7 +52,7 @@ export async function loadLocale(locale: SupportedLocale): Promise<void> {
 
 i18n.use(initReactI18next).init({
   resources: {
-    id: { landing: idLanding, layout: idLayout, pages: idPages },
+    id: { landing: idLanding, layout: idLayout, pages: idPages, admin: idAdmin },
   },
   lng: 'id',
   fallbackLng: 'id',

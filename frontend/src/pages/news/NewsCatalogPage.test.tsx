@@ -9,9 +9,7 @@ vi.mock('@/hooks/useNews', () => ({
   useNewsList: (filters: unknown) => useNewsListMock(filters),
 }))
 
-vi.mock('@/components/i18n/LanguageProvider', () => ({
-  useLanguage: () => ({ locale: 'id', dir: 'ltr', isChangingLocale: false, setLocale: vi.fn() }),
-}))
+vi.mock('@/components/i18n/LanguageProvider', () => import('@/test/mockLanguageProvider').then((m) => m.mockLanguageProviderModule))
 
 vi.mock('@/components/layout/PublicPageShell', () => ({
   PublicPageShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,

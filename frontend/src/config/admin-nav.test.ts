@@ -21,28 +21,28 @@ describe('admin-nav', () => {
   })
 
   it('findActiveAdminNavGroup returns group for active route', () => {
-    expect(findActiveAdminNavGroup('/admin/news')).toBe('Konten')
-    expect(findActiveAdminNavGroup('/admin/teachers')).toBe('Profil')
+    expect(findActiveAdminNavGroup('/admin/news')).toBe('nav.group.content')
+    expect(findActiveAdminNavGroup('/admin/teachers')).toBe('nav.group.profile')
     expect(findActiveAdminNavGroup('/admin')).toBeNull()
   })
 
   it('getAdminBreadcrumbs builds trail for list pages', () => {
     expect(getAdminBreadcrumbs('/admin/news')).toEqual([
-      { label: 'Admin', href: '/admin' },
-      { label: 'Konten' },
-      { label: 'Berita' },
+      { labelKey: 'nav.admin', href: '/admin' },
+      { labelKey: 'nav.group.content' },
+      { labelKey: 'nav.news' },
     ])
     expect(getAdminBreadcrumbs('/admin')).toEqual([
-      { label: 'Admin', href: '/admin' },
-      { label: 'Dashboard' },
+      { labelKey: 'nav.admin', href: '/admin' },
+      { labelKey: 'nav.dashboard' },
     ])
   })
 
   it('getAdminGroupDefaultHref returns default page per group', () => {
-    expect(getAdminGroupDefaultHref('Konten')).toBe('/admin/news')
-    expect(getAdminGroupDefaultHref('Profil')).toBe('/admin/teachers')
-    expect(getAdminGroupDefaultHref('PMB')).toBe('/admin/pmb-registrations')
-    expect(getAdminGroupDefaultHref('Sistem')).toBe('/admin/settings')
+    expect(getAdminGroupDefaultHref('nav.group.content')).toBe('/admin/news')
+    expect(getAdminGroupDefaultHref('nav.group.profile')).toBe('/admin/teachers')
+    expect(getAdminGroupDefaultHref('nav.group.pmb')).toBe('/admin/pmb-registrations')
+    expect(getAdminGroupDefaultHref('nav.group.system')).toBe('/admin/settings')
     expect(getAdminGroupDefaultHref('Unknown')).toBeNull()
   })
 

@@ -1,4 +1,5 @@
 import { Eye, MoreHorizontal, Pencil, Trash2, Upload, UploadCloud } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -81,29 +82,30 @@ export function AdminContentRowActions({
   onDelete,
   isPublishing,
 }: AdminContentRowActionsProps) {
+  const { t } = useTranslation('admin')
   const isPublished = status === 'published'
 
   return (
     <TooltipProvider delayDuration={300}>
       <div className="flex justify-end gap-0.5">
-        <IconButton label="Edit" href={editHref} asChild>
+        <IconButton label={t('common.edit')} href={editHref} asChild>
           <Pencil className="h-4 w-4" />
         </IconButton>
         {previewHref && (
-          <IconButton label="Pratinjau" href={previewHref} asChild>
+          <IconButton label={t('common.preview')} href={previewHref} asChild>
             <Eye className="h-4 w-4" />
           </IconButton>
         )}
         {isPublished && onUnpublish ? (
-          <IconButton label="Batalkan publikasi" onClick={onUnpublish} disabled={isPublishing}>
+          <IconButton label={t('common.unpublish')} onClick={onUnpublish} disabled={isPublishing}>
             <UploadCloud className="h-4 w-4" />
           </IconButton>
         ) : onPublish ? (
-          <IconButton label="Publikasikan" onClick={onPublish} disabled={isPublishing}>
+          <IconButton label={t('common.publish')} onClick={onPublish} disabled={isPublishing}>
             <Upload className="h-4 w-4" />
           </IconButton>
         ) : null}
-        <IconButton label="Hapus" onClick={onDelete} destructive>
+        <IconButton label={t('common.delete')} onClick={onDelete} destructive>
           <Trash2 className="h-4 w-4" />
         </IconButton>
       </div>
@@ -119,12 +121,13 @@ interface AdminSimpleRowActionsProps {
 }
 
 export function AdminSimpleRowActions({ editHref, onDelete, viewHref, extraItems }: AdminSimpleRowActionsProps) {
+  const { t } = useTranslation('admin')
   const hasMenu = extraItems?.length || onDelete
 
   if (!hasMenu && editHref) {
     return (
       <TooltipProvider delayDuration={300}>
-        <IconButton label="Edit" href={editHref} asChild>
+        <IconButton label={t('common.edit')} href={editHref} asChild>
           <Pencil className="h-4 w-4" />
         </IconButton>
       </TooltipProvider>
@@ -134,19 +137,19 @@ export function AdminSimpleRowActions({ editHref, onDelete, viewHref, extraItems
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" size="icon" variant="ghost" className="min-h-11 min-w-11" aria-label="Aksi lainnya">
+        <Button type="button" size="icon" variant="ghost" className="min-h-11 min-w-11" aria-label={t('common.moreActions')}>
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {viewHref && (
           <DropdownMenuItem asChild>
-            <Link to={viewHref}>Lihat detail</Link>
+            <Link to={viewHref}>{t('common.viewDetail')}</Link>
           </DropdownMenuItem>
         )}
         {editHref && (
           <DropdownMenuItem asChild>
-            <Link to={editHref}>Edit</Link>
+            <Link to={editHref}>{t('common.edit')}</Link>
           </DropdownMenuItem>
         )}
         {extraItems?.map((item) => (
@@ -158,7 +161,7 @@ export function AdminSimpleRowActions({ editHref, onDelete, viewHref, extraItems
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={onDelete}>
-              Hapus
+              {t('common.delete')}
             </DropdownMenuItem>
           </>
         )}

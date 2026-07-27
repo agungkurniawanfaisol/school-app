@@ -9,7 +9,7 @@ function FlyoutHarness() {
 
   return (
     <>
-      <button type="button" onClick={() => openFlyout('Konten', 100)}>
+      <button type="button" onClick={() => openFlyout('nav.group.content', 100)}>
         Buka flyout Konten
       </button>
       <AdminSidebarFlyout />

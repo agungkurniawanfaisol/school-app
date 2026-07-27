@@ -33,9 +33,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const { i18n } = useTranslation()
   const [locale, setLocaleState] = useState<Locale>(getStoredLocale)
   const [isChangingLocale, setIsChangingLocale] = useState(false)
-  const [isReady, setIsReady] = useState(false)
+  const [isReady, setIsReady] = useState(import.meta.env.MODE === 'test')
 
   useEffect(() => {
+    if (import.meta.env.MODE === 'test') {
+      setIsReady(true)
+      return
+    }
+
     i18nReady
       .then(() => setIsReady(true))
       .catch(() => setIsReady(true))
@@ -45,7 +50,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement
     root.setAttribute('lang', loc)
     root.setAttribute('dir', getDir(loc))
-    api.defaults.headers.common['X-Locale'] = loc
+    const headers = api.defaults?.headers
+    if (headers) {
+      headers.common ??= {}
+      headers.common['X-Locale'] = loc
+    }
   }, [])
 
   const setLocale = useCallback(async (next: Locale) => {

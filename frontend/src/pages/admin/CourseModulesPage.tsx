@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Plus, Trash2 } from 'lucide-react'
 import { AdminDeleteDialog } from '@/components/admin/AdminDeleteDialog'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
@@ -24,6 +25,7 @@ import { slugify } from '@/lib/utils'
 import type { CourseModule } from '@/types'
 
 function ModuleLessons({ moduleId }: { moduleId: number }) {
+  const { t } = useTranslation('admin')
   const { data } = useAdminCourseLessonsList({ course_module_id: moduleId, per_page: 50 })
   const createLesson = useCreateCourseLesson()
   const deleteLesson = useDeleteCourseLesson()
@@ -32,7 +34,7 @@ function ModuleLessons({ moduleId }: { moduleId: number }) {
 
   return (
     <div className="space-y-3 border-t border-primary/10 pt-3">
-      <p className="text-sm font-medium">Pelajaran</p>
+      <p className="text-sm font-medium">{t('form.lessons')}</p>
       <ul className="space-y-2">
         {data?.data.map((lesson) => (
           <li key={lesson.id} className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2 text-sm">
@@ -44,7 +46,7 @@ function ModuleLessons({ moduleId }: { moduleId: number }) {
         ))}
       </ul>
       <div className="flex gap-2">
-        <Input placeholder="Judul pelajaran baru" value={title} onChange={(e) => setTitle(e.target.value)} className="h-10" />
+        <Input placeholder={t('form.newLessonTitle')} value={title} onChange={(e) => setTitle(e.target.value)} className="h-10" />
         <Button
           type="button"
           size="sm"
@@ -57,7 +59,7 @@ function ModuleLessons({ moduleId }: { moduleId: number }) {
             )
           }}
         >
-          Tambah
+          {t('common.add')}
         </Button>
       </div>
       <AdminDeleteDialog
@@ -74,6 +76,7 @@ function ModuleLessons({ moduleId }: { moduleId: number }) {
 }
 
 export function CourseModulesPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const courseId = Number(id)
   const { data: course, isLoading: courseLoading } = useAdminCourseDetail(courseId)
@@ -85,19 +88,19 @@ export function CourseModulesPage() {
   const [deleteTarget, setDeleteTarget] = useState<CourseModule | null>(null)
 
   if (courseLoading || isLoading) {
-    return <p className="text-sm text-muted-foreground">Memuat modul kursus...</p>
+    return <p className="text-sm text-muted-foreground">{t('common.loadingModules')}</p>
   }
 
   return (
-    <AdminFormShell title={`Modul: ${course?.title ?? 'Kursus'}`} backHref="/admin/courses">
+    <AdminFormShell title={t('pages.courses.modulesTitle') + ': ' + (course?.title ?? t('table.course'))} backHref="/admin/courses">
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="module_title">Tambah Modul Baru</Label>
-            <Input id="module_title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Judul modul" className="h-11" />
+            <Label htmlFor="module_title">{t('common.addNew')} {t('common.module')}</Label>
+            <Input id="module_title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t('form.newModuleTitle')} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="module_desc">Deskripsi</Label>
+            <Label htmlFor="module_desc">{t('form.description')}</Label>
             <Textarea id="module_desc" value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
           </div>
           <Button
@@ -118,7 +121,7 @@ export function CourseModulesPage() {
             }}
           >
             <Plus className="h-4 w-4" />
-            Tambah Modul
+            {t('pages.courses.addModule')}
           </Button>
         </CardContent>
       </Card>

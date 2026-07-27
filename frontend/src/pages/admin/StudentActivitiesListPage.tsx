@@ -20,8 +20,10 @@ import {
 } from '@/hooks/useActivities'
 import type { StudentActivity } from '@/types'
 import { formatDate } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 export function StudentActivitiesListPage() {
+  const { t } = useTranslation('admin')
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -34,8 +36,8 @@ export function StudentActivitiesListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Kegiatan Siswa"
-        description="Dokumentasi kegiatan dan prestasi siswa"
+        title={t('pages.activities.listTitle')}
+        description={t('pages.activities.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -49,18 +51,18 @@ export function StudentActivitiesListPage() {
         }}
         createHref="/admin/student-activities/create"
         columns={[
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
+          { key: 'title', header: t('table.title'), cell: (item) => item.title },
           {
             key: 'activity_date',
-            header: 'Tanggal',
+            header: t('table.date'),
             cell: (item) => (item.activity_date ? formatDate(item.activity_date) : '-'),
           },
           {
             key: 'status',
-            header: 'Status',
+            header: t('table.status'),
             cell: (item) => (
               <Badge variant={item.status === 'published' ? 'default' : 'secondary'}>
-                {item.status === 'published' ? 'Dipublikasikan' : 'Draf'}
+                {item.status === 'published' ? t('status.published') : t('status.draft')}
               </Badge>
             ),
           },
@@ -82,14 +84,14 @@ export function StudentActivitiesListPage() {
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Hapus kegiatan?</DialogTitle>
+            <DialogTitle>{t('pages.activities.deleteTitle')}</DialogTitle>
             <DialogDescription>
-              Kegiatan &quot;{deleteTarget?.title}&quot; akan dihapus permanen.
+              {t('pages.activities.deleteDesc', { title: deleteTarget?.title })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
-              Batal
+              {t('common.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -101,7 +103,7 @@ export function StudentActivitiesListPage() {
                 navigate('/admin/student-activities')
               }}
             >
-              Hapus
+              {t('common.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

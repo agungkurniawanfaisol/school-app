@@ -1,33 +1,33 @@
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { PreviewFrame } from '@/components/editor/PreviewFrame'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/utils'
-import {
-  NEWS_DISPLAY_STATUS_LABELS,
-  NEWS_DISPLAY_STATUS_VARIANTS,
-  type NewsDisplayStatus,
-} from '@/lib/newsDisplayStatus'
+import { NEWS_DISPLAY_STATUS_VARIANTS, type NewsDisplayStatus } from '@/lib/newsDisplayStatus'
 import { useAdminNewsDetail } from '@/hooks/useNews'
+import { useNewsDisplayStatusLabels } from '@/hooks/useNewsDisplayStatusLabels'
 
 export function NewsPreviewPage() {
+  const { t } = useTranslation('admin')
+  const statusLabels = useNewsDisplayStatusLabels()
   const { uuid } = useParams<{ uuid: string }>()
   const { data: news, isLoading } = useAdminNewsDetail(uuid ?? '')
 
   if (isLoading || !news) {
-    return <div className="p-6 text-muted-foreground">Memuat pratinjau…</div>
+    return <div className="p-6 text-muted-foreground">{t('common.loadingPreview')}</div>
   }
 
   const displayStatus = (news.display_status ?? (news.status === 'published' ? 'live' : 'draft')) as NewsDisplayStatus
   const isDraft = displayStatus === 'draft'
   const scheduleNote =
-    displayStatus === 'scheduled'
-      ? `Akan tayang mulai ${formatDate(news.published_at)}`
-      : displayStatus === 'ended'
-        ? `Jadwal tampil berakhir ${formatDate(news.publish_ends_at)}`
+    displayStatus === 'scheduled' && news.published_at
+      ? t('preview.scheduleStarts', { date: formatDate(news.published_at) })
+      : displayStatus === 'ended' && news.publish_ends_at
+        ? t('preview.scheduleEnded', { date: formatDate(news.publish_ends_at) })
         : displayStatus === 'live' && news.publish_ends_at
-          ? `Tayang hingga ${formatDate(news.publish_ends_at)}`
+          ? t('preview.liveUntil', { date: formatDate(news.publish_ends_at) })
           : null
 
   return (
@@ -37,11 +37,11 @@ export function NewsPreviewPage() {
       toolbar={
         <>
           <Button asChild variant="outline" size="sm">
-            <Link to={`/admin/news/${news.uuid}/edit`}>Edit</Link>
+            <Link to={`/admin/news/${news.uuid}/edit`}>{t('common.edit')}</Link>
           </Button>
           {displayStatus === 'live' && (
             <Button asChild variant="outline" size="sm">
-              <Link to={`/berita/detail/${news.uuid}`}>Lihat publik</Link>
+              <Link to={`/berita/detail/${news.uuid}`}>{t('common.viewPublic')}</Link>
             </Button>
           )}
         </>
@@ -49,7 +49,7 @@ export function NewsPreviewPage() {
     >
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <Badge variant={NEWS_DISPLAY_STATUS_VARIANTS[displayStatus]}>
-          {NEWS_DISPLAY_STATUS_LABELS[displayStatus]}
+          {statusLabels[displayStatus]}
         </Badge>
         {news.category && <Badge variant="secondary">{news.category}</Badge>}
         {news.published_at && (

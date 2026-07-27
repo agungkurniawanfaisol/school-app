@@ -7,8 +7,10 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useAdminContactMessagesList, useDeleteContactMessage } from '@/hooks/useContactMessages'
 import type { ContactMessage } from '@/hooks/useContactMessages'
+import { useTranslation } from 'react-i18next'
 
 export function ContactMessagesListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<ContactMessage | null>(null)
@@ -19,8 +21,8 @@ export function ContactMessagesListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kontak Masuk"
-        description="Pesan dari pengunjung website"
+        title={t('pages.contact.listTitle')}
+        description={t('pages.contact.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -32,31 +34,31 @@ export function ContactMessagesListPage() {
         columns={[
           {
             key: 'name',
-            header: 'Pengirim',
+            header: t('table.sender'),
             cell: (item) => item.name,
           },
           {
             key: 'email',
-            header: 'Email',
+            header: t('table.email'),
             cell: (item) => item.email,
           },
           {
             key: 'subject',
-            header: 'Subjek',
+            header: t('table.subject'),
             cell: (item) => item.subject,
           },
           {
             key: 'is_read',
-            header: 'Status',
+            header: t('table.status'),
             cell: (item) => (
               <Badge variant={item.is_read ? 'secondary' : 'destructive'}>
-                {item.is_read ? 'Sudah Dibaca' : 'Belum Dibaca'}
+                {item.is_read ? t('status.read') : t('status.unread')}
               </Badge>
             ),
           },
           {
             key: 'created_at',
-            header: 'Tanggal',
+            header: t('table.date'),
             cell: (item) => new Date(item.created_at).toLocaleDateString('id-ID'),
           },
         ]}
@@ -89,8 +91,8 @@ export function ContactMessagesListPage() {
           }
         }}
         isLoading={deleteItem.isPending}
-        title="Hapus Pesan"
-        description="Apakah Anda yakin ingin menghapus pesan ini? Tindakan ini tidak dapat dibatalkan."
+        title={t('dialog.deleteMessageTitle')}
+        description={t('dialog.deleteMessageDesc')}
       />
     </>
   )

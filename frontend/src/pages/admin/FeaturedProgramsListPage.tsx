@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { useAdminCurriculumsList, useDeleteCurriculum } from '@/hooks/useCurriculums'
 import { resolveProgramIcon } from '@/lib/lucide-icon-map'
 import type { Curriculum } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 function ProgramThumbnail({ item }: { item: Curriculum }) {
   const Icon = resolveProgramIcon(item.icon)
@@ -31,6 +32,7 @@ function ProgramThumbnail({ item }: { item: Curriculum }) {
 }
 
 export function FeaturedProgramsListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Curriculum | null>(null)
@@ -40,8 +42,8 @@ export function FeaturedProgramsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Program Unggulan"
-        description="Program pembelajaran yang ditampilkan di beranda sekolah"
+        title={t('pages.programs.listTitle')}
+        description={t('pages.programs.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -57,7 +59,7 @@ export function FeaturedProgramsListPage() {
         columns={[
           {
             key: 'title',
-            header: 'Program',
+            header: t('table.program'),
             cell: (item) => (
               <div className="flex items-center gap-3">
                 <ProgramThumbnail item={item} />
@@ -72,17 +74,17 @@ export function FeaturedProgramsListPage() {
           },
           {
             key: 'order',
-            header: 'Urutan',
+            header: t('table.order'),
             cell: (item) => <span className="tabular-nums text-muted-foreground">{item.order}</span>,
           },
           {
             key: 'featured',
-            header: 'Beranda',
+            header: t('table.homepage'),
             cell: (item) => <AdminFeaturedBadge isFeatured={item.is_featured} />,
           },
           {
             key: 'active',
-            header: 'Status',
+            header: t('table.status'),
             cell: (item) => <AdminActiveBadge isActive={item.is_active} />,
           },
         ]}
@@ -91,7 +93,7 @@ export function FeaturedProgramsListPage() {
             <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
               <Link
                 to={`/admin/program-unggulan/${item.id}/edit`}
-                aria-label={`Edit ${item.title}`}
+                aria-label={t('pages.programs.editAria', { title: item.title })}
               >
                 <Pencil className="h-4 w-4" />
               </Link>
@@ -101,7 +103,7 @@ export function FeaturedProgramsListPage() {
               size="sm"
               variant="ghost"
               className="min-h-11 min-w-11 text-destructive hover:text-destructive"
-              aria-label={`Hapus ${item.title}`}
+              aria-label={t('pages.programs.deleteAria', { title: item.title })}
               onClick={() => setDeleteTarget(item)}
             >
               <Trash2 className="h-4 w-4" />
@@ -117,10 +119,10 @@ export function FeaturedProgramsListPage() {
           deleteItem.mutate(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) })
         }}
         isLoading={deleteItem.isPending}
-        title="Hapus program unggulan?"
+        title={t('pages.programs.deleteTitle')}
         description={
           deleteTarget
-            ? `Program "${deleteTarget.title}" akan dihapus permanen.`
+            ? t('pages.programs.deleteDesc', { title: deleteTarget.title })
             : undefined
         }
       />

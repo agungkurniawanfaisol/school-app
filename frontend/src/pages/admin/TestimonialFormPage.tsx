@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { AdminImageField } from '@/components/admin/AdminImageField'
 import { Card, CardContent } from '@/components/ui/card'
@@ -15,6 +16,7 @@ import {
 import { useSchool } from '@/hooks/useSchool'
 
 export function TestimonialFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -45,7 +47,7 @@ export function TestimonialFormPage() {
     setIsFeatured(existing.is_featured)
   }, [existing])
 
-  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
 
   const payload = {
     school_id: school?.id ?? existing?.school_id ?? 0,
@@ -69,7 +71,7 @@ export function TestimonialFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Testimoni' : 'Tambah Testimoni'}
+      title={isEdit ? t('pages.testimonials.editTitle') : t('pages.testimonials.createTitle')}
       backHref="/admin/testimonials"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/testimonials')}
@@ -80,22 +82,22 @@ export function TestimonialFormPage() {
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="name">Nama</Label>
+              <Label htmlFor="name">{t('form.name')}</Label>
               <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="role">Peran</Label>
+              <Label htmlFor="role">{t('form.role')}</Label>
               <Input id="role" value={role} onChange={(e) => setRole(e.target.value)} className="h-11" />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="content">Isi Testimoni</Label>
+            <Label htmlFor="content">{t('form.testimonialContent')}</Label>
             <Textarea id="content" value={content} onChange={(e) => setContent(e.target.value)} rows={4} />
           </div>
-          <AdminImageField label="Foto" value={photo} onChange={setPhoto} />
+          <AdminImageField label={t('form.photo')} value={photo} onChange={setPhoto} />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="rating">Rating (1-5)</Label>
+              <Label htmlFor="rating">{t('form.ratingRange')}</Label>
               <Input
                 id="rating"
                 type="number"
@@ -107,16 +109,16 @@ export function TestimonialFormPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="order">Urutan</Label>
+              <Label htmlFor="order">{t('form.order')}</Label>
               <Input id="order" type="number" min={0} value={order} onChange={(e) => setOrder(Number(e.target.value))} className="h-11" />
             </div>
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_featured">Unggulan</Label>
+            <Label htmlFor="is_featured">{t('form.featured')}</Label>
             <Switch id="is_featured" checked={isFeatured} onCheckedChange={setIsFeatured} />
           </div>
         </CardContent>

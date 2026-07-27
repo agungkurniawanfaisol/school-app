@@ -22,6 +22,7 @@ describe('i18n configuration', () => {
     expect(ns).toContain('landing')
     expect(ns).toContain('layout')
     expect(ns).toContain('pages')
+    expect(ns).toContain('admin')
   })
 
   it('loads Indonesian landing translations', () => {
@@ -56,6 +57,25 @@ describe('i18n configuration', () => {
     expect(i18n.t('common.loading', { ns: 'pages', lng: 'en' })).toBe('Loading...')
     expect(i18n.t('common.loading', { ns: 'pages', lng: 'ar' })).toBe('جاري التحميل...')
     expect(i18n.t('common.loading', { ns: 'pages', lng: 'ja' })).toBe('読み込み中...')
+  })
+
+  it('loads admin translations for all locales', () => {
+    expect(i18n.t('nav.dashboard', { ns: 'admin', lng: 'id' })).toBe('Dashboard')
+    expect(i18n.t('nav.dashboard', { ns: 'admin', lng: 'en' })).toBe('Dashboard')
+    expect(i18n.t('common.save', { ns: 'admin', lng: 'id' })).toBe('Simpan')
+    expect(i18n.t('common.save', { ns: 'admin', lng: 'en' })).toBe('Save')
+    expect(i18n.t('common.save', { ns: 'admin', lng: 'ar' })).toBe('حفظ')
+    expect(i18n.t('common.save', { ns: 'admin', lng: 'ja' })).toBe('保存')
+    expect(i18n.t('pages.news.listTitle', { ns: 'admin', lng: 'ar' })).toMatch(/[\u0600-\u06FF]/)
+    expect(i18n.t('pages.news.listTitle', { ns: 'admin', lng: 'ja' })).toMatch(/[\u3040-\u30FF\u4E00-\u9FFF]/)
+  })
+
+  it('has matching admin keys across all locales', () => {
+    const idKeys = Object.keys(i18n.getResourceBundle('id', 'admin') ?? {}).sort()
+    for (const lng of ['en', 'ar', 'ja'] as const) {
+      const keys = Object.keys(i18n.getResourceBundle(lng, 'admin') ?? {}).sort()
+      expect(keys).toEqual(idKeys)
+    }
   })
 
   it('can switch language', async () => {

@@ -5,8 +5,10 @@ import { AdminActiveBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { useAdminExtracurricularsList, useDeleteExtracurricular } from '@/hooks/useExtracurriculars'
 import type { Extracurricular } from '@/hooks/useExtracurriculars'
+import { useTranslation } from 'react-i18next'
 
 export function ExtracurricularsListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Extracurricular | null>(null)
@@ -16,8 +18,8 @@ export function ExtracurricularsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Ekstrakurikuler"
-        description="Kegiatan ekstrakurikuler sekolah"
+        title={t('pages.extracurriculars.listTitle')}
+        description={t('pages.extracurriculars.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -31,11 +33,11 @@ export function ExtracurricularsListPage() {
         }}
         createHref="/admin/extracurriculars/create"
         columns={[
-          { key: 'name', header: 'Nama', cell: (item) => item.name },
-          { key: 'category', header: 'Kategori', cell: (item) => item.category },
-          { key: 'schedule', header: 'Jadwal', cell: (item) => item.schedule ?? '—' },
-          { key: 'instructor', header: 'Pembina', cell: (item) => item.instructor ?? '—' },
-          { key: 'status', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'name', header: t('table.name'), cell: (item) => item.name },
+          { key: 'category', header: t('table.category'), cell: (item) => item.category },
+          { key: 'schedule', header: t('table.schedule'), cell: (item) => item.schedule ?? '—' },
+          { key: 'instructor', header: t('table.supervisor'), cell: (item) => item.instructor ?? '—' },
+          { key: 'status', header: t('table.status'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions

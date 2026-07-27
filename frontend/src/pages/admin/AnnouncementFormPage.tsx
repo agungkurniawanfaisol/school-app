@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -21,6 +22,7 @@ import {
 import { useSchool } from '@/hooks/useSchool'
 
 export function AnnouncementFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -55,7 +57,7 @@ export function AnnouncementFormPage() {
     setCtaUrl(existing.cta_url ?? '')
   }, [existing])
 
-  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
 
   const payload = {
     school_id: school?.id ?? existing?.school_id ?? 0,
@@ -82,7 +84,7 @@ export function AnnouncementFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Pengumuman' : 'Tambah Pengumuman'}
+      title={isEdit ? t('pages.announcements.editTitle') : t('pages.announcements.createTitle')}
       backHref="/admin/announcements"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/announcements')}
@@ -92,58 +94,58 @@ export function AnnouncementFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Judul</Label>
+            <Label htmlFor="title">{t('form.title')}</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="content">Konten</Label>
+            <Label htmlFor="content">{t('form.content')}</Label>
             <Textarea id="content" value={content} onChange={(e) => setContent(e.target.value)} rows={5} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="priority">Prioritas</Label>
+              <Label htmlFor="priority">{t('form.priority')}</Label>
               <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)}>
                 <SelectTrigger id="priority" className="h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="important">Penting</SelectItem>
-                  <SelectItem value="urgent">Mendesak</SelectItem>
+                  <SelectItem value="normal">{t('status.normal')}</SelectItem>
+                  <SelectItem value="important">{t('status.important')}</SelectItem>
+                  <SelectItem value="urgent">{t('status.urgent')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="order">Urutan</Label>
+              <Label htmlFor="order">{t('form.order')}</Label>
               <Input id="order" type="number" min={0} value={order} onChange={(e) => setOrder(Number(e.target.value))} className="h-11" />
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="published_at">Tanggal Publikasi</Label>
+              <Label htmlFor="published_at">{t('form.publishedAt')}</Label>
               <Input id="published_at" type="datetime-local" value={publishedAt} onChange={(e) => setPublishedAt(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="expires_at">Tanggal Kedaluwarsa</Label>
+              <Label htmlFor="expires_at">{t('form.expiresAt')}</Label>
               <Input id="expires_at" type="datetime-local" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} className="h-11" />
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="cta_text">Teks Tombol CTA</Label>
-              <Input id="cta_text" value={ctaText} onChange={(e) => setCtaText(e.target.value)} placeholder="Cth: Daftar Sekarang" className="h-11" />
+              <Label htmlFor="cta_text">{t('form.ctaText')}</Label>
+              <Input id="cta_text" value={ctaText} onChange={(e) => setCtaText(e.target.value)} placeholder={t('form.ctaExample')} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cta_url">URL Tombol CTA</Label>
+              <Label htmlFor="cta_url">{t('form.ctaUrl')}</Label>
               <Input id="cta_url" value={ctaUrl} onChange={(e) => setCtaUrl(e.target.value)} placeholder="https://..." className="h-11" />
             </div>
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_pinned">Tampilkan sebagai Popup</Label>
+            <Label htmlFor="is_pinned">{t('form.isPinned')}</Label>
             <Switch id="is_pinned" checked={isPinned} onCheckedChange={setIsPinned} />
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </CardContent>

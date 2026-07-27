@@ -5,8 +5,10 @@ import { AdminActiveBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { useAdminEventsList, useDeleteEvent } from '@/hooks/useEvents'
 import type { Event } from '@/hooks/useEvents'
+import { useTranslation } from 'react-i18next'
 
 export function EventsListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Event | null>(null)
@@ -16,8 +18,8 @@ export function EventsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Agenda"
-        description="Jadwal kegiatan dan acara sekolah"
+        title={t('pages.events.listTitle')}
+        description={t('pages.events.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -31,11 +33,11 @@ export function EventsListPage() {
         }}
         createHref="/admin/events/create"
         columns={[
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
-          { key: 'event_date', header: 'Tanggal', cell: (item) => new Date(item.event_date).toLocaleDateString('id-ID') },
-          { key: 'location', header: 'Lokasi', cell: (item) => item.location ?? '—' },
-          { key: 'category', header: 'Kategori', cell: (item) => item.category.charAt(0).toUpperCase() + item.category.slice(1) },
-          { key: 'status', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'title', header: t('table.title'), cell: (item) => item.title },
+          { key: 'event_date', header: t('table.date'), cell: (item) => new Date(item.event_date).toLocaleDateString('id-ID') },
+          { key: 'location', header: t('table.location'), cell: (item) => item.location ?? '—' },
+          { key: 'category', header: t('table.category'), cell: (item) => item.category.charAt(0).toUpperCase() + item.category.slice(1) },
+          { key: 'status', header: t('table.status'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions

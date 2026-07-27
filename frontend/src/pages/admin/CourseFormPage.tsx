@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { AdminImageField } from '@/components/admin/AdminImageField'
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,6 +14,7 @@ import { useSchool } from '@/hooks/useSchool'
 import { slugify } from '@/lib/utils'
 
 export function CourseFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -53,7 +55,7 @@ export function CourseFormPage() {
     setIsFeatured(existing.is_featured)
   }, [existing])
 
-  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
 
   const payload = {
     school_id: school?.id ?? existing?.school_id ?? 0,
@@ -82,7 +84,7 @@ export function CourseFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Kursus' : 'Tambah Kursus'}
+      title={isEdit ? t('pages.courses.editTitle') : t('pages.courses.createTitle')}
       backHref="/admin/courses"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/courses')}
@@ -92,62 +94,62 @@ export function CourseFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Judul</Label>
+            <Label htmlFor="title">{t('form.title')}</Label>
             <Input id="title" value={title} onChange={(e) => { setTitle(e.target.value); if (!isEdit) setSlug(slugify(e.target.value)) }} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="slug">Slug</Label>
+            <Label htmlFor="slug">{t('form.slug')}</Label>
             <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="excerpt">Ringkasan</Label>
+            <Label htmlFor="excerpt">{t('form.excerpt')}</Label>
             <Textarea id="excerpt" value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} />
           </div>
-          <AdminImageField label="Thumbnail" value={thumbnail} onChange={setThumbnail} />
+          <AdminImageField label={t('form.thumbnail')} value={thumbnail} onChange={setThumbnail} />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="category">Kategori</Label>
+              <Label htmlFor="category">{t('form.category')}</Label>
               <Input id="category" value={category} onChange={(e) => setCategory(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="level">Level</Label>
+              <Label htmlFor="level">{t('form.courseLevel')}</Label>
               <Input id="level" value={level} onChange={(e) => setLevel(e.target.value)} className="h-11" />
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="duration">Durasi (menit)</Label>
+              <Label htmlFor="duration">{t('form.duration')}</Label>
               <Input id="duration" type="number" min={0} value={durationMinutes} onChange={(e) => setDurationMinutes(e.target.value === '' ? '' : Number(e.target.value))} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="price">Harga</Label>
+              <Label htmlFor="price">{t('form.price')}</Label>
               <Input id="price" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label>Status</Label>
+              <Label>{t('form.status')}</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as 'draft' | 'published')}>
                 <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="draft">Draf</SelectItem>
-                  <SelectItem value="published">Dipublikasikan</SelectItem>
+                  <SelectItem value="draft">{t('form.draft')}</SelectItem>
+                  <SelectItem value="published">{t('form.published')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="order">Urutan</Label>
+            <Label htmlFor="order">{t('form.order')}</Label>
             <Input id="order" type="number" min={0} value={order} onChange={(e) => setOrder(Number(e.target.value))} className="h-11" />
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_featured">Unggulan</Label>
+            <Label htmlFor="is_featured">{t('form.featured')}</Label>
             <Switch id="is_featured" checked={isFeatured} onCheckedChange={setIsFeatured} />
           </div>
         </CardContent>

@@ -1,17 +1,31 @@
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 
-const STATUS_MAP: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
-  published: { label: 'Dipublikasikan', variant: 'default' },
-  draft: { label: 'Draf', variant: 'secondary' },
-  pending: { label: 'Menunggu', variant: 'secondary' },
-  review: { label: 'Direview', variant: 'outline' },
-  accepted: { label: 'Diterima', variant: 'default' },
-  rejected: { label: 'Ditolak', variant: 'destructive' },
-  paid: { label: 'Lunas', variant: 'default' },
-  active: { label: 'Aktif', variant: 'default' },
-  completed: { label: 'Selesai', variant: 'default' },
-  cancelled: { label: 'Dibatalkan', variant: 'destructive' },
+const STATUS_KEY_MAP: Record<string, string> = {
+  published: 'status.published',
+  draft: 'status.draft',
+  pending: 'status.pending',
+  review: 'status.reviewing',
+  accepted: 'status.accepted',
+  rejected: 'status.rejected',
+  paid: 'status.paid',
+  active: 'status.active',
+  completed: 'status.ended',
+  cancelled: 'status.cancelled',
+}
+
+const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
+  published: 'default',
+  draft: 'secondary',
+  pending: 'secondary',
+  review: 'outline',
+  accepted: 'default',
+  rejected: 'destructive',
+  paid: 'default',
+  active: 'default',
+  completed: 'default',
+  cancelled: 'destructive',
 }
 
 interface AdminStatusBadgeProps {
@@ -20,10 +34,14 @@ interface AdminStatusBadgeProps {
 }
 
 export function AdminStatusBadge({ status, className }: AdminStatusBadgeProps) {
-  const config = STATUS_MAP[status] ?? { label: status, variant: 'outline' as const }
+  const { t } = useTranslation('admin')
+  const labelKey = STATUS_KEY_MAP[status]
+  const label = labelKey ? t(labelKey) : status
+  const variant = STATUS_VARIANTS[status] ?? 'outline'
+
   return (
-    <Badge variant={config.variant} className={className}>
-      {config.label}
+    <Badge variant={variant} className={className}>
+      {label}
     </Badge>
   )
 }
@@ -33,9 +51,11 @@ interface AdminActiveBadgeProps {
 }
 
 export function AdminActiveBadge({ isActive }: AdminActiveBadgeProps) {
+  const { t } = useTranslation('admin')
+
   return (
     <Badge variant={isActive ? 'default' : 'secondary'}>
-      {isActive ? 'Aktif' : 'Nonaktif'}
+      {isActive ? t('status.active') : t('status.inactive')}
     </Badge>
   )
 }
@@ -45,12 +65,19 @@ interface AdminFeaturedBadgeProps {
 }
 
 export function AdminFeaturedBadge({ isFeatured }: AdminFeaturedBadgeProps) {
-  if (!isFeatured) return <span className="text-muted-foreground">—</span>
-  return <Badge variant="outline" className="border-gold/40 text-gold">Unggulan</Badge>
+  const { t } = useTranslation('admin')
+
+  if (!isFeatured) return <span className="text-muted-foreground">{t('common.dash')}</span>
+  return (
+    <Badge variant="outline" className="border-gold/40 text-gold">
+      {t('status.featured')}
+    </Badge>
+  )
 }
 
-export function adminStatusLabel(status: string): string {
-  return STATUS_MAP[status]?.label ?? status
+export function adminStatusLabel(status: string, t: (key: string) => string): string {
+  const labelKey = STATUS_KEY_MAP[status]
+  return labelKey ? t(labelKey) : status
 }
 
 export type AdminStatusBadgePropsType = AdminStatusBadgeProps

@@ -1,14 +1,20 @@
 import { z } from 'zod'
+import type { AdminTFunction } from '@/lib/zod-i18n'
+import { defaultAdminT } from '@/lib/zod-i18n'
 
-export const heroSliderSchema = z.object({
-  school_id: z.number().int().positive('Sekolah wajib dipilih'),
-  title: z.string().min(1, 'Judul wajib diisi').max(250),
-  subtitle: z.string().max(500).optional().nullable(),
-  image: z.string().min(1, 'Gambar wajib diisi').max(500),
-  cta_text: z.string().max(100).optional().nullable(),
-  cta_url: z.string().max(500).optional().nullable(),
-  order: z.number().int().min(0).default(0),
-  is_active: z.boolean().default(true),
-})
+export function createHeroSliderSchema(t: AdminTFunction) {
+  return z.object({
+    school_id: z.number().int().positive(t('validation.schoolRequired')),
+    title: z.string().min(1, t('validation.titleRequired')).max(250),
+    subtitle: z.string().max(500).optional().nullable(),
+    image: z.string().min(1, t('validation.imageRequired')).max(500),
+    cta_text: z.string().max(100).optional().nullable(),
+    cta_url: z.string().max(500).optional().nullable(),
+    order: z.number().int().min(0).default(0),
+    is_active: z.boolean().default(true),
+  })
+}
 
-export type HeroSliderFormValues = z.infer<typeof heroSliderSchema>
+export const heroSliderSchema = createHeroSliderSchema(defaultAdminT)
+
+export type HeroSliderFormValues = z.infer<ReturnType<typeof createHeroSliderSchema>>

@@ -11,8 +11,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { mediaKeys, useAdminMediaList, useDeleteMedia } from '@/hooks/useMedia'
 import { useMediaUpload } from '@/hooks/useMediaUpload'
 import type { Media } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 export function MediaLibraryPage() {
+  const { t } = useTranslation('admin')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [deleteTarget, setDeleteTarget] = useState<Media | null>(null)
@@ -31,12 +33,12 @@ export function MediaLibraryPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Perpustakaan Media"
-        description="Kelola file gambar dan aset media"
+        title={t('pages.media.title')}
+        description={t('pages.media.desc')}
         actions={
           <Button type="button" onClick={() => inputRef.current?.click()} disabled={upload.isPending}>
             <ImagePlus className="h-4 w-4" aria-hidden />
-            {upload.isPending ? 'Mengunggah...' : 'Unggah'}
+            {upload.isPending ? t('common.uploading') : t('common.upload')}
           </Button>
         }
       />
@@ -50,7 +52,7 @@ export function MediaLibraryPage() {
           e.target.value = ''
         }}
       />
-      <AdminToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1) }} searchPlaceholder="Cari file..." />
+      <AdminToolbar search={search} onSearchChange={(v) => { setSearch(v); setPage(1) }} searchPlaceholder={t('common.searchFile')} />
 
       <div className={`grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 ${isFetching ? 'opacity-70' : ''}`}>
         {isLoading ? (
@@ -72,14 +74,14 @@ export function MediaLibraryPage() {
                   onClick={() => setDeleteTarget(item)}
                 >
                   <Trash2 className="h-4 w-4" aria-hidden />
-                  Hapus
+                  {t('common.delete')}
                 </Button>
               </CardContent>
             </Card>
           ))
         ) : (
           <div className="col-span-full">
-            <AdminEmptyState icon={ImagePlus} title="Belum ada media" description="Unggah gambar untuk mulai membangun perpustakaan media." />
+            <AdminEmptyState icon={ImagePlus} title={t('pages.media.emptyTitle')} description={t('pages.media.emptyDesc')} />
           </div>
         )}
       </div>
@@ -87,13 +89,13 @@ export function MediaLibraryPage() {
       {data && data.meta.last_page > 1 && (
         <div className="flex justify-center gap-2">
           <Button variant="outline" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-            Sebelumnya
+            {t('common.previous')}
           </Button>
           <span className="flex items-center text-sm text-muted-foreground">
-            Halaman {page} dari {data.meta.last_page}
+            {t('common.pageOf', { page, lastPage: data.meta.last_page })}
           </span>
           <Button variant="outline" disabled={page >= data.meta.last_page} onClick={() => setPage((p) => p + 1)}>
-            Berikutnya
+            {t('common.next')}
           </Button>
         </div>
       )}

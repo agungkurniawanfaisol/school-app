@@ -1,4 +1,5 @@
 import { Inbox } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   Pagination,
@@ -55,12 +56,13 @@ function AdminPagination({
   page: number
   onPageChange: (page: number) => void
 }) {
+  const { t } = useTranslation('admin')
   if (meta.last_page <= 1) return null
 
   return (
     <div className="space-y-3">
       <p className="text-center text-sm text-muted-foreground md:hidden">
-        Halaman {page} dari {meta.last_page}
+        {t('common.pageOf', { page, lastPage: meta.last_page })}
       </p>
       <Pagination>
         <PaginationContent className="flex-wrap justify-center gap-1">
@@ -112,13 +114,10 @@ function AdminPagination({
 }
 
 function ListSummary({ meta }: { meta: PaginationMeta }) {
+  const { t } = useTranslation('admin')
   return (
     <p className="text-sm text-muted-foreground">
-      Menampilkan{' '}
-      <span className="font-medium text-foreground tabular-nums">
-        {meta.from ?? 0}–{meta.to ?? 0}
-      </span>{' '}
-      dari <span className="font-medium text-foreground tabular-nums">{meta.total}</span> item
+      {t('common.showingRange', { from: meta.from ?? 0, to: meta.to ?? 0, total: meta.total })}
     </p>
   )
 }
@@ -135,10 +134,13 @@ export function AdminDataTable<T extends { id: number }>({
   onSearchChange,
   searchPlaceholder,
   rowActions,
-  emptyTitle = 'Belum ada data',
-  emptyDescription = 'Data akan muncul di sini setelah ditambahkan.',
+  emptyTitle,
+  emptyDescription,
   toolbarFilters,
 }: AdminDataTableProps<T>) {
+  const { t } = useTranslation('admin')
+  const resolvedEmptyTitle = emptyTitle ?? t('empty.defaultTitle')
+  const resolvedEmptyDescription = emptyDescription ?? t('empty.defaultDescription')
   const showEmpty = !isLoading && !data?.length
 
   return (
@@ -187,7 +189,7 @@ export function AdminDataTable<T extends { id: number }>({
           </div>
         ) : (
           <div className="p-4">
-            <AdminEmptyState icon={Inbox} title={emptyTitle} description={emptyDescription} />
+            <AdminEmptyState icon={Inbox} title={resolvedEmptyTitle} description={resolvedEmptyDescription} />
           </div>
         )}
       </div>
@@ -201,7 +203,7 @@ export function AdminDataTable<T extends { id: number }>({
                   {col.header}
                 </TableHead>
               ))}
-              {rowActions && <TableHead className="text-right font-semibold text-foreground/80">Aksi</TableHead>}
+              {rowActions && <TableHead className="text-right font-semibold text-foreground/80">{t('common.actions')}</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -235,7 +237,7 @@ export function AdminDataTable<T extends { id: number }>({
               <TableRow>
                 <TableCell colSpan={columns.length + (rowActions ? 1 : 0)} className="p-0">
                   {showEmpty && (
-                    <AdminEmptyState icon={Inbox} title={emptyTitle} description={emptyDescription} className="border-0" />
+                    <AdminEmptyState icon={Inbox} title={resolvedEmptyTitle} description={resolvedEmptyDescription} className="border-0" />
                   )}
                 </TableCell>
               </TableRow>

@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { GripVertical, ImagePlus, Loader2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,6 +19,7 @@ function photoSrc(path: string) {
 }
 
 export function FacilityPhotoGalleryEditor({ photos, onChange }: FacilityPhotoGalleryEditorProps) {
+  const { t } = useTranslation('admin')
   const upload = useMediaUpload('facilities')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -52,8 +54,8 @@ export function FacilityPhotoGalleryEditor({ photos, onChange }: FacilityPhotoGa
     <Card className="border-primary/10">
       <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0 pb-3">
         <div>
-          <CardTitle className="text-base">Galeri Foto</CardTitle>
-          <p className="mt-1 text-sm text-muted-foreground">Unggah lebih dari satu foto untuk fasilitas ini.</p>
+          <CardTitle className="text-base">{t('components.facilityGallery.title')}</CardTitle>
+          <p className="mt-1 text-sm text-muted-foreground">{t('components.facilityGallery.desc')}</p>
         </div>
         <Button
           type="button"
@@ -68,7 +70,7 @@ export function FacilityPhotoGalleryEditor({ photos, onChange }: FacilityPhotoGa
           ) : (
             <ImagePlus className="h-4 w-4" aria-hidden />
           )}
-          Tambah Foto
+          {t('components.facilityGallery.addPhoto')}
         </Button>
         <input
           ref={inputRef}
@@ -76,7 +78,7 @@ export function FacilityPhotoGalleryEditor({ photos, onChange }: FacilityPhotoGa
           accept="image/jpeg,image/png,image/webp"
           multiple
           className="sr-only"
-          aria-label="Unggah foto fasilitas"
+          aria-label={t('components.facilityGallery.uploadAria')}
           onChange={(e) => void handleFiles(e.target.files)}
         />
       </CardHeader>
@@ -89,7 +91,7 @@ export function FacilityPhotoGalleryEditor({ photos, onChange }: FacilityPhotoGa
             className="flex min-h-32 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-primary/20 bg-muted/30 p-6 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:bg-muted/50"
           >
             <ImagePlus className="h-8 w-8 opacity-50" aria-hidden />
-            Klik untuk mengunggah foto galeri
+            {t('components.facilityGallery.clickToUpload')}
           </button>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
@@ -113,7 +115,7 @@ export function FacilityPhotoGalleryEditor({ photos, onChange }: FacilityPhotoGa
                     variant="destructive"
                     size="icon"
                     className="absolute right-2 top-2 h-9 w-9"
-                    aria-label={`Hapus foto ${index + 1}`}
+                    aria-label={t('components.facilityGallery.removePhotoAria', { n: index + 1 })}
                     onClick={() => removePhoto(index)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -121,13 +123,13 @@ export function FacilityPhotoGalleryEditor({ photos, onChange }: FacilityPhotoGa
                 </div>
                 <div className="space-y-2 p-3">
                   <Label htmlFor={`photo-caption-${index}`} className="text-xs">
-                    Keterangan foto
+                    {t('components.facilityGallery.captionLabel')}
                   </Label>
                   <Input
                     id={`photo-caption-${index}`}
                     value={photo.caption ?? ''}
                     onChange={(e) => updatePhoto(index, { caption: e.target.value || null })}
-                    placeholder="Contoh: Ruang kelas"
+                    placeholder={t('form.photoCaptionPlaceholder')}
                     className="h-10"
                   />
                 </div>

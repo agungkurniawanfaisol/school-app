@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ExternalLink, Facebook, Instagram, Youtube, MapPin, Globe } from 'lucide-react'
 import { toast } from 'sonner'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
@@ -12,13 +13,14 @@ import { Textarea } from '@/components/ui/textarea'
 import { useAdminSchoolDetail, useCreateSchool, useUpdateSchool } from '@/hooks/useSchool'
 import {
   MISSION_MAX_LENGTH,
-  schoolSchema,
-  visionMissionSchema,
+  createSchoolSchema,
+  createVisionMissionSchema,
   VISION_MAX_LENGTH,
 } from '@/schemas/school'
 import { slugify, cn } from '@/lib/utils'
 
 export function SchoolFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -26,6 +28,9 @@ export function SchoolFormPage() {
   const { data: existing, isLoading } = useAdminSchoolDetail(numericId)
   const createItem = useCreateSchool()
   const updateItem = useUpdateSchool(numericId)
+
+  const visionMissionSchema = useMemo(() => createVisionMissionSchema(t), [t])
+  const schoolSchema = useMemo(() => createSchoolSchema(t), [t])
 
   const [name, setName] = useState('')
   const [slug, setSlug] = useState('')
@@ -72,7 +77,7 @@ export function SchoolFormPage() {
     setLongitude(existing.longitude != null ? String(existing.longitude) : '')
   }, [existing])
 
-  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
 
   const socialMedia = (facebook || instagram || youtube)
     ? { facebook: facebook || null, instagram: instagram || null, youtube: youtube || null }
@@ -103,7 +108,7 @@ export function SchoolFormPage() {
     const visionMission = visionMissionSchema.safeParse({ vision, mission })
     if (!visionMission.success) {
       const firstError = visionMission.error.errors[0]?.message
-      toast.error(firstError ?? 'Visi atau misi tidak valid.')
+      toast.error(firstError ?? t('pages.schools.visionMissionInvalid'))
       return
     }
 
@@ -114,7 +119,7 @@ export function SchoolFormPage() {
     })
     if (!parsed.success) {
       const firstError = parsed.error.errors[0]?.message
-      toast.error(firstError ?? 'Data sekolah tidak valid.')
+      toast.error(firstError ?? t('pages.schools.dataInvalid'))
       return
     }
 
@@ -133,7 +138,7 @@ export function SchoolFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Data Sekolah' : 'Tambah Sekolah'}
+      title={isEdit ? t('pages.schools.editTitle') : t('pages.schools.createTitle')}
       backHref="/admin/schools"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/schools')}
@@ -144,51 +149,51 @@ export function SchoolFormPage() {
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="name">Nama Sekolah</Label>
+              <Label htmlFor="name">{t('form.schoolName')}</Label>
               <Input id="name" value={name} onChange={(e) => { setName(e.target.value); if (!isEdit) setSlug(slugify(e.target.value)) }} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="slug">Slug</Label>
+              <Label htmlFor="slug">{t('form.slug')}</Label>
               <Input id="slug" value={slug} onChange={(e) => setSlug(e.target.value)} className="h-11" />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="tagline">Tagline</Label>
+            <Label htmlFor="tagline">{t('form.tagline')}</Label>
             <Input id="tagline" value={tagline} onChange={(e) => setTagline(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('form.email')}</Label>
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Telepon</Label>
+              <Label htmlFor="phone">{t('form.phone')}</Label>
               <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="whatsapp">WhatsApp</Label>
+              <Label htmlFor="whatsapp">{t('form.whatsapp')}</Label>
               <Input id="whatsapp" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} className="h-11" />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="address">Alamat</Label>
+            <Label htmlFor="address">{t('form.address')}</Label>
             <Textarea id="address" value={address} onChange={(e) => setAddress(e.target.value)} rows={2} />
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="city">Kota</Label>
+              <Label htmlFor="city">{t('form.city')}</Label>
               <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="province">Provinsi</Label>
+              <Label htmlFor="province">{t('form.province')}</Label>
               <Input id="province" value={province} onChange={(e) => setProvince(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="postal_code">Kode Pos</Label>
+              <Label htmlFor="postal_code">{t('form.postalCode')}</Label>
               <Input id="postal_code" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} className="h-11" />
             </div>
           </div>
@@ -199,9 +204,9 @@ export function SchoolFormPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Globe className="h-4 w-4" aria-hidden />
-            Media Sosial
+            {t('pages.schools.socialTitle')}
           </CardTitle>
-          <CardDescription>Link profil media sosial sekolah yang tampil di footer.</CardDescription>
+          <CardDescription>{t('pages.schools.socialDesc')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -232,25 +237,25 @@ export function SchoolFormPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <MapPin className="h-4 w-4" aria-hidden />
-            Google Maps
+            {t('pages.schools.mapsTitle')}
           </CardTitle>
-          <CardDescription>Lokasi sekolah di peta yang tampil di footer.</CardDescription>
+          <CardDescription>{t('pages.schools.mapsDesc')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="map_embed_url">URL Embed Google Maps</Label>
+            <Label htmlFor="map_embed_url">{t('pages.schools.mapEmbedUrl')}</Label>
             <Input id="map_embed_url" placeholder="https://www.google.com/maps/embed?pb=..." value={mapEmbedUrl} onChange={(e) => setMapEmbedUrl(e.target.value)} className="h-11" />
             <p className="text-xs text-muted-foreground">
-              Buka Google Maps → cari lokasi → Bagikan → Sematkan peta → salin URL dari atribut <code>src</code>.
+              {t('pages.schools.mapEmbedHint')}
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="latitude">Latitude</Label>
+              <Label htmlFor="latitude">{t('form.latitude')}</Label>
               <Input id="latitude" type="number" step="any" placeholder="-6.2615025" value={latitude} onChange={(e) => setLatitude(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="longitude">Longitude</Label>
+              <Label htmlFor="longitude">{t('form.longitude')}</Label>
               <Input id="longitude" type="number" step="any" placeholder="106.7816014" value={longitude} onChange={(e) => setLongitude(e.target.value)} className="h-11" />
             </div>
           </div>
@@ -263,7 +268,7 @@ export function SchoolFormPage() {
               <div className="overflow-hidden rounded-lg border">
                 <iframe
                   src={mapEmbedUrl}
-                  title="Pratinjau Google Maps"
+                  title={`${t('common.preview')} Google Maps`}
                   className="h-[250px] w-full border-0"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -279,19 +284,19 @@ export function SchoolFormPage() {
       <Card className="admin-card">
         <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3 space-y-0">
           <div>
-            <CardTitle className="text-base">Visi & Misi</CardTitle>
-            <CardDescription>Tampil di bagian Tentang Kami pada beranda.</CardDescription>
+            <CardTitle className="text-base">{t('pages.schools.visionMissionSectionTitle')}</CardTitle>
+            <CardDescription>{t('pages.schools.visionMissionSectionDesc')}</CardDescription>
           </div>
           <Button asChild variant="outline" size="sm" className="min-h-11 shrink-0 gap-2">
             <Link to="/admin/vision-mission">
-              Buka editor Visi & Misi
+              {t('pages.schools.openVisionMissionEditor')}
               <ExternalLink className="h-4 w-4" aria-hidden />
             </Link>
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="vision">Visi</Label>
+            <Label htmlFor="vision">{t('form.vision')}</Label>
             <Textarea id="vision" value={vision} onChange={(e) => setVision(e.target.value)} rows={3} />
             <p
               className={cn(
@@ -303,10 +308,10 @@ export function SchoolFormPage() {
             </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="mission">Misi</Label>
+            <Label htmlFor="mission">{t('form.mission')}</Label>
             <Textarea id="mission" value={mission} onChange={(e) => setMission(e.target.value)} rows={4} />
             <p className="text-xs text-muted-foreground">
-              Satu baris = satu poin misi. Gunakan Enter untuk baris baru.
+              {t('pages.schools.missionLineHint')}
             </p>
             <p
               className={cn(
@@ -323,7 +328,7 @@ export function SchoolFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </CardContent>

@@ -7,11 +7,12 @@ import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { Badge } from '@/components/ui/badge'
 import { useAdminAnnouncementsList, useDeleteAnnouncement } from '@/hooks/useAnnouncements'
 import type { Announcement } from '@/types'
+import { useTranslation } from 'react-i18next'
 
-const priorityLabel: Record<Announcement['priority'], string> = {
-  normal: 'Normal',
-  important: 'Penting',
-  urgent: 'Mendesak',
+const priorityKeys: Record<Announcement['priority'], string> = {
+  normal: 'status.normal',
+  important: 'status.important',
+  urgent: 'status.urgent',
 }
 
 const priorityVariant: Record<Announcement['priority'], 'secondary' | 'default' | 'destructive'> = {
@@ -21,6 +22,7 @@ const priorityVariant: Record<Announcement['priority'], 'secondary' | 'default' 
 }
 
 export function AnnouncementsListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Announcement | null>(null)
@@ -30,8 +32,8 @@ export function AnnouncementsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Pengumuman"
-        description="Pengumuman dan informasi penting sekolah"
+        title={t('pages.announcements.listTitle')}
+        description={t('pages.announcements.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -45,23 +47,23 @@ export function AnnouncementsListPage() {
         }}
         createHref="/admin/announcements/create"
         columns={[
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
+          { key: 'title', header: t('table.title'), cell: (item) => item.title },
           {
             key: 'priority',
-            header: 'Prioritas',
+            header: t('table.priority'),
             cell: (item) => (
               <Badge variant={priorityVariant[item.priority]}>
-                {priorityLabel[item.priority]}
+                {t(priorityKeys[item.priority])}
               </Badge>
             ),
           },
           {
             key: 'is_pinned',
-            header: 'Disematkan',
+            header: t('table.pinned'),
             cell: (item) =>
               item.is_pinned ? <Pin className="h-4 w-4 text-primary" /> : '—',
           },
-          { key: 'active', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'active', header: t('table.status'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions

@@ -5,8 +5,10 @@ import { AdminActiveBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { useAdminAchievementsList, useDeleteAchievement } from '@/hooks/useAchievements'
 import type { Achievement } from '@/hooks/useAchievements'
+import { useTranslation } from 'react-i18next'
 
 export function AchievementsListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Achievement | null>(null)
@@ -18,8 +20,8 @@ export function AchievementsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Prestasi"
-        description="Pencapaian siswa dan sekolah"
+        title={t('pages.achievements.listTitle')}
+        description={t('pages.achievements.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -33,12 +35,12 @@ export function AchievementsListPage() {
         }}
         createHref="/admin/achievements/create"
         columns={[
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
-          { key: 'category', header: 'Kategori', cell: (item) => capitalize(item.category) },
-          { key: 'level', header: 'Tingkat', cell: (item) => capitalize(item.level) },
-          { key: 'student_name', header: 'Nama Siswa', cell: (item) => item.student_name ?? '—' },
-          { key: 'year', header: 'Tahun', cell: (item) => item.year },
-          { key: 'active', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'title', header: t('table.title'), cell: (item) => item.title },
+          { key: 'category', header: t('table.category'), cell: (item) => capitalize(item.category) },
+          { key: 'level', header: t('table.level'), cell: (item) => capitalize(item.level) },
+          { key: 'student_name', header: t('table.studentName'), cell: (item) => item.student_name ?? '—' },
+          { key: 'year', header: t('table.year'), cell: (item) => item.year },
+          { key: 'active', header: t('table.status'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions

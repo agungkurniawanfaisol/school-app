@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -20,7 +21,10 @@ import {
 } from '@/hooks/useFaqs'
 import { useSchool } from '@/hooks/useSchool'
 
+const faqCategories = ['pmb', 'akademik', 'biaya', 'umum'] as const
+
 export function FaqFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -45,7 +49,7 @@ export function FaqFormPage() {
     setIsActive(existing.is_active)
   }, [existing])
 
-  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">Memuat data...</p>
+  if (isEdit && isLoading) return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
 
   const payload = {
     school_id: school?.id ?? existing?.school_id ?? 0,
@@ -66,7 +70,7 @@ export function FaqFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit FAQ' : 'Tambah FAQ'}
+      title={isEdit ? t('pages.faqs.editTitle') : t('pages.faqs.createTitle')}
       backHref="/admin/faqs"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/faqs')}
@@ -76,35 +80,36 @@ export function FaqFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="question">Pertanyaan</Label>
+            <Label htmlFor="question">{t('form.question')}</Label>
             <Input id="question" value={question} onChange={(e) => setQuestion(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="answer">Jawaban</Label>
+            <Label htmlFor="answer">{t('form.answer')}</Label>
             <Textarea id="answer" value={answer} onChange={(e) => setAnswer(e.target.value)} rows={4} />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="category">Kategori</Label>
+              <Label htmlFor="category">{t('form.category')}</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger className="h-11">
-                  <SelectValue placeholder="Pilih kategori" />
+                  <SelectValue placeholder={t('form.selectCategory')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pmb">PMB</SelectItem>
-                  <SelectItem value="akademik">Akademik</SelectItem>
-                  <SelectItem value="biaya">Biaya</SelectItem>
-                  <SelectItem value="umum">Umum</SelectItem>
+                  {faqCategories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {t(`faqCategory.${cat}`)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="order">Urutan</Label>
+              <Label htmlFor="order">{t('form.order')}</Label>
               <Input id="order" type="number" min={0} value={order} onChange={(e) => setOrder(Number(e.target.value))} className="h-11" />
             </div>
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </CardContent>

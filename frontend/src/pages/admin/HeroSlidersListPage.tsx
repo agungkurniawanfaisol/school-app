@@ -5,8 +5,10 @@ import { AdminActiveBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { useAdminHeroSlidersList, useDeleteHeroSlider } from '@/hooks/useHeroSliders'
 import type { HeroSlider } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 export function HeroSlidersListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<HeroSlider | null>(null)
@@ -16,8 +18,8 @@ export function HeroSlidersListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Carousel Beranda"
-        description="Atur slide carousel utama halaman beranda"
+        title={t('pages.heroSliders.listTitle')}
+        description={t('pages.heroSliders.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -33,7 +35,7 @@ export function HeroSlidersListPage() {
         columns={[
           {
             key: 'image',
-            header: 'Gambar',
+            header: t('table.image'),
             cell: (item) =>
               item.image ? (
                 <img src={item.image} alt="" className="h-10 w-16 rounded object-cover" />
@@ -41,9 +43,9 @@ export function HeroSlidersListPage() {
                 '—'
               ),
           },
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
-          { key: 'order', header: 'Urutan', cell: (item) => item.order },
-          { key: 'active', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'title', header: t('table.title'), cell: (item) => item.title },
+          { key: 'order', header: t('table.order'), cell: (item) => item.order },
+          { key: 'active', header: t('table.status'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions
@@ -55,8 +57,8 @@ export function HeroSlidersListPage() {
       <AdminDeleteDialog
         open={!!deleteTarget}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
-        title="Hapus carousel?"
-        description={`"${deleteTarget?.title}" akan dihapus permanen.`}
+        title={t('pages.heroSliders.deleteTitle')}
+        description={t('pages.heroSliders.deleteDesc', { title: deleteTarget?.title ?? '' })}
         onConfirm={() => {
           if (!deleteTarget) return
           deleteItem.mutate(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) })

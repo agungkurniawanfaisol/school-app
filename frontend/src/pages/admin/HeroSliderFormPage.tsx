@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { AdminImageField } from '@/components/admin/AdminImageField'
 import { Card, CardContent } from '@/components/ui/card'
@@ -14,6 +15,7 @@ import {
 import { useSchool } from '@/hooks/useSchool'
 
 export function HeroSliderFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -43,7 +45,7 @@ export function HeroSliderFormPage() {
   }, [existing])
 
   if (isEdit && isLoading) {
-    return <p className="text-sm text-muted-foreground">Memuat data...</p>
+    return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
   }
 
   const payload = {
@@ -67,7 +69,7 @@ export function HeroSliderFormPage() {
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Carousel' : 'Tambah Carousel'}
+      title={isEdit ? t('pages.heroSliders.editTitle') : t('pages.heroSliders.createTitle')}
       backHref="/admin/hero-sliders"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/hero-sliders')}
@@ -77,26 +79,26 @@ export function HeroSliderFormPage() {
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Judul</Label>
+            <Label htmlFor="title">{t('form.title')}</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="subtitle">Subjudul</Label>
+            <Label htmlFor="subtitle">{t('form.subtitle')}</Label>
             <Input id="subtitle" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} className="h-11" />
           </div>
-          <AdminImageField label="Gambar" value={image} onChange={setImage} />
+          <AdminImageField label={t('form.image')} value={image} onChange={setImage} />
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="cta_text">Teks Tombol</Label>
+              <Label htmlFor="cta_text">{t('form.ctaButtonText')}</Label>
               <Input id="cta_text" value={ctaText} onChange={(e) => setCtaText(e.target.value)} className="h-11" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="cta_url">URL Tombol</Label>
+              <Label htmlFor="cta_url">{t('form.ctaButtonUrl')}</Label>
               <Input id="cta_url" value={ctaUrl} onChange={(e) => setCtaUrl(e.target.value)} className="h-11" />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="order">Urutan</Label>
+            <Label htmlFor="order">{t('form.order')}</Label>
             <Input
               id="order"
               type="number"
@@ -107,7 +109,7 @@ export function HeroSliderFormPage() {
             />
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">
-            <Label htmlFor="is_active">Aktif</Label>
+            <Label htmlFor="is_active">{t('form.active')}</Label>
             <Switch id="is_active" checked={isActive} onCheckedChange={setIsActive} />
           </div>
         </CardContent>

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -25,11 +26,11 @@ export function AdminFormShell({
   title,
   description,
   backHref,
-  backLabel = 'Kembali',
+  backLabel,
   children,
   onSubmit,
   onCancel,
-  submitLabel = 'Simpan',
+  submitLabel,
   isSubmitting,
   isDisabled,
   isLoading,
@@ -37,10 +38,14 @@ export function AdminFormShell({
   footerExtra,
   className,
 }: AdminFormShellProps) {
+  const { t } = useTranslation('admin')
+  const resolvedBackLabel = backLabel ?? t('common.back')
+  const resolvedSubmitLabel = submitLabel ?? t('common.save')
+
   if (isLoading) {
     return (
       <div className={cn('admin-page admin-fade-in', className)}>
-        <p className="text-sm text-muted-foreground">Memuat data...</p>
+        <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
       </div>
     )
   }
@@ -52,7 +57,7 @@ export function AdminFormShell({
           <Button asChild variant="ghost" size="sm" className="min-h-11 gap-2 px-0 hover:bg-transparent">
             <Link to={backHref}>
               <ArrowLeft className="h-4 w-4" aria-hidden />
-              {backLabel}
+              {resolvedBackLabel}
             </Link>
           </Button>
           <div>
@@ -77,7 +82,7 @@ export function AdminFormShell({
                 disabled={isSubmitting}
                 className="min-h-11 w-full sm:w-auto"
               >
-                Batal
+                {t('common.cancel')}
               </Button>
             )}
             {onSubmit && (
@@ -88,7 +93,7 @@ export function AdminFormShell({
                 className="min-h-11 w-full sm:w-auto"
               >
                 {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-                {submitLabel}
+                {resolvedSubmitLabel}
               </Button>
             )}
           </div>

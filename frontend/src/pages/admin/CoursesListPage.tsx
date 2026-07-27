@@ -8,8 +8,10 @@ import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { Button } from '@/components/ui/button'
 import { useAdminCoursesList, useDeleteCourse } from '@/hooks/useCourses'
 import type { Course } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 export function CoursesListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<Course | null>(null)
@@ -19,8 +21,8 @@ export function CoursesListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Kursus"
-        description="Daftar kursus dan program pembelajaran"
+        title={t('pages.courses.listTitle')}
+        description={t('pages.courses.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -34,15 +36,15 @@ export function CoursesListPage() {
         }}
         createHref="/admin/courses/create"
         columns={[
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
-          { key: 'category', header: 'Kategori', cell: (item) => item.category ?? '—' },
-          { key: 'status', header: 'Status', cell: (item) => <AdminStatusBadge status={item.status ?? 'draft'} /> },
-          { key: 'active', header: 'Aktif', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'title', header: t('table.title'), cell: (item) => item.title },
+          { key: 'category', header: t('table.category'), cell: (item) => item.category ?? '—' },
+          { key: 'status', header: t('table.status'), cell: (item) => <AdminStatusBadge status={item.status ?? 'draft'} /> },
+          { key: 'active', header: t('table.active'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <div className="flex justify-end gap-1">
-            <Button asChild size="icon" variant="ghost" className="h-9 w-9" title="Modul">
-              <Link to={`/admin/courses/${item.id}/modules`} aria-label="Kelola modul">
+            <Button asChild size="icon" variant="ghost" className="h-9 w-9" title={t('pages.courses.manageModules')}>
+              <Link to={`/admin/courses/${item.id}/modules`} aria-label={t('pages.courses.manageModulesAria')}>
                 <Layers className="h-4 w-4" />
               </Link>
             </Button>

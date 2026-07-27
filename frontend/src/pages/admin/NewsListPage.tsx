@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminContentRowActions } from '@/components/admin/AdminContentRowActions'
 import { AdminPaginatedTable } from '@/components/admin/AdminPaginatedTable'
 import { NewsPublishDialog } from '@/components/admin/NewsPublishDialog'
@@ -27,27 +28,31 @@ import {
   useUnpublishNews,
 } from '@/hooks/useNews'
 import {
-  NEWS_DISPLAY_STATUS_LABELS,
   NEWS_DISPLAY_STATUS_VARIANTS,
   type NewsDisplayStatus,
 } from '@/lib/newsDisplayStatus'
+import { useNewsDisplayStatusLabels } from '@/hooks/useNewsDisplayStatusLabels'
 import { formatDate } from '@/lib/utils'
 import type { News } from '@/types'
-
-const DISPLAY_STATUS_OPTIONS: { value: 'all' | NewsDisplayStatus; label: string }[] = [
-  { value: 'all', label: 'Semua status' },
-  { value: 'draft', label: NEWS_DISPLAY_STATUS_LABELS.draft },
-  { value: 'scheduled', label: NEWS_DISPLAY_STATUS_LABELS.scheduled },
-  { value: 'live', label: NEWS_DISPLAY_STATUS_LABELS.live },
-  { value: 'ended', label: NEWS_DISPLAY_STATUS_LABELS.ended },
-  { value: 'archived', label: NEWS_DISPLAY_STATUS_LABELS.archived },
-]
 
 function resolveDisplayStatus(item: News): NewsDisplayStatus {
   return item.display_status ?? (item.status === 'published' ? 'live' : 'draft')
 }
 
 export function AdminNewsListPage() {
+  const { t } = useTranslation('admin')
+  const statusLabels = useNewsDisplayStatusLabels()
+  const displayStatusOptions = useMemo(
+    () => [
+      { value: 'all' as const, label: t('common.allStatus') },
+      { value: 'draft' as const, label: statusLabels.draft },
+      { value: 'scheduled' as const, label: statusLabels.scheduled },
+      { value: 'live' as const, label: statusLabels.live },
+      { value: 'ended' as const, label: statusLabels.ended },
+      { value: 'archived' as const, label: statusLabels.archived },
+    ],
+    [t, statusLabels],
+  )
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -67,8 +72,8 @@ export function AdminNewsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Berita"
-        description="Daftar berita dan artikel sekolah"
+        title={t('pages.news.listTitle')}
+        description={t('pages.news.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -89,11 +94,11 @@ export function AdminNewsListPage() {
               setPage(1)
             }}
           >
-            <SelectTrigger className="h-11 w-full sm:w-44" aria-label="Filter status tampil">
-              <SelectValue placeholder="Status tampil" />
+            <SelectTrigger className="h-11 w-full sm:w-44" aria-label={t('common.filterDisplayStatus')}>
+              <SelectValue placeholder={t('common.displayStatus')} />
             </SelectTrigger>
             <SelectContent>
-              {DISPLAY_STATUS_OPTIONS.map((opt) => (
+              {displayStatusOptions.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}
                 </SelectItem>
@@ -102,11 +107,11 @@ export function AdminNewsListPage() {
           </Select>
         }
         columns={[
-          { key: 'title', header: 'Judul', cell: (item) => item.title },
-          { key: 'category', header: 'Kategori', cell: (item) => item.category ?? '-' },
+          { key: 'title', header: t('table.title'), cell: (item) => item.title },
+          { key: 'category', header: t('table.category'), cell: (item) => item.category ?? '-' },
           {
             key: 'schedule',
-            header: 'Jadwal',
+            header: t('table.schedule'),
             cell: (item) => {
               if (!item.published_at) return '-'
               const end = item.publish_ends_at ? ` – ${formatDate(item.publish_ends_at)}` : ''
@@ -120,12 +125,12 @@ export function AdminNewsListPage() {
           },
           {
             key: 'status',
-            header: 'Status',
+            header: t('table.status'),
             cell: (item) => {
               const status = resolveDisplayStatus(item)
               return (
                 <Badge variant={NEWS_DISPLAY_STATUS_VARIANTS[status]}>
-                  {NEWS_DISPLAY_STATUS_LABELS[status]}
+                  {statusLabels[status]}
                 </Badge>
               )
             },
@@ -161,14 +166,14 @@ export function AdminNewsListPage() {
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Hapus berita?</DialogTitle>
+            <DialogTitle>{t('pages.news.deleteTitle')}</DialogTitle>
             <DialogDescription>
-              Berita &quot;{deleteTarget?.title}&quot; akan dihapus permanen.
+              {t('pages.news.deleteDesc', { title: deleteTarget?.title })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
-              Batal
+              {t('common.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -180,7 +185,7 @@ export function AdminNewsListPage() {
                 navigate('/admin/news')
               }}
             >
-              Hapus
+              {t('common.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

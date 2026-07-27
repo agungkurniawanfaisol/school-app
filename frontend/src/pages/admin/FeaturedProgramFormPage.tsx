@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { AdminImageField } from '@/components/admin/AdminImageField'
@@ -28,9 +29,10 @@ import { useSchool } from '@/hooks/useSchool'
 import { PROGRAM_ICON_OPTIONS } from '@/lib/lucide-icon-map'
 import { slugify } from '@/lib/utils'
 import { EMPTY_EDITOR_DOC, type EditorDocument } from '@/schemas/editor'
-import { featuredProgramSchema, type FeaturedProgramFormValues } from '@/schemas/curriculum'
+import { createFeaturedProgramSchema, type FeaturedProgramFormValues } from '@/schemas/curriculum'
 
 export function FeaturedProgramFormPage() {
+  const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
   const numericId = Number(id)
@@ -42,6 +44,8 @@ export function FeaturedProgramFormPage() {
 
   const [contentJson, setContentJson] = useState<EditorDocument>(EMPTY_EDITOR_DOC)
   const [contentHtml, setContentHtml] = useState('')
+
+  const featuredProgramSchema = useMemo(() => createFeaturedProgramSchema(t), [t])
 
   const form = useForm<FeaturedProgramFormValues>({
     resolver: zodResolver(featuredProgramSchema),
@@ -113,17 +117,17 @@ export function FeaturedProgramFormPage() {
   }
 
   if (isEdit && isLoading) {
-    return <p className="text-sm text-muted-foreground">Memuat data...</p>
+    return <p className="text-sm text-muted-foreground">{t('common.loadingData')}</p>
   }
 
   return (
     <AdminFormShell
-      title={isEdit ? 'Edit Program Unggulan' : 'Tambah Program Unggulan'}
-      description="Program ini tampil di bagian Program Unggulan pada beranda publik."
+      title={isEdit ? t('pages.programs.editTitle') : t('pages.programs.createTitle')}
+      description={t('pages.programs.formDesc')}
       backHref="/admin/program-unggulan"
       onSubmit={() => {
         void form.handleSubmit(onSubmit, () => {
-          toast.error('Periksa kembali isian formulir.')
+          toast.error(t('validation.checkForm'))
         })()
       }}
       onCancel={() => navigate('/admin/program-unggulan')}
@@ -133,8 +137,8 @@ export function FeaturedProgramFormPage() {
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <Card className="admin-card">
           <CardHeader>
-            <CardTitle className="text-base">Informasi Program</CardTitle>
-            <CardDescription>Judul, ikon, dan ringkasan untuk kartu di beranda.</CardDescription>
+            <CardTitle className="text-base">{t('pages.programs.infoTitle')}</CardTitle>
+            <CardDescription>{t('pages.programs.infoDesc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -144,7 +148,7 @@ export function FeaturedProgramFormPage() {
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="title">Judul</FormLabel>
+                      <FormLabel htmlFor="title">{t('form.title')}</FormLabel>
                       <FormControl>
                         <Input
                           id="title"
@@ -168,11 +172,11 @@ export function FeaturedProgramFormPage() {
                   name="slug"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="slug">Slug URL</FormLabel>
+                      <FormLabel htmlFor="slug">{t('form.slugUrl')}</FormLabel>
                       <FormControl>
                         <Input id="slug" className="h-11" {...field} />
                       </FormControl>
-                      <FormDescription>Contoh: program-tahfidz</FormDescription>
+                      <FormDescription>{t('form.slugExample')}</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -183,7 +187,7 @@ export function FeaturedProgramFormPage() {
                   name="excerpt"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="excerpt">Ringkasan</FormLabel>
+                      <FormLabel htmlFor="excerpt">{t('form.excerpt')}</FormLabel>
                       <FormControl>
                         <Textarea id="excerpt" rows={2} {...field} value={field.value ?? ''} />
                       </FormControl>
@@ -197,11 +201,11 @@ export function FeaturedProgramFormPage() {
                   name="icon"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="icon">Ikon</FormLabel>
+                      <FormLabel htmlFor="icon">{t('form.icon')}</FormLabel>
                       <Select value={field.value ?? 'book-open'} onValueChange={field.onChange}>
                         <FormControl>
                           <SelectTrigger id="icon" className="h-11">
-                            <SelectValue placeholder="Pilih ikon" />
+                            <SelectValue placeholder={t('form.selectIcon')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -230,7 +234,7 @@ export function FeaturedProgramFormPage() {
                     <FormItem>
                       <FormControl>
                         <AdminImageField
-                          label="Thumbnail"
+                          label={t('form.thumbnail')}
                           value={field.value ?? ''}
                           onChange={field.onChange}
                         />
@@ -245,7 +249,7 @@ export function FeaturedProgramFormPage() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="category">Kategori</FormLabel>
+                      <FormLabel htmlFor="category">{t('form.category')}</FormLabel>
                       <FormControl>
                         <Input id="category" className="h-11" {...field} value={field.value ?? ''} />
                       </FormControl>
@@ -259,7 +263,7 @@ export function FeaturedProgramFormPage() {
                   name="order"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="order">Urutan</FormLabel>
+                      <FormLabel htmlFor="order">{t('form.order')}</FormLabel>
                       <FormControl>
                         <Input
                           id="order"
@@ -281,7 +285,7 @@ export function FeaturedProgramFormPage() {
                   render={({ field }) => (
                     <FormItem className="flex flex-col gap-3 rounded-lg border border-primary/10 p-4 sm:flex-row sm:items-center sm:justify-between">
                       <FormLabel htmlFor="is_active" className="mb-0">
-                        Aktif
+                        {t('form.active')}
                       </FormLabel>
                       <FormControl>
                         <Switch id="is_active" checked={field.value} onCheckedChange={field.onChange} />
@@ -297,10 +301,10 @@ export function FeaturedProgramFormPage() {
                     <FormItem className="flex flex-col gap-4 rounded-lg border border-primary/10 p-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0 flex-1 space-y-1">
                         <FormLabel htmlFor="is_featured" className="mb-0">
-                          Tampil di Beranda
+                          {t('pages.programs.showOnHomepage')}
                         </FormLabel>
                         <FormDescription className="mt-0">
-                          Hanya program unggulan yang muncul di landing page.
+                          {t('pages.programs.showOnHomepageDesc')}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -328,8 +332,8 @@ export function FeaturedProgramFormPage() {
 
       <Card className="admin-card mt-6">
         <CardHeader>
-          <CardTitle className="text-base">Konten Detail</CardTitle>
-          <CardDescription>Deskripsi lengkap program untuk halaman detail publik.</CardDescription>
+          <CardTitle className="text-base">{t('pages.programs.detailContentTitle')}</CardTitle>
+          <CardDescription>{t('pages.programs.detailContentDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <RichPageEditor

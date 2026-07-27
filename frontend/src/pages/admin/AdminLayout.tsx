@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminConnectionError } from '@/components/admin/AdminConnectionError'
 import { AdminSidebarProvider, useAdminSidebar } from '@/components/admin/AdminSidebarContext'
 import { AdminHeader } from '@/components/layout/AdminHeader'
@@ -64,6 +65,7 @@ export function AdminLayout() {
 }
 
 function AdminLayoutShell({ user }: { user: User }) {
+  const { t } = useTranslation('admin')
   const { contentOffsetClass } = useAdminSidebar()
   const { pathname } = useLocation()
 
@@ -77,7 +79,7 @@ function AdminLayoutShell({ user }: { user: User }) {
         href="#admin-main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
       >
-        Lewati ke konten
+        {t('nav.skipToContent')}
       </a>
 
       <AdminSidebar />

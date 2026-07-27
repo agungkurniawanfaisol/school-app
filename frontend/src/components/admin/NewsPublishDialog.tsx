@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -34,6 +35,7 @@ export function NewsPublishDialog({
   isPending,
   onConfirm,
 }: NewsPublishDialogProps) {
+  const { t } = useTranslation('admin')
   const [startsAt, setStartsAt] = useState('')
   const [endsAt, setEndsAt] = useState('')
 
@@ -48,7 +50,7 @@ export function NewsPublishDialog({
     const endsAtIso = fromDatetimeLocalValue(endsAt)
     const nowIso = new Date().toISOString()
     if (endsAtIso && new Date(endsAtIso) <= new Date(nowIso)) {
-      toast.error('Waktu berakhir harus setelah waktu mulai.')
+      toast.error(t('validation.endAfterStart'))
       return
     }
     onConfirm(news.uuid, {
@@ -62,11 +64,11 @@ export function NewsPublishDialog({
     const startsAtIso = fromDatetimeLocalValue(startsAt)
     const endsAtIso = fromDatetimeLocalValue(endsAt)
     if (!startsAtIso) {
-      toast.error('Waktu mulai tidak valid.')
+      toast.error(t('validation.invalidStartTime'))
       return
     }
     if (endsAtIso && new Date(endsAtIso) <= new Date(startsAtIso)) {
-      toast.error('Waktu berakhir harus setelah waktu mulai.')
+      toast.error(t('validation.endAfterStart'))
       return
     }
     onConfirm(news.uuid, {
@@ -79,16 +81,15 @@ export function NewsPublishDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Publikasikan berita</DialogTitle>
+          <DialogTitle>{t('publish.title')}</DialogTitle>
           <DialogDescription>
-            Atur jendela waktu tampil untuk &quot;{news?.title}&quot;. Kosongkan tanggal akhir jika berita tampil
-            tanpa batas.
+            {t('publish.description', { title: news?.title })}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <Label htmlFor="publish-starts">Mulai tampil</Label>
+            <Label htmlFor="publish-starts">{t('publish.startsLabel')}</Label>
             <Input
               id="publish-starts"
               type="datetime-local"
@@ -98,7 +99,7 @@ export function NewsPublishDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="publish-ends">Berakhir tampil (opsional)</Label>
+            <Label htmlFor="publish-ends">{t('publish.endsLabel')}</Label>
             <Input
               id="publish-ends"
               type="datetime-local"
@@ -111,13 +112,13 @@ export function NewsPublishDialog({
 
         <DialogFooter className="flex-col gap-2 sm:flex-row">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Batal
+            {t('common.cancel')}
           </Button>
           <Button type="button" variant="secondary" disabled={isPending} onClick={handlePublishNow}>
-            Publikasikan sekarang
+            {t('common.publishNow')}
           </Button>
           <Button type="button" disabled={isPending || !startsAt} onClick={handleSchedule}>
-            Simpan jadwal
+            {t('common.saveSchedule')}
           </Button>
         </DialogFooter>
       </DialogContent>

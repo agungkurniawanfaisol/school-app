@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useAdminFacilitiesList, useDeleteFacility } from '@/hooks/useFacilities'
 import type { Facility } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 function FacilityThumbnail({ facility }: { facility: Facility }) {
   const src = facility.thumbnail ?? facility.photos?.[0]?.url ?? facility.photos?.[0]?.path
@@ -35,6 +36,7 @@ function FacilityThumbnail({ facility }: { facility: Facility }) {
 }
 
 export function AdminFacilitiesListPage() {
+  const { t } = useTranslation('admin')
   const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -45,8 +47,8 @@ export function AdminFacilitiesListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Kelola Fasilitas"
-        description="Sarana dan prasarana sekolah dengan galeri foto dan konten detail"
+        title={t('pages.facilities.listTitle')}
+        description={t('pages.facilities.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -62,7 +64,7 @@ export function AdminFacilitiesListPage() {
         columns={[
           {
             key: 'name',
-            header: 'Nama',
+            header: t('table.name'),
             cell: (item) => (
               <div className="flex items-center gap-3">
                 <FacilityThumbnail facility={item} />
@@ -75,26 +77,26 @@ export function AdminFacilitiesListPage() {
           },
           {
             key: 'photos',
-            header: 'Foto',
+            header: t('table.photo'),
             cell: (item) => (
-              <span className="tabular-nums text-muted-foreground">{item.photos?.length ?? 0} foto</span>
+              <span className="tabular-nums text-muted-foreground">{t('pages.facilities.photoCount', { count: item.photos?.length ?? 0 })}</span>
             ),
           },
           {
             key: 'featured',
-            header: 'Unggulan',
+            header: t('table.featured'),
             cell: (item) => (
               <Badge variant={item.is_featured ? 'default' : 'secondary'}>
-                {item.is_featured ? 'Ya' : 'Tidak'}
+                {item.is_featured ? t('common.yes') : t('common.no')}
               </Badge>
             ),
           },
           {
             key: 'active',
-            header: 'Status',
+            header: t('table.status'),
             cell: (item) => (
               <Badge variant={item.is_active ? 'default' : 'secondary'}>
-                {item.is_active ? 'Aktif' : 'Nonaktif'}
+                {item.is_active ? t('status.active') : t('status.inactive')}
               </Badge>
             ),
           },
@@ -102,7 +104,7 @@ export function AdminFacilitiesListPage() {
         rowActions={(item) => (
           <div className="flex flex-wrap justify-end gap-1">
             <Button asChild size="sm" variant="ghost" className="min-h-11 min-w-11">
-              <Link to={`/admin/facilities/${item.uuid}/edit`} aria-label={`Edit ${item.name}`}>
+              <Link to={`/admin/facilities/${item.uuid}/edit`} aria-label={t('pages.facilities.editAria', { name: item.name })}>
                 <Pencil className="h-4 w-4" />
               </Link>
             </Button>
@@ -111,7 +113,7 @@ export function AdminFacilitiesListPage() {
                 to={`/admin/facilities/${item.uuid}/preview`}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Pratinjau ${item.name}`}
+                aria-label={t('pages.facilities.previewAria', { name: item.name })}
               >
                 <Eye className="h-4 w-4" />
               </Link>
@@ -121,7 +123,7 @@ export function AdminFacilitiesListPage() {
               size="sm"
               variant="ghost"
               className="min-h-11 min-w-11 text-destructive hover:text-destructive"
-              aria-label={`Hapus ${item.name}`}
+              aria-label={t('pages.facilities.deleteAria', { name: item.name })}
               onClick={() => setDeleteTarget(item)}
             >
               <Trash2 className="h-4 w-4" />
@@ -133,14 +135,14 @@ export function AdminFacilitiesListPage() {
       <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Hapus fasilitas?</DialogTitle>
+            <DialogTitle>{t('pages.facilities.deleteTitle')}</DialogTitle>
             <DialogDescription>
-              Fasilitas &quot;{deleteTarget?.name}&quot; beserta galeri fotonya akan dihapus permanen.
+              {t('pages.facilities.deleteDesc', { name: deleteTarget?.name ?? '' })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteTarget(null)}>
-              Batal
+              {t('common.cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -152,7 +154,7 @@ export function AdminFacilitiesListPage() {
                 navigate('/admin/facilities')
               }}
             >
-              Hapus
+              {t('common.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

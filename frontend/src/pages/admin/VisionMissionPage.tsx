@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ExternalLink, GripVertical, Plus, Trash2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
@@ -15,11 +15,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useSchool, useUpdateSchool } from '@/hooks/useSchool'
 import {
   MISSION_MAX_LENGTH,
-  visionMissionSchema,
+  createVisionMissionSchema,
   VISION_MAX_LENGTH,
   type VisionMissionFormValues,
 } from '@/schemas/school'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 function CharCounter({ value, max }: { value: string; max: number }) {
   return (
@@ -59,6 +60,8 @@ function MissionItemsList({
   items: string[]
   onChange: (items: string[]) => void
 }) {
+  const { t } = useTranslation('admin')
+
   function updateItem(index: number, value: string) {
     const next = [...items]
     next[index] = value
@@ -93,7 +96,7 @@ function MissionItemsList({
                 className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
                 disabled={index === 0}
                 onClick={() => moveItem(index, index - 1)}
-                aria-label="Pindah ke atas"
+                aria-label={t('pages.visionMission.moveUp')}
                 tabIndex={-1}
               >
                 <GripVertical className="h-4 w-4" />
@@ -105,7 +108,7 @@ function MissionItemsList({
             <Input
               value={item}
               onChange={(e) => updateItem(index, e.target.value)}
-              placeholder={`Poin misi ke-${index + 1}`}
+              placeholder={t('pages.visionMission.missionPlaceholder', { n: index + 1 })}
               className="h-10 flex-1"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -123,12 +126,12 @@ function MissionItemsList({
                   className="h-10 w-10 shrink-0 text-destructive hover:text-destructive"
                   disabled={items.length <= 1}
                   onClick={() => removeItem(index)}
-                  aria-label={`Hapus poin ${index + 1}`}
+                  aria-label={t('pages.visionMission.removePointN', { n: index + 1 })}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Hapus poin</TooltipContent>
+              <TooltipContent>{t('pages.visionMission.removePoint')}</TooltipContent>
             </Tooltip>
           </div>
         ))}
@@ -140,7 +143,7 @@ function MissionItemsList({
           onClick={addItem}
         >
           <Plus className="h-4 w-4" />
-          Tambah poin misi
+          {t('pages.visionMission.addPoint')}
         </Button>
       </div>
     </TooltipProvider>
@@ -148,8 +151,11 @@ function MissionItemsList({
 }
 
 export function VisionMissionPage() {
+  const { t } = useTranslation('admin')
   const { data: school, isLoading, isError } = useSchool()
   const updateSchool = useUpdateSchool(school?.id ?? 0)
+
+  const visionMissionSchema = useMemo(() => createVisionMissionSchema(t), [t])
 
   const form = useForm<VisionMissionFormValues>({
     resolver: zodResolver(visionMissionSchema),
@@ -198,9 +204,9 @@ export function VisionMissionPage() {
   if (isError || !school) {
     return (
       <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 text-center">
-        <p className="text-muted-foreground">Data sekolah tidak ditemukan.</p>
+        <p className="text-muted-foreground">{t('pages.visionMission.schoolNotFound')}</p>
         <Button asChild className="mt-4 min-h-11">
-          <Link to="/admin/schools">Ke Data Sekolah</Link>
+          <Link to="/admin/schools">{t('pages.visionMission.goToSchools')}</Link>
         </Button>
       </div>
     )
@@ -208,10 +214,10 @@ export function VisionMissionPage() {
 
   return (
     <AdminFormShell
-      title="Visi & Misi"
-      description="Konten ini tampil di bagian Tentang Kami pada beranda publik."
+      title={t('pages.visionMission.title')}
+      description={t('pages.visionMission.desc')}
       backHref="/admin"
-      backLabel="Dashboard"
+      backLabel={t('nav.dashboard')}
       onSubmit={() => {
         void form.handleSubmit(onSubmit)()
       }}
@@ -219,7 +225,7 @@ export function VisionMissionPage() {
       footerExtra={
         <Button asChild variant="outline" className="min-h-11 gap-2">
           <Link to={`/admin/schools/${school.id}/edit`}>
-            Data sekolah lengkap
+            {t('pages.visionMission.fullSchoolData')}
             <ExternalLink className="h-4 w-4" aria-hidden />
           </Link>
         </Button>
@@ -228,8 +234,8 @@ export function VisionMissionPage() {
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <Card className="admin-card">
           <CardHeader>
-            <CardTitle className="text-base">Edit Konten</CardTitle>
-            <CardDescription>Hanya administrator yang dapat mengubah visi dan misi sekolah.</CardDescription>
+            <CardTitle className="text-base">{t('pages.visionMission.editContent')}</CardTitle>
+            <CardDescription>{t('pages.visionMission.editDesc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -239,13 +245,13 @@ export function VisionMissionPage() {
                   name="vision"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="vision">Visi</FormLabel>
+                      <FormLabel htmlFor="vision">{t('form.vision')}</FormLabel>
                       <FormControl>
                         <Textarea
                           id="vision"
                           rows={4}
                           className="min-h-[6rem] resize-y"
-                          placeholder="Tuliskan visi sekolah..."
+                          placeholder={t('form.visionPlaceholder')}
                           {...field}
                           value={field.value ?? ''}
                         />
@@ -261,7 +267,7 @@ export function VisionMissionPage() {
                   name="mission"
                   render={() => (
                     <FormItem>
-                      <FormLabel>Misi</FormLabel>
+                      <FormLabel>{t('form.mission')}</FormLabel>
                       <MissionItemsList
                         items={missionItems}
                         onChange={handleMissionItemsChange}
@@ -277,7 +283,7 @@ export function VisionMissionPage() {
         </Card>
 
         <div className="lg:sticky lg:top-6">
-          <p className="mb-3 text-sm font-medium text-muted-foreground">Pratinjau Beranda</p>
+          <p className="mb-3 text-sm font-medium text-muted-foreground">{t('pages.visionMission.homePreview')}</p>
           <VisionMissionPreview vision={visionValue} mission={missionValue} />
         </div>
       </div>

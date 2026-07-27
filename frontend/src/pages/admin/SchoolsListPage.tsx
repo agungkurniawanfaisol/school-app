@@ -5,8 +5,10 @@ import { AdminActiveBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { useAdminSchoolsList, useDeleteSchool } from '@/hooks/useSchool'
 import type { School } from '@/types'
+import { useTranslation } from 'react-i18next'
 
 export function SchoolsListPage() {
+  const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<School | null>(null)
@@ -16,8 +18,8 @@ export function SchoolsListPage() {
   return (
     <>
       <AdminPaginatedTable
-        title="Data Sekolah"
-        description="Kelola profil dan informasi sekolah"
+        title={t('pages.schools.listTitle')}
+        description={t('pages.schools.listDesc')}
         data={data?.data}
         meta={data?.meta}
         isLoading={isLoading}
@@ -31,9 +33,9 @@ export function SchoolsListPage() {
         }}
         createHref="/admin/schools/create"
         columns={[
-          { key: 'name', header: 'Nama', cell: (item) => item.name },
-          { key: 'city', header: 'Kota', cell: (item) => item.city ?? '—' },
-          { key: 'active', header: 'Status', cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
+          { key: 'name', header: t('table.name'), cell: (item) => item.name },
+          { key: 'city', header: t('table.city'), cell: (item) => item.city ?? '—' },
+          { key: 'active', header: t('table.status'), cell: (item) => <AdminActiveBadge isActive={item.is_active} /> },
         ]}
         rowActions={(item) => (
           <AdminSimpleRowActions

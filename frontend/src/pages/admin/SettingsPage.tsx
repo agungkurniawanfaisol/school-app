@@ -21,52 +21,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAdminSettingsList, useUpdateSetting } from '@/hooks/useSettings'
 import type { Setting } from '@/types'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 interface SettingMeta {
   label: string
   description: string
   multiline?: boolean
-}
-
-const SETTING_LABELS: Record<string, SettingMeta> = {
-  site_name: {
-    label: 'Nama Situs',
-    description: 'Nama sekolah yang ditampilkan di seluruh situs',
-  },
-  site_tagline: {
-    label: 'Tagline',
-    description: 'Slogan atau motto yang muncul di bawah nama situs',
-  },
-  is_open: {
-    label: 'Pendaftaran Dibuka',
-    description: 'Aktifkan untuk membuka pendaftaran peserta didik baru',
-  },
-  pmb_description: {
-    label: 'Deskripsi PMB',
-    description: 'Keterangan singkat tentang penerimaan murid baru',
-    multiline: true,
-  },
-  pmb_period: {
-    label: 'Periode Pendaftaran',
-    description: 'Rentang waktu pendaftaran dibuka (contoh: 1 Jan – 30 Jun 2026)',
-  },
-  pmb_quota: {
-    label: 'Kuota Penerimaan',
-    description: 'Jumlah kuota tiap jenjang pendidikan',
-  },
-  pmb_requirements: {
-    label: 'Persyaratan Dokumen',
-    description: 'Daftar berkas yang harus dilengkapi calon siswa',
-    multiline: true,
-  },
-  pmb_fee: {
-    label: 'Biaya Pendaftaran',
-    description: 'Nominal biaya pendaftaran yang harus dibayarkan',
-  },
-  office_hours: {
-    label: 'Jam Operasional',
-    description: 'Waktu layanan administrasi sekolah',
-  },
 }
 
 interface GroupConfig {
@@ -75,48 +35,52 @@ interface GroupConfig {
   icon: LucideIcon
 }
 
-const GROUP_CONFIG: Record<string, GroupConfig> = {
-  general: {
-    label: 'Umum',
-    description: 'Identitas dan informasi dasar situs',
-    icon: Globe,
-  },
-  pmb: {
-    label: 'Penerimaan Murid Baru',
-    description: 'Pengaturan pendaftaran dan persyaratan PMB',
-    icon: GraduationCap,
-  },
-  contact: {
-    label: 'Kontak & Jadwal',
-    description: 'Informasi kontak dan jam operasional',
-    icon: Phone,
-  },
+const MULTILINE_SETTING_KEYS = new Set(['pmb_description', 'pmb_requirements'])
+
+const GROUP_ICONS: Record<string, LucideIcon> = {
+  general: Globe,
+  pmb: GraduationCap,
+  contact: Phone,
 }
 
-function getGroupConfig(group: string): GroupConfig {
-  return GROUP_CONFIG[group] ?? {
+function getGroupConfig(group: string, t: (k: string) => string): GroupConfig {
+  const icon = GROUP_ICONS[group] ?? Settings2
+  const label = t(`settings.groups.${group}.label`, { defaultValue: '' })
+  const description = t(`settings.groups.${group}.description`, { defaultValue: '' })
+  if (label) {
+    return { label, description, icon }
+  }
+  return {
     label: group.charAt(0).toUpperCase() + group.slice(1),
-    description: `Pengaturan ${group}`,
-    icon: Settings2,
+    description: t('settings.groups.fallback', { group }),
+    icon,
   }
 }
 
-function getSettingMeta(key: string): SettingMeta {
-  return SETTING_LABELS[key] ?? {
-    label: key
-      .split('_')
-      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' '),
+function getSettingMeta(key: string, t: (k: string) => string): SettingMeta {
+  const labelKey = `settings.fields.${key}.label`
+  const descKey = `settings.fields.${key}.description`
+  const label = t(labelKey, { defaultValue: '' })
+  if (label) {
+    return {
+      label,
+      description: t(descKey),
+      multiline: MULTILINE_SETTING_KEYS.has(key),
+    }
+  }
+  return {
+    label: key.split('_').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
     description: '',
   }
 }
 
 function SettingField({ setting }: { setting: Setting }) {
+  const { t } = useTranslation('admin')
   const update = useUpdateSetting(setting.id)
   const [value, setValue] = useState(setting.value ?? '')
   const [saved, setSaved] = useState(false)
 
-  const meta = getSettingMeta(setting.key)
+  const meta = getSettingMeta(setting.key, t)
   const isBoolean = setting.type === 'boolean'
   const boolValue = value === '1' || value === 'true'
   const hasChanged = value !== (setting.value ?? '')
@@ -202,14 +166,14 @@ function SettingField({ setting }: { setting: Setting }) {
           {saved ? (
             <>
               <Check className="h-3.5 w-3.5" aria-hidden />
-              Tersimpan
+              {t('common.saved')}
             </>
           ) : update.isPending ? (
-            'Menyimpan...'
+            t('common.saving')
           ) : (
             <>
               <Save className="h-3.5 w-3.5" aria-hidden />
-              Simpan
+              {t('common.save')}
             </>
           )}
         </Button>
@@ -219,7 +183,8 @@ function SettingField({ setting }: { setting: Setting }) {
 }
 
 function SettingsGroupCard({ group, items }: { group: string; items: Setting[] }) {
-  const config = getGroupConfig(group)
+  const { t } = useTranslation('admin')
+  const config = getGroupConfig(group, t)
   const Icon = config.icon
 
   return (
@@ -281,6 +246,7 @@ function SettingsSkeleton() {
 }
 
 export function SettingsPage() {
+  const { t } = useTranslation('admin')
   const { data, isLoading } = useAdminSettingsList({ per_page: 100 })
   const groups = useMemo(() => {
     const map = new Map<string, Setting[]>()
@@ -297,17 +263,17 @@ export function SettingsPage() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Pengaturan"
-        description="Kelola konfigurasi sistem, pendaftaran murid baru, dan informasi kontak sekolah"
+        title={t('pages.settings.title')}
+        description={t('pages.settings.desc')}
       />
 
       {groups.length === 0 ? (
         <Card className="admin-card">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <Settings2 className="mb-3 h-10 w-10 text-muted-foreground/40" aria-hidden />
-            <p className="font-medium text-muted-foreground">Belum ada pengaturan</p>
+            <p className="font-medium text-muted-foreground">{t('pages.settings.emptyTitle')}</p>
             <p className="mt-1 text-xs text-muted-foreground/70">
-              Pengaturan akan muncul setelah data sekolah dikonfigurasi.
+              {t('pages.settings.emptyDesc')}
             </p>
           </CardContent>
         </Card>
@@ -321,7 +287,7 @@ export function SettingsPage() {
         <Tabs defaultValue={groups[0]?.[0] ?? 'general'}>
           <TabsList className="flex h-auto flex-wrap gap-1 bg-transparent p-0">
             {groups.map(([group]) => {
-              const config = getGroupConfig(group)
+              const config = getGroupConfig(group, t)
               const Icon = config.icon
               return (
                 <TabsTrigger

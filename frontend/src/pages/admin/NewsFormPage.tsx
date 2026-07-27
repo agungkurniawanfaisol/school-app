@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Maximize2, Save } from 'lucide-react'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { RichPageEditor } from '@/components/editor/RichPageEditor'
@@ -24,11 +25,14 @@ import {
 import { useSchool } from '@/hooks/useSchool'
 import { NewsPublishDialog } from '@/components/admin/NewsPublishDialog'
 import { slugify, formatDate } from '@/lib/utils'
-import { toDatetimeLocalValue, fromDatetimeLocalValue, NEWS_DISPLAY_STATUS_LABELS } from '@/lib/newsDisplayStatus'
+import { toDatetimeLocalValue, fromDatetimeLocalValue } from '@/lib/newsDisplayStatus'
+import { useNewsDisplayStatusLabels } from '@/hooks/useNewsDisplayStatusLabels'
 import { EMPTY_EDITOR_DOC, type EditorDocument } from '@/schemas/editor'
 import type { NewsFormValues } from '@/schemas/news'
 
 export function NewsFormPage() {
+  const { t } = useTranslation('admin')
+  const statusLabels = useNewsDisplayStatusLabels()
   const { uuid } = useParams<{ uuid: string }>()
   const isEdit = !!uuid
   const navigate = useNavigate()
@@ -108,7 +112,7 @@ export function NewsFormPage() {
   const metaFields = (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="title">Judul</Label>
+        <Label htmlFor="title">{t('form.title')}</Label>
         <Input
           id="title"
           value={title}
@@ -121,7 +125,7 @@ export function NewsFormPage() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="slug">Slug</Label>
+        <Label htmlFor="slug">{t('form.slug')}</Label>
         <Input
           id="slug"
           value={slug}
@@ -133,15 +137,15 @@ export function NewsFormPage() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="category">Kategori</Label>
+        <Label htmlFor="category">{t('form.category')}</Label>
         <Input id="category" value={category} onChange={(e) => setCategory(e.target.value)} className="h-11" />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="excerpt">Ringkasan</Label>
+        <Label htmlFor="excerpt">{t('form.excerpt')}</Label>
         <Textarea id="excerpt" value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="thumbnail">URL Thumbnail</Label>
+        <Label htmlFor="thumbnail">{t('form.thumbnail')}</Label>
         <Input id="thumbnail" value={thumbnail} onChange={(e) => setThumbnail(e.target.value)} className="h-11" />
       </div>
       <label className="flex items-center gap-2 text-sm">
@@ -151,13 +155,13 @@ export function NewsFormPage() {
           onChange={(e) => setIsFeatured(e.target.checked)}
           className="h-4 w-4"
         />
-        Tampilkan di beranda
+        {t('form.showOnHomepageLabel')}
       </label>
 
       <div className="space-y-3 rounded-lg border border-dashed p-3">
-        <p className="text-sm font-medium">Jadwal tampil</p>
+        <p className="text-sm font-medium">{t('publish.scheduleTitle')}</p>
         <div className="space-y-2">
-          <Label htmlFor="published-at">Mulai tampil</Label>
+          <Label htmlFor="published-at">{t('publish.startsLabel')}</Label>
           <Input
             id="published-at"
             type="datetime-local"
@@ -170,7 +174,7 @@ export function NewsFormPage() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="publish-ends-at">Berakhir tampil (opsional)</Label>
+          <Label htmlFor="publish-ends-at">{t('publish.endsLabel')}</Label>
           <Input
             id="publish-ends-at"
             type="datetime-local"
@@ -184,9 +188,9 @@ export function NewsFormPage() {
         </div>
         {existing?.display_status && existing.display_status !== 'draft' && (
           <p className="text-xs text-muted-foreground">
-            Status saat ini: {NEWS_DISPLAY_STATUS_LABELS[existing.display_status]}
-            {existing.published_at && ` · mulai ${formatDate(existing.published_at)}`}
-            {existing.publish_ends_at && ` · berakhir ${formatDate(existing.publish_ends_at)}`}
+            {t('publish.currentStatus', { status: statusLabels[existing.display_status] })}
+            {existing.published_at && ` · ${t('publish.startsAt', { date: formatDate(existing.published_at) })}`}
+            {existing.publish_ends_at && ` · ${t('publish.endsAt', { date: formatDate(existing.publish_ends_at) })}`}
           </p>
         )}
       </div>
@@ -199,14 +203,14 @@ export function NewsFormPage() {
           disabled={publishNews.isPending}
           onClick={() => setPublishOpen(true)}
         >
-          Publikasikan
+          {t('common.publish')}
         </Button>
       )}
     </div>
   )
 
   if (isEdit && isLoading) {
-    return <div className="p-6 text-muted-foreground">Memuat…</div>
+    return <div className="p-6 text-muted-foreground">{t('common.loading')}</div>
   }
 
   return (
@@ -214,23 +218,23 @@ export function NewsFormPage() {
       <Button asChild variant="ghost" size="sm" className="min-h-11 -ml-2 gap-2 px-0 hover:bg-transparent">
         <Link to="/admin/news">
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          Kembali ke daftar berita
+          {t('pages.news.listTitle')}
         </Link>
       </Button>
       <Card className="border-primary/10">
         <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-xl font-bold">{isEdit ? 'Edit Berita' : 'Tambah Berita'}</h1>
-            <p className="text-sm text-muted-foreground">Page builder untuk konten berita</p>
+            <h1 className="text-xl font-bold">{isEdit ? t('pages.news.editTitle') : t('pages.news.createTitle')}</h1>
+            <p className="text-sm text-muted-foreground">{t('pages.news.formDesc')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="outline" onClick={() => setFullscreenOpen(true)}>
               <Maximize2 className="h-4 w-4" />
-              Fullscreen
+              {t('common.fullscreen')}
             </Button>
             {isEdit && uuid && (
               <Button asChild variant="outline">
-                <Link to={`/admin/news/${uuid}/preview`}>Pratinjau</Link>
+                <Link to={`/admin/news/${uuid}/preview`}>{t('common.preview')}</Link>
               </Button>
             )}
             <Button
@@ -239,7 +243,7 @@ export function NewsFormPage() {
               onClick={() => handleSave(false)}
             >
               <Save className="h-4 w-4" />
-              Simpan
+              {t('common.save')}
             </Button>
             <Button
               type="button"
@@ -253,7 +257,7 @@ export function NewsFormPage() {
                 }
               }}
             >
-              Simpan & Pratinjau
+              {t('common.save')} & {t('common.preview')}
             </Button>
           </div>
         </CardContent>
@@ -262,8 +266,8 @@ export function NewsFormPage() {
       <div className="lg:grid lg:grid-cols-[320px_1fr] lg:gap-6">
         <Tabs defaultValue="content" className="lg:hidden">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="content">Konten</TabsTrigger>
-            <TabsTrigger value="settings">Pengaturan</TabsTrigger>
+            <TabsTrigger value="content">{t('form.content')}</TabsTrigger>
+            <TabsTrigger value="settings">{t('common.settings')}</TabsTrigger>
           </TabsList>
           <TabsContent value="settings" className="mt-4">
             <Card>
@@ -303,10 +307,10 @@ export function NewsFormPage() {
       <Dialog open={fullscreenOpen} onOpenChange={setFullscreenOpen}>
         <DialogContent className="fixed inset-0 flex h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 flex-col rounded-none border-0 p-0">
           <DialogHeader className="border-b px-4 py-3">
-            <DialogTitle>Pratinjau fullscreen</DialogTitle>
+            <DialogTitle>{t('pages.activities.fullscreenPreview')}</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto p-6">
-            <h2 className="mb-4 text-2xl font-bold">{title || 'Tanpa judul'}</h2>
+            <h2 className="mb-4 text-2xl font-bold">{title || t('common.untitled')}</h2>
             <BlockRenderer contentJson={contentJson} contentHtml={contentHtml} />
           </div>
         </DialogContent>

@@ -1,8 +1,10 @@
 import { LogOut, Menu, PanelLeft, PanelLeftClose, User } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AdminNav, getAdminPageTitle } from '@/components/admin/AdminNav'
 import { useAdminSidebar } from '@/components/admin/AdminSidebarContext'
+import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -27,6 +29,7 @@ function getUserInitials(name: string): string {
 }
 
 export function AdminHeader() {
+  const { t } = useTranslation('admin')
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const { pathname } = useLocation()
@@ -34,7 +37,7 @@ export function AdminHeader() {
   const logout = useLogout()
   const { collapsed, toggleCollapsed } = useAdminSidebar()
   const breadcrumbs = getAdminBreadcrumbs(pathname)
-  const pageTitle = getAdminPageTitle(pathname)
+  const pageTitle = getAdminPageTitle(pathname, t)
 
   const handleLogout = () => {
     logout.mutate(undefined, {
@@ -51,14 +54,14 @@ export function AdminHeader() {
             variant="outline"
             size="icon"
             className="size-11 shrink-0 border-primary/20 lg:hidden"
-            aria-label="Buka menu navigasi"
+            aria-label={t('nav.openMenu')}
           >
             <Menu className="h-5 w-5" aria-hidden />
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="w-[min(100%,20rem)] gap-0 border-r-0 p-0">
           <SheetHeader className="sr-only">
-            <SheetTitle>Navigasi Admin</SheetTitle>
+            <SheetTitle>{t('nav.adminNav')}</SheetTitle>
           </SheetHeader>
           <AdminNav onNavigate={() => setOpen(false)} />
         </SheetContent>
@@ -70,7 +73,7 @@ export function AdminHeader() {
         size="icon"
         className="hidden size-9 shrink-0 border-primary/20 lg:inline-flex"
         onClick={toggleCollapsed}
-        aria-label={collapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
+        aria-label={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
       >
         {collapsed ? <PanelLeft className="size-4" aria-hidden /> : <PanelLeftClose className="size-4" aria-hidden />}
       </Button>
@@ -80,17 +83,17 @@ export function AdminHeader() {
           {breadcrumbs.map((crumb, index) => {
             const isLast = index === breadcrumbs.length - 1
             return (
-              <span key={`${crumb.label}-${index}`} className="flex items-center gap-1.5">
+              <span key={`${crumb.labelKey}-${index}`} className="flex items-center gap-1.5">
                 {index > 0 && <span className="text-muted-foreground/50" aria-hidden>/</span>}
                 {crumb.href && !isLast ? (
                   <Link
                     to={crumb.href}
                     className="truncate text-muted-foreground transition-colors hover:text-primary"
                   >
-                    {crumb.label}
+                    {t(crumb.labelKey)}
                   </Link>
                 ) : (
-                  <span className="truncate text-muted-foreground">{crumb.label}</span>
+                  <span className="truncate text-muted-foreground">{t(crumb.labelKey)}</span>
                 )}
               </span>
             )
@@ -102,6 +105,7 @@ export function AdminHeader() {
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
+        <LanguageSwitcher className="h-10 w-10" />
         {user?.role && (
           <Badge variant="secondary" className="hidden capitalize sm:inline-flex">
             {user.role}
@@ -110,7 +114,7 @@ export function AdminHeader() {
         {user?.name && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full p-0" aria-label="Menu akun">
+              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full p-0" aria-label={t('header.accountMenu')}>
                 <Avatar className="h-9 w-9 border border-primary/20">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">
                     {getUserInitials(user.name)}
@@ -127,13 +131,13 @@ export function AdminHeader() {
               <DropdownMenuItem asChild>
                 <Link to="/admin/profile" className="cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
-                  Profil Saya
+                  {t('nav.profile')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                 <LogOut className="mr-2 h-4 w-4" />
-                Keluar
+                {t('nav.logout')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
