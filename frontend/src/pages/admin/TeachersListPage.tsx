@@ -188,6 +188,7 @@ function ListPagination({
   page: number
   onPageChange: (page: number) => void
 }) {
+  const { t } = useTranslation('admin')
   if (lastPage <= 1) return null
 
   return (

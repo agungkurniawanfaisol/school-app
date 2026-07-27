@@ -24,7 +24,7 @@ export function createPmbTrackSchema(t: AdminTFunction) {
   })
 }
 
-export function createPmbAdminUpdateSchema(t: AdminTFunction) {
+export function createPmbAdminUpdateSchema(_t: AdminTFunction) {
   return z.object({
     status: z.enum(['pending', 'review', 'accepted', 'rejected']),
     notes: z.string().optional().nullable(),

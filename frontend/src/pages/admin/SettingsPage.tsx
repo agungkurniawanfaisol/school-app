@@ -22,6 +22,7 @@ import { useAdminSettingsList, useUpdateSetting } from '@/hooks/useSettings'
 import type { Setting } from '@/types'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 
 interface SettingMeta {
   label: string
@@ -43,7 +44,7 @@ const GROUP_ICONS: Record<string, LucideIcon> = {
   contact: Phone,
 }
 
-function getGroupConfig(group: string, t: (k: string) => string): GroupConfig {
+function getGroupConfig(group: string, t: TFunction<'admin'>): GroupConfig {
   const icon = GROUP_ICONS[group] ?? Settings2
   const label = t(`settings.groups.${group}.label`, { defaultValue: '' })
   const description = t(`settings.groups.${group}.description`, { defaultValue: '' })
@@ -57,7 +58,7 @@ function getGroupConfig(group: string, t: (k: string) => string): GroupConfig {
   }
 }
 
-function getSettingMeta(key: string, t: (k: string) => string): SettingMeta {
+function getSettingMeta(key: string, t: TFunction<'admin'>): SettingMeta {
   const labelKey = `settings.fields.${key}.label`
   const descKey = `settings.fields.${key}.description`
   const label = t(labelKey, { defaultValue: '' })

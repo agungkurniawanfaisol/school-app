@@ -7,8 +7,6 @@ import { useAdminFaqsList, useDeleteFaq } from '@/hooks/useFaqs'
 import type { Faq } from '@/hooks/useFaqs'
 import { useTranslation } from 'react-i18next'
 
-const faqCategories = ['pmb', 'akademik', 'biaya', 'umum'] as const
-
 export function FaqsListPage() {
   const { t } = useTranslation('admin')
   const [page, setPage] = useState(1)
