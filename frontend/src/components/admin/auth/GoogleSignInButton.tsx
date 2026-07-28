@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import { getGoogleOAuthStartUrl } from '@/lib/oauth'
+import { getOAuthErrorMessage, resolveGoogleOAuthUrl } from '@/lib/oauth'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -37,9 +38,15 @@ export function GoogleSignInButton({ className, disabled }: GoogleSignInButtonPr
   const { t } = useTranslation('admin')
   const [isRedirecting, setIsRedirecting] = useState(false)
 
-  const handleClick = () => {
+  const handleClick = async () => {
     setIsRedirecting(true)
-    window.location.assign(getGoogleOAuthStartUrl())
+    try {
+      const url = await resolveGoogleOAuthUrl()
+      window.location.assign(url)
+    } catch {
+      setIsRedirecting(false)
+      toast.error(getOAuthErrorMessage('oauth_failed'))
+    }
   }
 
   return (

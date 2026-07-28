@@ -24,16 +24,27 @@ class GoogleAuthController extends Controller
         private readonly GoogleOAuthService $googleOAuth,
     ) {}
 
-    public function redirect(): RedirectResponse
+    public function redirect(Request $request): RedirectResponse|JsonResponse
     {
         $authorizationUrl = $this->googleOAuth->authorizationUrl();
+        $wantsJson = $request->expectsJson() || $request->query('format') === 'json';
 
         if ($authorizationUrl === null) {
             Log::warning('Google OAuth redirect blocked: credentials not configured', [
-                'ip' => request()->ip(),
+                'ip' => $request->ip(),
             ]);
 
+            if ($wantsJson) {
+                return response()->json(['message' => 'Login Google tidak tersedia.'], 503);
+            }
+
             return redirect(AllowedFrontendUrl::to('/admin/login?error=oauth_failed'));
+        }
+
+        // JSON start URL lets the SPA assign() to Google without a top-level
+        // navigation to /api/... (PWA NavigationRoute would serve index.html).
+        if ($wantsJson) {
+            return response()->json(['url' => $authorizationUrl]);
         }
 
         return redirect()->away($authorizationUrl);

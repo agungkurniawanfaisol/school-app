@@ -32,6 +32,19 @@ class GoogleAuthTest extends TestCase
         $this->assertStringContainsString('client_id=test-client-id', (string) $target);
     }
 
+    public function test_redirect_returns_json_authorization_url_when_requested(): void
+    {
+        $response = $this->getJson('/api/admin/auth/google/redirect?format=json');
+
+        $response->assertOk()
+            ->assertJsonStructure(['url']);
+
+        $url = $response->json('url');
+        $this->assertIsString($url);
+        $this->assertStringContainsString('accounts.google.com/o/oauth2/v2/auth', $url);
+        $this->assertStringContainsString('client_id=test-client-id', $url);
+    }
+
     public function test_callback_issues_ticket_for_registered_panel_user(): void
     {
         $admin = User::factory()->admin()->create([
