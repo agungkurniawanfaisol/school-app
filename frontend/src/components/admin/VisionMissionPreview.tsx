@@ -3,6 +3,9 @@ import { CheckCircle2, Target } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface VisionMissionPreviewProps {
+  aboutImage?: string
+  schoolName?: string
+  schoolTagline?: string | null
   vision?: string | null
   mission?: string | null
 }
@@ -14,7 +17,13 @@ function parseMissionLines(mission: string): string[] {
     .filter(Boolean)
 }
 
-export function VisionMissionPreview({ vision, mission }: VisionMissionPreviewProps) {
+export function VisionMissionPreview({
+  aboutImage,
+  schoolName,
+  schoolTagline,
+  vision,
+  mission,
+}: VisionMissionPreviewProps) {
   const { t } = useTranslation('admin')
   const visionTrimmed = vision?.trim()
   const missionTrimmed = mission?.trim()
@@ -22,6 +31,19 @@ export function VisionMissionPreview({ vision, mission }: VisionMissionPreviewPr
 
   return (
     <div className="space-y-4" role="region" aria-live="polite" aria-label={t('components.visionMission.previewRegion')}>
+      {aboutImage ? (
+        <div className="overflow-hidden rounded-2xl border border-primary/15 shadow-sm">
+          <div className="relative">
+            <img src={aboutImage} alt="" className="aspect-[4/3] w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-4 text-white">
+              <p className="text-base font-bold">{schoolName}</p>
+              {schoolTagline ? <p className="text-sm text-white/80">{schoolTagline}</p> : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <Card className="border-primary/10 bg-secondary/30">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-primary">

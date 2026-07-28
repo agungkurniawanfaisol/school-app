@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_SCHOOL_FAVICON, DEFAULT_SCHOOL_LOGO, getSchoolFavicon, getSchoolLogo } from './brand'
+import { DEFAULT_ABOUT_IMAGE, DEFAULT_SCHOOL_FAVICON, DEFAULT_SCHOOL_LOGO, getAboutImage, getSchoolFavicon, getSchoolLogo } from './brand'
 
 describe('brand', () => {
   it('returns default logo when school logo is empty', () => {
@@ -23,5 +23,14 @@ describe('brand', () => {
 
   it('returns school favicon when provided', () => {
     expect(getSchoolFavicon('/media/icon.png')).toBe('/media/icon.png')
+  })
+
+  it('returns default about image when empty', () => {
+    expect(getAboutImage(null)).toBe(DEFAULT_ABOUT_IMAGE)
+    expect(getAboutImage('')).toBe(DEFAULT_ABOUT_IMAGE)
+  })
+
+  it('returns custom about image when provided', () => {
+    expect(getAboutImage('https://cdn.example.com/about.jpg')).toBe('https://cdn.example.com/about.jpg')
   })
 })

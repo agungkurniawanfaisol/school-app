@@ -16,6 +16,7 @@ class SchoolAboutSeeder extends Seeder
                 'tagline' => 'Membentuk Generasi Qurani & Berakhlak Mulia',
                 'logo' => '/logo.png',
                 'favicon' => '/favicon.png',
+                'about_image' => 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80',
                 'description' => 'Sekolah Islam Nurul Hikmah berdiri sejak 1998 sebagai lembaga pendidikan terpadu yang mengintegrasikan kurikulum nasional, program tahfidz Al-Qur\'an, dan pembinaan karakter Islami. Kami melayani jenjang TK, SD, dan SMP dengan fasilitas modern, guru berpengalaman, serta lingkungan belajar yang aman dan penuh kasih sayang. Setiap siswa dibimbing untuk unggul secara akademik, mandiri secara spiritual, dan peduli terhadap sesama melalui program AMAL (Akhlak, Ilmu, Amal) sekolah.',
                 'email' => 'info@nurulhikmah.sch.id',
                 'phone' => '02112345678',

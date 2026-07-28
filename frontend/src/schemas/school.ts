@@ -17,6 +17,7 @@ export function createVisionMissionSchema(t: AdminTFunction) {
       .max(MISSION_MAX_LENGTH, t('validation.maxLength', { max: MISSION_MAX_LENGTH }))
       .optional()
       .nullable(),
+    about_image: z.string().max(500, t('validation.maxLength', { max: 500 })).optional().nullable(),
   })
 }
 
@@ -38,6 +39,7 @@ export function createSchoolSchema(t: AdminTFunction) {
     slug: z.string().min(1).max(220),
     tagline: z.string().max(300).optional().nullable(),
     description: z.string().optional().nullable(),
+    about_image: z.string().max(500).optional().nullable(),
     email: z.string().email(t('validation.emailInvalid')).optional().nullable(),
     phone: z.string().max(30).optional().nullable(),
     whatsapp: z.string().max(30).optional().nullable(),

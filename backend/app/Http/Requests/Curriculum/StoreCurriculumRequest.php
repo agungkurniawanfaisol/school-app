@@ -3,7 +3,9 @@
 namespace App\Http\Requests\Curriculum;
 
 use App\Http\Requests\RichContentAdminRequest;
+use App\Models\Curriculum;
 use App\Rules\SafeMediaUrl;
+use Illuminate\Validation\Rule;
 
 class StoreCurriculumRequest extends RichContentAdminRequest
 {
@@ -12,7 +14,7 @@ class StoreCurriculumRequest extends RichContentAdminRequest
         return [
             'school_id' => ['required', 'exists:schools,id'],
             'title' => ['required', 'string', 'max:250'],
-            'slug' => ['required', 'string', 'max:270', 'unique:curriculums,slug'],
+            'slug' => ['required', 'string', 'max:270', Rule::unique(Curriculum::class, 'slug')],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['nullable', 'string'],
             'content_json' => ['nullable', 'array'],

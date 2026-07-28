@@ -70,6 +70,7 @@ export const adminNavTree: AdminNavGroup[] = [
       { labelKey: 'nav.announcements', href: '/admin/announcements', icon: Megaphone },
       { labelKey: 'nav.photoAlbums', href: '/admin/photo-albums', icon: ImageIcon },
       { labelKey: 'nav.heroSliders', href: '/admin/hero-sliders', icon: Image },
+      { labelKey: 'nav.heroCollage', href: '/admin/hero-collage', icon: LayoutDashboard },
       { labelKey: 'nav.virtualTours', href: '/admin/virtual-tours', icon: Compass },
       { labelKey: 'nav.testimonials', href: '/admin/testimonials', icon: Star },
     ],
@@ -192,6 +193,10 @@ export function getAdminBreadcrumbs(pathname: string): AdminBreadcrumb[] {
     crumbs.push({ labelKey: 'nav.group.content' }, { labelKey: 'nav.heroSliders' })
     if (pathname.endsWith('/create')) crumbs.push({ labelKey: 'nav.breadcrumb.add' })
     else if (pathname.includes('/edit')) crumbs.push({ labelKey: 'nav.breadcrumb.edit' })
+    return crumbs
+  }
+  if (pathname.startsWith('/admin/hero-collage')) {
+    crumbs.push({ labelKey: 'nav.group.content' }, { labelKey: 'nav.heroCollage' })
     return crumbs
   }
 

@@ -24,5 +24,7 @@ class SchoolAboutSeederTest extends TestCase
         $this->assertNotEmpty($school->vision);
         $this->assertNotEmpty($school->mission);
         $this->assertStringContainsString('Al-Qur', $school->mission);
+        $this->assertNotEmpty($school->about_image);
+        $this->assertStringStartsWith('https://', $school->about_image);
     }
 }

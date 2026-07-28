@@ -9,15 +9,18 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { CountUp } from '@/components/landing/CountUp'
 import { IslamicPattern } from '@/components/landing/IslamicPattern'
 import { useCarouselAutoplayPlugins } from '@/hooks/useCarouselAutoplay'
+import { useHeroCollage } from '@/hooks/useSettings'
 import { api } from '@/lib/api'
 import { queryConfig } from '@/hooks/queryConfig'
 import { useSchool } from '@/hooks/useSchool'
+import { displayCollageLetter } from '@/schemas/heroCollage'
 import type { HeroSlider, PaginatedResponse } from '@/types'
 import { cn } from '@/lib/utils'
 
 export function HeroSection() {
   const { t } = useTranslation('landing')
   const { data: school, isLoading: schoolLoading } = useSchool()
+  const { collage } = useHeroCollage()
   const { data: sliders, isLoading: slidersLoading } = useQuery({
     queryKey: ['hero-sliders'],
     queryFn: async () => {
@@ -52,12 +55,13 @@ export function HeroSection() {
     { icon: GraduationCap, value: null as number | null, suffix: '', label: t('hero.accreditedA') },
   ]
 
-  const collageItems = [
-    { label: t('hero.tahfidz'), color: 'from-primary/30 to-primary/10' },
-    { label: t('hero.academic'), color: 'from-primary/40 to-primary/10' },
-    { label: t('hero.character'), color: 'from-[var(--gold-accent)]/30 to-primary/10' },
-    { label: t('hero.activity'), color: 'from-primary/25 to-accent/40' },
+  const collageItems = collage?.items ?? [
+    { label: t('hero.tahfidz'), color: 'from-primary/30 to-primary/10', letter: '' },
+    { label: t('hero.academic'), color: 'from-primary/40 to-primary/10', letter: '' },
+    { label: t('hero.character'), color: 'from-[var(--gold-accent)]/30 to-primary/10', letter: '' },
+    { label: t('hero.activity'), color: 'from-primary/25 to-accent/40', letter: '' },
   ]
+  const collageSubtitle = collage?.subtitle ?? t('hero.subtitle')
 
   if (isLoading) {
     return (
@@ -179,7 +183,7 @@ export function HeroSection() {
                           <div className="grid grid-cols-2 gap-3">
                             {collageItems.map((item, i) => (
                               <div
-                                key={item.label}
+                                key={`${item.label}-${i}`}
                                 className={cn(
                                   'group relative flex aspect-square flex-col items-center justify-center rounded-2xl bg-gradient-to-br p-4 transition-transform duration-300 hover:scale-105',
                                   item.color,
@@ -187,7 +191,7 @@ export function HeroSection() {
                                 )}
                               >
                                 <span className="text-2xl font-bold text-white/90">
-                                  {item.label.charAt(0)}
+                                  {displayCollageLetter(item)}
                                 </span>
                                 <span className="mt-1 text-xs font-semibold text-white/75">
                                   {item.label}
@@ -196,7 +200,7 @@ export function HeroSection() {
                             ))}
                           </div>
                           <p className="mt-5 text-center text-sm font-medium text-white/85">
-                            {t('hero.subtitle')}
+                            {collageSubtitle}
                           </p>
                         </div>
                       </div>

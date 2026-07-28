@@ -4,12 +4,41 @@ import { api, getApiErrorMessage, getAuthToken } from '@/lib/api'
 import { buildQueryParams, queryConfig } from '@/hooks/queryConfig'
 import type { ApiResponse, ListFilters, PaginatedResponse, Setting } from '@/types'
 import type { SettingFormValues } from '@/schemas/setting'
+import { parseHeroCollageValue } from '@/schemas/heroCollage'
 
 export const settingKeys = {
   all: ['settings'] as const,
+  publicGroup: (group: string) => [...settingKeys.all, 'public', group] as const,
   adminLists: () => [...settingKeys.all, 'admin', 'list'] as const,
   adminList: (filters: ListFilters) => [...settingKeys.adminLists(), buildQueryParams(filters)] as const,
   adminDetail: (id: number) => [...settingKeys.all, 'admin', id] as const,
+}
+
+export function usePublicSettings(group: string) {
+  return useQuery({
+    queryKey: settingKeys.publicGroup(group),
+    queryFn: async () => {
+      const { data } = await api.get<ApiResponse<Setting[]>>('/v1/settings', {
+        params: { group },
+      })
+      return data.data
+    },
+    ...queryConfig,
+  })
+}
+
+export function useHeroCollage() {
+  const query = usePublicSettings('homepage')
+
+  const collage = (() => {
+    const raw = query.data?.find((s) => s.key === 'hero_collage')?.value
+    return parseHeroCollageValue(raw ?? null)
+  })()
+
+  return {
+    ...query,
+    collage,
+  }
 }
 
 export function useAdminSettingsList(filters: ListFilters & { group?: string } = {}) {
@@ -41,6 +70,7 @@ export function useAdminSettingDetail(id: number) {
 
 function invalidate(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: settingKeys.adminLists() })
+  queryClient.invalidateQueries({ queryKey: settingKeys.publicGroup('homepage') })
   queryClient.invalidateQueries({ queryKey: ['pmb'] })
 }
 
@@ -63,6 +93,9 @@ export function useUpdateSetting(id: number) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (payload: Partial<SettingFormValues>) => {
+      if (!id) {
+        throw new Error('Pengaturan belum tersedia.')
+      }
       const { data } = await api.put<ApiResponse<Setting>>(`/admin/settings/${id}`, payload)
       return data.data
     },

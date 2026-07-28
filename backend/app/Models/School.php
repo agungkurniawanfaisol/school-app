@@ -22,6 +22,7 @@ class School extends Model
         'description',
         'logo',
         'favicon',
+        'about_image',
         'email',
         'phone',
         'whatsapp',

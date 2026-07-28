@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { RevealOnScroll } from '@/components/landing/RevealOnScroll'
 import { SectionHeader } from '@/components/landing/SectionHeader'
 import { useSchool } from '@/hooks/useSchool'
+import { getAboutImage } from '@/lib/brand'
 import { cn } from '@/lib/utils'
 
 export function AboutSection() {
@@ -18,6 +19,8 @@ export function AboutSection() {
     { icon: HandHeart, title: t('about.amal'), desc: t('about.amalDesc'), color: 'hover:border-emerald-300/50 dark:hover:border-emerald-500/40' },
     { icon: Target, title: t('about.ukhuwah'), desc: t('about.ukhuwahDesc'), color: 'hover:border-primary/40' },
   ]
+
+  const aboutImageSrc = getAboutImage(school?.about_image)
 
   if (isLoading) {
     return (
@@ -47,7 +50,7 @@ export function AboutSection() {
             <div className="space-y-5">
               <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/15 shadow-lg shadow-primary/5">
                 <img
-                  src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&q=80"
+                  src={aboutImageSrc}
                   alt={school?.name ?? 'Nurul Hikmah'}
                   className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />

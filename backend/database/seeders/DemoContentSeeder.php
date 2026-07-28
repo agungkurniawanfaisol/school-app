@@ -849,6 +849,12 @@ class DemoContentSeeder extends Seeder
             ],
             ['group' => 'pmb', 'key' => 'pmb_fee', 'value' => 'Rp 350.000', 'type' => 'string'],
             ['group' => 'contact', 'key' => 'office_hours', 'value' => 'Senin–Jumat, 07.00–15.00 WIB', 'type' => 'string'],
+            [
+                'group' => 'homepage',
+                'key' => 'hero_collage',
+                'value' => json_encode(\App\Support\HeroCollage::defaultPayload(), JSON_UNESCAPED_UNICODE),
+                'type' => 'json',
+            ],
         ];
 
         foreach ($settings as $setting) {

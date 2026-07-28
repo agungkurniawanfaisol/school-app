@@ -58,6 +58,44 @@ class CurriculumAdminTest extends TestCase
         $this->assertAdminUpdate(self::RESOURCE, $id, ['title' => 'Updated Curriculum']);
     }
 
+    public function test_admin_can_update_without_changing_slug(): void
+    {
+        $payload = $this->validPayload();
+        $id = $this->assertAdminStoreSuccess(self::RESOURCE, $payload);
+
+        $this->actingAsAdmin()->putJson('/api/admin/curriculums/'.$id, [
+            'title' => 'Judul Diperbarui',
+            'slug' => $payload['slug'],
+        ])->assertOk()
+            ->assertJsonPath('data.slug', $payload['slug'])
+            ->assertJsonPath('data.title', 'Judul Diperbarui');
+    }
+
+    public function test_admin_can_update_slug_when_unique(): void
+    {
+        $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());
+        $newSlug = 'program-unggulan-baru-'.Str::random(6);
+
+        $this->actingAsAdmin()->putJson('/api/admin/curriculums/'.$id, [
+            'slug' => $newSlug,
+        ])->assertOk()
+            ->assertJsonPath('data.slug', $newSlug);
+    }
+
+    public function test_admin_update_rejects_duplicate_slug(): void
+    {
+        $first = $this->validPayload();
+        $this->assertAdminStoreSuccess(self::RESOURCE, $first);
+
+        $second = $this->validPayload();
+        $secondId = $this->assertAdminStoreSuccess(self::RESOURCE, $second);
+
+        $this->actingAsAdmin()->putJson('/api/admin/curriculums/'.$secondId, [
+            'slug' => $first['slug'],
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['slug']);
+    }
+
     public function test_admin_can_destroy(): void
     {
         $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());

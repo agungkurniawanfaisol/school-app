@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
+import { AdminImageField } from '@/components/admin/AdminImageField'
 import { VisionMissionPreview } from '@/components/admin/VisionMissionPreview'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -19,6 +20,7 @@ import {
   VISION_MAX_LENGTH,
   type VisionMissionFormValues,
 } from '@/schemas/school'
+import { getAboutImage } from '@/lib/brand'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 
@@ -159,7 +161,7 @@ export function VisionMissionPage() {
 
   const form = useForm<VisionMissionFormValues>({
     resolver: zodResolver(visionMissionSchema),
-    defaultValues: { vision: '', mission: '' },
+    defaultValues: { vision: '', mission: '', about_image: '' },
   })
 
   const [missionItems, setMissionItems] = useState<string[]>([''])
@@ -169,6 +171,7 @@ export function VisionMissionPage() {
     form.reset({
       vision: school.vision ?? '',
       mission: school.mission ?? '',
+      about_image: school.about_image ?? '',
     })
     setMissionItems(parseMissionItems(school.mission))
   }, [school, form])
@@ -180,12 +183,14 @@ export function VisionMissionPage() {
 
   const visionValue = form.watch('vision') ?? ''
   const missionValue = form.watch('mission') ?? ''
+  const aboutImageValue = form.watch('about_image') ?? ''
 
   const onSubmit = (values: VisionMissionFormValues) => {
     if (!school?.id) return
     updateSchool.mutate({
       vision: values.vision?.trim() || null,
       mission: values.mission?.trim() || null,
+      about_image: values.about_image?.trim() || null,
     })
   }
 
@@ -242,6 +247,25 @@ export function VisionMissionPage() {
               <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
                 <FormField
                   control={form.control}
+                  name="about_image"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <AdminImageField
+                          label={t('pages.visionMission.aboutImage')}
+                          hint={t('pages.visionMission.aboutImageHint')}
+                          value={field.value ?? ''}
+                          onChange={field.onChange}
+                          collection="general"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
                   name="vision"
                   render={({ field }) => (
                     <FormItem>
@@ -284,7 +308,13 @@ export function VisionMissionPage() {
 
         <div className="lg:sticky lg:top-6">
           <p className="mb-3 text-sm font-medium text-muted-foreground">{t('pages.visionMission.homePreview')}</p>
-          <VisionMissionPreview vision={visionValue} mission={missionValue} />
+          <VisionMissionPreview
+            aboutImage={getAboutImage(aboutImageValue || null)}
+            schoolName={school.name}
+            schoolTagline={school.tagline}
+            vision={visionValue}
+            mission={missionValue}
+          />
         </div>
       </div>
     </AdminFormShell>

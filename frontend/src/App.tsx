@@ -72,6 +72,9 @@ const FeaturedProgramFormPage = lazy(() =>
 const HeroSlidersListPage = lazy(() =>
   import('@/pages/admin/HeroSlidersListPage').then((m) => ({ default: m.HeroSlidersListPage })),
 )
+const HeroCollagePage = lazy(() =>
+  import('@/pages/admin/HeroCollagePage').then((m) => ({ default: m.HeroCollagePage })),
+)
 const HeroSliderFormPage = lazy(() =>
   import('@/pages/admin/HeroSliderFormPage').then((m) => ({ default: m.HeroSliderFormPage })),
 )
@@ -301,6 +304,7 @@ export default function App() {
             <Route path="hero-sliders" element={<LazyAdmin><HeroSlidersListPage /></LazyAdmin>} />
             <Route path="hero-sliders/create" element={<LazyAdmin><HeroSliderFormPage /></LazyAdmin>} />
             <Route path="hero-sliders/:id/edit" element={<LazyAdmin><HeroSliderFormPage /></LazyAdmin>} />
+            <Route path="hero-collage" element={<LazyAdmin><HeroCollagePage /></LazyAdmin>} />
             <Route path="virtual-tours" element={<LazyAdmin><VirtualTourListPage /></LazyAdmin>} />
             <Route path="virtual-tours/create" element={<LazyAdmin><VirtualTourEditorPage /></LazyAdmin>} />
             <Route path="virtual-tours/:uuid/edit" element={<LazyAdmin><VirtualTourEditorPage /></LazyAdmin>} />

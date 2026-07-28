@@ -18,6 +18,7 @@ const school = {
   tagline: null,
   description: null,
   logo: null,
+  about_image: null,
   favicon: null,
   email: null,
   phone: null,
@@ -45,6 +46,7 @@ describe('VisionMissionPage', () => {
 
     expect(screen.getByRole('heading', { name: 'Visi & Misi' })).toBeInTheDocument()
     expect(screen.getByLabelText('Visi')).toHaveValue('Visi lama')
+    expect(screen.getByText('Gambar bagian Tentang')).toBeInTheDocument()
     expect(screen.getAllByText('Misi').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Pratinjau Beranda')).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Pratinjau visi dan misi' })).toBeInTheDocument()
@@ -65,6 +67,7 @@ describe('VisionMissionPage', () => {
       expect(mutate).toHaveBeenCalledWith({
         vision: 'Visi baru',
         mission: 'Misi lama',
+        about_image: null,
       })
     })
     expect(useUpdateSchoolMock).toHaveBeenCalledWith(1)

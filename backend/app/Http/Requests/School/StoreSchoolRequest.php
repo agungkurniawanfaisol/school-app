@@ -3,6 +3,7 @@
 namespace App\Http\Requests\School;
 
 use App\Http\Requests\AdminFormRequest;
+use App\Rules\SafeMediaUrl;
 
 class StoreSchoolRequest extends AdminFormRequest
 {
@@ -13,8 +14,9 @@ class StoreSchoolRequest extends AdminFormRequest
             'slug' => ['required', 'string', 'max:270', 'unique:schools,slug'],
             'tagline' => ['nullable', 'string', 'max:500'],
             'description' => ['nullable', 'string'],
-            'logo' => ['nullable', 'string', 'max:500'],
-            'favicon' => ['nullable', 'string', 'max:500'],
+            'logo' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
+            'favicon' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
+            'about_image' => ['nullable', 'string', 'max:500', new SafeMediaUrl],
             'email' => ['nullable', 'email', 'max:150'],
             'phone' => ['nullable', 'string', 'max:30'],
             'whatsapp' => ['nullable', 'string', 'max:30'],

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Curriculum;
 
 use App\Http\Requests\RichContentAdminRequest;
+use App\Models\Curriculum;
 use App\Rules\SafeMediaUrl;
 use Illuminate\Validation\Rule;
 
@@ -10,12 +11,12 @@ class UpdateCurriculumRequest extends RichContentAdminRequest
 {
     public function rules(): array
     {
-        $id = $this->route('id');
+        $curriculumId = $this->route('curriculum') ?? $this->route('id');
 
         return [
             'school_id' => ['sometimes', 'exists:schools,id'],
             'title' => ['sometimes', 'string', 'max:250'],
-            'slug' => ['sometimes', 'string', 'max:270', Rule::unique('curriculums', 'slug')->ignore($id)],
+            'slug' => ['sometimes', 'string', 'max:270', Rule::unique(Curriculum::class, 'slug')->ignore($curriculumId)],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['nullable', 'string'],
             'content_json' => ['nullable', 'array'],

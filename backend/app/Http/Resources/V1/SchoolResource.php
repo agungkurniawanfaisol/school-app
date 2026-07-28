@@ -17,6 +17,7 @@ class SchoolResource extends JsonResource
             'description' => $this->description,
             'logo' => $this->logo,
             'favicon' => $this->favicon,
+            'about_image' => $this->about_image,
             'email' => $this->email,
             'phone' => $this->phone,
             'whatsapp' => $this->whatsapp,

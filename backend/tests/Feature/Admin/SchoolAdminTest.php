@@ -71,6 +71,33 @@ class SchoolAdminTest extends TestCase
             ->assertJsonPath('data.mission', "1. Poin pertama\n2. Poin kedua");
     }
 
+    public function test_admin_can_update_about_image(): void
+    {
+        $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());
+        $imageUrl = 'https://cdn.example.com/about.jpg';
+
+        $response = $this->actingAsAdmin()->putJson('/api/admin/schools/'.$id, [
+            'about_image' => $imageUrl,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.about_image', $imageUrl);
+
+        $this->getJson('/api/v1/schools/'.$response->json('data.slug'))
+            ->assertOk()
+            ->assertJsonPath('data.about_image', $imageUrl);
+    }
+
+    public function test_admin_about_image_update_rejects_unsafe_url(): void
+    {
+        $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());
+
+        $this->actingAsAdmin()->putJson('/api/admin/schools/'.$id, [
+            'about_image' => 'javascript:alert(1)',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['about_image']);
+    }
+
     public function test_admin_can_destroy(): void
     {
         $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());

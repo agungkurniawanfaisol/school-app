@@ -31,13 +31,16 @@ describe('AboutSection', () => {
         description: 'Sekolah unggulan.',
         vision: 'Visi sekolah',
         mission: 'Misi sekolah',
+        about_image: 'https://cdn.example.com/about.jpg',
       },
       isLoading: false,
     })
 
     renderWithProviders(<AboutSection />)
 
-    expect(screen.getByAltText('Nurul Hikmah School')).toBeInTheDocument()
+    const image = screen.getByAltText('Nurul Hikmah School')
+    expect(image).toBeInTheDocument()
+    expect(image).toHaveAttribute('src', 'https://cdn.example.com/about.jpg')
     expect(screen.getByText('Sekolah unggulan.')).toBeInTheDocument()
   })
 })

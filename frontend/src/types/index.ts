@@ -48,6 +48,7 @@ export interface School {
   description: string | null
   logo: string | null
   favicon: string | null
+  about_image: string | null
   email: string | null
   phone: string | null
   whatsapp: string | null
