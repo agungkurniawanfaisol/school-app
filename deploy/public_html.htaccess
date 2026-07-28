@@ -38,8 +38,10 @@ Options -Indexes
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
 
-  # Service worker must not stick on CDN/browser for days — OAuth /api navigations depend on it.
-  <FilesMatch "^(sw\.js|registerSW\.js|workbox-.*\.js)$">
+  # Service worker must not stick on CDN/browser — OAuth /api navigations depend on it.
+  <FilesMatch "^(sw\.js|sw-nh.*\.js|registerSW\.js|workbox-.*\.js)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Expires "0"
+    Header unset ETag
   </FilesMatch>
 </IfModule>

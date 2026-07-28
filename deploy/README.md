@@ -137,7 +137,13 @@ php artisan config:clear
 php artisan config:cache
 ```
 
-Jika login Google mengarahkan ke landing page (bukan ke Google), biasanya service worker lama masih menangkap `/api/...`. Setelah deploy frontend baru: hard refresh, atau di DevTools → Application → Service Workers → Unregister, lalu reload.
+Jika login Google mengarahkan ke landing page (bukan ke Google), biasanya service worker lama masih menangkap `/api/...`. Setelah deploy frontend baru:
+
+1. Hard clear data situs di Chrome (gembok → Cookies and site data → Delete), **atau** DevTools → Application → Service Workers → Unregister
+2. Di hPanel Hostinger → **CDN / Cache → Purge All** (penting: CDN masih bisa menyimpan `/sw.js` lama meski origin sudah baru)
+3. Buka lagi `/admin/login` lalu coba Google login
+
+Coba dulu di **Incognito** — jika di Incognito berhasil, berarti cache/SW di browser biasa yang bermasalah.
 
 **Catatan Google login:** email akun Google harus **sudah ada** di tabel `users` (role `admin`/`guru`). OAuth tidak membuat user baru.
 

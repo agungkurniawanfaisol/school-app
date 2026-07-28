@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input'
 import { useAuthMe, useLogin } from '@/hooks/useAuth'
 import { clearAuthSession, getApiErrorMessage, getAuthToken, isAuthError } from '@/lib/api'
 import { getOAuthErrorMessage } from '@/lib/oauth'
+import { unregisterLegacyServiceWorkers } from '@/lib/unregisterLegacyServiceWorkers'
 import { createLoginSchema, type LoginFormValues } from '@/schemas/auth'
 
 export function LoginPage() {
@@ -31,6 +32,20 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const token = getAuthToken()
   const { data: user, isError, error, isLoading, isSuccess } = useAuthMe()
+
+  useEffect(() => {
+    void (async () => {
+      if (sessionStorage.getItem('nh_legacy_sw_cleared') === '1') {
+        return
+      }
+
+      const removed = await unregisterLegacyServiceWorkers()
+      if (removed) {
+        sessionStorage.setItem('nh_legacy_sw_cleared', '1')
+        window.location.reload()
+      }
+    })()
+  }, [])
 
   useEffect(() => {
     if (token && isError && isAuthError(error)) {

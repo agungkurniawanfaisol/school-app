@@ -12,13 +12,18 @@ export default defineConfig(({ mode }) => ({
       ? [
           VitePWA({
             registerType: 'autoUpdate',
+            // New filename bypasses Hostinger CDN poison on stale /sw.js (breaks OAuth).
+            filename: 'sw-nh5.js',
             includeAssets: ['favicon.png', 'logo.png', 'logo-192.png', 'logo-512.png', 'manifest.json'],
             manifest: false,
             workbox: {
               globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
-              // Never serve SPA index.html for API/storage navigations (breaks Google OAuth redirect).
+              // vite-plugin-pwa defaults navigateFallback to index.html for SPAs.
+              // Deny ALL navigations so /api OAuth callbacks always hit the network;
+              // Apache .htaccess already serves index.html for frontend routes.
               navigateFallback: 'index.html',
-              navigateFallbackDenylist: [/^\/api(\/|$)/, /^\/storage(\/|$)/, /^\/backend(\/|$)/],
+              navigateFallbackDenylist: [/.*/],
+              cleanupOutdatedCaches: true,
               runtimeCaching: [
                 {
                   urlPattern: /^\/api\/v1\/(news|schools|facilities|teachers|curriculums|student-activities|testimonials|courses|hero-sliders|virtual-tours|settings)/,
