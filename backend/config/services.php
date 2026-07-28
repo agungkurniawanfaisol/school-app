@@ -38,7 +38,12 @@ return [
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('GOOGLE_REDIRECT_URI'),
+        // Strip accidental "GOOGLE_REDIRECT_URI=" pasted into the value.
+        'redirect' => preg_replace(
+            '/^GOOGLE_REDIRECT_URI=/i',
+            '',
+            (string) env('GOOGLE_REDIRECT_URI', ''),
+        ) ?: null,
         'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
     ],
 

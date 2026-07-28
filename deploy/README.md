@@ -105,9 +105,41 @@ DB_PASSWORD=password_db
 CACHE_STORE=file
 SESSION_DRIVER=file
 QUEUE_CONNECTION=database
+
+# Google OAuth (login admin)
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+# Hanya URL-nya saja — JANGAN tulis ulang nama key di nilai
+# ❌ GOOGLE_REDIRECT_URI=GOOGLE_REDIRECT_URI=https://...
+# ✅ GOOGLE_REDIRECT_URI=https://namadomain.com/api/admin/auth/google/callback
+GOOGLE_REDIRECT_URI=https://namadomain.com/api/admin/auth/google/callback
 ```
 
-Lalu:
+Pastikan juga:
+
+```env
+SANCTUM_STATEFUL_DOMAINS=namadomain.com,www.namadomain.com
+FRONTEND_URL=https://namadomain.com
+APP_URL=https://namadomain.com
+```
+
+Di [Google Cloud Console](https://console.cloud.google.com/) → Credentials → OAuth client:
+
+| Setting                       | Nilai                                                   |
+| ----------------------------- | ------------------------------------------------------- |
+| Authorized redirect URIs      | `https://namadomain.com/api/admin/auth/google/callback` |
+| Authorized JavaScript origins | `https://namadomain.com`                                |
+
+Setelah ubah `.env` Google:
+
+```bash
+php artisan config:clear
+php artisan config:cache
+```
+
+**Catatan Google login:** email akun Google harus **sudah ada** di tabel `users` (role `admin`/`guru`). OAuth tidak membuat user baru.
+
+Setup pertama kali (sekali saja):
 
 ```bash
 php artisan key:generate
