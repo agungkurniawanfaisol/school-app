@@ -183,6 +183,37 @@ class GoogleAuthTest extends TestCase
             ->assertRedirect('http://localhost:5173/admin/login?error=oauth_failed');
     }
 
+    public function test_callback_accepts_verified_email_as_string_true(): void
+    {
+        $admin = User::factory()->admin()->create([
+            'email' => 'admin-string-verified@gmail.com',
+        ]);
+
+        $state = (string) Str::uuid();
+        Cache::put('google_oauth_state:'.$state, true, now()->addMinutes(10));
+
+        Http::fake([
+            'oauth2.googleapis.com/token' => Http::response([
+                'access_token' => 'fake-access-token',
+            ]),
+            'www.googleapis.com/oauth2/v2/userinfo' => Http::response([
+                'email' => 'admin-string-verified@gmail.com',
+                'name' => 'Admin User',
+                'verified_email' => 'true',
+            ]),
+        ]);
+
+        $response = $this->get('/api/admin/auth/google/callback?'.http_build_query([
+            'code' => 'valid-auth-code',
+            'state' => $state,
+        ]));
+
+        $response->assertRedirect();
+        $location = (string) $response->headers->get('Location');
+        $this->assertStringContainsString('/admin/login/oauth?ticket=', $location);
+        $this->assertDatabaseHas('users', ['id' => $admin->id]);
+    }
+
     public function test_callback_redirects_on_invalid_state(): void
     {
         $this->get('/api/admin/auth/google/callback?code=abc&state=invalid-state')

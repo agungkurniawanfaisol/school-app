@@ -2,7 +2,10 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { LanguageProvider } from '@/components/i18n/LanguageProvider'
-import { OAuthCallbackPage } from '@/pages/admin/OAuthCallbackPage'
+import {
+  OAuthCallbackPage,
+  resetOAuthExchangeLockForTests,
+} from '@/pages/admin/OAuthCallbackPage'
 
 const { mutateMock } = vi.hoisted(() => ({
   mutateMock: vi.fn(),
@@ -45,6 +48,7 @@ describe('OAuthCallbackPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     sessionStorage.clear()
+    resetOAuthExchangeLockForTests()
     window.history.replaceState(null, '', '/admin/login/oauth')
   })
 
@@ -78,5 +82,41 @@ describe('OAuthCallbackPage', () => {
         }),
       )
     })
+  })
+
+  it('exchanges ticket from sessionStorage when URL query was cleared', async () => {
+    sessionStorage.setItem('nh_oauth_ticket_pending', '22222222-2222-2222-2222-222222222222')
+
+    renderOAuthCallback('/admin/login/oauth')
+
+    await waitFor(() => {
+      expect(mutateMock).toHaveBeenCalledWith(
+        '22222222-2222-2222-2222-222222222222',
+        expect.objectContaining({
+          onSuccess: expect.any(Function),
+          onError: expect.any(Function),
+        }),
+      )
+    })
+  })
+
+  it('does not start a second exchange for the same ticket (Strict Mode remount)', async () => {
+    const ticket = '33333333-3333-3333-3333-333333333333'
+    // Simulate first mount already started exchange for this ticket.
+    sessionStorage.setItem('nh_oauth_ticket_pending', ticket)
+    resetOAuthExchangeLockForTests()
+    // Prime the module lock by rendering once, then render again.
+    const first = renderOAuthCallback(`/admin/login/oauth?ticket=${ticket}`)
+    await waitFor(() => expect(mutateMock).toHaveBeenCalledTimes(1))
+    first.unmount()
+
+    mutateMock.mockClear()
+    renderOAuthCallback(`/admin/login/oauth?ticket=${ticket}`)
+
+    await waitFor(() => {
+      expect(screen.getByRole('status')).toBeInTheDocument()
+    })
+
+    expect(mutateMock).not.toHaveBeenCalled()
   })
 })

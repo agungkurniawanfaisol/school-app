@@ -84,7 +84,7 @@ class GoogleOAuthService
             return null;
         }
 
-        if ($userResponse->json('verified_email') !== true) {
+    if ($userResponse->json('verified_email') !== true && $userResponse->json('verified_email') !== 'true') {
             return null;
         }
 
