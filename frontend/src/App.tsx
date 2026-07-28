@@ -9,6 +9,7 @@ import { AdminLayout } from '@/pages/admin/AdminLayout'
 import { HomePage } from '@/pages/landing/HomePage'
 import { LoginPage } from '@/pages/admin/LoginPage'
 import { OAuthCallbackPage } from '@/pages/admin/OAuthCallbackPage'
+import { GoogleOAuthApiRescuePage } from '@/pages/admin/GoogleOAuthApiRescuePage'
 import { NewsCatalogPage } from '@/pages/news/NewsCatalogPage'
 import { NewsDetailPage } from '@/pages/news/NewsDetailPage'
 import { ActivitiesCatalogPage } from '@/pages/activities/ActivitiesCatalogPage'
@@ -221,6 +222,8 @@ export default function App() {
 
           <Route path="/admin/login" element={<LoginPage />} />
           <Route path="/admin/login/oauth" element={<OAuthCallbackPage />} />
+          {/* Stale SW may serve SPA for Google callback — rescue before catch-all sends users home. */}
+          <Route path="/api/admin/auth/google/callback" element={<GoogleOAuthApiRescuePage />} />
 
           <Route
             path="/admin/teachers/preview"

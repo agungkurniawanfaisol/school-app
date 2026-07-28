@@ -31,6 +31,24 @@
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
       })();
     </script>
+    <script>
+      // Kill Hostinger-CDN-cached /sw.js that rewrites Google OAuth /api callbacks to the landing page.
+      (function () {
+        if (!('serviceWorker' in navigator)) return;
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          regs.forEach(function (reg) {
+            var url =
+              (reg.active && reg.active.scriptURL) ||
+              (reg.waiting && reg.waiting.scriptURL) ||
+              (reg.installing && reg.installing.scriptURL) ||
+              '';
+            if (/\/sw\.js(\?|$)/.test(url)) {
+              reg.unregister();
+            }
+          });
+        });
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
