@@ -59,9 +59,9 @@ class GoogleAuthTest extends TestCase
 
         $response->assertRedirect();
         $location = (string) $response->headers->get('Location');
-        $this->assertStringStartsWith('http://localhost:5173/admin/login/oauth#ticket=', $location);
+        $this->assertStringStartsWith('http://localhost:5173/admin/login/oauth?ticket=', $location);
 
-        preg_match('/#ticket=([a-f0-9\-]+)/', $location, $matches);
+        preg_match('/[?&]ticket=([a-f0-9\-]+)/', $location, $matches);
         $this->assertNotEmpty($matches[1]);
         $this->assertSame($admin->id, Cache::get('oauth_ticket:'.$matches[1]));
     }

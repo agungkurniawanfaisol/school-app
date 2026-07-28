@@ -16,6 +16,9 @@ export default defineConfig(({ mode }) => ({
             manifest: false,
             workbox: {
               globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
+              // Never serve SPA index.html for API/storage navigations (breaks Google OAuth redirect).
+              navigateFallback: 'index.html',
+              navigateFallbackDenylist: [/^\/api(\/|$)/, /^\/storage(\/|$)/, /^\/backend(\/|$)/],
               runtimeCaching: [
                 {
                   urlPattern: /^\/api\/v1\/(news|schools|facilities|teachers|curriculums|student-activities|testimonials|courses|hero-sliders|virtual-tours|settings)/,

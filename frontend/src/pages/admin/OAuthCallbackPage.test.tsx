@@ -48,7 +48,23 @@ describe('OAuthCallbackPage', () => {
     window.history.replaceState(null, '', '/admin/login/oauth')
   })
 
-  it('exchanges ticket from hash on mount', async () => {
+  it('exchanges ticket from query string on mount', async () => {
+    renderOAuthCallback('/admin/login/oauth?ticket=11111111-1111-1111-1111-111111111111')
+
+    await waitFor(() => {
+      expect(mutateMock).toHaveBeenCalledWith(
+        '11111111-1111-1111-1111-111111111111',
+        expect.objectContaining({
+          onSuccess: expect.any(Function),
+          onError: expect.any(Function),
+        }),
+      )
+    })
+
+    expect(screen.getByText('Menyelesaikan login...')).toBeInTheDocument()
+  })
+
+  it('exchanges ticket from hash on mount (legacy)', async () => {
     window.location.hash = '#ticket=11111111-1111-1111-1111-111111111111'
 
     renderOAuthCallback('/admin/login/oauth#ticket=11111111-1111-1111-1111-111111111111')
@@ -62,7 +78,5 @@ describe('OAuthCallbackPage', () => {
         }),
       )
     })
-
-    expect(screen.getByText('Menyelesaikan login...')).toBeInTheDocument()
   })
 })

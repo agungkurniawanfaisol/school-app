@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useAuthMe, useGoogleExchange } from '@/hooks/useAuth'
@@ -22,6 +22,7 @@ function parseTicketFromHash(): string | null {
 export function OAuthCallbackPage() {
   const { t } = useTranslation('admin')
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { mutate, isPending } = useGoogleExchange()
   const startedRef = useRef(false)
   const token = getAuthToken()
@@ -32,7 +33,7 @@ export function OAuthCallbackPage() {
       return
     }
 
-    const ticket = parseTicketFromHash()
+    const ticket = searchParams.get('ticket') || parseTicketFromHash()
     if (!ticket) {
       toast.error(t('auth.ticketNotFound'))
       navigate('/admin/login', { replace: true })
@@ -60,7 +61,7 @@ export function OAuthCallbackPage() {
         navigate('/admin/login', { replace: true })
       },
     })
-  }, [mutate, navigate])
+  }, [mutate, navigate, searchParams, t])
 
   if (token && isSuccess && user && !isError) {
     return <Navigate to="/admin" replace />

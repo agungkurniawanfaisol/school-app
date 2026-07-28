@@ -137,6 +137,8 @@ php artisan config:clear
 php artisan config:cache
 ```
 
+Jika login Google mengarahkan ke landing page (bukan ke Google), biasanya service worker lama masih menangkap `/api/...`. Setelah deploy frontend baru: hard refresh, atau di DevTools → Application → Service Workers → Unregister, lalu reload.
+
 **Catatan Google login:** email akun Google harus **sudah ada** di tabel `users` (role `admin`/`guru`). OAuth tidak membuat user baru.
 
 Setup pertama kali (sekali saja):

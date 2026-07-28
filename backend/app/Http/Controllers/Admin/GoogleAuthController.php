@@ -89,7 +89,7 @@ class GoogleAuthController extends Controller
         $ticket = (string) Str::uuid();
         Cache::put('oauth_ticket:'.$ticket, $user->id, now()->addSeconds(120));
 
-        return redirect(AllowedFrontendUrl::to('/admin/login/oauth#ticket='.$ticket));
+        return redirect(AllowedFrontendUrl::to('/admin/login/oauth?ticket='.$ticket));
     }
 
     public function exchange(GoogleExchangeRequest $request): JsonResponse
