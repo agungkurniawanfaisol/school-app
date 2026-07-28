@@ -5,6 +5,7 @@ import { buildQueryParams, queryConfig } from '@/hooks/queryConfig'
 import type { ApiResponse, ListFilters, PaginatedResponse, Setting } from '@/types'
 import type { SettingFormValues } from '@/schemas/setting'
 import { parseHeroCollageValue } from '@/schemas/heroCollage'
+import { parseSplashScreenValue } from '@/schemas/splashScreen'
 
 export const settingKeys = {
   all: ['settings'] as const,
@@ -38,6 +39,20 @@ export function useHeroCollage() {
   return {
     ...query,
     collage,
+  }
+}
+
+export function useSplashScreen() {
+  const query = usePublicSettings('homepage')
+
+  const splash = (() => {
+    const raw = query.data?.find((s) => s.key === 'splash_screen')?.value
+    return parseSplashScreenValue(raw ?? null)
+  })()
+
+  return {
+    ...query,
+    splash,
   }
 }
 

@@ -855,6 +855,12 @@ class DemoContentSeeder extends Seeder
                 'value' => json_encode(\App\Support\HeroCollage::defaultPayload(), JSON_UNESCAPED_UNICODE),
                 'type' => 'json',
             ],
+            [
+                'group' => 'homepage',
+                'key' => 'splash_screen',
+                'value' => json_encode(\App\Support\SplashScreen::defaultPayload(), JSON_UNESCAPED_UNICODE),
+                'type' => 'json',
+            ],
         ];
 
         foreach ($settings as $setting) {

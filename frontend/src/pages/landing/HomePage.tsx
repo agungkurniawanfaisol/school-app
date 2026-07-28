@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
@@ -10,6 +10,7 @@ import { ContactSection } from '@/components/landing/ContactSection'
 import { DocumentsSection } from '@/components/landing/DocumentsSection'
 import { FeaturedProgramsSection } from '@/components/landing/FeaturedProgramsSection'
 import { GallerySection } from '@/components/landing/GallerySection'
+import { LandingSplashScreen } from '@/components/landing/LandingSplashScreen'
 import { PrincipalSection } from '@/components/landing/PrincipalSection'
 import { StaffSection } from '@/components/landing/StaffSection'
 import { FacilitiesSection } from '@/components/landing/FacilitiesSection'
@@ -21,53 +22,57 @@ import { SuggestionBoxSection } from '@/components/landing/SuggestionBoxSection'
 import { TeachersSection } from '@/components/landing/TeachersSection'
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
 import { useLandingPrefetch } from '@/hooks/useLandingPrefetch'
-
-function SplashScreen({ closing }: { closing: boolean }) {
-  return (
-    <div
-      className={`fixed inset-0 z-50 flex min-h-svh flex-col items-center justify-center gap-5 bg-background will-change-[opacity] ${closing ? 'animate-splash-out' : ''}`}
-    >
-      <img
-        src="/logo.png"
-        alt="Logo Sekolah Islam Nurul Hikmah"
-        className={`h-28 w-28 object-contain will-change-transform sm:h-36 sm:w-36 lg:h-44 lg:w-44 ${closing ? 'animate-splash-zoom' : 'animate-splash-in'}`}
-      />
-      <p
-        className={`text-center text-xl font-bold text-primary will-change-transform sm:text-2xl lg:text-3xl ${closing ? 'animate-splash-zoom' : 'animate-splash-text-in'}`}
-      >
-        Sekolah Islam Nurul Hikmah
-      </p>
-    </div>
-  )
-}
-
-const MAX_SPLASH_MS = 2500
+import { useSchool } from '@/hooks/useSchool'
+import { useSplashScreen } from '@/hooks/useSettings'
+import { resolveSplashDisplay } from '@/schemas/splashScreen'
 
 export function HomePage() {
-  const { isLoading } = useLandingPrefetch()
-  const [showSplash, setShowSplash] = useState(isLoading)
+  const { isLoading: landingLoading } = useLandingPrefetch()
+  const { splash, isLoading: splashSettingsLoading } = useSplashScreen()
+  const { data: school } = useSchool()
+
+  const splashDisplay = useMemo(
+    () => resolveSplashDisplay(splash, school),
+    [splash, school],
+  )
+
+  const [showSplash, setShowSplash] = useState(true)
   const [closing, setClosing] = useState(false)
+  const [minDurationElapsed, setMinDurationElapsed] = useState(false)
 
   useEffect(() => {
-    if (!isLoading && showSplash && !closing) {
+    const timer = setTimeout(() => setMinDurationElapsed(true), splashDisplay.durationMs)
+    return () => clearTimeout(timer)
+  }, [splashDisplay.durationMs])
+
+  useEffect(() => {
+    if (!showSplash || closing) return
+    if (!landingLoading && !splashSettingsLoading && minDurationElapsed) {
       setClosing(true)
       const timer = setTimeout(() => setShowSplash(false), 700)
       return () => clearTimeout(timer)
     }
-  }, [isLoading, showSplash, closing])
+  }, [landingLoading, splashSettingsLoading, minDurationElapsed, showSplash, closing])
 
   useEffect(() => {
     if (!showSplash) return
     const safety = setTimeout(() => {
       setClosing(true)
       setTimeout(() => setShowSplash(false), 700)
-    }, MAX_SPLASH_MS)
+    }, splashDisplay.durationMs + 1500)
     return () => clearTimeout(safety)
-  }, [showSplash])
+  }, [showSplash, splashDisplay.durationMs])
 
   return (
     <>
-      {showSplash && <SplashScreen closing={closing} />}
+      {showSplash ? (
+        <LandingSplashScreen
+          closing={closing}
+          image={splashDisplay.image}
+          title={splashDisplay.title}
+          subtitle={splashDisplay.subtitle}
+        />
+      ) : null}
 
       {!showSplash && (
         <div className="flex min-h-svh flex-col">

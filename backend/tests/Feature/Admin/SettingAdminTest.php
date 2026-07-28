@@ -112,4 +112,51 @@ class SettingAdminTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['value']);
     }
+
+    public function test_admin_can_update_splash_screen_json(): void
+    {
+        $setting = \App\Models\Setting::factory()->create([
+            'group' => 'homepage',
+            'key' => 'splash_screen',
+            'type' => 'json',
+            'value' => json_encode(\App\Support\SplashScreen::defaultPayload(), JSON_UNESCAPED_UNICODE),
+        ]);
+
+        $payload = \App\Support\SplashScreen::defaultPayload();
+        $payload['title'] = 'Selamat Datang';
+        $payload['image'] = 'https://cdn.example.com/splash.png';
+
+        $this->actingAsAdmin()
+            ->putJson('/api/admin/settings/'.$setting->id, [
+                'value' => json_encode($payload, JSON_UNESCAPED_UNICODE),
+                'type' => 'json',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.key', 'splash_screen');
+
+        $stored = json_decode((string) $setting->fresh()->value, true);
+        $this->assertSame('Selamat Datang', $stored['title']);
+        $this->assertSame('https://cdn.example.com/splash.png', $stored['image']);
+    }
+
+    public function test_admin_splash_screen_update_rejects_invalid_payload(): void
+    {
+        $setting = \App\Models\Setting::factory()->create([
+            'group' => 'homepage',
+            'key' => 'splash_screen',
+            'type' => 'json',
+            'value' => json_encode(\App\Support\SplashScreen::defaultPayload(), JSON_UNESCAPED_UNICODE),
+        ]);
+
+        $payload = \App\Support\SplashScreen::defaultPayload();
+        $payload['title'] = '';
+
+        $this->actingAsAdmin()
+            ->putJson('/api/admin/settings/'.$setting->id, [
+                'value' => json_encode($payload, JSON_UNESCAPED_UNICODE),
+                'type' => 'json',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['value']);
+    }
 }

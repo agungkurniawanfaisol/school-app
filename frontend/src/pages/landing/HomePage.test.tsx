@@ -1,5 +1,5 @@
-import { screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { act, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { HomePage } from '@/pages/landing/HomePage'
 import { renderWithProviders } from '@/test/renderWithProviders'
 
@@ -87,9 +87,32 @@ vi.mock('@/hooks/useLandingPrefetch', () => ({
   useLandingPrefetch: () => ({ isLoading: false }),
 }))
 
+vi.mock('@/hooks/useSettings', () => ({
+  useSplashScreen: () => ({ splash: null, isLoading: false }),
+}))
+
+vi.mock('@/hooks/useSchool', () => ({
+  useSchool: () => ({ data: { name: 'Nurul Hikmah School' }, isLoading: false }),
+}))
+
+async function renderHomeAfterSplash() {
+  renderWithProviders(<HomePage />)
+  await act(async () => {
+    await vi.runAllTimersAsync()
+  })
+}
+
 describe('HomePage', () => {
-  it('renders main landing sections', () => {
-    renderWithProviders(<HomePage />)
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('renders main landing sections', async () => {
+    await renderHomeAfterSplash()
 
     expect(screen.getByTestId('header')).toBeInTheDocument()
     expect(screen.getByTestId('hero')).toBeInTheDocument()
@@ -111,8 +134,8 @@ describe('HomePage', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument()
   })
 
-  it('renders sections in the requested landing order', () => {
-    renderWithProviders(<HomePage />)
+  it('renders sections in the requested landing order', async () => {
+    await renderHomeAfterSplash()
 
     const order = [
       'hero',

@@ -4,7 +4,7 @@ namespace App\Http\Requests\Setting;
 
 use App\Http\Requests\AdminFormRequest;
 use App\Models\Setting;
-use App\Support\HeroCollage;
+use App\Support\SettingValueValidator;
 use Illuminate\Validation\Validator;
 
 class UpdateSettingRequest extends AdminFormRequest
@@ -31,11 +31,7 @@ class UpdateSettingRequest extends AdminFormRequest
                 }
             }
 
-            if (! HeroCollage::isHeroCollageKey(is_string($key) ? $key : null)) {
-                return;
-            }
-
-            foreach (HeroCollage::validateValue($this->input('value')) as $message) {
+            foreach (SettingValueValidator::errors(is_string($key) ? $key : null, $this->input('value')) as $message) {
                 $validator->errors()->add('value', $message);
             }
         });

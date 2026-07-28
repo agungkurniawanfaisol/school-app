@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Setting;
 
 use App\Http\Requests\AdminFormRequest;
-use App\Support\HeroCollage;
+use App\Support\SettingValueValidator;
 use Illuminate\Validation\Validator;
 
 class StoreSettingRequest extends AdminFormRequest
@@ -23,11 +23,7 @@ class StoreSettingRequest extends AdminFormRequest
     {
         $validator->after(function (Validator $validator): void {
             $key = $this->input('key');
-            if (! HeroCollage::isHeroCollageKey(is_string($key) ? $key : null)) {
-                return;
-            }
-
-            foreach (HeroCollage::validateValue($this->input('value')) as $message) {
+            foreach (SettingValueValidator::errors(is_string($key) ? $key : null, $this->input('value')) as $message) {
                 $validator->errors()->add('value', $message);
             }
         });
