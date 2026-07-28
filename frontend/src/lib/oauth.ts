@@ -12,11 +12,50 @@ export function getGoogleOAuthStartUrl(): string {
 const GOOGLE_AUTH_ORIGIN = 'https://accounts.google.com'
 
 /**
+ * Activate a waiting service worker so /api OAuth callback is not intercepted
+ * by an outdated NavigationRoute (missing /api denylist).
+ */
+export async function ensureServiceWorkerUpdated(): Promise<void> {
+  if (!('serviceWorker' in navigator)) {
+    return
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.getRegistration()
+    if (!registration) {
+      return
+    }
+
+    await registration.update()
+
+    if (registration.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+      await Promise.race([
+        new Promise<void>((resolve) => {
+          const onChange = () => {
+            navigator.serviceWorker.removeEventListener('controllerchange', onChange)
+            resolve()
+          }
+          navigator.serviceWorker.addEventListener('controllerchange', onChange)
+        }),
+        new Promise<void>((resolve) => {
+          window.setTimeout(resolve, 2000)
+        }),
+      ])
+    }
+  } catch {
+    // OAuth can still proceed; worst case old SW still blocks callback.
+  }
+}
+
+/**
  * Fetch the Google authorization URL as JSON instead of top-level navigating
  * to /api/... — Workbox NavigationRoute would otherwise serve SPA index.html
  * and dump users on the public landing page.
  */
 export async function resolveGoogleOAuthUrl(): Promise<string> {
+  await ensureServiceWorkerUpdated()
+
   const response = await fetch(`${getGoogleOAuthStartUrl()}?format=json`, {
     headers: { Accept: 'application/json' },
     credentials: 'same-origin',
