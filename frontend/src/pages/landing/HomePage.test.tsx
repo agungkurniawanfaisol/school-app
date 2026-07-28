@@ -31,6 +31,22 @@ vi.mock('@/components/landing/ActivitiesSection', () => ({
   ActivitiesSection: () => <section data-testid="activities">Activities</section>,
 }))
 
+vi.mock('@/components/landing/AchievementsSection', () => ({
+  AchievementsSection: () => <section data-testid="achievements">Achievements</section>,
+}))
+
+vi.mock('@/components/landing/GallerySection', () => ({
+  GallerySection: () => <section data-testid="gallery">Gallery</section>,
+}))
+
+vi.mock('@/components/landing/AgendaSection', () => ({
+  AgendaSection: () => <section data-testid="agenda">Agenda</section>,
+}))
+
+vi.mock('@/components/landing/DocumentsSection', () => ({
+  DocumentsSection: () => <section data-testid="documents">Documents</section>,
+}))
+
 vi.mock('@/components/landing/FacilitiesSection', () => ({
   FacilitiesSection: () => <section data-testid="facilities">Facilities</section>,
 }))
@@ -79,15 +95,48 @@ describe('HomePage', () => {
     expect(screen.getByTestId('hero')).toBeInTheDocument()
     expect(screen.getByTestId('about')).toBeInTheDocument()
     expect(screen.getByTestId('featured-programs')).toBeInTheDocument()
-    expect(screen.getByTestId('teachers')).toBeInTheDocument()
+    expect(screen.getByTestId('achievements')).toBeInTheDocument()
     expect(screen.getByTestId('activities')).toBeInTheDocument()
+    expect(screen.getByTestId('gallery')).toBeInTheDocument()
     expect(screen.getByTestId('facilities')).toBeInTheDocument()
+    expect(screen.getByTestId('agenda')).toBeInTheDocument()
     expect(screen.getByTestId('news')).toBeInTheDocument()
+    expect(screen.getByTestId('documents')).toBeInTheDocument()
+    expect(screen.getByTestId('teachers')).toBeInTheDocument()
     expect(screen.getByTestId('testimonials')).toBeInTheDocument()
     expect(screen.getByTestId('pmb-cta')).toBeInTheDocument()
     expect(screen.getByTestId('principal')).toBeInTheDocument()
     expect(screen.getByTestId('staff')).toBeInTheDocument()
     expect(screen.getByTestId('contact')).toBeInTheDocument()
     expect(screen.getByTestId('footer')).toBeInTheDocument()
+  })
+
+  it('renders sections in the requested landing order', () => {
+    renderWithProviders(<HomePage />)
+
+    const order = [
+      'hero',
+      'about',
+      'featured-programs',
+      'achievements',
+      'activities',
+      'gallery',
+      'facilities',
+      'agenda',
+      'news',
+      'documents',
+      'principal',
+      'teachers',
+      'staff',
+      'testimonials',
+      'pmb-cta',
+      'contact',
+    ]
+
+    const nodes = order.map((id) => screen.getByTestId(id))
+
+    for (let i = 0; i < nodes.length - 1; i++) {
+      expect(nodes[i].compareDocumentPosition(nodes[i + 1]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    }
   })
 })

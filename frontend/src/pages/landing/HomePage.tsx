@@ -76,26 +76,26 @@ export function HomePage() {
             <HeroSection />
             <SectionDivider />
             <AboutSection />
-            <PrincipalSection />
             <SectionDivider />
             <FeaturedProgramsSection />
             <SectionDivider />
-            <TeachersSection />
-            <StaffSection />
+            <AchievementsSection />
             <SectionDivider />
             <ActivitiesSection />
             <SectionDivider />
-            <AchievementsSection />
+            <GallerySection />
             <SectionDivider />
             <FacilitiesSection />
-            <SectionDivider />
-            <GallerySection />
             <SectionDivider />
             <AgendaSection />
             <SectionDivider />
             <NewsSection />
             <SectionDivider />
             <DocumentsSection />
+            <SectionDivider />
+            <PrincipalSection />
+            <TeachersSection />
+            <StaffSection />
             <SectionDivider />
             <TestimonialsSection />
             <SectionDivider />
