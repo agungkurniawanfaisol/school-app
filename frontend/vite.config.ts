@@ -12,8 +12,11 @@ export default defineConfig(({ mode }) => ({
       ? [
           VitePWA({
             registerType: 'autoUpdate',
+            // Inline registration avoids a long-cached /registerSW.js that kept
+            // re-installing the broken Hostinger-CDN /sw.js worker.
+            injectRegister: 'inline',
             // New filename bypasses Hostinger CDN poison on stale /sw.js (breaks OAuth).
-            filename: 'sw-nh5.js',
+            filename: 'sw-nh6.js',
             includeAssets: ['favicon.png', 'logo.png', 'logo-192.png', 'logo-512.png', 'manifest.json'],
             manifest: false,
             workbox: {
