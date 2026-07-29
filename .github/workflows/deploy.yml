@@ -107,16 +107,16 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
-      - name: Add host to known_hosts
+      - name: Configure SSH known_hosts
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
-          # Empty DEPLOY_PORT secret must default in bash (GHA || is unreliable for secrets).
           PORT="${DEPLOY_PORT:-65002}"
           HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
           HOST="${HOST#ssh://}"
@@ -126,33 +126,47 @@ jobs:
             exit 1
           fi
 
-          echo "Scanning SSH host keys for ${HOST} port ${PORT}..."
-          # Avoid -H (hash hosts); clearer errors and better OpenSSH compatibility.
+          echo "SSH target host_len=${#HOST} port=${PORT}"
+
+          # Optional: paste output of `ssh-keyscan -p PORT HOST` as secret DEPLOY_KNOWN_HOSTS
+          if [ -n "${DEPLOY_KNOWN_HOSTS:-}" ]; then
+            printf '%s\n' "${DEPLOY_KNOWN_HOSTS}" >> ~/.ssh/known_hosts
+            chmod 600 ~/.ssh/known_hosts
+            echo "Loaded DEPLOY_KNOWN_HOSTS secret into known_hosts."
+            echo "SSH_STRICT=yes" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          # Hostinger / some hosts block ssh-keyscan from GitHub Actions IPs.
+          # Prefer keyscan when it works; otherwise accept-new on first connect.
           TMP_KEYS="$(mktemp)"
           ok=0
           for attempt in 1 2 3; do
-            if ssh-keyscan -p "${PORT}" -T 15 "${HOST}" >"${TMP_KEYS}" 2>/tmp/ssh-keyscan.err; then
+            if ssh-keyscan -p "${PORT}" -T 10 "${HOST}" >"${TMP_KEYS}" 2>/tmp/ssh-keyscan.err; then
               if [ -s "${TMP_KEYS}" ]; then
                 ok=1
                 break
               fi
             fi
-            echo "ssh-keyscan attempt ${attempt}/3 failed:"
+            echo "ssh-keyscan attempt ${attempt}/3 failed (stderr below):"
             cat /tmp/ssh-keyscan.err || true
-            sleep 3
+            # Quick TCP probe for clearer diagnostics (does not fail the job)
+            timeout 5 bash -c "echo >/dev/tcp/${HOST}/${PORT}" 2>/tmp/tcp.err \
+              && echo "TCP ${HOST}:${PORT} is reachable" \
+              || echo "TCP ${HOST}:${PORT} not reachable: $(cat /tmp/tcp.err 2>/dev/null || true)"
+            sleep 2
           done
 
-          if [ "${ok}" -ne 1 ]; then
-            echo ""
-            echo "Could not fetch host keys from ${HOST}:${PORT}."
-            echo "Check DEPLOY_HOST / DEPLOY_PORT secrets and that Hostinger SSH is enabled."
-            echo "Hostinger shared hosting usually uses port 65002 (not 22)."
-            exit 1
+          if [ "${ok}" -eq 1 ]; then
+            cat "${TMP_KEYS}" >> ~/.ssh/known_hosts
+            chmod 600 ~/.ssh/known_hosts
+            echo "known_hosts updated via ssh-keyscan ($(wc -l < "${TMP_KEYS}") line(s))."
+            echo "SSH_STRICT=yes" >> "$GITHUB_ENV"
+          else
+            echo "ssh-keyscan unavailable from this runner — using StrictHostKeyChecking=accept-new"
+            echo "Tip: set secret DEPLOY_KNOWN_HOSTS from local: ssh-keyscan -p ${PORT} YOUR_HOST"
+            echo "SSH_STRICT=accept-new" >> "$GITHUB_ENV"
           fi
-
-          cat "${TMP_KEYS}" >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-          echo "known_hosts updated ($(wc -l < "${TMP_KEYS}") key line(s))."
 
       - name: Rsync frontend → public_html (do not delete backend/)
         env:
@@ -163,9 +177,10 @@ jobs:
         run: |
           PORT="${DEPLOY_PORT:-65002}"
           HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
+          STRICT="${SSH_STRICT:-accept-new}"
           rsync -az --delete \
             --exclude='backend/' \
-            -e "ssh -p ${PORT} -o StrictHostKeyChecking=yes" \
+            -e "ssh -p ${PORT} -o StrictHostKeyChecking=${STRICT} -o UserKnownHostsFile=${HOME}/.ssh/known_hosts" \
             /tmp/frontend-deploy/ \
             "${DEPLOY_USER}@${HOST}:${DEPLOY_PATH}/"
 
@@ -178,6 +193,7 @@ jobs:
         run: |
           PORT="${DEPLOY_PORT:-65002}"
           HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
+          STRICT="${SSH_STRICT:-accept-new}"
           rsync -az --delete \
             --filter='P storage/' \
             --filter='P storage/***' \
@@ -185,7 +201,7 @@ jobs:
             --exclude='storage/' \
             --exclude='.env' \
             --exclude='.env.*' \
-            -e "ssh -p ${PORT} -o StrictHostKeyChecking=yes" \
+            -e "ssh -p ${PORT} -o StrictHostKeyChecking=${STRICT} -o UserKnownHostsFile=${HOME}/.ssh/known_hosts" \
             /tmp/backend-deploy/ \
             "${DEPLOY_USER}@${HOST}:${DEPLOY_PATH}/backend/"
 
@@ -200,5 +216,7 @@ jobs:
           PORT="${DEPLOY_PORT:-65002}"
           HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
           PHP_BIN="${DEPLOY_PHP:-php}"
-          ssh -p "${PORT}" -o StrictHostKeyChecking=yes "${DEPLOY_USER}@${HOST}" \
+          STRICT="${SSH_STRICT:-accept-new}"
+          ssh -p "${PORT}" -o StrictHostKeyChecking="${STRICT}" -o UserKnownHostsFile="${HOME}/.ssh/known_hosts" \
+            "${DEPLOY_USER}@${HOST}" \
             "cd '${DEPLOY_PATH}/backend' && DEPLOY_PHP='${PHP_BIN}' bash ./post-deploy.sh"
