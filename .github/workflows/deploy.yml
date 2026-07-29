@@ -66,6 +66,8 @@ jobs:
             --exclude='.phpunit.cache' \
             backend/ /tmp/backend-deploy/
           cp deploy/backend.htaccess /tmp/backend-deploy/.htaccess
+          cp deploy/post-deploy.sh /tmp/backend-deploy/post-deploy.sh
+          chmod +x /tmp/backend-deploy/post-deploy.sh
           # Keep empty storage skeleton so first deploy can create dirs without wiping server storage
           mkdir -p \
             /tmp/backend-deploy/storage/app/public \
@@ -146,7 +148,7 @@ jobs:
             /tmp/backend-deploy/ \
             "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/backend/"
 
-      - name: Post-deploy Artisan
+      - name: Post-deploy (backup DB + migrate only)
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -154,27 +156,5 @@ jobs:
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '65002' }}
           DEPLOY_PHP: ${{ secrets.DEPLOY_PHP || 'php' }}
         run: |
-          ssh -p "${DEPLOY_PORT}" "${DEPLOY_USER}@${DEPLOY_HOST}" bash -s <<EOF
-          set -euo pipefail
-          cd "${DEPLOY_PATH}/backend"
-          mkdir -p storage/app/public storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
-          chmod -R ug+rwx storage bootstrap/cache || true
-          if [ ! -f .env ]; then
-            echo "WARNING: backend/.env missing — skip artisan. Create .env on server once."
-            exit 0
-          fi
-          ${DEPLOY_PHP} artisan storage:link --force || true
-          if [ ! -d storage/app/public ]; then
-            echo "ERROR: storage/app/public missing after deploy"
-            exit 1
-          fi
-          if [ ! -w storage/app/public ]; then
-            echo "ERROR: storage/app/public is not writable by web user"
-            exit 1
-          fi
-          mkdir -p storage/app/public/uploads
-          ${DEPLOY_PHP} artisan migrate --force --no-interaction
-          ${DEPLOY_PHP} artisan config:cache
-          ${DEPLOY_PHP} artisan route:cache
-          ${DEPLOY_PHP} artisan view:cache
-          EOF
+          ssh -p "${DEPLOY_PORT}" "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "cd '${DEPLOY_PATH}/backend' && DEPLOY_PHP='${DEPLOY_PHP}' bash ./post-deploy.sh"

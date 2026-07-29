@@ -6,8 +6,9 @@ COMPOSE_PROD := docker compose -f docker-compose.yml -f docker-compose.prod.yml
 dev:
 	$(COMPOSE) up -d
 	@$(COMPOSE) exec backend sh -c '\
+		SCHOOL_COUNT=$$(php artisan tinker --execute="echo \\App\\Models\\School::count();" 2>/dev/null | tail -n 1 | tr -d "\r"); \
 		USER_COUNT=$$(php artisan tinker --execute="echo \\App\\Models\\User::count();" 2>/dev/null | tail -n 1 | tr -d "\r"); \
-		if [ "$${USER_COUNT:-0}" = "0" ]; then \
+		if [ "$${SCHOOL_COUNT:-0}" = "0" ] || [ "$${USER_COUNT:-0}" = "0" ]; then \
 			echo "[make dev] Database kosong — menjalankan db:seed..."; \
 			php artisan db:seed --force --no-interaction; \
 		fi'

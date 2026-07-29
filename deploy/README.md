@@ -157,6 +157,56 @@ php artisan migrate --force
 
 `.env` dan `storage/` **tidak** dihapus saat deploy berikutnya.
 
+## Data production TIDAK dihapus oleh deploy
+
+Push ke `main` **tidak** menjalankan `migrate:fresh`, `db:wipe`, atau `db:seed`.
+
+| Yang dijalankan                  | Efek pada data                                      |
+| -------------------------------- | --------------------------------------------------- |
+| `rsync` frontend                 | Hanya file React; folder `backend/` di-exclude      |
+| `rsync` backend                  | Update kode PHP; **`.env` + `storage/` dilindungi** |
+| `mysqldump` → `storage/backups/` | Cadangan sebelum migrate (otomatis)                 |
+| `php artisan migrate --force`    | Hanya **tambah/ubah skema**; **baris data tetap**   |
+
+### Jangan pernah dijalankan di production
+
+```bash
+# ❌ HAPUS SEMUA DATA
+php artisan migrate:fresh
+php artisan migrate:fresh --seed
+php artisan db:wipe
+php artisan db:seed          # hanya boleh di local/Docker kosong
+```
+
+`db:seed` hanya untuk development (Docker). Di Hostinger, konten diisi lewat **Admin panel**.
+
+### Jika data “hilang” setelah deploy — cek ini dulu
+
+1. **Database masih ada?** SSH ke server:
+   ```bash
+   cd ~/domains/namadomain.com/public_html/backend
+   php artisan tinker --execute="echo 'users='.\App\Models\User::count().' news='.\App\Models\News::count();"
+   ```
+2. **`.env` masih mengarah ke DB yang sama?**  
+   `DB_DATABASE` / `DB_USERNAME` tidak berubah / bukan database kosong baru.
+3. **Gambar hilang tapi baris admin masih ada?**  
+   Cek `storage/app/public/uploads` masih ada (bukan DB yang kosong).
+4. **API error / halaman kosong?**  
+   Bukan data hilang — cek log `storage/logs/laravel.log`, lalu `php artisan config:clear`.
+5. **Restore dari backup otomatis** (jika migrate bermasalah):
+   ```bash
+   cd ~/domains/namadomain.com/public_html/backend
+   ls -lt storage/backups/
+   gunzip -c storage/backups/pre-migrate-YYYYMMDD_HHMMSS.sql.gz | mysql -u DB_USER -p DB_NAME
+   ```
+   Atau restore lewat **hPanel → Databases → Backup**.
+
+### Backup Hostinger (disarankan)
+
+Di hPanel aktifkan **daily backup**. Cadangan GitHub Actions menyimpan ~10 file terakhir di `backend/storage/backups/` (tidak menggantikan backup hPanel).
+
+---
+
 ### Upload gambar / file (admin)
 
 File disimpan di `backend/storage/app/public/uploads/...` dan diakses lewat URL:
@@ -196,7 +246,9 @@ push main → GitHub Actions
   → build frontend/dist
   → rsync ke public_html/          (jangan hapus backend/)
   → rsync backend/                 (jangan hapus storage/ + .env)
-  → php artisan migrate + cache
+  → mysqldump backup → storage/backups/
+  → php artisan migrate --force    (TANPA seed / migrate:fresh)
+  → cache config/route/view
 ```
 
 Hasil di Hostinger:

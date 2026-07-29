@@ -3,7 +3,7 @@
 > **Read after [`AGENTS.md`](AGENTS.md)** when starting a new session or switching AI/model.  
 > This file tracks recent work and follow-ups — not a substitute for rules or skills.
 
-**Last updated:** 2026-07-24 (Hostinger SSH deploy)
+**Last updated:** 2026-07-29 (PMB analytics dashboard)
 
 ---
 
@@ -30,6 +30,31 @@
 ---
 
 ## 3. Completed (recent sessions)
+
+### 2026-07-29 — PMB Registrations Analytics Dashboard
+
+- Admin `/admin/pmb-registrations`: KPI + Recharts (status/jenjang/tren/sekolah asal), filter bersama, sort, Cetak, Unduh CSV
+- Backend: `GET .../stats`, `GET .../export` (UTF-8 BOM, cap `config/pmb.php`), allowlisted sort di `PmbRegistrationRepository`
+- Tests: `PmbRegistrationAnalyticsTest`, `PmbStatsKpis.test.tsx`; phpunit `force=true` untuk sqlite
+- **Next:** opsional gender chart di mobile; Excel `.xlsx` jika diminta
+
+### 2026-07-28 — Tahun Ajaran (Academic Year)
+
+- Master `academic_years` (label `YYYY/YYYY`, satu `is_active` per sekolah)
+- Kolom `academic_year` di `pmb_registrations` + filter admin
+- Admin: `/admin/academic-years` (Sistem → Tahun Ajaran)
+- Admin PMB: filter tahun di daftar pendaftaran; API index tahun ajaran read-only
+- Portal PMB: pakai tahun aktif dari API (`/api/v1/academic-years/active`)
+- **Next:** opsional — tutup PMB otomatis jika tidak ada tahun aktif
+
+### 2026-07-28 — PMB Pendaftar Portal
+
+- Spec: `docs/superpowers/specs/2026-07-28-pmb-pendaftar-portal-design.md`
+- Roles: `admin_pmb`, `pendaftar`; Google OAuth `intent=pmb` auto-creates pendaftar
+- Portal API: draft/submit/upload/messages/timeline; Admin PMB verify payment + LoA shell
+- Frontend: wizard `/pmb/daftar`, OAuth callback, portal detail UUID, Admin PMB nav isolation
+- Status pipeline: `draft` → `awaiting_payment_review` → `submitted` → `review` → `accepted`|`rejected`
+- **Next:** LoA PDF template when sample provided; optional document upload types in wizard
 
 ### 2026-07-24 — Hostinger auto-deploy
 
