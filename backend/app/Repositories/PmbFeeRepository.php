@@ -81,15 +81,6 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
         });
     }
 
-    public function delete(Model $model): bool
-    {
-        if ($model->is_active) {
-            throw new \InvalidArgumentException('Biaya aktif tidak dapat dihapus. Aktifkan biaya lain terlebih dahulu.');
-        }
-
-        return parent::delete($model);
-    }
-
     private function deactivateOthers(int $schoolId, ?int $exceptId = null): void
     {
         $query = $this->model()::query()

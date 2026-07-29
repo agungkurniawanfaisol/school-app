@@ -103,7 +103,7 @@ class PmbFeeAdminTest extends TestCase
         ])->assertUnprocessable();
     }
 
-    public function test_cannot_delete_active_fee(): void
+    public function test_admin_can_destroy_active_fee(): void
     {
         $school = $this->createSchool();
         $year = AcademicYear::factory()->for($school)->create(['label' => '2026/2027']);
@@ -117,8 +117,9 @@ class PmbFeeAdminTest extends TestCase
         Sanctum::actingAs(User::factory()->admin()->create());
 
         $this->deleteJson($this->adminUrl(self::RESOURCE.'/'.$fee->id))
-            ->assertUnprocessable()
-            ->assertJsonPath('message', 'Biaya aktif tidak dapat dihapus. Aktifkan biaya lain terlebih dahulu.');
+            ->assertOk();
+
+        $this->assertSoftDeleted('pmb_fees', ['id' => $fee->id]);
     }
 
     public function test_admin_can_destroy_inactive_fee(): void

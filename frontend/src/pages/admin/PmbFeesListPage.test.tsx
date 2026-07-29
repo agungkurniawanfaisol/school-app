@@ -45,8 +45,18 @@ vi.mock('@/hooks/usePmbFees', () => ({
   useActivatePmbFee: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
+vi.mock('@/hooks/useSettings', () => ({
+  usePublicSettings: () => ({
+    data: [
+      { key: 'pmb_bank_name', value: 'Bank Syariah Indonesia (BSI)' },
+      { key: 'pmb_account_number', value: '7123456789' },
+      { key: 'pmb_account_holder', value: 'Yayasan Nurul Hikmah' },
+    ],
+  }),
+}))
+
 describe('PmbFeesListPage', () => {
-  it('lists fees without edit links', () => {
+  it('lists fees, shows bank banner, and exposes actions for active fees', () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     })
@@ -63,7 +73,15 @@ describe('PmbFeesListPage', () => {
 
     expect(screen.getAllByText('Rp 350.000').length).toBeGreaterThan(0)
     expect(screen.getAllByText('2025/2026').length).toBeGreaterThan(0)
+    expect(screen.getByText('Bank Syariah Indonesia (BSI)')).toBeInTheDocument()
+    expect(screen.getByText('7123456789')).toBeInTheDocument()
+    expect(screen.getByText('Yayasan Nurul Hikmah')).toBeInTheDocument()
     expect(document.querySelector('a[href*="/edit"]')).toBeNull()
     expect(document.querySelector('a[href="/admin/pmb-fees/create"]')).not.toBeNull()
+    expect(document.querySelector('a[href="/admin/settings"]')).not.toBeNull()
+
+    // Active + inactive rows both expose the actions menu (delete always available).
+    // Desktop table + mobile cards may both mount action triggers.
+    expect(screen.getAllByLabelText('Aksi lainnya').length).toBeGreaterThanOrEqual(2)
   })
 })
