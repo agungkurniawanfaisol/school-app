@@ -23,6 +23,20 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     console.error('[ErrorBoundary]', error, errorInfo)
+    try {
+      sessionStorage.setItem(
+        '__last_error_boundary__',
+        JSON.stringify({
+          message: error.message,
+          stack: error.stack?.slice(0, 2000) ?? null,
+          componentStack: errorInfo.componentStack?.slice(0, 2000) ?? null,
+          href: typeof window !== 'undefined' ? window.location.href : null,
+          at: new Date().toISOString(),
+        }),
+      )
+    } catch {
+      // ignore storage failures
+    }
   }
 
   render(): ReactNode {

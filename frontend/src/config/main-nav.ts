@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react'
 import {
   Award, Building2, CalendarDays, ClipboardList, Compass, Dumbbell, FileText,
   GraduationCap, Images, Info, MessageSquare, Newspaper, Sparkles,
-  Star, Users, Search,
+  Star, Users,
 } from 'lucide-react'
 
 export type NavLink = {
@@ -62,7 +62,6 @@ export const mainNavTree: NavEntry[] = [
     children: [
       { label: 'nav.pmbInfo', href: '/pmb', icon: GraduationCap },
       { label: 'nav.registerNew', href: '/pmb/daftar', icon: ClipboardList },
-      { label: 'nav.checkStatus', href: '/pmb/status', icon: Search },
     ],
   },
 ]

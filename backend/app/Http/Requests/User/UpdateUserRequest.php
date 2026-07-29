@@ -16,7 +16,7 @@ class UpdateUserRequest extends AdminFormRequest
             'name' => ['sometimes', 'string', 'max:200'],
             'email' => ['sometimes', 'email', 'max:150', Rule::unique('users', 'email')->ignore($id)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'role' => ['sometimes', 'string', Rule::in([User::ROLE_ADMIN, User::ROLE_GURU])],
+            'role' => ['sometimes', 'string', Rule::in(User::ASSIGNABLE_ROLES)],
             'is_active' => ['sometimes', 'boolean'],
             'teacher_id' => [
                 'nullable',

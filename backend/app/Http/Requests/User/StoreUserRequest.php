@@ -14,7 +14,7 @@ class StoreUserRequest extends AdminFormRequest
             'name' => ['required', 'string', 'max:200'],
             'email' => ['required', 'email', 'max:150', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'role' => ['required', 'string', Rule::in([User::ROLE_ADMIN, User::ROLE_GURU])],
+            'role' => ['required', 'string', Rule::in(User::ASSIGNABLE_ROLES)],
             'is_active' => ['sometimes', 'boolean'],
             'teacher_id' => [
                 'nullable',

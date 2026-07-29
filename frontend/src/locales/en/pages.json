@@ -196,6 +196,7 @@
   "teachersCatalog.type_kepala_sekolah": "Principal",
   "teachersCatalog.type_guru": "Teacher",
   "teachersCatalog.type_staff": "Staff",
+  "teachersCatalog.type_pimpinan_yayasan": "Foundation Board",
   "teacherDetail.defaultRole": "Nurul Hikmah Teacher",
   "pmbRegister.badge": "Admission",
   "pmbRegister.defaultSchool": "our school",

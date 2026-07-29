@@ -51,6 +51,22 @@ class UserFactory extends Factory
         ]);
     }
 
+    public function adminPmb(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => User::ROLE_ADMIN_PMB,
+            'is_active' => true,
+        ]);
+    }
+
+    public function pendaftar(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => User::ROLE_PENDAFTAR,
+            'is_active' => true,
+        ]);
+    }
+
     public function inactive(): static
     {
         return $this->state(fn (array $attributes) => [

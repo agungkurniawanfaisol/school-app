@@ -10,5 +10,6 @@ describe('useTeacherTypeLabels', () => {
     expect(result.current.kepala_sekolah).toBe('Kepala Sekolah')
     expect(result.current.guru).toBe('Guru')
     expect(result.current.staff).toBe('Staff')
+    expect(result.current.pimpinan_yayasan).toBe('Pimpinan Yayasan')
   })
 })

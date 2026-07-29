@@ -12,6 +12,7 @@ import { FeaturedProgramsSection } from '@/components/landing/FeaturedProgramsSe
 import { GallerySection } from '@/components/landing/GallerySection'
 import { LandingSplashScreen } from '@/components/landing/LandingSplashScreen'
 import { PrincipalSection } from '@/components/landing/PrincipalSection'
+import { FoundationBoardSection } from '@/components/landing/FoundationBoardSection'
 import { StaffSection } from '@/components/landing/StaffSection'
 import { FacilitiesSection } from '@/components/landing/FacilitiesSection'
 import { HeroSection } from '@/components/landing/HeroSection'
@@ -98,6 +99,7 @@ export function HomePage() {
             <SectionDivider />
             <DocumentsSection />
             <SectionDivider />
+            <FoundationBoardSection />
             <PrincipalSection />
             <TeachersSection />
             <StaffSection />

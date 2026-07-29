@@ -1,6 +1,7 @@
 import { AdminDataTable, type AdminTableColumn } from '@/components/admin/AdminDataTable'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
 import type { PaginationMeta } from '@/types'
+import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 
 export type { AdminTableColumn }
@@ -21,8 +22,11 @@ interface AdminPaginatedTableProps<T extends { id: number }> {
   createLabel?: string
   rowActions?: (item: T) => React.ReactNode
   toolbarFilters?: React.ReactNode
+  headerActions?: ReactNode
+  beforeTable?: ReactNode
   emptyTitle?: string
   emptyDescription?: string
+  getRowClassName?: (item: T) => string | undefined
 }
 
 export function AdminPaginatedTable<T extends { id: number }>(props: AdminPaginatedTableProps<T>) {
@@ -43,8 +47,11 @@ export function AdminPaginatedTable<T extends { id: number }>(props: AdminPagina
     onSearchChange,
     rowActions,
     toolbarFilters,
+    headerActions,
+    beforeTable,
     emptyTitle,
     emptyDescription,
+    getRowClassName,
   } = props
 
   return (
@@ -56,7 +63,9 @@ export function AdminPaginatedTable<T extends { id: number }>(props: AdminPagina
         createLabel={createLabel}
         totalCount={meta?.total}
         totalLabel={t('common.item')}
+        actions={headerActions}
       />
+      {beforeTable}
       <AdminDataTable
         columns={columns}
         data={data}
@@ -71,6 +80,7 @@ export function AdminPaginatedTable<T extends { id: number }>(props: AdminPagina
         toolbarFilters={toolbarFilters}
         emptyTitle={emptyTitle}
         emptyDescription={emptyDescription}
+        getRowClassName={getRowClassName}
       />
     </div>
   )

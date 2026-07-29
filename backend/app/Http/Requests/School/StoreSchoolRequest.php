@@ -3,10 +3,23 @@
 namespace App\Http\Requests\School;
 
 use App\Http\Requests\AdminFormRequest;
+use App\Rules\GoogleMapsEmbedUrl;
 use App\Rules\SafeMediaUrl;
+use App\Support\GoogleMapsEmbed;
 
 class StoreSchoolRequest extends AdminFormRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if ($this->exists('map_embed_url')) {
+            $this->merge([
+                'map_embed_url' => GoogleMapsEmbed::normalize(
+                    is_string($this->input('map_embed_url')) ? $this->input('map_embed_url') : null
+                ),
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [
@@ -26,7 +39,7 @@ class StoreSchoolRequest extends AdminFormRequest
             'postal_code' => ['nullable', 'string', 'max:10'],
             'latitude' => ['nullable', 'numeric', 'min:-90', 'max:90'],
             'longitude' => ['nullable', 'numeric', 'min:-180', 'max:180'],
-            'map_embed_url' => ['nullable', 'url:https', 'max:1000', 'regex:/^https:\/\/(www\.)?google\.(com|co\.\w+)/i'],
+            'map_embed_url' => ['nullable', 'string', 'max:'.GoogleMapsEmbed::MAX_LENGTH, new GoogleMapsEmbedUrl],
             'vision' => ['nullable', 'string', 'max:1000'],
             'mission' => ['nullable', 'string', 'max:2000'],
             'social_media' => ['nullable', 'array'],

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\V1;
 
+use App\Support\PmbMediaUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,9 +21,7 @@ class MediaResource extends JsonResource
             'size' => $this->size,
             'collection' => $this->collection,
             'meta' => $this->meta,
-            'url' => $this->path
-                ? '/storage/'.$this->path
-                : null,
+            'url' => PmbMediaUrl::resolve($this->resource),
             'created_at' => $this->created_at?->toIso8601String(),
         ];
     }

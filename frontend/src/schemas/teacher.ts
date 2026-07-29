@@ -16,11 +16,12 @@ const contentFields = {
   content_json: editorDocumentSchema.optional().nullable(),
 }
 
-export const TEACHER_TYPES = ['kepala_sekolah', 'guru', 'staff'] as const
+export const TEACHER_TYPES = ['pimpinan_yayasan', 'kepala_sekolah', 'guru', 'staff'] as const
 export type TeacherTypeValue = (typeof TEACHER_TYPES)[number]
 
 // UI labels via i18n hooks; static ID labels for non-hook contexts
 export const TEACHER_TYPE_LABELS: Record<TeacherTypeValue, string> = {
+  pimpinan_yayasan: 'Pimpinan Yayasan',
   kepala_sekolah: 'Kepala Sekolah',
   guru: 'Guru',
   staff: 'Staff',

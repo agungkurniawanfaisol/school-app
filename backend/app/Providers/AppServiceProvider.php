@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Repositories\AcademicYearRepository;
 use App\Repositories\CourseEnrollmentRepository;
 use App\Repositories\CourseLessonRepository;
 use App\Repositories\CourseModuleRepository;
@@ -14,6 +15,7 @@ use App\Repositories\HeroSliderRepository;
 use App\Repositories\MediaRepository;
 use App\Repositories\NewsRepository;
 use App\Repositories\PmbDocumentRepository;
+use App\Repositories\PmbFeeRepository;
 use App\Repositories\PmbRegistrationRepository;
 use App\Repositories\SchoolRepository;
 use App\Repositories\SettingRepository;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $bindings = [
+            AcademicYearRepository::class,
             SchoolRepository::class,
             HeroSliderRepository::class,
             CurriculumRepository::class,
@@ -42,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
             CourseEnrollmentRepository::class,
             CourseProgressRepository::class,
             PmbRegistrationRepository::class,
+            PmbFeeRepository::class,
             PmbDocumentRepository::class,
             MediaRepository::class,
             SettingRepository::class,

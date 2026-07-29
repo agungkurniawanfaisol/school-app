@@ -27,7 +27,7 @@ class AuthController extends Controller
             ]);
         }
 
-        if (! $user->isPanelUser()) {
+        if (! $user->isPanelUser() && ! $user->isPendaftar()) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 

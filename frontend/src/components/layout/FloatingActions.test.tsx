@@ -4,9 +4,14 @@ import { FloatingActions } from './FloatingActions'
 
 const useLocationMock = vi.fn(() => ({ pathname: '/' }))
 const usePrefersReducedMotionMock = vi.fn(() => false)
+const getAuthTokenMock = vi.fn(() => null)
 
 vi.mock('react-router-dom', () => ({
   useLocation: () => useLocationMock(),
+}))
+
+vi.mock('@/lib/api', () => ({
+  getAuthToken: () => getAuthTokenMock(),
 }))
 
 vi.mock('@/hooks/useSchool', () => ({
@@ -27,6 +32,7 @@ describe('FloatingActions', () => {
     window.scrollTo = scrollToMock
     useLocationMock.mockReturnValue({ pathname: '/' })
     usePrefersReducedMotionMock.mockReturnValue(false)
+    getAuthTokenMock.mockReturnValue(null)
   })
 
   afterEach(() => {
@@ -75,6 +81,13 @@ describe('FloatingActions', () => {
 
   it('does not render on admin routes', () => {
     useLocationMock.mockReturnValue({ pathname: '/admin' })
+    const { container } = render(<FloatingActions />)
+
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('does not render when user is logged in', () => {
+    getAuthTokenMock.mockReturnValue('token-123')
     const { container } = render(<FloatingActions />)
 
     expect(container).toBeEmptyDOMElement()

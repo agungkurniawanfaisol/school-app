@@ -5,7 +5,7 @@ import { AdminSidebarProvider, useAdminSidebar } from '@/components/admin/AdminS
 import { AdminHeader } from '@/components/layout/AdminHeader'
 import { AdminSidebar } from '@/components/layout/AdminSidebar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { isGuruAllowedPath } from '@/config/admin-nav'
+import { isAdminPmbAllowedPath, isGuruAllowedPath } from '@/config/admin-nav'
 import { useAuthMe } from '@/hooks/useAuth'
 import { isGuruRole } from '@/hooks/useUsers'
 import { clearAuthSession, getAuthToken, isAuthError, isNetworkError } from '@/lib/api'
@@ -71,6 +71,12 @@ function AdminLayoutShell({ user }: { user: User }) {
 
   if (user && isGuruRole(user.role) && !isGuruAllowedPath(pathname)) {
     return <Navigate to="/admin/profile" replace />
+  }
+  if (user.role === 'pendaftar') {
+    return <Navigate to="/pmb/daftar" replace />
+  }
+  if (user.role === 'admin_pmb' && !isAdminPmbAllowedPath(pathname)) {
+    return <Navigate to="/admin/pmb-registrations" replace />
   }
 
   return (

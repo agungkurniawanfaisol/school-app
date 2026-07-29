@@ -1,4 +1,4 @@
-import { BookOpen, GraduationCap, HandHeart, Heart, Sparkles, Target, Users } from 'lucide-react'
+import { Target } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { StaggerChildren, StaggerItem } from '@/components/motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -6,20 +6,27 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { RevealOnScroll } from '@/components/landing/RevealOnScroll'
 import { SectionHeader } from '@/components/landing/SectionHeader'
 import { useSchool } from '@/hooks/useSchool'
+import { useSchoolStatsList } from '@/hooks/useSchoolStats'
+import { useSchoolValuesList } from '@/hooks/useSchoolValues'
 import { getAboutImage } from '@/lib/brand'
+import { resolveValueIcon } from '@/lib/lucide-icon-map'
 import { cn } from '@/lib/utils'
+
+const VALUE_HOVER_COLORS = [
+  'hover:border-rose-300/50 dark:hover:border-rose-500/40',
+  'hover:border-amber-300/50 dark:hover:border-amber-500/40',
+  'hover:border-emerald-300/50 dark:hover:border-emerald-500/40',
+  'hover:border-primary/40',
+] as const
 
 export function AboutSection() {
   const { t } = useTranslation('landing')
   const { data: school, isLoading } = useSchool()
+  const { data: valuesResponse } = useSchoolValuesList({ per_page: 12 })
+  const { data: statsResponse } = useSchoolStatsList({ per_page: 12 })
 
-  const values = [
-    { icon: Heart, title: t('about.akhlak'), desc: t('about.akhlakDesc'), color: 'hover:border-rose-300/50 dark:hover:border-rose-500/40' },
-    { icon: Sparkles, title: t('about.ilmu'), desc: t('about.ilmuDesc'), color: 'hover:border-amber-300/50 dark:hover:border-amber-500/40' },
-    { icon: HandHeart, title: t('about.amal'), desc: t('about.amalDesc'), color: 'hover:border-emerald-300/50 dark:hover:border-emerald-500/40' },
-    { icon: Target, title: t('about.ukhuwah'), desc: t('about.ukhuwahDesc'), color: 'hover:border-primary/40' },
-  ]
-
+  const values = valuesResponse?.data ?? []
+  const stats = statsResponse?.data ?? []
   const aboutImageSrc = getAboutImage(school?.about_image)
 
   if (isLoading) {
@@ -61,19 +68,23 @@ export function AboutSection() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { icon: GraduationCap, value: '1998', label: t('about.statSince') },
-                  { icon: Users, value: '500+', label: t('about.statStudents') },
-                  { icon: BookOpen, value: 'TK–SMP', label: t('about.statLevels') },
-                ].map(({ icon: Icon, value, label }) => (
-                  <div key={label} className="flex flex-col items-center gap-1 rounded-xl border border-primary/10 bg-secondary/40 px-2 py-3 text-center">
-                    <Icon className="h-5 w-5 text-primary" />
-                    <span className="text-sm font-bold text-foreground">{value}</span>
-                    <span className="text-xs text-muted-foreground">{label}</span>
-                  </div>
-                ))}
-              </div>
+              {stats.length > 0 ? (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {stats.map((stat) => {
+                    const Icon = resolveValueIcon(stat.icon)
+                    return (
+                      <div
+                        key={stat.uuid}
+                        className="flex flex-col items-center gap-1 rounded-xl border border-primary/10 bg-secondary/40 px-2 py-3 text-center"
+                      >
+                        <Icon className="h-5 w-5 text-primary" />
+                        <span className="text-sm font-bold text-foreground">{stat.value}</span>
+                        <span className="text-xs text-muted-foreground">{stat.label}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : null}
             </div>
           </RevealOnScroll>
 
@@ -110,29 +121,35 @@ export function AboutSection() {
           </div>
         </div>
 
-        <RevealOnScroll direction="up" delay={150}>
-          <div className="mt-14">
-            <h3 className="mb-8 text-center text-xl font-bold text-primary">{t('about.values')}</h3>
-            <StaggerChildren className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {values.map(({ icon: Icon, title, desc, color }) => (
-                <StaggerItem key={title}>
-                  <div
-                    className={cn(
-                      'card-hover flex h-full flex-col items-center rounded-2xl border border-primary/10 bg-card p-5 text-center',
-                      color,
-                    )}
-                  >
-                    <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
-                      <Icon className="h-6 w-6" />
-                    </span>
-                    <p className="font-semibold text-foreground">{title}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{desc}</p>
-                  </div>
-                </StaggerItem>
-              ))}
-            </StaggerChildren>
-          </div>
-        </RevealOnScroll>
+        {values.length > 0 ? (
+          <RevealOnScroll direction="up" delay={150}>
+            <div className="mt-14">
+              <h3 className="mb-8 text-center text-xl font-bold text-primary">{t('about.values')}</h3>
+              <StaggerChildren className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                {values.map((item, index) => {
+                  const Icon = resolveValueIcon(item.icon)
+                  const color = VALUE_HOVER_COLORS[index % VALUE_HOVER_COLORS.length]
+                  return (
+                    <StaggerItem key={item.uuid}>
+                      <div
+                        className={cn(
+                          'card-hover flex h-full flex-col items-center rounded-2xl border border-primary/10 bg-card p-5 text-center',
+                          color,
+                        )}
+                      >
+                        <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+                          <Icon className="h-6 w-6" />
+                        </span>
+                        <p className="font-semibold text-foreground">{item.title}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{item.description}</p>
+                      </div>
+                    </StaggerItem>
+                  )
+                })}
+              </StaggerChildren>
+            </div>
+          </RevealOnScroll>
+        ) : null}
       </div>
     </section>
   )

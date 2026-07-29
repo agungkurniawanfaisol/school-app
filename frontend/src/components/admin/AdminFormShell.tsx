@@ -68,7 +68,7 @@ export function AdminFormShell({
         {actions}
       </div>
 
-      <div className="space-y-6">{children}</div>
+      <div className="space-y-6 pb-20 sm:pb-10">{children}</div>
 
       {(onSubmit || onCancel) && (
         <div className="admin-form-footer mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">

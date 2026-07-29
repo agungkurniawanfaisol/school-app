@@ -35,4 +35,19 @@ describe('teacherSchema', () => {
 
     expect(result.success).toBe(false)
   })
+
+  it('accepts pimpinan_yayasan type', () => {
+    const result = teacherSchema.safeParse({
+      school_id: 1,
+      name: 'H. Abdullah Syafii',
+      slug: 'h-abdullah-syafii',
+      type: 'pimpinan_yayasan',
+      title: 'Ketua Yayasan',
+    })
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.type).toBe('pimpinan_yayasan')
+    }
+  })
 })

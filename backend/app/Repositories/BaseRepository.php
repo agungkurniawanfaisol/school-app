@@ -50,6 +50,10 @@ abstract class BaseRepository implements RepositoryInterface
 
     protected function applyFilters(Builder $query, array $filters = []): Builder
     {
+        if (isset($filters['academic_year'])) {
+            $query->where('academic_year', $filters['academic_year']);
+        }
+
         if (isset($filters['school_id'])) {
             $query->where('school_id', $filters['school_id']);
         }
@@ -142,6 +146,8 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
+        $perPage = min(max($perPage, 1), 50);
+
         return $this->applyFilters($this->newQuery(), $filters)
             ->paginate($perPage)
             ->withQueryString();

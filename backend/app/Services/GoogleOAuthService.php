@@ -8,6 +8,10 @@ use Illuminate\Support\Str;
 
 class GoogleOAuthService
 {
+    public const INTENT_ADMIN = 'admin';
+
+    public const INTENT_PMB = 'pmb';
+
     public function isConfigured(): bool
     {
         return filled(config('services.google.client_id'))
@@ -15,14 +19,18 @@ class GoogleOAuthService
             && filled(config('services.google.redirect'));
     }
 
-    public function authorizationUrl(): ?string
+    public function authorizationUrl(string $intent = self::INTENT_ADMIN): ?string
     {
         if (! $this->isConfigured()) {
             return null;
         }
 
+        if (! in_array($intent, [self::INTENT_ADMIN, self::INTENT_PMB], true)) {
+            $intent = self::INTENT_ADMIN;
+        }
+
         $state = (string) Str::uuid();
-        Cache::put($this->stateCacheKey($state), true, now()->addMinutes(10));
+        Cache::put($this->stateCacheKey($state), ['intent' => $intent], now()->addMinutes(10));
 
         $query = http_build_query([
             'client_id' => config('services.google.client_id'),
@@ -37,13 +45,32 @@ class GoogleOAuthService
         return 'https://accounts.google.com/o/oauth2/v2/auth?'.$query;
     }
 
-    public function validateState(?string $state): bool
+    /**
+     * @return array{intent: string}|null
+     */
+    public function pullStatePayload(?string $state): ?array
     {
         if ($state === null || $state === '') {
-            return false;
+            return null;
         }
 
-        return Cache::pull($this->stateCacheKey($state)) === true;
+        $payload = Cache::pull($this->stateCacheKey($state));
+
+        if ($payload === true) {
+            return ['intent' => self::INTENT_ADMIN];
+        }
+
+        if (! is_array($payload) || ! isset($payload['intent']) || ! is_string($payload['intent'])) {
+            return null;
+        }
+
+        return ['intent' => $payload['intent']];
+    }
+
+    /** @deprecated use pullStatePayload */
+    public function validateState(?string $state): bool
+    {
+        return $this->pullStatePayload($state) !== null;
     }
 
     /**
@@ -84,7 +111,7 @@ class GoogleOAuthService
             return null;
         }
 
-    if ($userResponse->json('verified_email') !== true && $userResponse->json('verified_email') !== 'true') {
+        if ($userResponse->json('verified_email') !== true && $userResponse->json('verified_email') !== 'true') {
             return null;
         }
 

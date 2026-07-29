@@ -19,9 +19,9 @@ describe('main-nav', () => {
         expect.arrayContaining([
           expect.objectContaining({ href: '/pmb' }),
           expect.objectContaining({ href: '/pmb/daftar' }),
-          expect.objectContaining({ href: '/pmb/status' }),
         ]),
       )
+      expect(pmbEntry.children.some((c) => c.href === '/pmb/status')).toBe(false)
     }
   })
 

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { useSchool } from '@/hooks/useSchool'
+import { getAuthToken } from '@/lib/api'
 
 const SCROLL_TOP_THRESHOLD = 400
 
@@ -29,6 +30,7 @@ export function FloatingActions() {
   const [showScrollTop, setShowScrollTop] = useState(false)
 
   const isAdmin = location.pathname.startsWith('/admin')
+  const isLoggedIn = Boolean(getAuthToken())
   const waUrl = school?.whatsapp
     ? `https://wa.me/${school.whatsapp.replace(/\D/g, '')}`
     : null
@@ -42,7 +44,7 @@ export function FloatingActions() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  if (isAdmin) {
+  if (isAdmin || isLoggedIn) {
     return null
   }
 

@@ -56,7 +56,7 @@ class AllowedFrontendUrl
         $port = parse_url($url, PHP_URL_PORT);
         $hostPort = $port !== null ? "{$host}:{$port}" : $host;
 
-        $allowed = collect(explode(',', (string) env('SANCTUM_STATEFUL_DOMAINS', '')))
+        $allowed = collect(explode(',', (string) (getenv('SANCTUM_STATEFUL_DOMAINS') ?: env('SANCTUM_STATEFUL_DOMAINS', ''))))
             ->map(static fn (string $domain): string => trim($domain))
             ->filter();
 

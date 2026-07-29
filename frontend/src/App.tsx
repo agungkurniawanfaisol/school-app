@@ -22,7 +22,10 @@ import { CurriculumPublicDetailPage } from '@/pages/curriculums/CurriculumPublic
 import { FeaturedProgramsCatalogPage } from '@/pages/curriculums/FeaturedProgramsCatalogPage'
 import { PmbInfoPage } from '@/pages/pmb/PmbInfoPage'
 import { PmbRegisterPage } from '@/pages/pmb/PmbRegisterPage'
-import { PmbStatusPage } from '@/pages/pmb/PmbStatusPage'
+import { PmbTestimonialPage } from '@/pages/pmb/PmbTestimonialPage'
+import { PmbOAuthCallbackPage } from '@/pages/pmb/PmbOAuthCallbackPage'
+import { PmbPortalDetailPage } from '@/pages/pmb/PmbPortalDetailPage'
+import { PmbPortalLayout } from '@/pages/pmb/PmbPortalLayout'
 import { CourseCatalogPage } from '@/pages/lms/CourseCatalogPage'
 import { CourseDetailPage } from '@/pages/lms/CourseDetailPage'
 import { GalleryCatalogPage } from '@/pages/gallery/GalleryCatalogPage'
@@ -84,6 +87,18 @@ const HeroSliderFormPage = lazy(() =>
 const TestimonialsListPage = lazy(() =>
   import('@/pages/admin/TestimonialsListPage').then((m) => ({ default: m.TestimonialsListPage })),
 )
+const SchoolValuesListPage = lazy(() =>
+  import('@/pages/admin/SchoolValuesListPage').then((m) => ({ default: m.SchoolValuesListPage })),
+)
+const SchoolValueFormPage = lazy(() =>
+  import('@/pages/admin/SchoolValueFormPage').then((m) => ({ default: m.SchoolValueFormPage })),
+)
+const SchoolStatsListPage = lazy(() =>
+  import('@/pages/admin/SchoolStatsListPage').then((m) => ({ default: m.SchoolStatsListPage })),
+)
+const SchoolStatFormPage = lazy(() =>
+  import('@/pages/admin/SchoolStatFormPage').then((m) => ({ default: m.SchoolStatFormPage })),
+)
 const TestimonialFormPage = lazy(() =>
   import('@/pages/admin/TestimonialFormPage').then((m) => ({ default: m.TestimonialFormPage })),
 )
@@ -95,11 +110,23 @@ const CourseModulesPage = lazy(() =>
 const CourseEnrollmentsListPage = lazy(() =>
   import('@/pages/admin/CourseEnrollmentsListPage').then((m) => ({ default: m.CourseEnrollmentsListPage })),
 )
+const AcademicYearsListPage = lazy(() =>
+  import('@/pages/admin/AcademicYearsListPage').then((m) => ({ default: m.AcademicYearsListPage })),
+)
+const AcademicYearFormPage = lazy(() =>
+  import('@/pages/admin/AcademicYearFormPage').then((m) => ({ default: m.AcademicYearFormPage })),
+)
 const PmbRegistrationsListPage = lazy(() =>
   import('@/pages/admin/PmbRegistrationsListPage').then((m) => ({ default: m.PmbRegistrationsListPage })),
 )
 const PmbRegistrationDetailPage = lazy(() =>
   import('@/pages/admin/PmbRegistrationDetailPage').then((m) => ({ default: m.PmbRegistrationDetailPage })),
+)
+const PmbFeesListPage = lazy(() =>
+  import('@/pages/admin/PmbFeesListPage').then((m) => ({ default: m.PmbFeesListPage })),
+)
+const PmbFeeFormPage = lazy(() =>
+  import('@/pages/admin/PmbFeeFormPage').then((m) => ({ default: m.PmbFeeFormPage })),
 )
 const SchoolsListPage = lazy(() => import('@/pages/admin/SchoolsListPage').then((m) => ({ default: m.SchoolsListPage })))
 const SchoolFormPage = lazy(() => import('@/pages/admin/SchoolFormPage').then((m) => ({ default: m.SchoolFormPage })))
@@ -207,9 +234,12 @@ export default function App() {
           <Route path="/kursus" element={<CourseCatalogPage />} />
           <Route path="/kursus/:slug" element={<CourseDetailPage />} />
           <Route path="/pmb" element={<PmbInfoPage />} />
-          <Route path="/pmb/daftar" element={<PmbRegisterPage />} />
-          <Route path="/pmb/status" element={<PmbStatusPage />} />
-          <Route path="/pmb/status/:token" element={<PmbStatusPage />} />
+          <Route element={<PmbPortalLayout />}>
+            <Route path="/pmb/daftar" element={<PmbRegisterPage />} />
+            <Route path="/pmb/portal/testimoni" element={<PmbTestimonialPage />} />
+            <Route path="/pmb/portal/pendaftaran/:uuid" element={<PmbPortalDetailPage />} />
+          </Route>
+          <Route path="/pmb/daftar/oauth" element={<PmbOAuthCallbackPage />} />
           <Route path="/berita" element={<NewsCatalogPage />} />
           <Route path="/berita/detail/:uuid" element={<NewsDetailPage />} />
           <Route path="/kegiatan" element={<ActivitiesCatalogPage />} />
@@ -318,6 +348,12 @@ export default function App() {
             <Route path="testimonials" element={<LazyAdmin><TestimonialsListPage /></LazyAdmin>} />
             <Route path="testimonials/create" element={<LazyAdmin><TestimonialFormPage /></LazyAdmin>} />
             <Route path="testimonials/:id/edit" element={<LazyAdmin><TestimonialFormPage /></LazyAdmin>} />
+            <Route path="nilai-kami" element={<LazyAdmin><SchoolValuesListPage /></LazyAdmin>} />
+            <Route path="nilai-kami/create" element={<LazyAdmin><SchoolValueFormPage /></LazyAdmin>} />
+            <Route path="nilai-kami/:uuid/edit" element={<LazyAdmin><SchoolValueFormPage /></LazyAdmin>} />
+            <Route path="statistik-sekolah" element={<LazyAdmin><SchoolStatsListPage /></LazyAdmin>} />
+            <Route path="statistik-sekolah/create" element={<LazyAdmin><SchoolStatFormPage /></LazyAdmin>} />
+            <Route path="statistik-sekolah/:uuid/edit" element={<LazyAdmin><SchoolStatFormPage /></LazyAdmin>} />
             <Route path="facilities" element={<LazyAdmin><AdminFacilitiesListPage /></LazyAdmin>} />
             <Route path="facilities/create" element={<LazyAdmin><FacilityFormPage /></LazyAdmin>} />
             <Route path="facilities/:uuid/edit" element={<LazyAdmin><FacilityFormPage /></LazyAdmin>} />
@@ -351,7 +387,12 @@ export default function App() {
             <Route path="contact-messages" element={<LazyAdmin><ContactMessagesListPage /></LazyAdmin>} />
             <Route path="contact-messages/:id" element={<LazyAdmin><ContactMessageDetailPage /></LazyAdmin>} />
             <Route path="pmb-registrations" element={<LazyAdmin><PmbRegistrationsListPage /></LazyAdmin>} />
-            <Route path="pmb-registrations/:id" element={<LazyAdmin><PmbRegistrationDetailPage /></LazyAdmin>} />
+            <Route path="pmb-registrations/:uuid" element={<LazyAdmin><PmbRegistrationDetailPage /></LazyAdmin>} />
+            <Route path="pmb-fees" element={<LazyAdmin><PmbFeesListPage /></LazyAdmin>} />
+            <Route path="pmb-fees/create" element={<LazyAdmin><PmbFeeFormPage /></LazyAdmin>} />
+            <Route path="academic-years" element={<LazyAdmin><AcademicYearsListPage /></LazyAdmin>} />
+            <Route path="academic-years/create" element={<LazyAdmin><AcademicYearFormPage /></LazyAdmin>} />
+            <Route path="academic-years/:id/edit" element={<LazyAdmin><AcademicYearFormPage /></LazyAdmin>} />
             <Route path="schools" element={<LazyAdmin><SchoolsListPage /></LazyAdmin>} />
             <Route path="schools/create" element={<LazyAdmin><SchoolFormPage /></LazyAdmin>} />
             <Route path="schools/:id/edit" element={<LazyAdmin><SchoolFormPage /></LazyAdmin>} />

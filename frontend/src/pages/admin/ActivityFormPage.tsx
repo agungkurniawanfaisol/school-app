@@ -68,6 +68,7 @@ export function ActivityFormPage() {
     activity_date: activityDate || null,
     content: contentHtml || null,
     content_json: contentJson,
+    // Keep published status from server cache — never silently revert after Publish.
     status: (existing?.status as ActivityFormValues['status'] | undefined) ?? 'draft',
     is_active: true,
     is_featured: isFeatured,
@@ -75,6 +76,10 @@ export function ActivityFormPage() {
     published_at: existing?.published_at ?? null,
   })
 
+  const handlePublish = () => {
+    if (!uuid) return
+    publishActivity.mutate(uuid)
+  }
   const handleSave = async (andPreview = false) => {
     const payload = buildPayload()
     if (!payload.school_id) return
@@ -146,10 +151,15 @@ export function ActivityFormPage() {
           variant="secondary"
           className="w-full"
           disabled={publishActivity.isPending}
-          onClick={() => uuid && publishActivity.mutate(uuid)}
+          onClick={handlePublish}
         >
-          {t('common.publish')}
+          {publishActivity.isPending ? 'Mempublikasikan…' : t('common.publish')}
         </Button>
+      )}
+      {isEdit && existing?.status === 'published' && (
+        <p className="rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary">
+          {t('status.published')}
+        </p>
       )}
     </div>
   )

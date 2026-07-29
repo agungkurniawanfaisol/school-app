@@ -7,6 +7,14 @@ import { useAdminUsersList, useDeleteUser } from '@/hooks/useUsers'
 import { toast } from 'sonner'
 import { getApiErrorMessage } from '@/lib/api'
 import { useTranslation } from 'react-i18next'
+import type { UserRole } from '@/types'
+
+const ROLE_LABEL_KEYS: Record<UserRole, string> = {
+  admin: 'pages.users.roleAdmin',
+  guru: 'pages.users.roleGuru',
+  admin_pmb: 'pages.users.roleAdminPmb',
+  pendaftar: 'pages.users.rolePendaftar',
+}
 
 export function UsersListPage() {
   const { t } = useTranslation('admin')
@@ -22,6 +30,11 @@ export function UsersListPage() {
       onSuccess: () => toast.success(t('toast.userDeleted')),
       onError: (error) => toast.error(getApiErrorMessage(error, t('toast.userDeleteFailed'))),
     })
+  }
+
+  const roleLabel = (role: string) => {
+    const key = ROLE_LABEL_KEYS[role as UserRole]
+    return key ? t(key) : role
   }
 
   return (
@@ -57,8 +70,8 @@ export function UsersListPage() {
           key: 'role',
           header: t('table.role'),
           cell: (item) => (
-            <Badge variant={item.role === 'admin' ? 'default' : 'secondary'} className="capitalize">
-              {item.role}
+            <Badge variant={item.role === 'admin' ? 'default' : 'secondary'}>
+              {roleLabel(item.role)}
             </Badge>
           ),
         },

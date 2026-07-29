@@ -102,6 +102,17 @@ class TeacherApiTest extends TestCase
             ->assertJsonCount(3, 'data');
     }
 
+    public function test_list_filters_by_type_pimpinan_yayasan(): void
+    {
+        Teacher::factory()->count(2)->create(['type' => 'guru']);
+        Teacher::factory()->pimpinanYayasan()->count(2)->create();
+
+        $this->getJson('/api/v1/teachers?type=pimpinan_yayasan')
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.type', 'pimpinan_yayasan');
+    }
+
     public function test_show_includes_type_field(): void
     {
         $teacher = Teacher::factory()->kepalaSekolah()->create();

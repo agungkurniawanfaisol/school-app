@@ -20,7 +20,7 @@ trait HandlesCrud
     {
         $items = $this->repository()->paginate(
             $request->all(),
-            (int) $request->get('per_page', 15),
+            min(max((int) $request->get('per_page', 15), 1), 50),
         );
 
         return $this->resourceClass()::collection($items)->response();

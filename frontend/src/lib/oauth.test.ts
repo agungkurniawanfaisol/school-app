@@ -15,12 +15,23 @@ describe('oauth helpers', () => {
     expect(getGoogleOAuthStartUrl()).toContain('/api/admin/auth/google/redirect')
   })
 
+  it('includes PMB intent in OAuth URLs', async () => {
+    expect(getGoogleOAuthStartUrl('pmb')).toContain('intent=pmb')
+  })
+
   it('maps known oauth error codes to Indonesian messages', () => {
     expect(getOAuthErrorMessage('not_registered')).toBe(
       'Akun Google Anda belum terdaftar. Hubungi administrator.',
     )
     expect(getOAuthErrorMessage('access_denied')).toBe('Akses ditolak.')
     expect(getOAuthErrorMessage(null)).toBeNull()
+  })
+
+  it('resolves PMB authorization URL with its intent', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ url: 'https://accounts.google.com/o/oauth2/v2/auth?state=abc' }) }))
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { serviceWorker: undefined } })
+    await resolveGoogleOAuthUrl('pmb')
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('intent=pmb&format=json'), expect.anything())
   })
 
   it('resolves Google authorization URL via JSON fetch (avoids SW navigation)', async () => {
@@ -41,7 +52,7 @@ describe('oauth helpers', () => {
 
     await expect(resolveGoogleOAuthUrl()).resolves.toBe(googleUrl)
     expect(fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/admin/auth/google/redirect?format=json'),
+      expect.stringContaining('/api/admin/auth/google/redirect?intent=admin&format=json'),
       expect.objectContaining({
         headers: expect.objectContaining({ Accept: 'application/json' }),
       }),

@@ -3,6 +3,7 @@ import { AlertTriangle, ExternalLink, Info, Megaphone, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { useAnnouncementsList } from '@/hooks/useAnnouncements'
+import { resolveSafeHref } from '@/lib/safe-url'
 import type { Announcement } from '@/types'
 
 const DISMISSED_KEY = 'nh-dismissed-banners'
@@ -60,6 +61,7 @@ export function AnnouncementBanner() {
 
   const config = priorityConfig[active.priority]
   const Icon = config.icon
+  const ctaHref = resolveSafeHref(active.cta_url)
 
   function handleDismiss() {
     dismiss(active!.uuid)
@@ -71,11 +73,11 @@ export function AnnouncementBanner() {
       <div className="container-page flex items-center gap-3 px-4 py-2.5">
         <Icon className="h-4 w-4 shrink-0" aria-hidden />
         <p className="flex-1 text-sm font-medium">{active.title}</p>
-        {active.cta_text && active.cta_url && (
+        {active.cta_text && ctaHref && (
           <a
-            href={active.cta_url}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={ctaHref}
+            target={ctaHref.startsWith('/') ? undefined : '_blank'}
+            rel={ctaHref.startsWith('/') ? undefined : 'noopener noreferrer'}
             className={`hidden items-center gap-1 rounded-md border px-3 py-1 text-xs font-medium transition-colors sm:inline-flex ${config.btnClass}`}
           >
             {active.cta_text}

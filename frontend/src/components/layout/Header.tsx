@@ -1,8 +1,9 @@
-import { LayoutDashboard, LogIn, Menu, MessageCircle, Phone } from 'lucide-react'
+import { LogIn, Menu, MessageCircle, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { SchoolLogo } from '@/components/brand/SchoolLogo'
+import { UserAvatar } from '@/components/common/UserAvatar'
 import { LanguageSwitcher } from '@/components/i18n'
 import { MainNav } from '@/components/layout/MainNav'
 import { MobileNavTree } from '@/components/layout/MobileNavTree'
@@ -10,7 +11,8 @@ import { ThemeToggle } from '@/components/theme'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { useIsAuthenticated } from '@/hooks/useAuth'
+import { useAuthUser, useIsAuthenticated } from '@/hooks/useAuth'
+import { getAuthHomePathForUser } from '@/lib/auth-redirect'
 import { useSchool } from '@/hooks/useSchool'
 import { cn } from '@/lib/utils'
 
@@ -24,6 +26,10 @@ export function Header() {
   const location = useLocation()
   const { data: school } = useSchool()
   const isLoggedIn = useIsAuthenticated()
+  const authUser = useAuthUser()
+  const authHomePath = getAuthHomePathForUser(authUser)
+  const authButtonLabel =
+    authUser?.role === 'pendaftar' ? t('header.enter') : t('header.dashboard')
 
   const isHome = location.pathname === '/'
   const isHeroOverlay = isHome && !scrolled
@@ -99,26 +105,32 @@ export function Header() {
                   : 'border-primary/25 text-primary',
               )}
             >
-              <Link to="/admin">
-                <LayoutDashboard className="h-4 w-4" />
-                {t('header.dashboard')}
+              <Link to={authHomePath} className="flex items-center gap-2">
+                {authUser?.role === 'pendaftar' ? (
+                  <UserAvatar
+                    name={authUser.name}
+                    photoUrl={authUser.avatar_url}
+                    size="xs"
+                    className={cn(isHeroOverlay && 'ring-1 ring-white/30')}
+                  />
+                ) : null}
+                {authButtonLabel}
               </Link>
             </Button>
           ) : (
             <Button
               asChild
               variant="outline"
-              size="sm"
+              size="icon"
               className={cn(
-                'hidden sm:inline-flex',
+                'hidden h-11 w-11 sm:inline-flex',
                 isHeroOverlay
                   ? 'border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white'
                   : 'border-primary/25 text-primary',
               )}
             >
-              <Link to="/admin/login">
+              <Link to="/admin/login" aria-label={t('header.login')}>
                 <LogIn className="h-4 w-4" />
-                {t('header.login')}
               </Link>
             </Button>
           )}
@@ -213,9 +225,11 @@ export function Header() {
                     )}
                   >
                     {isLoggedIn ? (
-                      <Link to="/admin" onClick={() => setOpen(false)}>
-                        <LayoutDashboard className="h-4 w-4" />
-                        {t('header.dashboard')}
+                      <Link to={authHomePath} onClick={() => setOpen(false)} className="flex items-center gap-2">
+                        {authUser?.role === 'pendaftar' ? (
+                          <UserAvatar name={authUser.name} photoUrl={authUser.avatar_url} size="xs" />
+                        ) : null}
+                        {authButtonLabel}
                       </Link>
                     ) : (
                       <Link to="/admin/login" onClick={() => setOpen(false)}>

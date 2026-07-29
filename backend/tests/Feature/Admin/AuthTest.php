@@ -53,6 +53,20 @@ class AuthTest extends TestCase
             ->assertJsonValidationErrors(['email']);
     }
 
+    public function test_pendaftar_can_login_via_unified_endpoint(): void
+    {
+        $pendaftar = User::factory()->pendaftar()->create([
+            'password' => Hash::make('password123'),
+        ]);
+
+        $this->postJson('/api/admin/login', [
+            'email' => $pendaftar->email,
+            'password' => 'password123',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.user.role', 'pendaftar');
+    }
+
     public function test_non_panel_user_gets_403_on_login(): void
     {
         $user = User::factory()->create([

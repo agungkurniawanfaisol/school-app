@@ -62,6 +62,9 @@ export function RichPageEditor({
   uploadImageRef.current = handleImageUpload
 
   const editor = useEditor({
+    // TipTap + React 19: avoid creating the editor during the first render pass
+    // (Strict Mode / Suspense remounts otherwise call commands on a destroyed instance).
+    immediatelyRender: false,
     extensions: createEditorExtensions(),
     content: (value ? parseEditorDocument(value) : EMPTY_EDITOR_DOC) as JSONContent,
     editorProps: {
@@ -87,7 +90,7 @@ export function RichPageEditor({
         const coords = view.posAtCoords({ left: event.clientX, top: event.clientY })
         const pos = coords?.pos ?? view.state.selection.from
         const activeEditor = editorRef.current
-        if (!activeEditor) return false
+        if (!activeEditor || activeEditor.isDestroyed) return false
 
         void insertImagesAtPosition(activeEditor, uploadImageRef.current, pos, imageFiles).catch(
           (error) => {
@@ -109,7 +112,7 @@ export function RichPageEditor({
 
         event.preventDefault()
         const activeEditor = editorRef.current
-        if (!activeEditor) return false
+        if (!activeEditor || activeEditor.isDestroyed) return false
 
         const pos = activeEditor.state.selection.from
         void insertImagesAtPosition(activeEditor, uploadImageRef.current, pos, imageFiles).catch(
@@ -122,6 +125,7 @@ export function RichPageEditor({
       },
     },
     onUpdate: ({ editor: ed }) => {
+      if (ed.isDestroyed) return
       onChangeRef.current?.(ed.getJSON() as EditorDocument, ed.getHTML())
     },
   })
@@ -131,7 +135,7 @@ export function RichPageEditor({
   }, [editor])
 
   useEffect(() => {
-    if (!editor || value === undefined) return
+    if (!editor || editor.isDestroyed || value === undefined) return
     const current = JSON.stringify(editor.getJSON())
     const next = JSON.stringify(parseEditorDocument(value))
     if (current !== next) {
@@ -140,7 +144,7 @@ export function RichPageEditor({
   }, [editor, value])
 
   const insertImage = async (file: File) => {
-    if (!editor) return
+    if (!editor || editor.isDestroyed) return
     try {
       const url = await handleImageUpload(file)
       editor.chain().focus().setImage({ src: url }).run()
@@ -150,7 +154,7 @@ export function RichPageEditor({
   }
 
   const insertVideo = async (file: File) => {
-    if (!editor) return
+    if (!editor || editor.isDestroyed) return
     try {
       const media = await upload.mutateAsync(file)
       editor.chain().focus().insertContent({ type: 'videoBlock', attrs: { src: media.url } }).run()
@@ -160,12 +164,14 @@ export function RichPageEditor({
   }
 
   const insertYoutube = (url: string) => {
-    editor?.chain().focus().setYoutubeVideo({ src: url }).run()
+    if (!editor || editor.isDestroyed) return
+    editor.chain().focus().setYoutubeVideo({ src: url }).run()
   }
 
   const insertColumns = () => {
+    if (!editor || editor.isDestroyed) return
     editor
-      ?.chain()
+      .chain()
       .focus()
       .insertContent({
         type: 'columns',
@@ -177,7 +183,7 @@ export function RichPageEditor({
       .run()
   }
 
-  if (!editor) {
+  if (!editor || editor.isDestroyed) {
     return <div className="min-h-[320px] animate-pulse rounded-lg border bg-muted/30" />
   }
 

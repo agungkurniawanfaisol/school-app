@@ -39,10 +39,6 @@ export function UserFormPage() {
   const createUser = useCreateUser()
   const updateUser = useUpdateUser(userId)
 
-  if (authUser && !isAdminRole(authUser.role)) {
-    return <Navigate to="/admin/profile" replace />
-  }
-
   const userSchema = useMemo(
     () => (isEdit ? createUserFormSchema(t) : createCreateUserSchema(t)),
     [t, isEdit],
@@ -77,7 +73,17 @@ export function UserFormPage() {
     }
   }, [userDetail, isEdit, form])
 
+  useEffect(() => {
+    if (role !== 'guru') {
+      form.setValue('teacher_id', null)
+    }
+  }, [role, form])
+
   const onSubmit = (values: UserFormValues) => {
+    const payload = {
+      ...values,
+      teacher_id: values.role === 'guru' ? values.teacher_id : null,
+    }
     const handlers = {
       onSuccess: () => {
         toast.success(isEdit ? t('toast.userUpdated') : t('toast.userCreated'))
@@ -89,11 +95,15 @@ export function UserFormPage() {
     }
 
     if (isEdit) {
-      updateUser.mutate(values, handlers)
+      updateUser.mutate(payload, handlers)
       return
     }
 
-    createUser.mutate(values as CreateUserFormValues, handlers)
+    createUser.mutate(payload as CreateUserFormValues, handlers)
+  }
+
+  if (authUser && !isAdminRole(authUser.role)) {
+    return <Navigate to="/admin/profile" replace />
   }
 
   if (isEdit && isLoading) {
@@ -189,6 +199,8 @@ export function UserFormPage() {
                       <SelectContent>
                         <SelectItem value="admin">{t('pages.users.roleAdmin')}</SelectItem>
                         <SelectItem value="guru">{t('pages.users.roleGuru')}</SelectItem>
+                        <SelectItem value="admin_pmb">{t('pages.users.roleAdminPmb')}</SelectItem>
+                        <SelectItem value="pendaftar">{t('pages.users.rolePendaftar')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

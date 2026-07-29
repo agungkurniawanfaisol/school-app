@@ -52,7 +52,7 @@ class GoogleAuthTest extends TestCase
         ]);
 
         $state = (string) Str::uuid();
-        Cache::put('google_oauth_state:'.$state, true, now()->addMinutes(10));
+        Cache::put('google_oauth_state:'.$state, ['intent' => 'admin'], now()->addMinutes(10));
 
         Http::fake([
             'oauth2.googleapis.com/token' => Http::response([
@@ -76,13 +76,16 @@ class GoogleAuthTest extends TestCase
 
         preg_match('/[?&]ticket=([a-f0-9\-]+)/', $location, $matches);
         $this->assertNotEmpty($matches[1]);
-        $this->assertSame($admin->id, Cache::get('oauth_ticket:'.$matches[1]));
+        $this->assertSame([
+            'user_id' => $admin->id,
+            'intent' => 'admin',
+        ], Cache::get('oauth_ticket:'.$matches[1]));
     }
 
-    public function test_callback_redirects_when_email_not_registered(): void
+    public function test_callback_creates_pendaftar_for_unknown_email(): void
     {
         $state = (string) Str::uuid();
-        Cache::put('google_oauth_state:'.$state, true, now()->addMinutes(10));
+        Cache::put('google_oauth_state:'.$state, ['intent' => 'admin'], now()->addMinutes(10));
 
         Http::fake([
             'oauth2.googleapis.com/token' => Http::response(['access_token' => 'fake-access-token']),
@@ -93,11 +96,18 @@ class GoogleAuthTest extends TestCase
             ]),
         ]);
 
-        $this->get('/api/admin/auth/google/callback?'.http_build_query([
+        $response = $this->get('/api/admin/auth/google/callback?'.http_build_query([
             'code' => 'valid-auth-code',
             'state' => $state,
-        ]))
-            ->assertRedirect('http://localhost:5173/admin/login?error=not_registered');
+        ]));
+
+        $response->assertRedirect();
+        $location = (string) $response->headers->get('Location');
+        $this->assertStringStartsWith('http://localhost:5173/admin/login/oauth?ticket=', $location);
+        $this->assertDatabaseHas('users', [
+            'email' => 'unknown@gmail.com',
+            'role' => User::ROLE_PENDAFTAR,
+        ]);
     }
 
     public function test_callback_redirects_when_user_inactive(): void
@@ -107,7 +117,7 @@ class GoogleAuthTest extends TestCase
         ]);
 
         $state = (string) Str::uuid();
-        Cache::put('google_oauth_state:'.$state, true, now()->addMinutes(10));
+        Cache::put('google_oauth_state:'.$state, ['intent' => 'admin'], now()->addMinutes(10));
 
         Http::fake([
             'oauth2.googleapis.com/token' => Http::response(['access_token' => 'fake-access-token']),
@@ -121,7 +131,7 @@ class GoogleAuthTest extends TestCase
             'code' => 'valid-auth-code',
             'state' => $state,
         ]))
-            ->assertRedirect('http://localhost:5173/admin/login?error=not_registered');
+            ->assertRedirect('http://localhost:5173/admin/login?error=access_denied');
     }
 
     public function test_callback_redirects_when_user_not_panel_role(): void
@@ -133,7 +143,7 @@ class GoogleAuthTest extends TestCase
         ]);
 
         $state = (string) Str::uuid();
-        Cache::put('google_oauth_state:'.$state, true, now()->addMinutes(10));
+        Cache::put('google_oauth_state:'.$state, ['intent' => 'admin'], now()->addMinutes(10));
 
         Http::fake([
             'oauth2.googleapis.com/token' => Http::response(['access_token' => 'fake-access-token']),
@@ -166,7 +176,7 @@ class GoogleAuthTest extends TestCase
         User::factory()->admin()->create(['email' => 'unverified@gmail.com']);
 
         $state = (string) Str::uuid();
-        Cache::put('google_oauth_state:'.$state, true, now()->addMinutes(10));
+        Cache::put('google_oauth_state:'.$state, ['intent' => 'admin'], now()->addMinutes(10));
 
         Http::fake([
             'oauth2.googleapis.com/token' => Http::response(['access_token' => 'fake-access-token']),
@@ -190,7 +200,7 @@ class GoogleAuthTest extends TestCase
         ]);
 
         $state = (string) Str::uuid();
-        Cache::put('google_oauth_state:'.$state, true, now()->addMinutes(10));
+        Cache::put('google_oauth_state:'.$state, ['intent' => 'admin'], now()->addMinutes(10));
 
         Http::fake([
             'oauth2.googleapis.com/token' => Http::response([
@@ -224,7 +234,10 @@ class GoogleAuthTest extends TestCase
     {
         $admin = User::factory()->admin()->create();
         $ticket = (string) Str::uuid();
-        Cache::put('oauth_ticket:'.$ticket, $admin->id, now()->addSeconds(120));
+        Cache::put('oauth_ticket:'.$ticket, [
+            'user_id' => $admin->id,
+            'intent' => 'admin',
+        ], now()->addSeconds(120));
 
         $this->postJson('/api/admin/auth/google/exchange', ['ticket' => $ticket])
             ->assertOk()
@@ -247,12 +260,65 @@ class GoogleAuthTest extends TestCase
     {
         $admin = User::factory()->admin()->create();
         $ticket = (string) Str::uuid();
-        Cache::put('oauth_ticket:'.$ticket, $admin->id, now()->addSeconds(120));
+        Cache::put('oauth_ticket:'.$ticket, [
+            'user_id' => $admin->id,
+            'intent' => 'admin',
+        ], now()->addSeconds(120));
 
         $this->postJson('/api/admin/auth/google/exchange', ['ticket' => $ticket])->assertOk();
 
         $this->postJson('/api/admin/auth/google/exchange', ['ticket' => $ticket])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['ticket']);
+    }
+
+    public function test_pmb_callback_auto_creates_pendaftar(): void
+    {
+        $state = (string) Str::uuid();
+        Cache::put('google_oauth_state:'.$state, ['intent' => 'pmb'], now()->addMinutes(10));
+
+        Http::fake([
+            'oauth2.googleapis.com/token' => Http::response(['access_token' => 'fake-access-token']),
+            'www.googleapis.com/oauth2/v2/userinfo' => Http::response([
+                'email' => 'baru@gmail.com',
+                'name' => 'Pendaftar Baru',
+                'verified_email' => true,
+            ]),
+        ]);
+
+        $response = $this->get('/api/admin/auth/google/callback?'.http_build_query([
+            'code' => 'valid-auth-code',
+            'state' => $state,
+        ]));
+
+        $response->assertRedirect();
+        $location = (string) $response->headers->get('Location');
+        $this->assertStringStartsWith('http://localhost:5173/admin/login/oauth?ticket=', $location);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'baru@gmail.com',
+            'role' => User::ROLE_PENDAFTAR,
+        ]);
+    }
+
+    public function test_pmb_callback_rejects_panel_user(): void
+    {
+        User::factory()->admin()->create(['email' => 'admin-pmb-block@gmail.com']);
+
+        $state = (string) Str::uuid();
+        Cache::put('google_oauth_state:'.$state, ['intent' => 'pmb'], now()->addMinutes(10));
+
+        Http::fake([
+            'oauth2.googleapis.com/token' => Http::response(['access_token' => 'fake-access-token']),
+            'www.googleapis.com/oauth2/v2/userinfo' => Http::response([
+                'email' => 'admin-pmb-block@gmail.com',
+                'verified_email' => true,
+            ]),
+        ]);
+
+        $this->get('/api/admin/auth/google/callback?'.http_build_query([
+            'code' => 'valid-auth-code',
+            'state' => $state,
+        ]))->assertRedirect('http://localhost:5173/admin/login?error=access_denied');
     }
 }

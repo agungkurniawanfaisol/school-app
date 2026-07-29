@@ -1,6 +1,32 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, beforeEach } from 'vitest'
 import axios from 'axios'
-import { api, isNetworkError } from '@/lib/api'
+import { api, isNetworkError, setAuthSession } from '@/lib/api'
+
+describe('api response interceptor', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('clears auth session on portal 401', async () => {
+    setAuthSession('stale-token', {
+      id: 1,
+      name: 'Wali',
+      email: 'wali@test.id',
+      role: 'pendaftar',
+    })
+
+    const responseInterceptor = api.interceptors.response.handlers.find((h) => h?.rejected)?.rejected
+    expect(responseInterceptor).toBeDefined()
+
+    const error = new axios.AxiosError('Unauthorized')
+    error.config = { url: '/v1/pmb/portal/me' } as never
+    error.response = { status: 401, data: {}, statusText: 'Unauthorized', headers: {}, config: {} as never }
+
+    await expect(responseInterceptor!(error)).rejects.toBe(error)
+    expect(localStorage.getItem('nh_admin_token')).toBeNull()
+    expect(localStorage.getItem('nh_admin_user')).toBeNull()
+  })
+})
 
 describe('api request interceptor', () => {
   it('removes Content-Type for FormData so multipart boundary is set automatically', async () => {

@@ -71,6 +71,10 @@ vi.mock('@/components/landing/PrincipalSection', () => ({
   PrincipalSection: () => <section data-testid="principal">Principal</section>,
 }))
 
+vi.mock('@/components/landing/FoundationBoardSection', () => ({
+  FoundationBoardSection: () => <section data-testid="foundation-board">Foundation Board</section>,
+}))
+
 vi.mock('@/components/landing/StaffSection', () => ({
   StaffSection: () => <section data-testid="staff">Staff</section>,
 }))
@@ -125,6 +129,7 @@ describe('HomePage', () => {
     expect(screen.getByTestId('agenda')).toBeInTheDocument()
     expect(screen.getByTestId('news')).toBeInTheDocument()
     expect(screen.getByTestId('documents')).toBeInTheDocument()
+    expect(screen.getByTestId('foundation-board')).toBeInTheDocument()
     expect(screen.getByTestId('teachers')).toBeInTheDocument()
     expect(screen.getByTestId('testimonials')).toBeInTheDocument()
     expect(screen.getByTestId('pmb-cta')).toBeInTheDocument()
@@ -148,6 +153,7 @@ describe('HomePage', () => {
       'agenda',
       'news',
       'documents',
+      'foundation-board',
       'principal',
       'teachers',
       'staff',

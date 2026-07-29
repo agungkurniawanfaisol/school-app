@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { FadeInView } from '@/components/motion/FadeInView'
 import { SectionHeader } from '@/components/landing/SectionHeader'
 import { useDocumentsList } from '@/hooks/useDocuments'
+import { resolveSafeHref } from '@/lib/safe-url'
 import type { Document } from '@/types'
 
 function formatFileSize(bytes: number | null): string {
@@ -30,6 +31,7 @@ function getFileIcon(fileType: string | null) {
 function DocumentCard({ document }: { document: Document }) {
   const { t } = useTranslation('landing')
   const Icon = getFileIcon(document.file_type)
+  const fileHref = resolveSafeHref(document.file_url)
 
   return (
     <Card className="h-full border-primary/10 transition-shadow hover:shadow-md">
@@ -57,17 +59,19 @@ function DocumentCard({ document }: { document: Document }) {
         </CardContent>
       )}
       <CardContent className="pt-0">
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className="w-full border-primary/20 text-primary hover:bg-primary/5"
-        >
-          <a href={document.file_url} download target="_blank" rel="noopener noreferrer">
-            <Download className="mr-2 h-4 w-4" aria-hidden />
-            {t('documents.download')}
-          </a>
-        </Button>
+        {fileHref ? (
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="w-full border-primary/20 text-primary hover:bg-primary/5"
+          >
+            <a href={fileHref} download target="_blank" rel="noopener noreferrer">
+              <Download className="mr-2 h-4 w-4" aria-hidden />
+              {t('documents.download')}
+            </a>
+          </Button>
+        ) : null}
       </CardContent>
     </Card>
   )

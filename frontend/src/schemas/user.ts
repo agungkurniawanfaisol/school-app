@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type { AdminTFunction } from '@/lib/zod-i18n'
 import { defaultAdminT } from '@/lib/zod-i18n'
 
-export const userRoleSchema = z.enum(['admin', 'guru'])
+export const userRoleSchema = z.enum(['admin', 'guru', 'admin_pmb', 'pendaftar'])
 
 function createUserBaseSchema(t: AdminTFunction) {
   return z.object({

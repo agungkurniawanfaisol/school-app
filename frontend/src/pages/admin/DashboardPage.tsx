@@ -70,9 +70,9 @@ export function DashboardPage() {
   const { data: teachersData, isLoading: teachersLoading } = useAdminTeachersList({ per_page: 1 })
   const { data: facilitiesData, isLoading: facilitiesLoading } = useAdminFacilitiesList({ per_page: 1 })
   const { data: curriculumsData, isLoading: curriculumsLoading } = useAdminCurriculumsList({ per_page: 1 })
-  const { data: pmbData, isLoading: pmbLoading } = useAdminPmbRegistrationsList({ per_page: 1, status: 'pending' })
+  const { data: pmbData, isLoading: pmbLoading } = useAdminPmbRegistrationsList({ per_page: 1, status: 'awaiting_verification' })
   const { data: recentNews, isLoading: recentLoading } = useAdminNewsList({ per_page: 5 })
-  const { data: pendingPmb, isLoading: pendingPmbLoading } = useAdminPmbRegistrationsList({ per_page: 5, status: 'pending' })
+  const { data: pendingPmb, isLoading: pendingPmbLoading } = useAdminPmbRegistrationsList({ per_page: 5, status: 'awaiting_verification' })
 
   const counts: Record<string, number | undefined> = {
     news: newsData?.meta.total,
@@ -187,12 +187,12 @@ export function DashboardPage() {
           >
             {pendingPmb?.data.map((reg) => (
               <Link
-                key={reg.id}
-                to={`/admin/pmb-registrations/${reg.id}`}
+                key={reg.uuid}
+                to={`/admin/pmb-registrations/${reg.uuid}`}
                 className="flex min-h-[3.25rem] items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none"
               >
                 <div className="min-w-0">
-                  <p className="truncate font-medium">{reg.student_name}</p>
+                  <p className="truncate font-medium">{reg.student_name ?? 'Belum diisi'}</p>
                   <p className="text-xs text-muted-foreground sm:text-sm">
                     {[reg.registration_number, reg.grade_applied].filter(Boolean).join(' · ')}
                   </p>

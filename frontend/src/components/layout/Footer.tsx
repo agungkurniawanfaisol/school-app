@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { SchoolLogo } from '@/components/brand/SchoolLogo'
 import { Separator } from '@/components/ui/separator'
 import { useSchool } from '@/hooks/useSchool'
+import { isAllowedMapEmbedUrl } from '@/lib/google-maps-embed'
 
 function FooterWave() {
   return (
@@ -13,18 +14,6 @@ function FooterWave() {
       </svg>
     </div>
   )
-}
-
-function isAllowedMapEmbedUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url)
-    return (
-      parsed.protocol === 'https:' &&
-      /^(www\.)?google\.(com|co\.\w+)(\.maps)?$/i.test(parsed.hostname)
-    )
-  } catch {
-    return false
-  }
 }
 
 function safeSocialUrl(raw: string, platform: 'facebook' | 'instagram' | 'youtube'): string | null {
@@ -82,11 +71,6 @@ export function Footer() {
               <li>
                 <Link to="/pmb" className="transition-colors hover:text-white">
                   {t('footer.pmb')}
-                </Link>
-              </li>
-              <li>
-                <Link to="/pmb/status" className="transition-colors hover:text-white">
-                  {t('footer.checkPmb')}
                 </Link>
               </li>
             </ul>

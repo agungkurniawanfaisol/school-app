@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Header } from './Header'
 
 const useLocationMock = vi.fn(() => ({ pathname: '/' }))
+const useIsAuthenticatedMock = vi.fn(() => false)
+const useAuthUserMock = vi.fn(() => null)
 
 vi.mock('@/components/ui/dropdown-menu', () => ({
   DropdownMenu: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -50,7 +52,8 @@ vi.mock('@/components/i18n', () => ({
 }))
 
 vi.mock('@/hooks/useAuth', () => ({
-  useIsAuthenticated: () => false,
+  useIsAuthenticated: () => useIsAuthenticatedMock(),
+  useAuthUser: () => useAuthUserMock(),
   useAuthMe: () => ({ data: null }),
 }))
 
@@ -60,6 +63,8 @@ describe('Header', () => {
   }
 
   beforeEach(() => {
+    useIsAuthenticatedMock.mockReturnValue(false)
+    useAuthUserMock.mockReturnValue(null)
     Object.defineProperty(window, 'scrollY', { value: 0, writable: true, configurable: true })
     Object.defineProperty(document.documentElement, 'scrollHeight', {
       value: 2000,
@@ -111,6 +116,23 @@ describe('Header', () => {
     expect(screen.getByRole('button', { name: 'Profil' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Konten' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'PMB' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Login/ })).toHaveAttribute('href', '/admin/login')
+    expect(screen.getByRole('link', { name: 'Masuk' })).toHaveAttribute('href', '/admin/login')
+  })
+
+  it('renders enter link for logged-in pendaftar', () => {
+    useIsAuthenticatedMock.mockReturnValue(true)
+    useAuthUserMock.mockReturnValue({
+      id: 1,
+      name: 'Wali',
+      email: 'wali@test.id',
+      role: 'pendaftar',
+      avatar_url: '/storage/uploads/pmb/student.jpg',
+    })
+
+    renderHeader()
+
+    expect(screen.getByRole('link', { name: /Masuk/ })).toHaveAttribute('href', '/pmb/daftar')
+    expect(screen.getByRole('img', { name: 'Wali' })).toHaveAttribute('src', '/storage/uploads/pmb/student.jpg')
+    expect(document.querySelector('a[href="/admin/login"]')).not.toBeInTheDocument()
   })
 })

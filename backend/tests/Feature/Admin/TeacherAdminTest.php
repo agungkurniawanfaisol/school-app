@@ -50,6 +50,19 @@ class TeacherAdminTest extends TestCase
         $this->assertAdminStoreSuccessUuid(self::RESOURCE, $this->validPayload());
     }
 
+    public function test_admin_can_store_pimpinan_yayasan_type(): void
+    {
+        $payload = $this->validPayload();
+        $payload['type'] = 'pimpinan_yayasan';
+        $payload['title'] = 'Ketua Yayasan';
+
+        $this->actingAsAdmin()
+            ->postJson($this->adminUrl(self::RESOURCE), $payload)
+            ->assertCreated()
+            ->assertJsonPath('data.type', 'pimpinan_yayasan')
+            ->assertJsonPath('data.title', 'Ketua Yayasan');
+    }
+
     public function test_admin_can_store_with_auto_slug(): void
     {
         $payload = $this->validPayload();

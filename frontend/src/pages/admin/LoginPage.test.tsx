@@ -26,7 +26,7 @@ describe('LoginPage', () => {
   it('shows Google sign-in as primary action', () => {
     renderWithProviders(<LoginPage />)
 
-    expect(screen.getByText('Panel Admin')).toBeInTheDocument()
+    expect(screen.getByText('Masuk')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Masuk dengan Google' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Kembali/i })).toHaveAttribute('href', '/')
   })

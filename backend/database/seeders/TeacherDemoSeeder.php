@@ -29,6 +29,11 @@ class TeacherDemoSeeder extends Seeder
 
             ['slug' => 'h-muhammad-ridwan', 'name' => 'H. Muhammad Ridwan, M.Pd.I.', 'title' => 'Kepala Sekolah', 'subject' => null, 'featured' => true, 'type' => 'kepala_sekolah'],
 
+            ['slug' => 'h-abdullah-syafii', 'name' => 'H. Abdullah Syafii, M.A.', 'title' => 'Ketua Yayasan', 'subject' => null, 'featured' => true, 'type' => 'pimpinan_yayasan'],
+            ['slug' => 'hj-siti-aminah', 'name' => 'Hj. Siti Aminah, S.E.', 'title' => 'Wakil Ketua Yayasan', 'subject' => null, 'featured' => true, 'type' => 'pimpinan_yayasan'],
+            ['slug' => 'drs-ahmad-zainuddin', 'name' => 'Drs. Ahmad Zainuddin', 'title' => 'Sekretaris Yayasan', 'subject' => null, 'featured' => false, 'type' => 'pimpinan_yayasan'],
+            ['slug' => 'h-bambang-sutrisno', 'name' => 'H. Bambang Sutrisno, S.E.', 'title' => 'Bendahara Yayasan', 'subject' => null, 'featured' => false, 'type' => 'pimpinan_yayasan'],
+
             ['slug' => 'ibu-sri-wahyuni', 'name' => 'Ibu Sri Wahyuni', 'title' => 'Kepala Tata Usaha', 'subject' => null, 'featured' => false, 'type' => 'staff'],
             ['slug' => 'pak-hendra-wijaya', 'name' => 'Pak Hendra Wijaya', 'title' => 'Staf Keuangan', 'subject' => null, 'featured' => false, 'type' => 'staff'],
             ['slug' => 'bu-ratna-sari', 'name' => 'Bu Ratna Sari', 'title' => 'Staf Administrasi', 'subject' => null, 'featured' => false, 'type' => 'staff'],

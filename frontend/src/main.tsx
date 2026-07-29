@@ -10,6 +10,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
 import App from './App.tsx'
 import { authKeys } from '@/hooks/useAuth'
+import { pmbKeys } from '@/hooks/usePmb'
 import './index.css'
 
 const queryClient = new QueryClient({
@@ -29,6 +30,7 @@ function AuthSessionSync() {
   useEffect(() => {
     const onAuthCleared = () => {
       queryClient.removeQueries({ queryKey: authKeys.all })
+      queryClient.removeQueries({ queryKey: pmbKeys.all })
     }
 
     window.addEventListener('nh:auth-cleared', onAuthCleared)

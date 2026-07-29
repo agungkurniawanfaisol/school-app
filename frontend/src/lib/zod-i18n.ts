@@ -5,6 +5,9 @@ export type AdminTFunction = TFunction<'admin'>
 const ID_VALIDATION_DEFAULTS: Record<string, string> = {
   'validation.required': 'Wajib diisi',
   'validation.titleRequired': 'Judul wajib diisi',
+  'validation.descriptionRequired': 'Deskripsi wajib diisi',
+  'validation.labelRequired': 'Label wajib diisi',
+  'validation.valueRequired': 'Nilai wajib diisi',
   'validation.nameRequired': 'Nama wajib diisi',
   'validation.schoolRequired': 'Sekolah wajib dipilih',
   'validation.schoolNameRequired': 'Nama sekolah wajib diisi',

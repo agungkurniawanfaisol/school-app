@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SectionHeader } from '@/components/landing/SectionHeader'
 import { useSchool } from '@/hooks/useSchool'
+import { isAllowedMapEmbedUrl } from '@/lib/google-maps-embed'
 
 export function ContactSection() {
   const { t } = useTranslation('landing')
@@ -92,7 +93,7 @@ export function ContactSection() {
             </CardContent>
           </Card>
 
-          {school?.map_embed_url ? (
+          {school?.map_embed_url && isAllowedMapEmbedUrl(school.map_embed_url) ? (
             <div className="overflow-hidden rounded-2xl border border-primary/15 shadow-lg shadow-primary/5">
               <iframe
                 src={school.map_embed_url}
@@ -100,6 +101,7 @@ export function ContactSection() {
                 className="h-80 w-full lg:h-full lg:min-h-[320px]"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
               />
             </div>
           ) : (

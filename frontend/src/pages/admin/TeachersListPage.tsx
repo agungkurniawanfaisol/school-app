@@ -75,7 +75,7 @@ function TeacherListCard({
               <div className="flex items-center gap-2">
                 <h2 className="truncate text-base font-semibold text-foreground group-hover:text-primary">{teacher.name}</h2>
                 {teacher.type && teacher.type !== 'guru' && (
-                  <Badge variant={teacher.type === 'kepala_sekolah' ? 'default' : 'secondary'} className="shrink-0 text-[10px]">
+                  <Badge variant={teacher.type === 'kepala_sekolah' || teacher.type === 'pimpinan_yayasan' ? 'default' : 'secondary'} className="shrink-0 text-[10px]">
                     {teacherTypeLabels[teacher.type as TeacherTypeValue] ?? teacher.type}
                   </Badge>
                 )}
@@ -360,6 +360,7 @@ export function AdminTeachersListPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t('common.allTypes')}</SelectItem>
+                <SelectItem value="pimpinan_yayasan">{teacherTypeLabels.pimpinan_yayasan}</SelectItem>
                 <SelectItem value="kepala_sekolah">{teacherTypeLabels.kepala_sekolah}</SelectItem>
                 <SelectItem value="guru">{teacherTypeLabels.guru}</SelectItem>
                 <SelectItem value="staff">{teacherTypeLabels.staff}</SelectItem>

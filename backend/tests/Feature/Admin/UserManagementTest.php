@@ -78,6 +78,85 @@ class UserManagementTest extends TestCase
             ->assertJsonPath('data.teacher_id', $teacher->id);
     }
 
+    public function test_admin_can_create_admin_pmb_user(): void
+    {
+        $this->sanctumAdmin();
+
+        $this->postJson('/api/admin/users', [
+            'name' => 'Admin PMB',
+            'email' => 'adminpmb@test.id',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => User::ROLE_ADMIN_PMB,
+            'is_active' => true,
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.role', User::ROLE_ADMIN_PMB)
+            ->assertJsonPath('data.teacher_id', null);
+    }
+
+    public function test_admin_can_create_pendaftar_user_without_teacher(): void
+    {
+        $this->sanctumAdmin();
+
+        $this->postJson('/api/admin/users', [
+            'name' => 'Pendaftar Baru',
+            'email' => 'pendaftar@test.id',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => User::ROLE_PENDAFTAR,
+            'is_active' => true,
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.role', User::ROLE_PENDAFTAR)
+            ->assertJsonPath('data.teacher_id', null);
+    }
+
+    public function test_admin_cannot_create_user_with_invalid_role(): void
+    {
+        $this->sanctumAdmin();
+
+        $this->postJson('/api/admin/users', [
+            'name' => 'Invalid Role',
+            'email' => 'invalidrole@test.id',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'role' => 'editor',
+            'is_active' => true,
+        ])->assertUnprocessable();
+    }
+
+    public function test_updating_guru_to_admin_pmb_clears_teacher_id(): void
+    {
+        $this->sanctumAdmin();
+        $school = $this->createSchool();
+        $teacher = Teacher::factory()->create(['school_id' => $school->id]);
+        $guru = User::factory()->guru()->create(['teacher_id' => $teacher->id]);
+
+        $this->putJson("/api/admin/users/{$guru->id}", [
+            'role' => User::ROLE_ADMIN_PMB,
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.role', User::ROLE_ADMIN_PMB)
+            ->assertJsonPath('data.teacher_id', null);
+    }
+
+    public function test_patching_teacher_id_on_non_guru_is_ignored(): void
+    {
+        $this->sanctumAdmin();
+        $school = $this->createSchool();
+        $teacher = Teacher::factory()->create(['school_id' => $school->id]);
+        $pendaftar = User::factory()->pendaftar()->create(['teacher_id' => null]);
+
+        $this->putJson("/api/admin/users/{$pendaftar->id}", [
+            'name' => 'Pendaftar Updated',
+            'teacher_id' => $teacher->id,
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.name', 'Pendaftar Updated')
+            ->assertJsonPath('data.teacher_id', null);
+    }
+
     public function test_guru_can_view_and_update_profile(): void
     {
         $school = $this->createSchool();

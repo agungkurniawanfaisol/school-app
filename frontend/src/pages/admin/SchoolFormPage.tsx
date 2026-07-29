@@ -17,6 +17,7 @@ import {
   createVisionMissionSchema,
   VISION_MAX_LENGTH,
 } from '@/schemas/school'
+import { isAllowedMapEmbedUrl, normalizeMapEmbedUrl } from '@/lib/google-maps-embed'
 import { slugify, cn } from '@/lib/utils'
 
 export function SchoolFormPage() {
@@ -97,7 +98,7 @@ export function SchoolFormPage() {
     postal_code: postalCode || null,
     latitude: latitude ? parseFloat(latitude) : null,
     longitude: longitude ? parseFloat(longitude) : null,
-    map_embed_url: mapEmbedUrl || null,
+    map_embed_url: normalizeMapEmbedUrl(mapEmbedUrl),
     social_media: socialMedia,
     vision: vision || null,
     mission: mission || null,
@@ -124,9 +125,7 @@ export function SchoolFormPage() {
     }
 
     const finalPayload = {
-      ...payload,
-      vision: vision.trim() || null,
-      mission: mission.trim() || null,
+      ...parsed.data,
     }
 
     if (isEdit) {
@@ -244,7 +243,14 @@ export function SchoolFormPage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="map_embed_url">{t('pages.schools.mapEmbedUrl')}</Label>
-            <Input id="map_embed_url" placeholder="https://www.google.com/maps/embed?pb=..." value={mapEmbedUrl} onChange={(e) => setMapEmbedUrl(e.target.value)} className="h-11" />
+            <Input
+              id="map_embed_url"
+              placeholder="https://www.google.com/maps/embed?pb=..."
+              value={mapEmbedUrl}
+              onChange={(e) => setMapEmbedUrl(e.target.value)}
+              onBlur={() => setMapEmbedUrl((prev) => normalizeMapEmbedUrl(prev) ?? '')}
+              className="h-11"
+            />
             <p className="text-xs text-muted-foreground">
               {t('pages.schools.mapEmbedHint')}
             </p>
@@ -259,15 +265,13 @@ export function SchoolFormPage() {
               <Input id="longitude" type="number" step="any" placeholder="106.7816014" value={longitude} onChange={(e) => setLongitude(e.target.value)} className="h-11" />
             </div>
           </div>
-          {mapEmbedUrl && (() => {
-            try {
-              const u = new URL(mapEmbedUrl)
-              if (u.protocol !== 'https:' || !/^(www\.)?google\.(com|co\.\w+)/i.test(u.hostname)) return null
-            } catch { return null }
+          {(() => {
+            const previewUrl = normalizeMapEmbedUrl(mapEmbedUrl)
+            if (!previewUrl || !isAllowedMapEmbedUrl(previewUrl)) return null
             return (
               <div className="overflow-hidden rounded-lg border">
                 <iframe
-                  src={mapEmbedUrl}
+                  src={previewUrl}
                   title={`${t('common.preview')} Google Maps`}
                   className="h-[250px] w-full border-0"
                   loading="lazy"

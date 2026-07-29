@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useAuthMe, useGoogleExchange } from '@/hooks/useAuth'
 import { getApiErrorMessage, getAuthToken } from '@/lib/api'
+import { resolvePostLoginPath } from '@/lib/auth-redirect'
 
 const OAUTH_TICKET_SESSION_KEY = 'nh_oauth_ticket_pending'
 
@@ -47,6 +48,7 @@ export function OAuthCallbackPage() {
   const { t } = useTranslation('admin')
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const redirectTo = searchParams.get('redirect')
   const { mutate, isPending } = useGoogleExchange()
   const startedRef = useRef(false)
   const token = getAuthToken()
@@ -64,6 +66,8 @@ export function OAuthCallbackPage() {
       return
     }
 
+    window.history.replaceState({}, '', window.location.pathname)
+
     sessionStorage.setItem(OAUTH_TICKET_SESSION_KEY, ticket)
 
     // Prevent a second Cache::pull when StrictMode remounts this page.
@@ -79,7 +83,7 @@ export function OAuthCallbackPage() {
         exchangeInFlightTicket = null
         sessionStorage.removeItem(OAUTH_TICKET_SESSION_KEY)
         toast.success(t('auth.loginSuccess'))
-        navigate(data.user.role === 'guru' ? '/admin/profile' : '/admin', { replace: true })
+        navigate(resolvePostLoginPath(data.user, redirectTo), { replace: true })
       },
       onError: (error) => {
         exchangeInFlightTicket = null
@@ -91,7 +95,7 @@ export function OAuthCallbackPage() {
   }, [mutate, navigate, searchParams, t])
 
   if (token && isSuccess && user && !isError) {
-    return <Navigate to="/admin" replace />
+    return <Navigate to={resolvePostLoginPath(user, redirectTo)} replace />
   }
 
   return (

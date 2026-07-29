@@ -10,6 +10,7 @@ export function useTeacherTypeLabels(): Record<TeacherTypeValue, string> {
       kepala_sekolah: t('teacherType.principal'),
       guru: t('teacherType.teacher'),
       staff: t('teacherType.staff'),
+      pimpinan_yayasan: t('teacherType.foundationBoard'),
     }),
     [t],
   )

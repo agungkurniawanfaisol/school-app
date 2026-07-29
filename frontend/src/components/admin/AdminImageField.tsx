@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ImagePlus, Loader2, X } from 'lucide-react'
+import { ImagePlus, X } from 'lucide-react'
+import { UploadProgressBar } from '@/components/common/UploadProgressBar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -61,11 +62,18 @@ export function AdminImageField({
             className="mx-auto flex h-32 w-full max-w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-primary/25 bg-muted/50 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:bg-muted sm:mx-0 sm:h-28 sm:max-w-xs sm:w-48"
           >
             {upload.isPending ? (
-              <Loader2 className="h-6 w-6 animate-spin" />
+              <UploadProgressBar
+                phase={upload.phase === 'idle' ? 'uploading' : upload.phase}
+                progress={upload.progress}
+                compact
+                className="w-full max-w-[10rem] px-2"
+              />
             ) : (
-              <ImagePlus className="h-6 w-6" />
+              <>
+                <ImagePlus className="h-6 w-6" />
+                {t('components.adminImage.uploadImage')}
+              </>
             )}
-            {t('components.adminImage.uploadImage')}
           </button>
         )}
         <div className="min-w-0 flex-1 space-y-2">
@@ -83,6 +91,9 @@ export function AdminImageField({
           >
             {t('components.adminImage.selectFile')}
           </Button>
+          {upload.isPending && value && (
+            <UploadProgressBar phase={upload.phase === 'idle' ? 'uploading' : upload.phase} progress={upload.progress} />
+          )}
         </div>
       </div>
       <input

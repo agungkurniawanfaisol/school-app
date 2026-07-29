@@ -47,6 +47,30 @@ describe('schoolSchema', () => {
     expect(result.success).toBe(true)
   })
 
+  it('normalizes iframe html into embed url', () => {
+    const result = schoolSchema.safeParse({
+      name: 'Sekolah',
+      slug: 'sekolah',
+      map_embed_url:
+        '<iframe src="https://www.google.com/maps/embed?pb=abc" width="600" height="450"></iframe>',
+    })
+
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.map_embed_url).toBe('https://www.google.com/maps/embed?pb=abc')
+    }
+  })
+
+  it('rejects share short links for map embed', () => {
+    const result = schoolSchema.safeParse({
+      name: 'Sekolah',
+      slug: 'sekolah',
+      map_embed_url: 'https://maps.app.goo.gl/Abc123',
+    })
+
+    expect(result.success).toBe(false)
+  })
+
   it('rejects latitude out of range', () => {
     const result = schoolSchema.safeParse({
       name: 'Sekolah',

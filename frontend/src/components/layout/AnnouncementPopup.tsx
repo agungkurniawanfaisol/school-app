@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useAnnouncementsList } from '@/hooks/useAnnouncements'
+import { resolveSafeHref } from '@/lib/safe-url'
 import type { Announcement } from '@/types'
 
 const POPUP_DISMISSED_KEY = 'nh-dismissed-popups'
@@ -89,6 +90,7 @@ export function AnnouncementPopup() {
 
   const Icon = priorityIcons[popup.priority]
   const iconColor = priorityColors[popup.priority]
+  const ctaHref = resolveSafeHref(popup.cta_url)
 
   function handleClose() {
     if (dontShow) {
@@ -116,11 +118,11 @@ export function AnnouncementPopup() {
           )}
         </DialogHeader>
         <DialogFooter className="flex-col gap-3 sm:flex-col">
-          {popup.cta_text && popup.cta_url && (
+          {popup.cta_text && ctaHref && (
             <a
-              href={popup.cta_url}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={ctaHref}
+              target={ctaHref.startsWith('/') ? undefined : '_blank'}
+              rel={ctaHref.startsWith('/') ? undefined : 'noopener noreferrer'}
               className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-primary bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
             >
               {popup.cta_text}

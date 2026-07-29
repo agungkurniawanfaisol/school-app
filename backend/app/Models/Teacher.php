@@ -19,11 +19,13 @@ class Teacher extends Model
     public const TYPE_KEPALA_SEKOLAH = 'kepala_sekolah';
     public const TYPE_GURU = 'guru';
     public const TYPE_STAFF = 'staff';
+    public const TYPE_PIMPINAN_YAYASAN = 'pimpinan_yayasan';
 
     public const TYPES = [
         self::TYPE_KEPALA_SEKOLAH,
         self::TYPE_GURU,
         self::TYPE_STAFF,
+        self::TYPE_PIMPINAN_YAYASAN,
     ];
 
     protected $fillable = [

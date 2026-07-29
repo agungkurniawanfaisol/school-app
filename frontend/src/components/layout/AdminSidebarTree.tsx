@@ -18,6 +18,7 @@ import {
   type AdminNavItem,
 } from '@/config/admin-nav'
 import { useAuthMe } from '@/hooks/useAuth'
+import { useAdminPmbNotifications } from '@/hooks/usePmb'
 import { cn } from '@/lib/utils'
 
 type AdminSidebarTreeProps = {
@@ -41,10 +42,12 @@ function AdminNavLink({
   item,
   onNavigate,
   nested,
+  badgeCount,
 }: {
   item: AdminNavItem
   onNavigate?: () => void
   nested?: boolean
+  badgeCount?: number
 }) {
   const location = useLocation()
   const { t } = useTranslation('admin')
@@ -66,6 +69,14 @@ function AdminNavLink({
         <Icon className="size-4" />
       </NavIcon>
       <span className="flex-1 truncate">{t(item.labelKey)}</span>
+      {badgeCount != null && badgeCount > 0 ? (
+        <span
+          className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-none text-destructive-foreground"
+          aria-label={`${badgeCount} notifikasi belum dibaca`}
+        >
+          {badgeCount > 9 ? '9+' : badgeCount}
+        </span>
+      ) : null}
     </Link>
   )
 }
@@ -169,6 +180,9 @@ export function AdminSidebarTree({ mode = 'full', onNavigate, className }: Admin
   const location = useLocation()
   const { t } = useTranslation('admin')
   const { data: user } = useAuthMe()
+  const canSeePmbNotifications = user?.role === 'admin' || user?.role === 'admin_pmb'
+  const { data: pmbNotifications } = useAdminPmbNotifications(canSeePmbNotifications)
+  const pmbUnread = pmbNotifications?.unread_count ?? 0
   const navConfig = getAdminNavForRole(user?.role ?? 'admin')
   const activeGroup = findActiveAdminNavGroup(location.pathname)
   const dashboardActive = isAdminNavActive(location.pathname, adminDashboardItem.href, true)
@@ -239,11 +253,24 @@ export function AdminSidebarTree({ mode = 'full', onNavigate, className }: Admin
                     <GroupIcon className="size-3.5" />
                   </span>
                   {t(group.labelKey)}
+                  {group.labelKey === 'nav.group.pmb' && pmbUnread > 0 ? (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-none text-destructive-foreground">
+                      {pmbUnread > 9 ? '9+' : pmbUnread}
+                    </span>
+                  ) : null}
                 </span>
               </AccordionTrigger>
               <AccordionContent className="space-y-0.5 border-l border-[rgb(255_255_255/0.1)] pb-1 pl-2 pt-0.5">
                 {group.children.map((item) => (
-                  <AdminNavLink key={`${group.labelKey}-${item.labelKey}`} item={item} onNavigate={onNavigate} nested />
+                  <AdminNavLink
+                    key={`${group.labelKey}-${item.labelKey}`}
+                    item={item}
+                    onNavigate={onNavigate}
+                    nested
+                    badgeCount={
+                      item.href === '/admin/pmb-registrations' ? pmbUnread : undefined
+                    }
+                  />
                 ))}
               </AccordionContent>
             </AccordionItem>

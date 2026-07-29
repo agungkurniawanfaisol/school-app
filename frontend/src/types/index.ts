@@ -97,7 +97,7 @@ export interface Curriculum {
   created_at: string | null
 }
 
-export type TeacherType = 'kepala_sekolah' | 'guru' | 'staff'
+export type TeacherType = 'kepala_sekolah' | 'guru' | 'staff' | 'pimpinan_yayasan'
 
 export interface Teacher {
   id: number
@@ -209,6 +209,28 @@ export interface Testimonial {
   is_featured: boolean
 }
 
+export interface SchoolValue {
+  id?: number
+  uuid: string
+  school_id: number
+  icon: string | null
+  title: string
+  description: string
+  order: number
+  is_active: boolean
+}
+
+export interface SchoolStat {
+  id?: number
+  uuid: string
+  school_id: number
+  icon: string | null
+  label: string
+  value: string
+  order: number
+  is_active: boolean
+}
+
 export interface CourseLesson {
   id: number
   course_module_id: number
@@ -294,13 +316,45 @@ export interface Setting {
   type: string
 }
 
-export type PmbStatus = 'pending' | 'review' | 'accepted' | 'rejected' | 'paid'
+export type PmbStatus =
+  | 'draft'
+  | 'awaiting_verification'
+  | 'needs_revision'
+  | 'accepted'
+  | 'rejected'
+  // Legacy (pre-simplify) — still accepted in some caches/tests during rollout
+  | 'awaiting_payment_review'
+  | 'submitted'
+  | 'review'
+  | 'pending'
+  | 'paid'
+
+export interface PmbEvent {
+  id: number
+  type: string
+  message?: string | null
+  actor?: { id: number; name: string; role: string } | null
+  created_at?: string | null
+}
+
+export interface PmbMessage {
+  id: number
+  body: string
+  media_id?: number | null
+  user?: { id: number; name: string; role: string } | null
+  sender_name?: string | null
+  sender_role?: string | null
+  created_at: string | null
+}
 
 export interface PmbRegistration {
   id: number
+  uuid: string
   registration_number: string
   tracking_token?: string
-  student_name: string
+  current_step?: number | null
+  draft_payload?: Record<string, unknown> | null
+  student_name: string | null
   birth_place: string | null
   birth_date: string | null
   gender: 'L' | 'P' | null
@@ -310,9 +364,24 @@ export interface PmbRegistration {
   address: string | null
   previous_school: string | null
   grade_applied: string
+  academic_year?: string | null
   status: PmbStatus
+  status_label?: string | null
+  status_description?: string | null
   notes?: string | null
   payment_info?: Record<string, unknown> | null
+  student_photo?: {
+    id: number
+    uuid: string
+    url: string | null
+    mime_type: string | null
+    original_name: string | null
+  } | null
+  loa_issued_at?: string | null
+  loa_media_id?: number | null
+  has_admin_unread?: boolean
+  events?: PmbEvent[]
+  messages?: PmbMessage[]
   created_at: string | null
   updated_at: string | null
 }
@@ -323,9 +392,10 @@ export interface User {
   email: string
   role: UserRole
   teacher_id?: number | null
+  avatar_url?: string | null
 }
 
-export type UserRole = 'admin' | 'guru'
+export type UserRole = 'admin' | 'guru' | 'admin_pmb' | 'pendaftar'
 
 export interface AdminUser extends User {
   is_active: boolean
@@ -481,9 +551,50 @@ export interface ListFilters {
   featured?: boolean
   school_id?: number
   status?: string
+  academic_year?: string
   display_status?: string
   group?: string
   is_active?: boolean
   is_featured?: boolean
   type?: string
+  grade_applied?: string
+  sort_by?: string
+  sort_dir?: 'asc' | 'desc'
+}
+
+export interface PmbRegistrationStats {
+  totals: {
+    all: number
+    by_status: Record<string, number>
+  }
+  by_grade: Array<{ grade: string; count: number }>
+  by_gender: Array<{ gender: string; count: number }>
+  by_month: Array<{ year: number; month: number; count: number }>
+  top_previous_schools: Array<{ name: string; count: number }>
+}
+
+export type PmbNotificationType =
+  | 'message'
+  | 'payment_verified'
+  | 'payment_rejected'
+  | 'status_changed'
+  | 'loa_issued'
+  | string
+
+export interface PmbNotificationItem {
+  id: string
+  source: 'message' | 'event'
+  source_id: number
+  type: PmbNotificationType
+  title: string
+  body: string
+  registration_uuid: string | null
+  href_hash: string | null
+  unread: boolean
+  created_at: string | null
+}
+
+export interface PmbNotificationsPayload {
+  unread_count: number
+  items: PmbNotificationItem[]
 }

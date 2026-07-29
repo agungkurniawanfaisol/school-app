@@ -98,6 +98,34 @@ class SchoolAdminTest extends TestCase
             ->assertJsonValidationErrors(['about_image']);
     }
 
+    public function test_admin_can_update_map_embed_url_from_iframe_html(): void
+    {
+        $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());
+        $embedUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966';
+        $iframe = '<iframe src="'.$embedUrl.'" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>';
+
+        $response = $this->actingAsAdmin()->putJson('/api/admin/schools/'.$id, [
+            'map_embed_url' => $iframe,
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.map_embed_url', $embedUrl);
+
+        $this->getJson('/api/v1/schools/'.$response->json('data.slug'))
+            ->assertOk()
+            ->assertJsonPath('data.map_embed_url', $embedUrl);
+    }
+
+    public function test_admin_map_embed_url_rejects_share_link(): void
+    {
+        $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());
+
+        $this->actingAsAdmin()->putJson('/api/admin/schools/'.$id, [
+            'map_embed_url' => 'https://maps.app.goo.gl/Abc123',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['map_embed_url']);
+    }
+
     public function test_admin_can_destroy(): void
     {
         $id = $this->assertAdminStoreSuccess(self::RESOURCE, $this->validPayload());

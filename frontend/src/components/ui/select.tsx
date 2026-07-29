@@ -58,7 +58,7 @@ SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayNam
 const SelectContent = React.forwardRef<
   React.ComponentRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = 'popper', ...props }, ref) => (
+>(({ className, children, position = 'popper', onCloseAutoFocus, ...props }, ref) => (
   <SelectPrimitive.Portal>
     <SelectPrimitive.Content
       ref={ref}
@@ -69,6 +69,11 @@ const SelectContent = React.forwardRef<
         className,
       )}
       position={position}
+      onCloseAutoFocus={(event) => {
+        // Prevent scroll jump when the select closes and returns focus to the trigger.
+        event.preventDefault()
+        onCloseAutoFocus?.(event)
+      }}
       {...props}
     >
       <SelectScrollUpButton />

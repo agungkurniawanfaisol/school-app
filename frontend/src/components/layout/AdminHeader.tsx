@@ -2,6 +2,7 @@ import { LogOut, Menu, PanelLeft, PanelLeftClose, User } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { AdminPmbNotificationBell } from '@/components/admin/AdminPmbNotificationBell'
 import { AdminNav, getAdminPageTitle } from '@/components/admin/AdminNav'
 import { useAdminSidebar } from '@/components/admin/AdminSidebarContext'
 import { LanguageSwitcher } from '@/components/i18n/LanguageSwitcher'
@@ -38,6 +39,7 @@ export function AdminHeader() {
   const { collapsed, toggleCollapsed } = useAdminSidebar()
   const breadcrumbs = getAdminBreadcrumbs(pathname)
   const pageTitle = getAdminPageTitle(pathname, t)
+  const showPmbBell = user?.role === 'admin' || user?.role === 'admin_pmb'
 
   const handleLogout = () => {
     logout.mutate(undefined, {
@@ -105,6 +107,7 @@ export function AdminHeader() {
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
+        {showPmbBell && <AdminPmbNotificationBell />}
         <LanguageSwitcher className="h-10 w-10" />
         {user?.role && (
           <Badge variant="secondary" className="hidden capitalize sm:inline-flex">

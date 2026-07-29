@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isAllowedMapEmbedUrl, MAP_EMBED_URL_MAX, normalizeMapEmbedUrl } from '@/lib/google-maps-embed'
 import type { AdminTFunction } from '@/lib/zod-i18n'
 import { defaultAdminT } from '@/lib/zod-i18n'
 
@@ -49,11 +50,18 @@ export function createSchoolSchema(t: AdminTFunction) {
     postal_code: z.string().max(10).optional().nullable(),
     latitude: z.number().min(-90).max(90).optional().nullable(),
     longitude: z.number().min(-180).max(180).optional().nullable(),
-    map_embed_url: z
-      .string()
-      .max(1000, t('validation.maxLength', { max: 1000 }))
-      .optional()
-      .nullable(),
+    map_embed_url: z.preprocess(
+      (value) => normalizeMapEmbedUrl(typeof value === 'string' ? value : null),
+      z
+        .string()
+        .max(MAP_EMBED_URL_MAX, t('validation.maxLength', { max: MAP_EMBED_URL_MAX }))
+        .nullable()
+        .optional()
+        .refine(
+          (value) => value == null || isAllowedMapEmbedUrl(value),
+          { message: t('pages.schools.mapEmbedInvalid') },
+        ),
+    ),
     social_media: createSocialMediaSchema(t).optional().nullable(),
     vision: z
       .string()

@@ -12,6 +12,18 @@ vi.mock('@/hooks/useAuth', () => ({
   useLogout: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
+vi.mock('@/hooks/usePmb', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/hooks/usePmb')>()
+  return {
+    ...actual,
+    useAdminPmbNotifications: () => ({
+      data: { unread_count: 0, items: [] },
+      isLoading: false,
+    }),
+    useMarkAdminPmbNotificationsRead: () => ({ mutate: vi.fn(), isPending: false }),
+  }
+})
+
 vi.mock('@/components/theme/ThemeToggle', () => ({
   ThemeToggle: () => <button type="button">Tema</button>,
 }))

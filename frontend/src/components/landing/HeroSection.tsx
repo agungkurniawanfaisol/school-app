@@ -16,6 +16,11 @@ import { useSchool } from '@/hooks/useSchool'
 import { displayCollageLetter } from '@/schemas/heroCollage'
 import type { HeroSlider, PaginatedResponse } from '@/types'
 import { cn } from '@/lib/utils'
+import { resolveSafeHref } from '@/lib/safe-url'
+
+function resolveHeroCtaLink(ctaUrl?: string | null): string {
+  return resolveSafeHref(ctaUrl) ?? '/pmb/daftar'
+}
 
 export function HeroSection() {
   const { t } = useTranslation('landing')
@@ -152,13 +157,7 @@ export function HeroSection() {
                             size="lg"
                             className="btn-shine h-12 bg-white px-7 text-primary shadow-xl shadow-black/25 transition-transform hover:scale-[1.02] hover:bg-white/95"
                           >
-                            <Link
-                              to={
-                                slide.cta_url?.startsWith('/')
-                                  ? slide.cta_url
-                                  : `/${slide.cta_url ?? 'pmb/daftar'}`
-                              }
-                            >
+                            <Link to={resolveHeroCtaLink(slide.cta_url)}>
                               {slide.cta_text ?? t('hero.registerPmb')}
                             </Link>
                           </Button>

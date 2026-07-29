@@ -37,8 +37,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       const url = error.config?.url ?? ''
       const isProtectedAdmin = url.includes('/admin/') && !url.includes('/admin/login')
+      const isProtectedPortal =
+        url.includes('/v1/pmb/portal/') && !url.includes('/v1/pmb/portal/login')
 
-      if (isProtectedAdmin) {
+      if (isProtectedAdmin || isProtectedPortal) {
         clearAuthSession()
       }
     }
@@ -48,6 +50,14 @@ api.interceptors.response.use(
 
 export function getAuthToken(): string | null {
   return localStorage.getItem(TOKEN_KEY)
+}
+
+export function isPortalSession(): boolean {
+  return getStoredUser()?.role === 'pendaftar'
+}
+
+export function hasPortalAuth(): boolean {
+  return !!getAuthToken() && isPortalSession()
 }
 
 export function getStoredUser(): User | null {

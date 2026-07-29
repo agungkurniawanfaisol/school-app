@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'panel' => \App\Http\Middleware\EnsurePanelUser::class,
+            'pendaftar' => \App\Http\Middleware\EnsurePendaftar::class,
+            'admin_pmb' => \App\Http\Middleware\EnsureAdminPmbOrAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -71,11 +71,14 @@ class UserController extends Controller
             }
         }
 
-        if (($data['role'] ?? $model->role) === User::ROLE_GURU) {
+        $effectiveRole = $data['role'] ?? $model->role;
+
+        if ($effectiveRole === User::ROLE_GURU) {
             if (array_key_exists('teacher_id', $data)) {
                 $data['teacher_id'] = $this->resolveTeacherId($data['teacher_id'], $data['name'] ?? $model->name, $model->teacher_id);
             }
-        } elseif (array_key_exists('role', $data) && $data['role'] === User::ROLE_ADMIN) {
+        } else {
+            // Non-guru roles must never keep a teacher profile link
             $data['teacher_id'] = null;
         }
 

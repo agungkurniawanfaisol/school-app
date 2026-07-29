@@ -51,4 +51,9 @@ class TeacherFactory extends Factory
     {
         return $this->state(fn () => ['type' => Teacher::TYPE_STAFF]);
     }
+
+    public function pimpinanYayasan(): static
+    {
+        return $this->state(fn () => ['type' => Teacher::TYPE_PIMPINAN_YAYASAN]);
+    }
 }

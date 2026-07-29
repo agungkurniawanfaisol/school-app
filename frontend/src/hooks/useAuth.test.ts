@@ -19,7 +19,7 @@ vi.mock('@/lib/api', async () => {
 })
 
 import { getAuthToken, getStoredUser, setAuthSession } from '@/lib/api'
-import { useAuthMe, useGoogleExchange, useLogin, useLogout } from '@/hooks/useAuth'
+import { useAuthMe, useGoogleExchange, useIsAuthenticated, useLogin, useLogout } from '@/hooks/useAuth'
 
 describe('useAuthMe', () => {
   beforeEach(() => {
@@ -51,6 +51,38 @@ describe('useAuthMe', () => {
     rerender()
     await waitFor(() => expect(result.current.isFetching).toBe(false))
     expect(apiGet).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('useIsAuthenticated', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    localStorage.clear()
+  })
+
+  it('returns true when token and stored user exist even if /me fails', async () => {
+    setAuthSession('token-1', {
+      id: 1,
+      name: 'Wali',
+      email: 'wali@test.id',
+      role: 'pendaftar',
+    })
+
+    apiGet.mockRejectedValueOnce(new Error('network'))
+
+    const wrapper = createWrapper()
+    const { result } = renderHook(() => useIsAuthenticated(), { wrapper })
+
+    await waitFor(() => expect(result.current).toBe(true))
+    expect(getAuthToken()).toBe('token-1')
+    expect(getStoredUser()?.role).toBe('pendaftar')
+  })
+
+  it('returns false when no token is stored', () => {
+    const wrapper = createWrapper()
+    const { result } = renderHook(() => useIsAuthenticated(), { wrapper })
+
+    expect(result.current).toBe(false)
   })
 })
 

@@ -45,6 +45,7 @@ interface AdminDataTableProps<T extends { id: number }> {
   emptyTitle?: string
   emptyDescription?: string
   toolbarFilters?: React.ReactNode
+  getRowClassName?: (item: T) => string | undefined
 }
 
 function AdminPagination({
@@ -137,6 +138,7 @@ export function AdminDataTable<T extends { id: number }>({
   emptyTitle,
   emptyDescription,
   toolbarFilters,
+  getRowClassName,
 }: AdminDataTableProps<T>) {
   const { t } = useTranslation('admin')
   const resolvedEmptyTitle = emptyTitle ?? t('empty.defaultTitle')
@@ -171,7 +173,10 @@ export function AdminDataTable<T extends { id: number }>({
             {data.map((item) => (
               <Card
                 key={item.id}
-                className="admin-card overflow-hidden border-primary/10 transition-colors hover:border-primary/20"
+                className={cn(
+                  'admin-card overflow-hidden border-primary/10 transition-colors hover:border-primary/20',
+                  getRowClassName?.(item),
+                )}
               >
                 <CardContent className="space-y-3 p-4">
                   {columns.map((col) => (
@@ -224,7 +229,13 @@ export function AdminDataTable<T extends { id: number }>({
               ))
             ) : data?.length ? (
               data.map((item) => (
-                <TableRow key={item.id} className="border-primary/5 transition-colors hover:bg-muted/30">
+                <TableRow
+                  key={item.id}
+                  className={cn(
+                    'border-primary/5 transition-colors hover:bg-muted/30',
+                    getRowClassName?.(item),
+                  )}
+                >
                   {columns.map((col) => (
                     <TableCell key={col.key} className={col.className}>
                       {col.cell(item)}

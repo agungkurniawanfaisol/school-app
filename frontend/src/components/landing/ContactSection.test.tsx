@@ -42,4 +42,21 @@ describe('ContactSection', () => {
     expect(screen.getByText('info@nurulhikmah.sch.id')).toBeInTheDocument()
     expect(screen.getByText('0211234567')).toBeInTheDocument()
   })
+
+  it('renders map iframe when embed url is valid', () => {
+    useSchoolMock.mockReturnValue({
+      data: {
+        name: 'Nurul Hikmah School',
+        map_embed_url: 'https://www.google.com/maps/embed?pb=abc',
+      },
+      isLoading: false,
+    })
+
+    renderWithProviders(<ContactSection />)
+
+    expect(screen.getByTitle('Peta Lokasi Sekolah')).toHaveAttribute(
+      'src',
+      'https://www.google.com/maps/embed?pb=abc',
+    )
+  })
 })

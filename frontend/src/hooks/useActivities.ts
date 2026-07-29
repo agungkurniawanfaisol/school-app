@@ -84,7 +84,8 @@ export function useAdminActivityDetail(uuid: string) {
 
 function invalidateActivities(queryClient: ReturnType<typeof useQueryClient>) {
   queryClient.invalidateQueries({ queryKey: activityKeys.lists() })
-  queryClient.invalidateQueries({ queryKey: activityKeys.adminLists() })
+  // Covers admin list + admin detail (form page status).
+  queryClient.invalidateQueries({ queryKey: [...activityKeys.all, 'admin'] })
   queryClient.invalidateQueries({ queryKey: activityKeys.details() })
 }
 
@@ -140,8 +141,9 @@ export function usePublishActivity() {
       const { data } = await api.patch<ApiResponse<StudentActivity>>(`/admin/student-activities/${uuid}/publish`)
       return data.data
     },
-    onSuccess: () => {
+    onSuccess: (data, uuid) => {
       invalidateActivities(queryClient)
+      queryClient.setQueryData(activityKeys.adminDetail(uuid), data)
       toast.success('Kegiatan dipublikasikan.')
     },
     onError: (error) => toast.error(getApiErrorMessage(error, 'Gagal mempublikasikan.')),
@@ -155,8 +157,9 @@ export function useUnpublishActivity() {
       const { data } = await api.patch<ApiResponse<StudentActivity>>(`/admin/student-activities/${uuid}/unpublish`)
       return data.data
     },
-    onSuccess: () => {
+    onSuccess: (data, uuid) => {
       invalidateActivities(queryClient)
+      queryClient.setQueryData(activityKeys.adminDetail(uuid), data)
       toast.success('Kegiatan diarsipkan sebagai draf.')
     },
     onError: (error) => toast.error(getApiErrorMessage(error, 'Gagal mengarsipkan.')),

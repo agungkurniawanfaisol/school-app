@@ -1,12 +1,13 @@
 /**
- * Build the backend URL that starts Google OAuth for admin login.
- * In dev, Vite proxies /api but OAuth redirect must hit the real API host.
+ * Build the API path that starts Google OAuth.
+ * Always same-origin `/api/...` so the browser never hits Docker-internal
+ * hosts (e.g. http://backend:8000 from VITE_API_PROXY_TARGET).
+ * Vite/nginx proxies /api to the Laravel backend.
  */
-export function getGoogleOAuthStartUrl(): string {
-  const proxyTarget = import.meta.env.VITE_API_PROXY_TARGET as string | undefined
-  const base = proxyTarget?.replace(/\/$/, '') ?? ''
+export type GoogleOAuthIntent = 'admin' | 'pmb'
 
-  return `${base}/api/admin/auth/google/redirect`
+export function getGoogleOAuthStartUrl(intent: GoogleOAuthIntent = 'admin'): string {
+  return `/api/admin/auth/google/redirect?intent=${intent}`
 }
 
 const GOOGLE_AUTH_ORIGIN = 'https://accounts.google.com'
@@ -53,10 +54,10 @@ export async function ensureServiceWorkerUpdated(): Promise<void> {
  * to /api/... — Workbox NavigationRoute would otherwise serve SPA index.html
  * and dump users on the public landing page.
  */
-export async function resolveGoogleOAuthUrl(): Promise<string> {
+export async function resolveGoogleOAuthUrl(intent: GoogleOAuthIntent = 'admin'): Promise<string> {
   await ensureServiceWorkerUpdated()
 
-  const response = await fetch(`${getGoogleOAuthStartUrl()}?format=json`, {
+  const response = await fetch(`${getGoogleOAuthStartUrl(intent)}&format=json`, {
     headers: { Accept: 'application/json' },
     credentials: 'same-origin',
   })

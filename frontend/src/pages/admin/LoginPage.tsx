@@ -20,6 +20,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { useAuthMe, useLogin } from '@/hooks/useAuth'
 import { clearAuthSession, getApiErrorMessage, getAuthToken, isAuthError } from '@/lib/api'
+import { resolvePostLoginPath } from '@/lib/auth-redirect'
 import { getOAuthErrorMessage } from '@/lib/oauth'
 import { unregisterLegacyServiceWorkers } from '@/lib/unregisterLegacyServiceWorkers'
 import { createLoginSchema, type LoginFormValues } from '@/schemas/auth'
@@ -28,6 +29,7 @@ export function LoginPage() {
   const { t } = useTranslation('admin')
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const redirectTo = searchParams.get('redirect')
   const login = useLogin()
   const [showPassword, setShowPassword] = useState(false)
   const token = getAuthToken()
@@ -72,7 +74,7 @@ export function LoginPage() {
   })
 
   if (token && isSuccess && user && !isError) {
-    return <Navigate to="/admin" replace />
+    return <Navigate to={resolvePostLoginPath(user, redirectTo)} replace />
   }
 
   const isCheckingSession = Boolean(token && isLoading)
@@ -81,7 +83,7 @@ export function LoginPage() {
     login.mutate(values, {
       onSuccess: (data) => {
         toast.success(t('auth.loginSuccess'))
-        navigate(data.user.role === 'guru' ? '/admin/profile' : '/admin')
+        navigate(resolvePostLoginPath(data.user, redirectTo))
       },
       onError: (submitError) => {
         toast.error(getApiErrorMessage(submitError, t('auth.loginFailed')))
@@ -104,11 +106,12 @@ export function LoginPage() {
         </div>
       </header>
 
-      <main className="flex flex-1 items-center justify-center px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-6">
+      <main className="flex flex-1 flex-col items-center justify-center gap-4 px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] sm:px-6">
         {isCheckingSession ? (
           <p className="text-sm text-muted-foreground">{t('common.verifyingSession')}</p>
         ) : (
-          <AdminLoginCard>
+          <div className="w-full max-w-md space-y-4">
+            <AdminLoginCard>
             <GoogleSignInButton disabled={login.isPending} />
 
             <div className="relative py-1">
@@ -188,6 +191,7 @@ export function LoginPage() {
               </AccordionItem>
             </Accordion>
           </AdminLoginCard>
+          </div>
         )}
       </main>
     </div>
