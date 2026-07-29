@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   Globe,
   GraduationCap,
@@ -9,6 +10,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -37,6 +39,9 @@ interface GroupConfig {
 }
 
 const MULTILINE_SETTING_KEYS = new Set(['pmb_description', 'pmb_requirements'])
+
+/** Managed elsewhere in admin — hide from Settings to avoid duplicate editors. */
+const HIDDEN_SETTING_KEYS = new Set(['pmb_fee'])
 
 const GROUP_ICONS: Record<string, LucideIcon> = {
   general: Globe,
@@ -187,6 +192,7 @@ function SettingsGroupCard({ group, items }: { group: string; items: Setting[] }
   const { t } = useTranslation('admin')
   const config = getGroupConfig(group, t)
   const Icon = config.icon
+  const visibleItems = items.filter((item) => !HIDDEN_SETTING_KEYS.has(item.key))
 
   return (
     <Card className="admin-card">
@@ -201,9 +207,21 @@ function SettingsGroupCard({ group, items }: { group: string; items: Setting[] }
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="space-y-4 pt-0">
+        {group === 'pmb' && (
+          <Alert className="border-primary/20 bg-primary/5">
+            <GraduationCap className="h-4 w-4" />
+            <AlertTitle>{t('settings.pmbFeeManagedTitle')}</AlertTitle>
+            <AlertDescription className="space-y-3">
+              <p>{t('settings.pmbFeeManagedDesc')}</p>
+              <Button asChild variant="outline" size="sm" className="min-h-11">
+                <Link to="/admin/pmb-fees">{t('settings.pmbFeeManagedLink')}</Link>
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
         <div className="divide-y divide-border">
-          {items.map((setting) => (
+          {visibleItems.map((setting) => (
             <SettingField key={setting.id} setting={setting} />
           ))}
         </div>
@@ -252,6 +270,7 @@ export function SettingsPage() {
   const groups = useMemo(() => {
     const map = new Map<string, Setting[]>()
     for (const item of data?.data ?? []) {
+      if (HIDDEN_SETTING_KEYS.has(item.key)) continue
       const list = map.get(item.group) ?? []
       list.push(item)
       map.set(item.group, list)
