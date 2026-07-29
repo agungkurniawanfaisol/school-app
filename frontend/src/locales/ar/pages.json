@@ -61,6 +61,8 @@
   "activityDetail.readTimeLabel": "وقت القراءة",
   "activityDetail.featuredLabel": "الحالة",
   "activityDetail.featuredValue": "مميز",
+  "activityDetail.gallery": "معرض الصور",
+  "activityDetail.photoAria": "صورة النشاط {{index}}",
   "activityDetail.sharePrompt": "شارك هذا النشاط",
   "activityDetail.copyLink": "نسخ الرابط",
   "activityDetail.linkCopied": "تم النسخ!",

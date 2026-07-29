@@ -24,6 +24,12 @@ class StoreStudentActivityRequest extends RichContentAdminRequest
             'is_active' => ['sometimes', 'boolean'],
             'is_featured' => ['sometimes', 'boolean'],
             'published_at' => ['nullable', 'date'],
+            'photos' => ['sometimes', 'array', 'max:24'],
+            'photos.*.id' => ['sometimes', 'integer', 'exists:student_activity_photos,id'],
+            'photos.*.path' => ['required_with:photos', 'string', 'max:500', new SafeMediaUrl],
+            'photos.*.caption' => ['nullable', 'string', 'max:250'],
+            'photos.*.order' => ['sometimes', 'integer', 'min:0'],
+            'photos.*.is_active' => ['sometimes', 'boolean'],
         ];
     }
 

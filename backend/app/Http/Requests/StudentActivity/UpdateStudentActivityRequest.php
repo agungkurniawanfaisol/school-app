@@ -29,6 +29,18 @@ class UpdateStudentActivityRequest extends RichContentAdminRequest
             'is_active' => ['sometimes', 'boolean'],
             'is_featured' => ['sometimes', 'boolean'],
             'published_at' => ['nullable', 'date'],
+            'photos' => ['sometimes', 'array', 'max:24'],
+            'photos.*.id' => [
+                'sometimes',
+                'integer',
+                Rule::exists('student_activity_photos', 'id')->where(
+                    fn ($query) => $query->where('student_activity_id', $activity?->id),
+                ),
+            ],
+            'photos.*.path' => ['required_with:photos', 'string', 'max:500', new SafeMediaUrl],
+            'photos.*.caption' => ['nullable', 'string', 'max:250'],
+            'photos.*.order' => ['sometimes', 'integer', 'min:0'],
+            'photos.*.is_active' => ['sometimes', 'boolean'],
         ];
     }
 

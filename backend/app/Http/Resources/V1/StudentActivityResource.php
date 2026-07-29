@@ -31,6 +31,7 @@ class StudentActivityResource extends JsonResource
             'order' => $this->order,
             'is_active' => $this->is_active,
             'is_featured' => $this->is_featured,
+            'photos' => StudentActivityPhotoResource::collection($this->whenLoaded('photos')),
             'published_at' => $this->published_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
         ];

@@ -121,6 +121,17 @@ export interface Teacher {
   created_at?: string | null
 }
 
+export interface StudentActivityPhoto {
+  id: number
+  uuid?: string
+  student_activity_id: number
+  path: string
+  url?: string
+  caption: string | null
+  order: number
+  is_active: boolean
+}
+
 export interface StudentActivity {
   id: number
   uuid: string
@@ -137,6 +148,7 @@ export interface StudentActivity {
   order: number
   is_active: boolean
   is_featured: boolean
+  photos?: StudentActivityPhoto[]
   published_at: string | null
   created_at: string | null
 }

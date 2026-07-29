@@ -21,6 +21,10 @@ class StudentActivityAdminTest extends TestCase
             'title' => 'Kegiatan Outbound',
             'slug' => 'kegiatan-outbound-'.Str::random(6),
             'content' => 'Deskripsi kegiatan.',
+            'photos' => [
+                ['path' => '/images/activities/sample.jpg', 'caption' => 'Lomba'],
+                ['path' => '/images/activities/sample-2.jpg', 'caption' => 'Pemenang'],
+            ],
         ];
     }
 
@@ -46,7 +50,66 @@ class StudentActivityAdminTest extends TestCase
 
     public function test_admin_can_store(): void
     {
-        $this->assertAdminStoreSuccessUuid(self::RESOURCE, $this->validPayload());
+        $uuid = $this->assertAdminStoreSuccessUuid(self::RESOURCE, $this->validPayload());
+
+        $this->actingAsAdmin()
+            ->getJson($this->adminUrl(self::RESOURCE).'/'.$uuid)
+            ->assertOk()
+            ->assertJsonCount(2, 'data.photos');
+    }
+
+    public function test_admin_rejects_unsafe_photo_path(): void
+    {
+        $payload = $this->validPayload();
+        $payload['photos'] = [
+            ['path' => 'javascript:alert(1)', 'caption' => 'bad'],
+        ];
+
+        $this->actingAsAdmin()
+            ->postJson($this->adminUrl(self::RESOURCE), $payload)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['photos.0.path']);
+    }
+
+    public function test_admin_rejects_more_than_24_photos(): void
+    {
+        $payload = $this->validPayload();
+        $payload['photos'] = array_map(
+            fn (int $i) => ['path' => "/images/activities/p{$i}.jpg"],
+            range(1, 25),
+        );
+
+        $this->actingAsAdmin()
+            ->postJson($this->adminUrl(self::RESOURCE), $payload)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['photos']);
+    }
+
+    public function test_update_photo_id_cannot_target_other_activity(): void
+    {
+        $uuid = $this->assertAdminStoreSuccessUuid(self::RESOURCE, $this->validPayload());
+        $foreign = StudentActivity::factory()->create();
+        $foreignPhoto = $foreign->photos()->create([
+            'path' => '/images/activities/foreign.jpg',
+            'caption' => 'Foreign',
+            'order' => 0,
+            'is_active' => true,
+        ]);
+
+        $this->actingAsAdmin()
+            ->putJson($this->adminUrl(self::RESOURCE).'/'.$uuid, [
+                'title' => 'Updated',
+                'photos' => [
+                    ['id' => $foreignPhoto->id, 'path' => '/images/activities/hijack.jpg', 'caption' => 'Nope'],
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['photos.0.id']);
+
+        $this->assertDatabaseHas('student_activity_photos', [
+            'id' => $foreignPhoto->id,
+            'path' => '/images/activities/foreign.jpg',
+        ]);
     }
 
     public function test_admin_can_show(): void

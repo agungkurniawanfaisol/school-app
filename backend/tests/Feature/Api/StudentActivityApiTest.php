@@ -45,4 +45,26 @@ class StudentActivityApiTest extends TestCase
             ->assertJsonPath('meta.per_page', 1)
             ->assertJsonPath('meta.total', 1);
     }
+
+    public function test_show_includes_active_photos_only(): void
+    {
+        $activity = StudentActivity::factory()->create();
+        $activity->photos()->create([
+            'path' => '/images/activities/active.jpg',
+            'caption' => 'Aktif',
+            'order' => 0,
+            'is_active' => true,
+        ]);
+        $activity->photos()->create([
+            'path' => '/images/activities/hidden.jpg',
+            'caption' => 'Nonaktif',
+            'order' => 1,
+            'is_active' => false,
+        ]);
+
+        $this->getJson('/api/v1/student-activities/uuid/'.$activity->uuid)
+            ->assertOk()
+            ->assertJsonCount(1, 'data.photos')
+            ->assertJsonPath('data.photos.0.path', '/images/activities/active.jpg');
+    }
 }

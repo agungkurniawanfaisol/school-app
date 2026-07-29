@@ -61,6 +61,8 @@
   "activityDetail.readTimeLabel": "Read Time",
   "activityDetail.featuredLabel": "Status",
   "activityDetail.featuredValue": "Featured",
+  "activityDetail.gallery": "Photo Gallery",
+  "activityDetail.photoAria": "Activity photo {{index}}",
   "activityDetail.sharePrompt": "Share this activity",
   "activityDetail.copyLink": "Copy Link",
   "activityDetail.linkCopied": "Copied!",

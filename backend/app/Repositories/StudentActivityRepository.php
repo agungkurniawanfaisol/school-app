@@ -12,6 +12,16 @@ class StudentActivityRepository extends BaseRepository implements RepositoryInte
         return StudentActivity::class;
     }
 
+    protected function defaultWith(): array
+    {
+        return [
+            'photos' => fn ($q) => $q
+                ->select(['id', 'uuid', 'student_activity_id', 'path', 'caption', 'order', 'is_active'])
+                ->where('is_active', true)
+                ->orderBy('order'),
+        ];
+    }
+
     protected function defaultSelect(): array
     {
         return ['id', 'uuid', 'school_id', 'title', 'slug', 'excerpt', 'content', 'content_json', 'thumbnail', 'category', 'status', 'activity_date', 'order', 'is_active', 'is_featured', 'published_at', 'created_at', 'updated_at'];

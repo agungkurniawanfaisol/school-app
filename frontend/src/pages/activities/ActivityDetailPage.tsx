@@ -29,7 +29,17 @@ import {
 import { estimateReadingTimeMinutes } from '@/lib/reading-time'
 import { openWhatsAppShare } from '@/lib/share'
 import { cn, formatDate } from '@/lib/utils'
+import { resolveAssetUrl } from '@/lib/safe-url'
 import type { RelatedContentItem } from '@/components/content/RelatedContentCards'
+import type { StudentActivityPhoto } from '@/types'
+
+function activityPhotoSrc(photo: StudentActivityPhoto) {
+  const src = photo.url ?? photo.path
+  if (src.startsWith('http') || src.startsWith('/')) {
+    return resolveAssetUrl(src, '')
+  }
+  return resolveAssetUrl(`/storage/${src}`, '')
+}
 
 function ActivityDetailSkeleton() {
   return (
@@ -60,10 +70,15 @@ export function ActivityDetailPage() {
     category: activity?.category ?? undefined,
   })
   const [copied, setCopied] = useState(false)
+  const [activePhoto, setActivePhoto] = useState(0)
 
   useLayoutEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
   }, [activity?.title])
+
+  useLayoutEffect(() => {
+    setActivePhoto(0)
+  }, [activity?.uuid])
 
   if (isLoading) {
     return (
@@ -92,7 +107,12 @@ export function ActivityDetailPage() {
   const pageUrl = typeof window !== 'undefined' ? window.location.href : ''
   const readingMinutes = estimateReadingTimeMinutes(activity.content ?? activity.excerpt ?? '')
   const dateFormatted = activity.activity_date ? formatDate(activity.activity_date, undefined, locale) : null
-  const hasBackdrop = Boolean(activity.thumbnail)
+  const photos = (activity.photos ?? []).filter((photo) => photo.is_active !== false)
+  const heroSrc =
+    resolveAssetUrl(activity.thumbnail, '') ||
+    (photos[activePhoto] ? activityPhotoSrc(photos[activePhoto]) : '') ||
+    (photos[0] ? activityPhotoSrc(photos[0]) : '')
+  const hasBackdrop = Boolean(heroSrc)
 
   const related: RelatedContentItem[] = (relatedData?.data ?? [])
     .filter((item) => item.uuid !== uuid)
@@ -148,9 +168,9 @@ export function ActivityDetailPage() {
             hasBackdrop ? 'min-h-[40vh] sm:min-h-[50vh]' : 'min-h-[32vh] sm:min-h-[38vh]',
           )}
         >
-          {activity.thumbnail ? (
+          {heroSrc ? (
             <img
-              src={activity.thumbnail}
+              src={heroSrc}
               alt=""
               className="absolute inset-0 h-full w-full scale-105 object-cover"
               aria-hidden
@@ -272,7 +292,49 @@ export function ActivityDetailPage() {
 
         {/* --- CONTENT BODY --- */}
         <div className="container-page section-padding pt-8 sm:pt-12">
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-3xl space-y-8">
+            {photos.length > 0 && (
+              <m.div
+                className="space-y-3"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...springSnappy, delay: 0.25 }}
+              >
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  {t('activityDetail.gallery')}
+                </h2>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {photos.map((photo, index) => {
+                    const src = activityPhotoSrc(photo)
+                    if (!src) return null
+                    return (
+                      <button
+                        key={photo.uuid ?? photo.id}
+                        type="button"
+                        onClick={() => setActivePhoto(index)}
+                        className={cn(
+                          'min-h-11 overflow-hidden rounded-xl border-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                          activePhoto === index ? 'border-primary' : 'border-transparent hover:border-primary/30',
+                        )}
+                        aria-label={photo.caption ?? t('activityDetail.photoAria', { index: index + 1 })}
+                        aria-pressed={activePhoto === index}
+                      >
+                        <img
+                          src={src}
+                          alt={photo.caption ?? activity.title}
+                          className="aspect-[4/3] w-full object-cover"
+                          loading="lazy"
+                        />
+                        {photo.caption && (
+                          <p className="border-t px-3 py-2 text-xs text-muted-foreground">{photo.caption}</p>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </m.div>
+            )}
+
             <m.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}

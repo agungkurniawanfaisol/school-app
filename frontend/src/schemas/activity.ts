@@ -3,6 +3,14 @@ import { editorDocumentSchema } from '@/schemas/editor'
 import type { AdminTFunction } from '@/lib/zod-i18n'
 import { defaultAdminT } from '@/lib/zod-i18n'
 
+export const activityPhotoSchema = z.object({
+  id: z.number().int().optional(),
+  path: z.string().min(1).max(500),
+  caption: z.string().max(250).optional().nullable(),
+  order: z.number().int().min(0).default(0),
+  is_active: z.boolean().default(true),
+})
+
 const contentFields = {
   content: z.string().optional().nullable(),
   content_json: editorDocumentSchema.optional().nullable(),
@@ -22,6 +30,7 @@ function createActivityBaseSchema(t: AdminTFunction) {
     is_active: z.boolean().default(true),
     is_featured: z.boolean().default(false),
     published_at: z.string().optional().nullable(),
+    photos: z.array(activityPhotoSchema).max(24).default([]),
     ...contentFields,
   })
 }
@@ -40,4 +49,5 @@ export function createActivityUpdateSchema(t: AdminTFunction) {
 export const activitySchema = createActivitySchema(defaultAdminT)
 export const activityUpdateSchema = createActivityUpdateSchema(defaultAdminT)
 
+export type ActivityPhotoFormValues = z.infer<typeof activityPhotoSchema>
 export type ActivityFormValues = z.infer<ReturnType<typeof createActivitySchema>>

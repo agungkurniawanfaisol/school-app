@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Maximize2, Save } from 'lucide-react'
 import { BlockRenderer } from '@/components/editor/BlockRenderer'
 import { RichPageEditor } from '@/components/editor/RichPageEditor'
+import { ActivityPhotoGalleryEditor } from '@/components/admin/ActivityPhotoGalleryEditor'
+import { AdminImageField } from '@/components/admin/AdminImageField'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -20,7 +22,7 @@ import {
 import { useSchool } from '@/hooks/useSchool'
 import { slugify } from '@/lib/utils'
 import { EMPTY_EDITOR_DOC, type EditorDocument } from '@/schemas/editor'
-import type { ActivityFormValues } from '@/schemas/activity'
+import type { ActivityFormValues, ActivityPhotoFormValues } from '@/schemas/activity'
 
 export function ActivityFormPage() {
   const { t } = useTranslation('admin')
@@ -42,6 +44,7 @@ export function ActivityFormPage() {
   const [thumbnail, setThumbnail] = useState('')
   const [activityDate, setActivityDate] = useState('')
   const [isFeatured, setIsFeatured] = useState(false)
+  const [photos, setPhotos] = useState<ActivityPhotoFormValues[]>([])
   const [contentJson, setContentJson] = useState<EditorDocument>(EMPTY_EDITOR_DOC)
   const [contentHtml, setContentHtml] = useState('')
 
@@ -54,6 +57,15 @@ export function ActivityFormPage() {
     setThumbnail(existing.thumbnail ?? '')
     setActivityDate(existing.activity_date ?? '')
     setIsFeatured(existing.is_featured)
+    setPhotos(
+      (existing.photos ?? []).map((photo, index) => ({
+        id: photo.id,
+        path: photo.url ?? photo.path,
+        caption: photo.caption,
+        order: photo.order ?? index,
+        is_active: photo.is_active ?? true,
+      })),
+    )
     setContentJson((existing.content_json as EditorDocument) ?? EMPTY_EDITOR_DOC)
     setContentHtml(existing.content ?? '')
   }, [existing])
@@ -74,6 +86,7 @@ export function ActivityFormPage() {
     is_featured: isFeatured,
     order: existing?.order ?? 0,
     published_at: existing?.published_at ?? null,
+    photos: photos.map((photo, index) => ({ ...photo, order: index })),
   })
 
   const handlePublish = () => {
@@ -138,9 +151,24 @@ export function ActivityFormPage() {
         <Textarea id="excerpt" value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="thumbnail">{t('form.thumbnail')}</Label>
-        <Input id="thumbnail" value={thumbnail} onChange={(e) => setThumbnail(e.target.value)} className="h-11" />
+        <AdminImageField
+          label={t('form.thumbnail')}
+          value={thumbnail}
+          collection="activities"
+          onChange={(url) => {
+            setThumbnail(url)
+            setDirty(true)
+          }}
+          hint={t('form.activityCoverHint')}
+        />
       </div>
+      <ActivityPhotoGalleryEditor
+        photos={photos}
+        onChange={(next) => {
+          setPhotos(next)
+          setDirty(true)
+        }}
+      />
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="h-4 w-4" />
         {t('form.showOnHomepage')}

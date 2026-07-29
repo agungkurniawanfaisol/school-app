@@ -61,6 +61,8 @@
   "activityDetail.readTimeLabel": "読了時間",
   "activityDetail.featuredLabel": "ステータス",
   "activityDetail.featuredValue": "注目",
+  "activityDetail.gallery": "フォトギャラリー",
+  "activityDetail.photoAria": "活動写真 {{index}}",
   "activityDetail.sharePrompt": "この活動を共有",
   "activityDetail.copyLink": "リンクをコピー",
   "activityDetail.linkCopied": "コピー済み！",

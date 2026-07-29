@@ -61,6 +61,8 @@
   "activityDetail.readTimeLabel": "Waktu Baca",
   "activityDetail.featuredLabel": "Status",
   "activityDetail.featuredValue": "Unggulan",
+  "activityDetail.gallery": "Galeri Foto",
+  "activityDetail.photoAria": "Foto kegiatan {{index}}",
   "activityDetail.sharePrompt": "Bagikan kegiatan ini",
   "activityDetail.copyLink": "Salin Tautan",
   "activityDetail.linkCopied": "Tersalin!",
