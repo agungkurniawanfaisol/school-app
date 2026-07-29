@@ -103,40 +103,81 @@ jobs:
           fi
 
       - name: Start SSH agent
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
       - name: Add host to known_hosts
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '65002' }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
         run: |
+          set -euo pipefail
           mkdir -p ~/.ssh
-          # Hostinger shared hosting SSH port is usually 65002 (not 22)
-          ssh-keyscan -p "${DEPLOY_PORT}" -H "${DEPLOY_HOST}" >> ~/.ssh/known_hosts
+          chmod 700 ~/.ssh
+
+          # Empty DEPLOY_PORT secret must default in bash (GHA || is unreliable for secrets).
+          PORT="${DEPLOY_PORT:-65002}"
+          HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
+          HOST="${HOST#ssh://}"
+
+          if [ -z "${HOST}" ]; then
+            echo "DEPLOY_HOST secret is empty"
+            exit 1
+          fi
+
+          echo "Scanning SSH host keys for ${HOST} port ${PORT}..."
+          # Avoid -H (hash hosts); clearer errors and better OpenSSH compatibility.
+          TMP_KEYS="$(mktemp)"
+          ok=0
+          for attempt in 1 2 3; do
+            if ssh-keyscan -p "${PORT}" -T 15 "${HOST}" >"${TMP_KEYS}" 2>/tmp/ssh-keyscan.err; then
+              if [ -s "${TMP_KEYS}" ]; then
+                ok=1
+                break
+              fi
+            fi
+            echo "ssh-keyscan attempt ${attempt}/3 failed:"
+            cat /tmp/ssh-keyscan.err || true
+            sleep 3
+          done
+
+          if [ "${ok}" -ne 1 ]; then
+            echo ""
+            echo "Could not fetch host keys from ${HOST}:${PORT}."
+            echo "Check DEPLOY_HOST / DEPLOY_PORT secrets and that Hostinger SSH is enabled."
+            echo "Hostinger shared hosting usually uses port 65002 (not 22)."
+            exit 1
+          fi
+
+          cat "${TMP_KEYS}" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          echo "known_hosts updated ($(wc -l < "${TMP_KEYS}") key line(s))."
 
       - name: Rsync frontend → public_html (do not delete backend/)
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '65002' }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
         run: |
+          PORT="${DEPLOY_PORT:-65002}"
+          HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
           rsync -az --delete \
             --exclude='backend/' \
-            -e "ssh -p ${DEPLOY_PORT}" \
+            -e "ssh -p ${PORT} -o StrictHostKeyChecking=yes" \
             /tmp/frontend-deploy/ \
-            "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
+            "${DEPLOY_USER}@${HOST}:${DEPLOY_PATH}/"
 
       - name: Rsync backend → public_html/backend (preserve remote storage + .env)
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '65002' }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
         run: |
-          # --filter protect remote storage and .env from --delete
+          PORT="${DEPLOY_PORT:-65002}"
+          HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
           rsync -az --delete \
             --filter='P storage/' \
             --filter='P storage/***' \
@@ -144,17 +185,20 @@ jobs:
             --exclude='storage/' \
             --exclude='.env' \
             --exclude='.env.*' \
-            -e "ssh -p ${DEPLOY_PORT}" \
+            -e "ssh -p ${PORT} -o StrictHostKeyChecking=yes" \
             /tmp/backend-deploy/ \
-            "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/backend/"
+            "${DEPLOY_USER}@${HOST}:${DEPLOY_PATH}/backend/"
 
       - name: Post-deploy (backup DB + migrate only)
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '65002' }}
-          DEPLOY_PHP: ${{ secrets.DEPLOY_PHP || 'php' }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_PHP: ${{ secrets.DEPLOY_PHP }}
         run: |
-          ssh -p "${DEPLOY_PORT}" "${DEPLOY_USER}@${DEPLOY_HOST}" \
-            "cd '${DEPLOY_PATH}/backend' && DEPLOY_PHP='${DEPLOY_PHP}' bash ./post-deploy.sh"
+          PORT="${DEPLOY_PORT:-65002}"
+          HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
+          PHP_BIN="${DEPLOY_PHP:-php}"
+          ssh -p "${PORT}" -o StrictHostKeyChecking=yes "${DEPLOY_USER}@${HOST}" \
+            "cd '${DEPLOY_PATH}/backend' && DEPLOY_PHP='${PHP_BIN}' bash ./post-deploy.sh"
