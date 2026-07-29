@@ -14,7 +14,7 @@ vi.mock('@/lib/api', () => ({
   },
 }))
 
-import { usePmbRegister, usePmbTrack } from '@/hooks/usePmb'
+import { usePmbRegister } from '@/hooks/usePmb'
 
 describe('usePmb', () => {
   beforeEach(() => {
@@ -44,32 +44,5 @@ describe('usePmb', () => {
       student_name: 'Ahmad',
       parent_email: null,
     }))
-  })
-
-  it('track query is enabled only when token is provided', async () => {
-    apiGet.mockResolvedValueOnce({
-      data: {
-        data: {
-          student_name: 'Ahmad',
-          status: 'pending',
-          registration_number: 'PMB-001',
-          grade_applied: 'Kelas 1 SD',
-          parent_name: 'Budi',
-          parent_phone: '081234567890',
-        },
-      },
-    })
-
-    const { result } = renderHook(() => usePmbTrack('token1234567'), { wrapper: createWrapper() })
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(apiGet).toHaveBeenCalledWith('/v1/pmb/track/token1234567')
-  })
-
-  it('track query stays idle without token', () => {
-    const { result } = renderHook(() => usePmbTrack(''), { wrapper: createWrapper() })
-
-    expect(result.current.fetchStatus).toBe('idle')
-    expect(apiGet).not.toHaveBeenCalled()
   })
 })

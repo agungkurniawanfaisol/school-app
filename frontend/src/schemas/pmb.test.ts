@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pmbRegisterSchema, pmbTrackSchema } from './pmb'
+import { pmbRegisterSchema, pmbPortalDraftSchema } from './pmb'
 
 describe('pmbRegisterSchema', () => {
   it('accepts valid register input', () => {
@@ -27,23 +27,12 @@ describe('pmbRegisterSchema', () => {
   })
 })
 
-describe('pmbTrackSchema', () => {
-  it('accepts valid tracking token', () => {
-    const result = pmbTrackSchema.safeParse({
-      token: 'abc123456789',
-    })
-
-    expect(result.success).toBe(true)
-  })
-
-  it('rejects token shorter than 10 characters', () => {
-    const result = pmbTrackSchema.safeParse({
-      token: 'pendek',
-    })
-
-    expect(result.success).toBe(false)
-    if (!result.success) {
-      expect(result.error.flatten().fieldErrors.token).toBeDefined()
-    }
+describe('pmbPortalDraftSchema', () => {
+  it('allows partial draft values for autosave', () => {
+    expect(
+      pmbPortalDraftSchema.safeParse({
+        student_name: 'Ahmad',
+      }).success,
+    ).toBe(true)
   })
 })

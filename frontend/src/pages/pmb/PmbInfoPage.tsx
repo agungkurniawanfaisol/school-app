@@ -91,9 +91,6 @@ export function PmbInfoPage() {
           <Button asChild size="lg">
             <Link to="/pmb/daftar">{t('pmbInfo.registerNow')}</Link>
           </Button>
-          <Button asChild size="lg" variant="outline">
-            <Link to="/pmb/status">{t('pmbInfo.checkStatus')}</Link>
-          </Button>
         </div>
       </section>
     </PublicPageShell>

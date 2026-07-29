@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => ({
               cleanupOutdatedCaches: true,
               runtimeCaching: [
                 {
-                  urlPattern: /^\/api\/v1\/(news|schools|facilities|teachers|curriculums|student-activities|testimonials|courses|hero-sliders|virtual-tours|settings)/,
+                  urlPattern: /^\/api\/v1\/(news|schools|facilities|teachers|curriculums|student-activities|testimonials|school-values|courses|hero-sliders|virtual-tours|settings)/,
                   handler: 'StaleWhileRevalidate',
                   options: {
                     cacheName: 'api-public',
@@ -84,6 +84,7 @@ export default defineConfig(({ mode }) => ({
   cacheDir: process.env.VITE_CACHE_DIR ?? 'node_modules/.vite',
   optimizeDeps: {
     include: [
+      'qrcode',
       '@tiptap/react',
       '@tiptap/starter-kit',
       '@tiptap/extension-color',
