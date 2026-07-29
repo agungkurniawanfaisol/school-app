@@ -12,7 +12,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -83,6 +83,7 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
         run: |
           missing=0
           for name in DEPLOY_HOST DEPLOY_USER DEPLOY_PATH DEPLOY_SSH_KEY; do
@@ -94,11 +95,16 @@ jobs:
               echo "OK: $name is set"
             fi
           done
+          PORT="${DEPLOY_PORT:-65002}"
+          echo "OK: DEPLOY_PORT effective=${PORT}"
+          if [ "${PORT}" = "22" ]; then
+            echo "WARNING: Port 22 usually fails on Hostinger shared hosting. Prefer 65002."
+          fi
           if [ "$missing" -ne 0 ]; then
             echo ""
             echo "Add secrets at: Settings → Secrets and variables → Actions"
             echo "Required: DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH, DEPLOY_SSH_KEY"
-            echo "Optional: DEPLOY_PORT (default 65002), DEPLOY_PHP"
+            echo "Optional: DEPLOY_PORT (default 65002), DEPLOY_PHP, DEPLOY_KNOWN_HOSTS"
             exit 1
           fi
 
@@ -120,6 +126,10 @@ jobs:
           PORT="${DEPLOY_PORT:-65002}"
           HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
           HOST="${HOST#ssh://}"
+          HOST="${HOST%%/*}"
+          # Strip accidental user@ or :port from host secret
+          HOST="${HOST##*@}"
+          HOST="${HOST%%:*}"
 
           if [ -z "${HOST}" ]; then
             echo "DEPLOY_HOST secret is empty"
@@ -134,89 +144,183 @@ jobs:
             chmod 600 ~/.ssh/known_hosts
             echo "Loaded DEPLOY_KNOWN_HOSTS secret into known_hosts."
             echo "SSH_STRICT=yes" >> "$GITHUB_ENV"
-            exit 0
+          else
+            # Hostinger / some hosts block ssh-keyscan from GitHub Actions IPs.
+            TMP_KEYS="$(mktemp)"
+            ok=0
+            for attempt in 1 2 3; do
+              if ssh-keyscan -p "${PORT}" -T 10 "${HOST}" >"${TMP_KEYS}" 2>/tmp/ssh-keyscan.err; then
+                if [ -s "${TMP_KEYS}" ]; then
+                  ok=1
+                  break
+                fi
+              fi
+              echo "ssh-keyscan attempt ${attempt}/3 failed (stderr below):"
+              cat /tmp/ssh-keyscan.err || true
+              sleep 2
+            done
+
+            if [ "${ok}" -eq 1 ]; then
+              cat "${TMP_KEYS}" >> ~/.ssh/known_hosts
+              chmod 600 ~/.ssh/known_hosts
+              echo "known_hosts updated via ssh-keyscan ($(wc -l < "${TMP_KEYS}") line(s))."
+              echo "SSH_STRICT=yes" >> "$GITHUB_ENV"
+            else
+              echo "ssh-keyscan unavailable from this runner — using StrictHostKeyChecking=accept-new"
+              echo "Tip: set secret DEPLOY_KNOWN_HOSTS from local: ssh-keyscan -p ${PORT} YOUR_HOST"
+              echo "SSH_STRICT=accept-new" >> "$GITHUB_ENV"
+            fi
           fi
 
-          # Hostinger / some hosts block ssh-keyscan from GitHub Actions IPs.
-          # Prefer keyscan when it works; otherwise accept-new on first connect.
-          TMP_KEYS="$(mktemp)"
-          ok=0
-          for attempt in 1 2 3; do
-            if ssh-keyscan -p "${PORT}" -T 10 "${HOST}" >"${TMP_KEYS}" 2>/tmp/ssh-keyscan.err; then
-              if [ -s "${TMP_KEYS}" ]; then
-                ok=1
-                break
-              fi
+          echo "DEPLOY_SSH_PORT=${PORT}" >> "$GITHUB_ENV"
+          echo "DEPLOY_SSH_HOST=${HOST}" >> "$GITHUB_ENV"
+
+      - name: Preflight SSH connectivity
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          set -euo pipefail
+          PORT="${DEPLOY_SSH_PORT:-65002}"
+          HOST="${DEPLOY_SSH_HOST:?missing DEPLOY_SSH_HOST}"
+          STRICT="${SSH_STRICT:-accept-new}"
+          SSH_BASE=(
+            ssh -p "${PORT}"
+            -o StrictHostKeyChecking="${STRICT}"
+            -o UserKnownHostsFile="${HOME}/.ssh/known_hosts"
+            -o ConnectTimeout=30
+            -o ConnectionAttempts=3
+            -o ServerAliveInterval=15
+          )
+
+          echo "Probing TCP port ${PORT}..."
+          tcp_ok=0
+          for attempt in 1 2 3 4 5; do
+            if timeout 20 bash -c "echo >/dev/tcp/${HOST}/${PORT}" 2>/tmp/tcp.err; then
+              echo "TCP reachable (attempt ${attempt}/5)."
+              tcp_ok=1
+              break
             fi
-            echo "ssh-keyscan attempt ${attempt}/3 failed (stderr below):"
-            cat /tmp/ssh-keyscan.err || true
-            # Quick TCP probe for clearer diagnostics (does not fail the job)
-            timeout 5 bash -c "echo >/dev/tcp/${HOST}/${PORT}" 2>/tmp/tcp.err \
-              && echo "TCP ${HOST}:${PORT} is reachable" \
-              || echo "TCP ${HOST}:${PORT} not reachable: $(cat /tmp/tcp.err 2>/dev/null || true)"
-            sleep 2
+            echo "TCP attempt ${attempt}/5 failed: $(cat /tmp/tcp.err 2>/dev/null || true)"
+            sleep $((attempt * 3))
           done
 
-          if [ "${ok}" -eq 1 ]; then
-            cat "${TMP_KEYS}" >> ~/.ssh/known_hosts
-            chmod 600 ~/.ssh/known_hosts
-            echo "known_hosts updated via ssh-keyscan ($(wc -l < "${TMP_KEYS}") line(s))."
-            echo "SSH_STRICT=yes" >> "$GITHUB_ENV"
-          else
-            echo "ssh-keyscan unavailable from this runner — using StrictHostKeyChecking=accept-new"
-            echo "Tip: set secret DEPLOY_KNOWN_HOSTS from local: ssh-keyscan -p ${PORT} YOUR_HOST"
-            echo "SSH_STRICT=accept-new" >> "$GITHUB_ENV"
+          if [ "${tcp_ok}" -ne 1 ]; then
+            echo ""
+            echo "ERROR: Cannot open TCP to Hostinger SSH (port ${PORT})."
+            echo "GitHub Actions cannot reach the server — rsync will also time out."
+            echo ""
+            echo "Checklist:"
+            echo "  1. hPanel → Advanced → SSH Access → Enable SSH"
+            echo "  2. DEPLOY_PORT must be 65002 for Hostinger shared (not 22)"
+            echo "  3. DEPLOY_HOST must be the SSH IP from hPanel (prefer IP over domain)"
+            echo "  4. From your laptop verify: ssh -p ${PORT} ${DEPLOY_USER}@YOUR_HOST"
+            echo "  5. If laptop works but Actions times out, Hostinger may block GHA IPs — open a Hostinger ticket"
+            exit 1
+          fi
+
+          echo "Probing SSH auth..."
+          ssh_ok=0
+          for attempt in 1 2 3; do
+            if "${SSH_BASE[@]}" "${DEPLOY_USER}@${HOST}" "echo deploy-ok" 2>/tmp/ssh.err; then
+              echo "SSH auth OK (attempt ${attempt}/3)."
+              ssh_ok=1
+              break
+            fi
+            echo "SSH attempt ${attempt}/3 failed:"
+            cat /tmp/ssh.err || true
+            sleep $((attempt * 4))
+          done
+
+          if [ "${ssh_ok}" -ne 1 ]; then
+            echo ""
+            echo "ERROR: TCP works but SSH auth/session failed."
+            echo "Check DEPLOY_USER + DEPLOY_SSH_KEY (public key must be in Hostinger authorized_keys)."
+            exit 1
           fi
 
       - name: Rsync frontend → public_html (do not delete backend/)
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
         run: |
-          PORT="${DEPLOY_PORT:-65002}"
-          HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
+          set -euo pipefail
+          PORT="${DEPLOY_SSH_PORT:-65002}"
+          HOST="${DEPLOY_SSH_HOST:?missing DEPLOY_SSH_HOST}"
           STRICT="${SSH_STRICT:-accept-new}"
-          rsync -az --delete \
-            --exclude='backend/' \
-            -e "ssh -p ${PORT} -o StrictHostKeyChecking=${STRICT} -o UserKnownHostsFile=${HOME}/.ssh/known_hosts" \
-            /tmp/frontend-deploy/ \
-            "${DEPLOY_USER}@${HOST}:${DEPLOY_PATH}/"
+          SSH_E="ssh -p ${PORT} -o StrictHostKeyChecking=${STRICT} -o UserKnownHostsFile=${HOME}/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=3 -o ServerAliveInterval=15"
+
+          for attempt in 1 2 3; do
+            if rsync -az --delete --timeout=120 \
+              --exclude='backend/' \
+              -e "${SSH_E}" \
+              /tmp/frontend-deploy/ \
+              "${DEPLOY_USER}@${HOST}:${DEPLOY_PATH}/"; then
+              echo "Frontend rsync OK (attempt ${attempt}/3)."
+              exit 0
+            fi
+            echo "Frontend rsync attempt ${attempt}/3 failed; retrying..."
+            sleep $((attempt * 5))
+          done
+          echo "Frontend rsync failed after 3 attempts."
+          exit 1
 
       - name: Rsync backend → public_html/backend (preserve remote storage + .env)
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
         run: |
-          PORT="${DEPLOY_PORT:-65002}"
-          HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
+          set -euo pipefail
+          PORT="${DEPLOY_SSH_PORT:-65002}"
+          HOST="${DEPLOY_SSH_HOST:?missing DEPLOY_SSH_HOST}"
           STRICT="${SSH_STRICT:-accept-new}"
-          rsync -az --delete \
-            --filter='P storage/' \
-            --filter='P storage/***' \
-            --filter='P .env' \
-            --exclude='storage/' \
-            --exclude='.env' \
-            --exclude='.env.*' \
-            -e "ssh -p ${PORT} -o StrictHostKeyChecking=${STRICT} -o UserKnownHostsFile=${HOME}/.ssh/known_hosts" \
-            /tmp/backend-deploy/ \
-            "${DEPLOY_USER}@${HOST}:${DEPLOY_PATH}/backend/"
+          SSH_E="ssh -p ${PORT} -o StrictHostKeyChecking=${STRICT} -o UserKnownHostsFile=${HOME}/.ssh/known_hosts -o ConnectTimeout=30 -o ConnectionAttempts=3 -o ServerAliveInterval=15"
+
+          for attempt in 1 2 3; do
+            if rsync -az --delete --timeout=120 \
+              --filter='P storage/' \
+              --filter='P storage/***' \
+              --filter='P .env' \
+              --exclude='storage/' \
+              --exclude='.env' \
+              --exclude='.env.*' \
+              -e "${SSH_E}" \
+              /tmp/backend-deploy/ \
+              "${DEPLOY_USER}@${HOST}:${DEPLOY_PATH}/backend/"; then
+              echo "Backend rsync OK (attempt ${attempt}/3)."
+              exit 0
+            fi
+            echo "Backend rsync attempt ${attempt}/3 failed; retrying..."
+            sleep $((attempt * 5))
+          done
+          echo "Backend rsync failed after 3 attempts."
+          exit 1
 
       - name: Post-deploy (backup DB + migrate only)
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_PHP: ${{ secrets.DEPLOY_PHP }}
         run: |
-          PORT="${DEPLOY_PORT:-65002}"
-          HOST="$(echo -n "${DEPLOY_HOST}" | tr -d '[:space:]')"
+          set -euo pipefail
+          PORT="${DEPLOY_SSH_PORT:-65002}"
+          HOST="${DEPLOY_SSH_HOST:?missing DEPLOY_SSH_HOST}"
           PHP_BIN="${DEPLOY_PHP:-php}"
           STRICT="${SSH_STRICT:-accept-new}"
-          ssh -p "${PORT}" -o StrictHostKeyChecking="${STRICT}" -o UserKnownHostsFile="${HOME}/.ssh/known_hosts" \
-            "${DEPLOY_USER}@${HOST}" \
-            "cd '${DEPLOY_PATH}/backend' && DEPLOY_PHP='${PHP_BIN}' bash ./post-deploy.sh"
+
+          for attempt in 1 2 3; do
+            if ssh -p "${PORT}" \
+              -o StrictHostKeyChecking="${STRICT}" \
+              -o UserKnownHostsFile="${HOME}/.ssh/known_hosts" \
+              -o ConnectTimeout=30 \
+              -o ConnectionAttempts=3 \
+              -o ServerAliveInterval=15 \
+              "${DEPLOY_USER}@${HOST}" \
+              "cd '${DEPLOY_PATH}/backend' && DEPLOY_PHP='${PHP_BIN}' bash ./post-deploy.sh"; then
+              echo "Post-deploy OK (attempt ${attempt}/3)."
+              exit 0
+            fi
+            echo "Post-deploy attempt ${attempt}/3 failed; retrying..."
+            sleep $((attempt * 5))
+          done
+          echo "Post-deploy failed after 3 attempts."
+          exit 1

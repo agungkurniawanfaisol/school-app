@@ -85,6 +85,26 @@ Lalu simpan seluruh output sebagai secret `DEPLOY_KNOWN_HOSTS`.
 
 ---
 
+## Troubleshooting: `Connection timed out` di GitHub Actions
+
+Artinya runner GitHub **tidak bisa membuka TCP** ke host:port SSH (bukan salah password dulu).
+
+1. **Port** — secret `DEPLOY_PORT` = `65002` (Hostinger shared). Jangan `22` kecuali VPS.
+2. **Host** — pakai **IP SSH dari hPanel** (Advanced → SSH Access), bukan hanya domain website.
+3. **SSH aktif** — hPanel → Advanced → SSH Access → **Enable**.
+4. **Uji dari laptop** (harus berhasil dulu):
+   ```bash
+   ssh -p 65002 DEPLOY_USER@DEPLOY_HOST
+   ```
+5. **Laptop OK, Actions timeout** — Hostinger/firewall sering memblokir IP datacenter GitHub.  
+   - Buka tiket Hostinger: minta izinkan koneksi SSH dari GitHub Actions, **atau**  
+   - Deploy manual sementara: `rsync` dari laptop, **atau**  
+   - Self-hosted runner di mesin yang bisa SSH ke Hostinger.
+
+Workflow sekarang punya **preflight TCP/SSH + retry rsync 3×** agar gagal lebih jelas dan tahan gangguan singkat.
+
+---
+
 ## Setelah deploy pertama (buat `.env` di server)
 
 ```bash
