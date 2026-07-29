@@ -21,7 +21,7 @@ class StorePmbRegistrationRequest extends AdminFormRequest
             'address' => ['nullable', 'string'],
             'previous_school' => ['nullable', 'string', 'max:250'],
             'grade_applied' => ['nullable', 'string', 'max:50'],
-            'status' => ['sometimes', 'string', 'in:pending,review,accepted,rejected'],
+            'status' => ['sometimes', 'string', 'in:draft,awaiting_verification,needs_revision,accepted,rejected'],
             'notes' => ['nullable', 'string'],
             'payment_info' => ['nullable', 'array'],
         ];

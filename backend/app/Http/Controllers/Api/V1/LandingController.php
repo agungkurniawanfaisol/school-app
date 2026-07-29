@@ -12,6 +12,8 @@ use App\Http\Resources\V1\PhotoAlbumResource;
 use App\Http\Resources\V1\HeroSliderResource;
 use App\Http\Resources\V1\NewsResource;
 use App\Http\Resources\V1\SchoolResource;
+use App\Http\Resources\V1\SchoolStatResource;
+use App\Http\Resources\V1\SchoolValueResource;
 use App\Http\Resources\V1\StudentActivityResource;
 use App\Http\Resources\V1\TeacherResource;
 use App\Http\Resources\V1\TestimonialResource;
@@ -24,6 +26,8 @@ use App\Repositories\PhotoAlbumRepository;
 use App\Repositories\HeroSliderRepository;
 use App\Repositories\NewsRepository;
 use App\Repositories\SchoolRepository;
+use App\Repositories\SchoolStatRepository;
+use App\Repositories\SchoolValueRepository;
 use App\Repositories\StudentActivityRepository;
 use App\Repositories\TeacherRepository;
 use App\Repositories\TestimonialRepository;
@@ -45,6 +49,8 @@ class LandingController extends Controller
         private FacilityRepository $facilityRepository,
         private NewsRepository $newsRepository,
         private TestimonialRepository $testimonialRepository,
+        private SchoolValueRepository $schoolValueRepository,
+        private SchoolStatRepository $schoolStatRepository,
     ) {}
 
     public function __invoke(): JsonResponse
@@ -59,6 +65,7 @@ class LandingController extends Controller
 
             $teachers = $this->teacherRepository->paginate(array_merge($baseFilters, ['type' => 'guru']), 7);
             $principal = $this->teacherRepository->paginate(array_merge($baseFilters, ['type' => 'kepala_sekolah']), 1);
+            $foundationBoard = $this->teacherRepository->paginate(array_merge($baseFilters, ['type' => 'pimpinan_yayasan']), 4);
             $staff = $this->teacherRepository->paginate(array_merge($baseFilters, ['type' => 'staff']), 12);
 
             $activities = $this->studentActivityRepository->paginate(array_merge($baseFilters, ['featured' => true]), 6);
@@ -66,9 +73,11 @@ class LandingController extends Controller
             $events = $this->eventRepository->paginate($baseFilters, 5);
             $documents = $this->documentRepository->paginate($baseFilters, 6);
             $photoAlbums = $this->photoAlbumRepository->paginate($baseFilters, 4);
-            $facilities = $this->facilityRepository->paginate(array_merge($baseFilters, ['featured' => true]), 6);
+            $facilities = $this->facilityRepository->paginate($baseFilters, 8);
             $news = $this->newsRepository->paginate(array_merge($baseFilters, ['featured' => true]), 3);
             $testimonials = $this->testimonialRepository->paginate(array_merge($baseFilters, ['featured' => true]), 6);
+            $schoolValues = $this->schoolValueRepository->paginate($baseFilters, 12);
+            $schoolStats = $this->schoolStatRepository->paginate($baseFilters, 12);
 
             $payload = response()->json(['data' => [
                 'school' => $school ? new SchoolResource($school) : null,
@@ -76,6 +85,7 @@ class LandingController extends Controller
                 'curriculums' => CurriculumResource::collection($curriculums),
                 'teachers' => TeacherResource::collection($teachers),
                 'principal' => TeacherResource::collection($principal),
+                'foundation_board' => TeacherResource::collection($foundationBoard),
                 'staff' => TeacherResource::collection($staff),
                 'activities' => StudentActivityResource::collection($activities),
                 'achievements' => AchievementResource::collection($achievements),
@@ -83,8 +93,11 @@ class LandingController extends Controller
                 'documents' => DocumentResource::collection($documents),
                 'photo_albums' => PhotoAlbumResource::collection($photoAlbums),
                 'facilities' => FacilityResource::collection($facilities),
+                'facilities_total' => $facilities->total(),
                 'news' => NewsResource::collection($news),
                 'testimonials' => TestimonialResource::collection($testimonials),
+                'school_values' => SchoolValueResource::collection($schoolValues),
+                'school_stats' => SchoolStatResource::collection($schoolStats),
             ]])->content();
 
             return json_decode($payload, true)['data'];

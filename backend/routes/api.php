@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AcademicYearController as AdminAcademicYearController;
 use App\Http\Controllers\Admin\AchievementController as AdminAchievementController;
 use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
 use App\Http\Controllers\Admin\AuthController;
@@ -23,16 +24,20 @@ use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\PhotoAlbumController as AdminPhotoAlbumController;
 use App\Http\Controllers\Admin\PmbDocumentController;
+use App\Http\Controllers\Admin\PmbFeeController as AdminPmbFeeController;
 use App\Http\Controllers\Admin\PmbRegistrationController as AdminPmbRegistrationController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SchoolController as AdminSchoolController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\StudentActivityController as AdminStudentActivityController;
 use App\Http\Controllers\Admin\TeacherController as AdminTeacherController;
+use App\Http\Controllers\Admin\SchoolValueController as AdminSchoolValueController;
+use App\Http\Controllers\Admin\SchoolStatController as AdminSchoolStatController;
 use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\Api\V1\AchievementController;
+use App\Http\Controllers\Api\V1\AcademicYearController;
 use App\Http\Controllers\Api\V1\AnnouncementController;
 use App\Http\Controllers\Api\V1\ContactMessageController;
 use App\Http\Controllers\Api\V1\CourseController;
@@ -45,18 +50,27 @@ use App\Http\Controllers\Api\V1\FaqController;
 use App\Http\Controllers\Api\V1\HeroSliderController;
 use App\Http\Controllers\Api\V1\NewsController;
 use App\Http\Controllers\Api\V1\PhotoAlbumController;
+use App\Http\Controllers\Api\V1\PmbFeeController;
 use App\Http\Controllers\Api\V1\PmbRegistrationController;
 use App\Http\Controllers\Api\V1\SchoolController;
+use App\Http\Controllers\Api\V1\SchoolValueController;
+use App\Http\Controllers\Api\V1\SchoolStatController;
 use App\Http\Controllers\Api\V1\SettingController;
 use App\Http\Controllers\Api\V1\StudentActivityController;
 use App\Http\Controllers\Api\V1\TeacherController;
 use App\Http\Controllers\Api\V1\TestimonialController;
 use App\Http\Controllers\Api\V1\VirtualTourController;
+use App\Http\Middleware\EnsureAdminPmbOrAdmin;
 use App\Http\Middleware\EnsurePanelUser;
+use App\Http\Middleware\EnsurePendaftar;
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Controllers\Api\V1\PmbPortalController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware(\App\Http\Middleware\TranslateResponse::class)->group(function (): void {
+    Route::get('academic-years/active', [AcademicYearController::class, 'active']);
+    Route::get('pmb/fees/active', [PmbFeeController::class, 'active']);
+
     Route::get('landing', \App\Http\Controllers\Api\V1\LandingController::class);
 
     Route::get('schools', [SchoolController::class, 'index']);
@@ -87,6 +101,8 @@ Route::prefix('v1')->middleware(\App\Http\Middleware\TranslateResponse::class)->
     Route::get('news/{slug}', [NewsController::class, 'showBySlug'])
         ->name('v1.news.showBySlug');
     Route::get('testimonials', [TestimonialController::class, 'index']);
+    Route::get('school-values', [SchoolValueController::class, 'index']);
+    Route::get('school-stats', [SchoolStatController::class, 'index']);
     Route::get('faqs', [FaqController::class, 'index']);
     Route::get('achievements', [AchievementController::class, 'index']);
     Route::get('achievements/{uuid}', [AchievementController::class, 'show'])->whereUuid('uuid');
@@ -110,7 +126,32 @@ Route::prefix('v1')->middleware(\App\Http\Middleware\TranslateResponse::class)->
 
     Route::post('pmb/registrations', [PmbRegistrationController::class, 'store'])
         ->middleware('throttle:10,1');
-    Route::get('pmb/track/{token}', [PmbRegistrationController::class, 'track']);
+    Route::get('pmb/track/{token}', [PmbRegistrationController::class, 'track'])
+        ->middleware('throttle:10,1');
+
+    Route::get('pmb/portal/media/{media:uuid}', [PmbPortalController::class, 'showMedia'])
+        ->whereUuid('media')
+        ->middleware('signed:relative')
+        ->name('v1.pmb.portal.media');
+
+    Route::post('pmb/portal/login', [PmbPortalController::class, 'login'])
+        ->middleware('throttle:5,1');
+
+    Route::middleware(['auth:sanctum', EnsurePendaftar::class])->prefix('pmb/portal')->group(function (): void {
+        Route::get('me', [PmbPortalController::class, 'me']);
+        Route::post('logout', [PmbPortalController::class, 'logout']);
+        Route::get('notifications', [PmbPortalController::class, 'notifications']);
+        Route::post('notifications/read', [PmbPortalController::class, 'markNotificationsRead']);
+        Route::post('uploads', [PmbPortalController::class, 'upload']);
+        Route::get('registration', [PmbPortalController::class, 'showDraft']);
+        Route::patch('registration', [PmbPortalController::class, 'saveDraft']);
+        Route::post('registration/submit', [PmbPortalController::class, 'submit']);
+        Route::post('registration/correction', [PmbPortalController::class, 'submitCorrection']);
+        Route::get('testimonial', [PmbPortalController::class, 'showTestimonial']);
+        Route::put('testimonial', [PmbPortalController::class, 'upsertTestimonial']);
+        Route::get('registrations/{uuid}', [PmbPortalController::class, 'show'])->whereUuid('uuid');
+        Route::post('registrations/{uuid}/messages', [PmbPortalController::class, 'storeMessage'])->whereUuid('uuid');
+    });
 });
 
 Route::prefix('admin')->group(function (): void {
@@ -147,6 +188,8 @@ Route::prefix('admin')->group(function (): void {
         Route::apiResource('virtual-tours', AdminVirtualTourController::class);
         Route::apiResource('facility-photos', FacilityPhotoController::class);
         Route::apiResource('testimonials', AdminTestimonialController::class);
+        Route::apiResource('school-values', AdminSchoolValueController::class);
+        Route::apiResource('school-stats', AdminSchoolStatController::class);
         Route::apiResource('faqs', AdminFaqController::class);
         Route::apiResource('achievements', AdminAchievementController::class);
         Route::apiResource('extracurriculars', AdminExtracurricularController::class);
@@ -161,10 +204,25 @@ Route::prefix('admin')->group(function (): void {
         Route::apiResource('course-lessons', CourseLessonController::class);
         Route::apiResource('course-enrollments', CourseEnrollmentController::class);
         Route::apiResource('course-progress', CourseProgressController::class);
-        Route::apiResource('pmb-registrations', AdminPmbRegistrationController::class);
-        Route::apiResource('pmb-documents', PmbDocumentController::class);
         Route::apiResource('media', MediaController::class);
         Route::apiResource('settings', AdminSettingController::class);
+        Route::apiResource('academic-years', AdminAcademicYearController::class)->except(['index']);
+        });
+
+        Route::middleware(EnsureAdminPmbOrAdmin::class)->group(function (): void {
+            Route::get('academic-years', [AdminAcademicYearController::class, 'index']);
+            Route::apiResource('pmb-fees', AdminPmbFeeController::class);
+            Route::get('pmb-registrations/stats', [AdminPmbRegistrationController::class, 'stats']);
+            Route::get('pmb-registrations/notifications', [AdminPmbRegistrationController::class, 'notifications']);
+            Route::post('pmb-registrations/notifications/read', [AdminPmbRegistrationController::class, 'markNotificationsRead']);
+            Route::get('pmb-registrations/export', [AdminPmbRegistrationController::class, 'export'])
+                ->middleware('throttle:10,1');
+            Route::get('pmb-registrations/by-uuid/{uuid}', [AdminPmbRegistrationController::class, 'showByUuid'])->whereUuid('uuid');
+            Route::patch('pmb-registrations/by-uuid/{uuid}', [AdminPmbRegistrationController::class, 'updateByUuid'])->whereUuid('uuid');
+            Route::post('pmb-registrations/by-uuid/{uuid}/messages', [AdminPmbRegistrationController::class, 'storeMessage'])->whereUuid('uuid');
+            Route::apiResource('pmb-registrations', AdminPmbRegistrationController::class);
+            Route::apiResource('pmb-documents', PmbDocumentController::class);
+            Route::post('uploads', [UploadController::class, 'store']);
         });
     });
 });

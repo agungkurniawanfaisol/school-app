@@ -26,15 +26,33 @@ use App\Models\User;
 use Database\Seeders\Concerns\SeedsActivityRichContent;
 use Database\Seeders\Concerns\SeedsNewsRichContent;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DemoContentSeeder extends Seeder
 {
     use SeedsActivityRichContent;
     use SeedsNewsRichContent;
+
     public function run(): void
     {
-        $school = School::query()->where('slug', 'nurul-hikmah')->firstOrFail();
-        $admin = User::query()->where('email', 'admin@nurulhikmah.sch.id')->firstOrFail();
+        $school = School::query()->updateOrCreate(
+            ['slug' => 'nurul-hikmah'],
+            [
+                'name' => 'Sekolah Islam Nurul Hikmah',
+                'is_active' => true,
+            ],
+        );
+
+        $admin = User::query()->updateOrCreate(
+            ['email' => 'admin@nurulhikmah.sch.id'],
+            [
+                'name' => 'Administrator',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+                'is_active' => true,
+                'email_verified_at' => now(),
+            ],
+        );
 
         $this->seedHeroSliders($school);
         $this->seedCurriculums($school);
@@ -798,6 +816,7 @@ class DemoContentSeeder extends Seeder
                 'address' => 'Jl. Melati No. 8, Jakarta Selatan',
                 'previous_school' => 'TK Islam Al-Azhar',
                 'grade_applied' => 'SD',
+                'academic_year' => '2026/2027',
                 'status' => 'accepted',
                 'notes' => 'Data contoh untuk demonstrasi pelacakan PMB.',
             ],
@@ -827,6 +846,7 @@ class DemoContentSeeder extends Seeder
                 'address' => 'Jl. Kenanga No. 15, Depok',
                 'previous_school' => 'SDIT Bina Umat',
                 'grade_applied' => 'SMP',
+                'academic_year' => '2026/2027',
                 'status' => 'pending',
             ],
         );
@@ -848,6 +868,9 @@ class DemoContentSeeder extends Seeder
                 'type' => 'string',
             ],
             ['group' => 'pmb', 'key' => 'pmb_fee', 'value' => 'Rp 350.000', 'type' => 'string'],
+            ['group' => 'pmb', 'key' => 'pmb_bank_name', 'value' => 'Bank Syariah Indonesia (BSI)', 'type' => 'string'],
+            ['group' => 'pmb', 'key' => 'pmb_account_number', 'value' => '1234567890', 'type' => 'string'],
+            ['group' => 'pmb', 'key' => 'pmb_account_holder', 'value' => 'Yayasan Nurul Hikmah', 'type' => 'string'],
             ['group' => 'contact', 'key' => 'office_hours', 'value' => 'Senin–Jumat, 07.00–15.00 WIB', 'type' => 'string'],
             [
                 'group' => 'homepage',

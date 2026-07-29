@@ -15,8 +15,25 @@ abstract class TestCase extends BaseTestCase
 
     protected function setUp(): void
     {
+        // Docker Compose sets DB_* in $_SERVER; PHPUnit <env force> updates
+        // putenv/$_ENV but Laravel's env() prefers $_SERVER — pin sqlite first.
+        $this->forceSqliteTestingDatabase();
+
         parent::setUp();
         $this->withoutMiddleware(ThrottleRequests::class);
+    }
+
+    private function forceSqliteTestingDatabase(): void
+    {
+        putenv('DB_CONNECTION=sqlite');
+        putenv('DB_DATABASE=:memory:');
+        putenv('DB_URL');
+        $_ENV['DB_CONNECTION'] = 'sqlite';
+        $_ENV['DB_DATABASE'] = ':memory:';
+        $_ENV['DB_URL'] = '';
+        $_SERVER['DB_CONNECTION'] = 'sqlite';
+        $_SERVER['DB_DATABASE'] = ':memory:';
+        $_SERVER['DB_URL'] = '';
     }
 
     protected function createSchool(array $attributes = []): School

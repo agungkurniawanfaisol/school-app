@@ -32,8 +32,12 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
+        $this->call(AcademicYearSeeder::class);
         $this->call(SchoolAboutSeeder::class);
+        $this->call(SchoolValueSeeder::class);
+        $this->call(SchoolStatSeeder::class);
         $this->call(DemoContentSeeder::class);
+        $this->call(PmbFeeSeeder::class);
         $this->call(VirtualTourSeeder::class);
 
         $teacher = Teacher::query()->orderBy('id')->first();
@@ -46,6 +50,17 @@ class DatabaseSeeder extends Seeder
                 'role' => 'guru',
                 'is_active' => true,
                 'teacher_id' => $teacher?->id,
+                'email_verified_at' => now(),
+            ],
+        );
+
+        User::query()->updateOrCreate(
+            ['email' => 'pendaftar@nurulhikmah.sch.id'],
+            [
+                'name' => 'Calon Siswa Demo',
+                'password' => Hash::make('password'),
+                'role' => User::ROLE_PENDAFTAR,
+                'is_active' => true,
                 'email_verified_at' => now(),
             ],
         );

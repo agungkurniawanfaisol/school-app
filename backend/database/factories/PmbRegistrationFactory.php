@@ -29,7 +29,25 @@ class PmbRegistrationFactory extends Factory
             'parent_email' => fake()->safeEmail(),
             'address' => fake()->address(),
             'grade_applied' => 'SD',
-            'status' => 'pending',
+            'academic_year' => '2026/2027',
+            'user_id' => null,
+            'status' => 'draft',
+            'current_step' => 1,
         ];
+    }
+
+    public function submitted(): static
+    {
+        return $this->state(fn () => ['status' => PmbRegistration::STATUS_AWAITING_VERIFICATION]);
+    }
+
+    public function needsRevision(): static
+    {
+        return $this->state(fn () => ['status' => PmbRegistration::STATUS_NEEDS_REVISION]);
+    }
+
+    public function forUser(\App\Models\User $user): static
+    {
+        return $this->state(fn () => ['user_id' => $user->id]);
     }
 }
