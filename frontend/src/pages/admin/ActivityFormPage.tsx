@@ -150,25 +150,6 @@ export function ActivityFormPage() {
         <Label htmlFor="excerpt">{t('form.excerpt')}</Label>
         <Textarea id="excerpt" value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} />
       </div>
-      <div className="space-y-2">
-        <AdminImageField
-          label={t('form.thumbnail')}
-          value={thumbnail}
-          collection="activities"
-          onChange={(url) => {
-            setThumbnail(url)
-            setDirty(true)
-          }}
-          hint={t('form.activityCoverHint')}
-        />
-      </div>
-      <ActivityPhotoGalleryEditor
-        photos={photos}
-        onChange={(next) => {
-          setPhotos(next)
-          setDirty(true)
-        }}
-      />
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="h-4 w-4" />
         {t('form.showOnHomepage')}
@@ -189,6 +170,32 @@ export function ActivityFormPage() {
           {t('status.published')}
         </p>
       )}
+    </div>
+  )
+
+  const mediaFields = (
+    <div className="space-y-4">
+      <Card className="border-primary/10">
+        <CardContent className="p-4">
+          <AdminImageField
+            label={t('form.thumbnail')}
+            value={thumbnail}
+            collection="activities"
+            onChange={(url) => {
+              setThumbnail(url)
+              setDirty(true)
+            }}
+            hint={t('form.activityCoverHint')}
+          />
+        </CardContent>
+      </Card>
+      <ActivityPhotoGalleryEditor
+        photos={photos}
+        onChange={(next) => {
+          setPhotos(next)
+          setDirty(true)
+        }}
+      />
     </div>
   )
 
@@ -241,12 +248,16 @@ export function ActivityFormPage() {
 
       <div className="lg:grid lg:grid-cols-[320px_1fr] lg:gap-6">
         <Tabs defaultValue="content" className="lg:hidden">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="content">{t('common.content')}</TabsTrigger>
+            <TabsTrigger value="media">{t('common.gallery')}</TabsTrigger>
             <TabsTrigger value="settings">{t('common.settings')}</TabsTrigger>
           </TabsList>
           <TabsContent value="settings" className="mt-4">
             <Card><CardContent className="p-4">{metaFields}</CardContent></Card>
+          </TabsContent>
+          <TabsContent value="media" className="mt-4 space-y-4">
+            {mediaFields}
           </TabsContent>
           <TabsContent value="content" className="mt-4">
             <RichPageEditor
@@ -262,7 +273,8 @@ export function ActivityFormPage() {
         </Tabs>
 
         <Card className="hidden lg:block"><CardContent className="p-4">{metaFields}</CardContent></Card>
-        <div className="hidden lg:block">
+        <div className="hidden space-y-4 lg:block">
+          {mediaFields}
           <RichPageEditor
             collection="activities"
             value={contentJson}
