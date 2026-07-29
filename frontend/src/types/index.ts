@@ -210,7 +210,7 @@ export interface Testimonial {
 }
 
 export interface SchoolValue {
-  id?: number
+  id: number
   uuid: string
   school_id: number
   icon: string | null
@@ -221,7 +221,7 @@ export interface SchoolValue {
 }
 
 export interface SchoolStat {
-  id?: number
+  id: number
   uuid: string
   school_id: number
   icon: string | null

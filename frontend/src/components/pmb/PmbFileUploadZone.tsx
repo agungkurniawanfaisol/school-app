@@ -124,7 +124,7 @@ export function PmbFileUploadZone({
           disabled={isUploading}
         />
 
-        {showImagePreview ? (
+        {showImagePreview && resolvedPreview ? (
           <img
             src={resolvedPreview}
             alt="Pratinjau unggahan"

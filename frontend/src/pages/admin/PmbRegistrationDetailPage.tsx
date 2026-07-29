@@ -24,8 +24,24 @@ import { Input } from '@/components/ui/input'
 import { useAdminPmbMessage, useAdminPmbRegistrationByUuid, useUpdatePmbByUuid } from '@/hooks/usePmb'
 import { PMB_STATUS_DESCRIPTIONS } from '@/config/pmb-portal-nav'
 import { resolveAssetUrl } from '@/lib/safe-url'
+import type { PmbAdminUpdateFormValues } from '@/schemas/pmb'
 import { cn } from '@/lib/utils'
-import type { PmbStatus } from '@/types'
+
+type AdminWritableStatus = NonNullable<PmbAdminUpdateFormValues['status']>
+
+const ADMIN_WRITABLE_STATUSES: readonly AdminWritableStatus[] = [
+  'draft',
+  'awaiting_verification',
+  'needs_revision',
+  'accepted',
+  'rejected',
+]
+
+function toAdminWritableStatus(value: string): AdminWritableStatus {
+  return (ADMIN_WRITABLE_STATUSES as readonly string[]).includes(value)
+    ? (value as AdminWritableStatus)
+    : 'awaiting_verification'
+}
 
 const DRAFT_FIELD_LABELS: Record<string, string> = {
   nickname: 'Nama panggilan',
@@ -151,13 +167,13 @@ export function PmbRegistrationDetailPage() {
   const { data, isLoading, refetch, isFetching } = useAdminPmbRegistrationByUuid(uuid)
   const updateItem = useUpdatePmbByUuid(uuid)
   const message = useAdminPmbMessage(uuid)
-  const [status, setStatus] = useState('awaiting_verification')
+  const [status, setStatus] = useState<AdminWritableStatus>('awaiting_verification')
   const [notes, setNotes] = useState('')
   const [messageBody, setMessageBody] = useState('')
 
   useEffect(() => {
     if (!data) return
-    setStatus(data.status)
+    setStatus(toAdminWritableStatus(data.status))
     setNotes(data.notes ?? '')
   }, [data])
 
@@ -202,7 +218,7 @@ export function PmbRegistrationDetailPage() {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label>{t('form.status')}</Label>
-          <Select value={status} onValueChange={setStatus}>
+          <Select value={status} onValueChange={(value) => setStatus(toAdminWritableStatus(value))}>
             <SelectTrigger className="h-11">
               <SelectValue />
             </SelectTrigger>
@@ -294,7 +310,7 @@ export function PmbRegistrationDetailPage() {
       }
       onSubmit={() =>
         updateItem.mutate({
-          status: status as PmbStatus,
+          status,
           notes: notes || null,
         })
       }

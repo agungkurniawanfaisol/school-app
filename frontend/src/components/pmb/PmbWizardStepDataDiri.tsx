@@ -9,6 +9,7 @@ import { PmbStudentPhotoUpload } from '@/components/pmb/PmbStudentPhotoUpload'
 import { PmbTextInput } from '@/components/pmb/PmbTextInput'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import type { UploadPhase } from '@/hooks/useMediaUpload'
 import { PMB_INPUT_TEXT } from '@/lib/pmb-portal-layout'
 import { cn } from '@/lib/utils'
 import { RELATIONSHIP_OPTIONS, type PmbPortalDraftValues } from '@/schemas/pmb'
@@ -19,7 +20,10 @@ type PmbPortalUploadPurpose = 'student_photo' | 'payment_proof' | 'testimonial_p
 interface PmbWizardStepDataDiriProps {
   form: UseFormReturn<PmbPortalDraftValues>
   registrationUuid?: string | null
-  upload: UseMutationResult<Media, Error, { file: File; purpose: PmbPortalUploadPurpose }, unknown>
+  upload: UseMutationResult<Media, Error, { file: File; purpose: PmbPortalUploadPurpose }, unknown> & {
+    progress: number
+    phase: UploadPhase
+  }
   photoPreviewUrl?: string | null
   onPhotoUploaded: (media: Media) => void
 }
