@@ -57,7 +57,26 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
                 $this->deactivateOthers((int) $data['school_id']);
             }
 
-            $model = $this->model()::create($data);
+            // Unique (school_id, academic_year_id) still applies to soft-deleted rows.
+            // Restore + update instead of inserting a conflicting row.
+            $trashed = $this->model()::withTrashed()
+                ->where('school_id', $data['school_id'])
+                ->where('academic_year_id', $data['academic_year_id'])
+                ->onlyTrashed()
+                ->first();
+
+            if ($trashed instanceof PmbFee) {
+                $trashed->restore();
+                $trashed->update([
+                    'amount' => $data['amount'],
+                    'notes' => $data['notes'] ?? null,
+                    'is_active' => (bool) ($data['is_active'] ?? false),
+                ]);
+                $model = $trashed->fresh();
+            } else {
+                $model = $this->model()::create($data);
+            }
+
             $this->syncSettingIfActive($model);
             $this->clearCache();
 

@@ -122,6 +122,34 @@ class PmbFeeAdminTest extends TestCase
         $this->assertSoftDeleted('pmb_fees', ['id' => $fee->id]);
     }
 
+    public function test_admin_can_recreate_fee_after_soft_delete(): void
+    {
+        $school = $this->createSchool();
+        $year = AcademicYear::factory()->for($school)->create(['label' => '2026/2027']);
+        $fee = PmbFee::factory()->create([
+            'school_id' => $school->id,
+            'academic_year_id' => $year->id,
+            'amount' => 300000,
+            'is_active' => false,
+        ]);
+
+        Sanctum::actingAs(User::factory()->admin()->create());
+
+        $this->deleteJson($this->adminUrl(self::RESOURCE.'/'.$fee->id))
+            ->assertOk();
+
+        $this->postJson($this->adminUrl(self::RESOURCE), [
+            'school_id' => $school->id,
+            'academic_year_id' => $year->id,
+            'amount' => 350000,
+            'notes' => 'BSI',
+            'is_active' => true,
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.amount', 350000)
+            ->assertJsonPath('data.is_active', true);
+    }
+
     public function test_admin_can_destroy_inactive_fee(): void
     {
         $school = $this->createSchool();
