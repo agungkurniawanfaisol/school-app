@@ -1,11 +1,21 @@
 import { Link } from 'react-router-dom'
 import { Building2 } from 'lucide-react'
+import { resolveAssetUrl } from '@/lib/safe-url'
 import { cn } from '@/lib/utils'
-import type { Facility } from '@/types'
+import type { Facility, FacilityPhoto } from '@/types'
+
+function facilityImageSrc(facility: Facility): string | null {
+  const photo: FacilityPhoto | null = facility.photos?.[0] ?? null
+  const raw = photo?.url ?? photo?.path ?? facility.thumbnail
+  if (!raw?.trim()) return null
+  const resolved = resolveAssetUrl(raw, '')
+  if (resolved) return resolved
+  if (raw.startsWith('http') || raw.startsWith('/')) return raw
+  return `/storage/${raw}`
+}
 
 export function FacilityCard({ facility }: { facility: Facility }) {
-  const previewPhoto = facility.photos?.[0] ?? null
-  const imageSrc = previewPhoto?.path ?? facility.thumbnail
+  const imageSrc = facilityImageSrc(facility)
 
   return (
     <Link
@@ -16,33 +26,26 @@ export function FacilityCard({ facility }: { facility: Facility }) {
       )}
       aria-label={facility.name}
     >
-      {imageSrc ? (
-        <img
-          src={imageSrc}
-          alt=""
-          className="aspect-[4/3] w-full object-cover transition-transform duration-300 md:group-hover:scale-[1.02]"
-          loading="lazy"
-        />
-      ) : (
-        <div className="flex aspect-[4/3] items-center justify-center bg-secondary/50">
-          <Building2 className="h-12 w-12 text-primary/30" aria-hidden />
-        </div>
-      )}
-
-      <div className="absolute inset-0 hidden items-end bg-gradient-to-t from-primary/80 via-primary/20 to-transparent p-4 opacity-0 transition-opacity duration-200 md:flex md:group-hover:opacity-100 md:group-focus-visible:opacity-100">
-        <div className="text-primary-foreground">
-          <p className="font-semibold">{facility.name}</p>
+      <div className="relative aspect-[4/3] overflow-hidden">
+        {imageSrc ? (
+          <img
+            src={imageSrc}
+            alt=""
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-secondary/50">
+            <Building2 className="h-12 w-12 text-primary/30" aria-hidden />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+          <p className="line-clamp-2 text-sm font-semibold text-white md:text-base">{facility.name}</p>
           {facility.category && (
-            <p className="text-xs text-primary-foreground/80">{facility.category}</p>
+            <p className="mt-0.5 line-clamp-1 text-xs text-white/75">{facility.category}</p>
           )}
         </div>
-      </div>
-
-      <div className="border-t border-primary/10 p-4 md:hidden">
-        <p className="font-medium text-foreground">{facility.name}</p>
-        {facility.description && (
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{facility.description}</p>
-        )}
       </div>
     </Link>
   )

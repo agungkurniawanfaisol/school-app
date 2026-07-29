@@ -11,6 +11,8 @@ import { facilityKeys } from '@/hooks/useFacilities'
 import { newsKeys } from '@/hooks/useNews'
 import { photoAlbumKeys } from '@/hooks/usePhotoAlbums'
 import { schoolKeys } from '@/hooks/useSchool'
+import { schoolStatKeys } from '@/hooks/useSchoolStats'
+import { schoolValueKeys } from '@/hooks/useSchoolValues'
 import { teacherKeys } from '@/hooks/useTeachers'
 import { testimonialKeys } from '@/hooks/useTestimonials'
 import type {
@@ -22,6 +24,8 @@ import type {
   PaginatedResponse,
   PhotoAlbum,
   School,
+  SchoolStat,
+  SchoolValue,
   StudentActivity,
   Teacher,
   Testimonial,
@@ -33,6 +37,7 @@ interface LandingData {
   curriculums: Curriculum[]
   teachers: Teacher[]
   principal: Teacher[]
+  foundation_board: Teacher[]
   staff: Teacher[]
   activities: StudentActivity[]
   achievements: Achievement[]
@@ -40,23 +45,28 @@ interface LandingData {
   documents: Document[]
   photo_albums: PhotoAlbum[]
   facilities: Facility[]
+  /** Full facilities count for landing gallery load-more (optional; falls back to page length). */
+  facilities_total?: number
   news: News[]
   testimonials: Testimonial[]
+  school_values: SchoolValue[]
+  school_stats: SchoolStat[]
 }
 
 const LANDING_KEY = ['landing'] as const
 
-function wrapPaginated<T>(items: T[], perPage: number): PaginatedResponse<T> {
+function wrapPaginated<T>(items: T[], perPage: number, total?: number): PaginatedResponse<T> {
+  const resolvedTotal = total ?? items.length
   return {
     data: items,
     meta: {
       current_page: 1,
       from: items.length > 0 ? 1 : null,
-      last_page: 1,
+      last_page: Math.max(1, Math.ceil(resolvedTotal / perPage)),
       path: '',
       per_page: perPage,
       to: items.length > 0 ? items.length : null,
-      total: items.length,
+      total: resolvedTotal,
     },
     links: { first: null, last: null, prev: null, next: null },
   }
@@ -76,6 +86,10 @@ function seedSectionCaches(qc: QueryClient, data: LandingData): void {
     wrapPaginated(data.principal, 1),
   )
   qc.setQueryData(
+    teacherKeys.list(buildQueryParams({ type: 'pimpinan_yayasan', per_page: 4 })),
+    wrapPaginated(data.foundation_board ?? [], 4),
+  )
+  qc.setQueryData(
     teacherKeys.list(buildQueryParams({ type: 'staff', per_page: 12 })),
     wrapPaginated(data.staff, 12),
   )
@@ -92,8 +106,8 @@ function seedSectionCaches(qc: QueryClient, data: LandingData): void {
     wrapPaginated(data.achievements, 6),
   )
   qc.setQueryData(
-    facilityKeys.list(buildQueryParams({ per_page: 6, featured: true })),
-    wrapPaginated(data.facilities, 6),
+    facilityKeys.list(buildQueryParams({ per_page: 8 })),
+    wrapPaginated(data.facilities, 8, data.facilities_total),
   )
   qc.setQueryData(
     eventKeys.list(buildQueryParams({ per_page: 5 })),
@@ -114,6 +128,14 @@ function seedSectionCaches(qc: QueryClient, data: LandingData): void {
   qc.setQueryData(
     testimonialKeys.list(buildQueryParams({ per_page: 6, featured: true })),
     wrapPaginated(data.testimonials, 6),
+  )
+  qc.setQueryData(
+    schoolValueKeys.list(buildQueryParams({ per_page: 12 })),
+    wrapPaginated(data.school_values ?? [], 12),
+  )
+  qc.setQueryData(
+    schoolStatKeys.list(buildQueryParams({ per_page: 12 })),
+    wrapPaginated(data.school_stats ?? [], 12),
   )
 }
 

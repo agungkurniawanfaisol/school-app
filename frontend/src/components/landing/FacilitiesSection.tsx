@@ -1,25 +1,29 @@
-import { ArrowRight } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowRight, Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import { Carousel, CarouselContent, CarouselDots, CarouselItem } from '@/components/ui/carousel'
 import { Skeleton } from '@/components/ui/skeleton'
-import { StaggerChildren, StaggerItem } from '@/components/motion'
+import { FadeInView } from '@/components/motion/FadeInView'
 import { FacilityCard } from '@/components/landing/FacilityCard'
 import { SectionHeader } from '@/components/landing/SectionHeader'
 import { useFacilitiesList } from '@/hooks/useFacilities'
 import { cn } from '@/lib/utils'
 
-export const LANDING_FACILITY_LIMIT = 6
+/** Initial gallery page size (2×4 on large screens). API max per_page is 50. */
+export const LANDING_FACILITY_PAGE_SIZE = 8
+export const LANDING_FACILITY_MAX = 50
 
 export function FacilitiesSection() {
   const { t } = useTranslation('landing')
+  const [limit, setLimit] = useState(LANDING_FACILITY_PAGE_SIZE)
   const { data, isLoading, isFetching } = useFacilitiesList({
-    per_page: LANDING_FACILITY_LIMIT,
-    featured: true,
+    per_page: limit,
   })
   const facilities = data?.data ?? []
-  const hasMore = (data?.meta?.total ?? 0) > facilities.length
+  const total = data?.meta?.total ?? facilities.length
+  const canRaiseLimit = limit < LANDING_FACILITY_MAX && total > facilities.length
+  const showCatalogCta = total > facilities.length || total > LANDING_FACILITY_PAGE_SIZE
 
   return (
     <section id="fasilitas" className="section-padding pattern-bg">
@@ -32,19 +36,17 @@ export function FacilitiesSection() {
             align="left"
             className="mb-0"
           />
-          {hasMore && !isLoading && (
-            <Button asChild className="min-h-11 shrink-0 shadow-md shadow-primary/20">
-              <Link to="/fasilitas">
-                {t('facilities.viewAll')}
-                <ArrowRight className="h-4 w-4" aria-hidden />
-              </Link>
-            </Button>
-          )}
+          <Button asChild variant="outline" className="min-h-11 shrink-0 border-primary text-primary hover:bg-secondary">
+            <Link to="/fasilitas">
+              {t('facilities.viewAll')}
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </Button>
         </div>
 
         {isLoading ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
               <Skeleton key={i} className="aspect-[4/3] w-full rounded-xl" />
             ))}
           </div>
@@ -52,47 +54,45 @@ export function FacilitiesSection() {
           <p className="text-center text-muted-foreground">{t('facilities.empty')}</p>
         ) : (
           <>
-            <StaggerChildren
-              className={cn(
-                'hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3',
-                isFetching && 'opacity-70',
-              )}
-            >
-              {facilities.map((facility) => (
-                <StaggerItem key={facility.id}>
-                  <FacilityCard facility={facility} />
-                </StaggerItem>
-              ))}
-            </StaggerChildren>
+            <FadeInView direction="up" tier="full">
+              <div
+                className={cn(
+                  'grid grid-cols-2 gap-4 lg:grid-cols-4',
+                  isFetching && 'opacity-70',
+                )}
+                data-testid="facilities-gallery"
+              >
+                {facilities.map((facility) => (
+                  <FacilityCard key={facility.id} facility={facility} />
+                ))}
+              </div>
+            </FadeInView>
 
-            <div className={cn('md:hidden', isFetching && 'opacity-70')}>
-              <Carousel opts={{ align: 'start', loop: false, dragFree: true }} className="w-full">
-                <CarouselContent className="-ml-4">
-                  {facilities.map((facility) => (
-                    <CarouselItem key={facility.id} className="basis-[88%] pl-4 sm:basis-[72%]">
-                      <FacilityCard facility={facility} />
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                {facilities.length > 1 && <CarouselDots count={facilities.length} className="mt-4" />}
-              </Carousel>
-              {facilities.length > 1 && (
-                <p className="mt-2 text-center text-xs text-muted-foreground">
-                  {t('facilities.swipe')}
-                </p>
+            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              {canRaiseLimit && (
+                <Button
+                  type="button"
+                  className="min-h-11 w-full shadow-md shadow-primary/20 sm:w-auto"
+                  disabled={isFetching}
+                  onClick={() =>
+                    setLimit((prev) => Math.min(prev + LANDING_FACILITY_PAGE_SIZE, LANDING_FACILITY_MAX))
+                  }
+                >
+                  {isFetching ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  ) : null}
+                  {t('facilities.loadMore')}
+                </Button>
               )}
-            </div>
-
-            {hasMore && (
-              <div className="mt-8 text-center md:hidden">
+              {showCatalogCta && (
                 <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
                   <Link to="/fasilitas">
                     {t('facilities.viewAllMobile')}
                     <ArrowRight className="h-4 w-4" aria-hidden />
                   </Link>
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </>
         )}
       </div>

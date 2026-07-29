@@ -235,6 +235,19 @@
     box-shadow: 4px 0 24px rgb(15 36 20 / 0.18);
   }
 
+  .pmb-portal-sidebar {
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    border-color: var(--sidebar-border);
+    box-shadow: 4px 0 24px rgb(15 36 20 / 0.14);
+  }
+
+  .pmb-portal-content {
+    background-color: var(--background);
+    background-image: radial-gradient(var(--pattern-dot) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
   .admin-sidebar-pattern {
     background-image: radial-gradient(var(--pattern-dot) 1px, transparent 1px);
     background-size: 18px 18px;
@@ -353,7 +366,7 @@
   }
 
   .admin-toolbar {
-    @apply flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between;
+    @apply flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-4;
   }
 
   .admin-stat-icon {
@@ -369,7 +382,8 @@
   }
 
   .admin-form-footer {
-    @apply sticky bottom-0 z-10 -mx-4 flex flex-wrap gap-2 border-t border-primary/10 bg-background/95 px-4 py-4 backdrop-blur-sm sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8;
+    @apply sticky bottom-0 z-10 -mx-4 flex flex-wrap gap-2 border-t border-primary/10 bg-background/95 px-4 pt-4 backdrop-blur-sm sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
   }
 
   .admin-fade-in {
@@ -401,7 +415,7 @@
   }
 
   .admin-list-toolbar {
-    @apply border-b border-primary/10 bg-muted/25 px-4 py-3 sm:px-6 sm:py-4;
+    @apply border-b border-primary/10 bg-muted/20 px-3 py-3 sm:px-5 sm:py-4;
   }
 
   .admin-dashboard-hero {
@@ -905,4 +919,106 @@ div.vt-hotspot-nav span {
 
 .animate-splash-out {
   animation: splash-out 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Confetti burst for accepted PMB celebration */
+.pmb-confetti-piece {
+  animation: pmb-confetti-fall 2.6s ease-out forwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+  transform: translateX(calc((var(--i, 0) - 9) * 12px));
+}
+
+@keyframes pmb-confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateX(calc((var(--i, 0) - 9) * 12px)) translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(calc((var(--i, 0) - 9) * 18px)) translateY(220px) rotate(420deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmb-confetti-piece {
+    animation: none !important;
+    display: none !important;
+  }
+}
+
+/* PMB print — only blank the page when printing admin analytics or portal LoA/form */
+@media print {
+  body:has(.pmb-registrations-page) * {
+    visibility: hidden;
+  }
+
+  body:has(.pmb-registrations-page) .pmb-registrations-page,
+  body:has(.pmb-registrations-page) .pmb-registrations-page * {
+    visibility: visible;
+  }
+
+  body:has(.pmb-registrations-page) .pmb-registrations-page {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    background: white;
+  }
+
+  body[data-pmb-printing] * {
+    visibility: hidden;
+  }
+
+  body[data-pmb-printing] .pmb-print-root[data-print-active='true'],
+  body[data-pmb-printing] .pmb-print-root[data-print-active='true'] * {
+    visibility: visible;
+  }
+
+  body[data-pmb-printing] .pmb-print-root[data-print-active='true'] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+
+  body[data-pmb-printing] .pmb-doc-sheet {
+    max-width: none !important;
+    padding: 12mm !important;
+  }
+
+  body:has(.pmb-registrations-page) .print\:hidden,
+  body:has(.pmb-registrations-page) aside,
+  body:has(.pmb-registrations-page) [data-sidebar],
+  body:has(.pmb-registrations-page) nav,
+  body:has(.pmb-registrations-page) header,
+  body:has(.pmb-registrations-page) .admin-toolbar,
+  body:has(.pmb-registrations-page) [data-testid='pmb-export-actions'],
+  body:has(.pmb-registrations-page) .admin-list-toolbar,
+  body[data-pmb-printing] .print\:hidden {
+    display: none !important;
+  }
+
+  body:has(.pmb-registrations-page) .admin-card {
+    break-inside: avoid;
+    box-shadow: none !important;
+  }
+
+  body:has(.pmb-registrations-page) [data-testid='pmb-analytics-dashboard'] {
+    break-after: page;
+  }
+
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmb-registrations-page .admin-fade-in,
+  .pmb-registrations-page .admin-card {
+    animation: none !important;
+    transition: none !important;
+  }
 }
