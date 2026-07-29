@@ -10,6 +10,7 @@ import {
   FolderOpen,
   GraduationCap,
   HelpCircle,
+  Heart,
   Image,
   ImageIcon,
   LayoutDashboard,
@@ -24,6 +25,7 @@ import {
   Users,
   UserCog,
   UserRound,
+  Wallet,
 } from 'lucide-react'
 import type { UserRole } from '@/types'
 
@@ -104,6 +106,7 @@ export const adminNavTree: AdminNavGroup[] = [
     defaultHref: '/admin/pmb-registrations',
     children: [
       { labelKey: 'nav.pmbRegistrations', href: '/admin/pmb-registrations', icon: GraduationCap },
+      { labelKey: 'nav.pmbFees', href: '/admin/pmb-fees', icon: Wallet },
       { labelKey: 'nav.faqs', href: '/admin/faqs', icon: HelpCircle },
     ],
   },
@@ -114,9 +117,12 @@ export const adminNavTree: AdminNavGroup[] = [
     children: [
       { labelKey: 'nav.schools', href: '/admin/schools', icon: School },
       { labelKey: 'nav.visionMission', href: '/admin/vision-mission', icon: Target },
+      { labelKey: 'nav.schoolValues', href: '/admin/nilai-kami', icon: Heart },
+      { labelKey: 'nav.schoolStats', href: '/admin/statistik-sekolah', icon: Users },
       { labelKey: 'nav.media', href: '/admin/media', icon: FileImage },
       { labelKey: 'nav.contactMessages', href: '/admin/contact-messages', icon: Mail },
       { labelKey: 'nav.users', href: '/admin/users', icon: UserCog },
+      { labelKey: 'nav.academicYears', href: '/admin/academic-years', icon: Calendar },
       { labelKey: 'nav.settings', href: '/admin/settings', icon: Settings },
     ],
   },
@@ -147,6 +153,14 @@ export function getAdminNavForRole(role: UserRole | string) {
     }
   }
 
+  if (role === 'admin_pmb') {
+    return {
+      showDashboard: false,
+      groups: adminNavTree.filter((group) => group.labelKey === 'nav.group.pmb'),
+      profileItem: guruProfileItem,
+    }
+  }
+
   return {
     showDashboard: true,
     groups: adminNavTree,
@@ -156,6 +170,15 @@ export function getAdminNavForRole(role: UserRole | string) {
 
 export function isGuruAllowedPath(pathname: string): boolean {
   return pathname === '/admin/profile'
+}
+
+export function isAdminPmbAllowedPath(pathname: string): boolean {
+  return (
+    pathname === '/admin/profile'
+    || pathname.startsWith('/admin/pmb-registrations')
+    || pathname.startsWith('/admin/pmb-fees')
+    || pathname.startsWith('/admin/faqs')
+  )
 }
 
 export function getAdminBreadcrumbs(pathname: string): AdminBreadcrumb[] {
@@ -290,6 +313,19 @@ export function getAdminBreadcrumbs(pathname: string): AdminBreadcrumb[] {
     return crumbs
   }
 
+  if (pathname.startsWith('/admin/pmb-fees')) {
+    crumbs.push({ labelKey: 'nav.group.pmb' }, { labelKey: 'nav.pmbFees', href: '/admin/pmb-fees' })
+    if (pathname.endsWith('/create')) crumbs.push({ labelKey: 'nav.breadcrumb.add' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/academic-years')) {
+    crumbs.push({ labelKey: 'nav.group.system' }, { labelKey: 'nav.academicYears', href: '/admin/academic-years' })
+    if (pathname.endsWith('/create')) crumbs.push({ labelKey: 'nav.breadcrumb.add' })
+    else if (pathname.includes('/edit')) crumbs.push({ labelKey: 'nav.breadcrumb.edit' })
+    return crumbs
+  }
+
   if (pathname.startsWith('/admin/schools')) {
     crumbs.push({ labelKey: 'nav.group.system' }, { labelKey: 'nav.schools' })
     if (pathname.endsWith('/create')) crumbs.push({ labelKey: 'nav.breadcrumb.add' })
@@ -299,6 +335,20 @@ export function getAdminBreadcrumbs(pathname: string): AdminBreadcrumb[] {
 
   if (pathname === '/admin/vision-mission') {
     crumbs.push({ labelKey: 'nav.group.system' }, { labelKey: 'nav.visionMission' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/nilai-kami')) {
+    crumbs.push({ labelKey: 'nav.group.system' }, { labelKey: 'nav.schoolValues', href: '/admin/nilai-kami' })
+    if (pathname.endsWith('/create')) crumbs.push({ labelKey: 'nav.breadcrumb.add' })
+    else if (pathname.includes('/edit')) crumbs.push({ labelKey: 'nav.breadcrumb.edit' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/statistik-sekolah')) {
+    crumbs.push({ labelKey: 'nav.group.system' }, { labelKey: 'nav.schoolStats', href: '/admin/statistik-sekolah' })
+    if (pathname.endsWith('/create')) crumbs.push({ labelKey: 'nav.breadcrumb.add' })
+    else if (pathname.includes('/edit')) crumbs.push({ labelKey: 'nav.breadcrumb.edit' })
     return crumbs
   }
 

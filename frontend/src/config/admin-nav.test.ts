@@ -6,6 +6,7 @@ import {
   getAdminNavForRole,
   isAdminNavActive,
   isGuruAllowedPath,
+  isAdminPmbAllowedPath,
 } from '@/config/admin-nav'
 
 describe('admin-nav', () => {
@@ -36,6 +37,11 @@ describe('admin-nav', () => {
       { labelKey: 'nav.admin', href: '/admin' },
       { labelKey: 'nav.dashboard' },
     ])
+    expect(getAdminBreadcrumbs('/admin/statistik-sekolah')).toEqual([
+      { labelKey: 'nav.admin', href: '/admin' },
+      { labelKey: 'nav.group.system' },
+      { labelKey: 'nav.schoolStats', href: '/admin/statistik-sekolah' },
+    ])
   })
 
   it('getAdminGroupDefaultHref returns default page per group', () => {
@@ -60,5 +66,15 @@ describe('admin-nav', () => {
   it('isGuruAllowedPath only allows profile route', () => {
     expect(isGuruAllowedPath('/admin/profile')).toBe(true)
     expect(isGuruAllowedPath('/admin/news')).toBe(false)
+  })
+
+  it('limits admin PMB navigation to PMB and profile', () => {
+    const nav = getAdminNavForRole('admin_pmb')
+    expect(nav.showDashboard).toBe(false)
+    expect(nav.groups).toHaveLength(1)
+    expect(nav.groups[0]?.labelKey).toBe('nav.group.pmb')
+    expect(isAdminPmbAllowedPath('/admin/pmb-registrations/example')).toBe(true)
+    expect(isAdminPmbAllowedPath('/admin/pmb-fees')).toBe(true)
+    expect(isAdminPmbAllowedPath('/admin/news')).toBe(false)
   })
 })
