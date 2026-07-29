@@ -89,19 +89,30 @@ Lalu simpan seluruh output sebagai secret `DEPLOY_KNOWN_HOSTS`.
 
 Artinya runner GitHub **tidak bisa membuka TCP** ke host:port SSH (bukan salah password dulu).
 
+Log CI menampilkan `host_len=…`. Contoh mencurigakan: **`host_len=13`** bisa berarti secret
+`DEPLOY_HOST=hostinger.com` (salah) — harus **IP/hostname SSH dari hPanel**.
+
 1. **Port** — secret `DEPLOY_PORT` = `65002` (Hostinger shared). Jangan `22` kecuali VPS.
-2. **Host** — pakai **IP SSH dari hPanel** (Advanced → SSH Access), bukan hanya domain website.
+2. **Host** — pakai **IP SSH dari hPanel** (Advanced → SSH Access), bukan `hostinger.com` / domain marketing saja.
 3. **SSH aktif** — hPanel → Advanced → SSH Access → **Enable**.
 4. **Uji dari laptop** (harus berhasil dulu):
    ```bash
    ssh -p 65002 DEPLOY_USER@DEPLOY_HOST
    ```
-5. **Laptop OK, Actions timeout** — Hostinger/firewall sering memblokir IP datacenter GitHub.  
-   - Buka tiket Hostinger: minta izinkan koneksi SSH dari GitHub Actions, **atau**  
-   - Deploy manual sementara: `rsync` dari laptop, **atau**  
-   - Self-hosted runner di mesin yang bisa SSH ke Hostinger.
+5. **Laptop OK, Actions timeout** — Hostinger sering memblokir IP datacenter GitHub.
+   - Buka tiket Hostinger agar SSH dari GitHub Actions diizinkan, **atau**
+   - Deploy dari laptop (skrip sama alur CI):
 
-Workflow sekarang punya **preflight TCP/SSH + retry rsync 3×** agar gagal lebih jelas dan tahan gangguan singkat.
+```bash
+export DEPLOY_HOST='IP_DARI_HPANEL'
+export DEPLOY_USER='u……'
+export DEPLOY_PATH='/home/u……/domains/nurulhikmahsda.sch.id/public_html'
+export DEPLOY_PORT=65002
+export DEPLOY_SSH_KEY="$HOME/.ssh/hostinger_deploy"   # opsional
+bash deploy/from-laptop.sh
+```
+
+Workflow **tidak bisa** menembus firewall Hostinger jika IP GitHub diblok; preflight hanya membuat error lebih jelas.
 
 ---
 
