@@ -58,4 +58,43 @@ class SettingApiTest extends TestCase
         $this->assertSame('Sekolah Islam Nurul Hikmah', $value['title']);
         $this->assertSame(2500, $value['duration_ms']);
     }
+
+    public function test_pmb_group_exposes_bank_transfer_settings_when_present(): void
+    {
+        $school = \App\Models\School::factory()->create();
+
+        Setting::factory()->create([
+            'school_id' => $school->id,
+            'group' => 'pmb',
+            'key' => 'pmb_bank_name',
+            'value' => 'Bank Syariah Indonesia (BSI)',
+            'type' => 'string',
+        ]);
+        Setting::factory()->create([
+            'school_id' => $school->id,
+            'group' => 'pmb',
+            'key' => 'pmb_account_number',
+            'value' => '7123456789',
+            'type' => 'string',
+        ]);
+        Setting::factory()->create([
+            'school_id' => $school->id,
+            'group' => 'pmb',
+            'key' => 'pmb_account_holder',
+            'value' => 'Yayasan Nurul Hikmah',
+            'type' => 'string',
+        ]);
+
+        $response = $this->getJson('/api/v1/settings?group=pmb&school_id='.$school->id)
+            ->assertOk();
+
+        $keys = collect($response->json('data'))->pluck('key')->all();
+        $this->assertContains('pmb_bank_name', $keys);
+        $this->assertContains('pmb_account_number', $keys);
+        $this->assertContains('pmb_account_holder', $keys);
+        $this->assertSame(
+            'Bank Syariah Indonesia (BSI)',
+            collect($response->json('data'))->firstWhere('key', 'pmb_bank_name')['value'],
+        );
+    }
 }

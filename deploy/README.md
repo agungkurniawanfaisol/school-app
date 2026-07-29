@@ -63,13 +63,13 @@ Atau File Manager → buka `public_html` → lihat path di atas.
 
 Repo → **Settings → Secrets and variables → Actions → New repository secret**
 
-| Secret           | Isi dari Hostinger                               |
-| ---------------- | ------------------------------------------------ |
-| `DEPLOY_HOST`    | IP / hostname SSH                                |
-| `DEPLOY_USER`    | username `u…`                                    |
-| `DEPLOY_SSH_KEY` | isi penuh private key (`BEGIN` … `END`)          |
-| `DEPLOY_PATH`    | `/home/u…/domains/namadomain.com/public_html`    |
-| `DEPLOY_PORT`    | `65002` (opsional; default workflow sudah 65002) |
+| Secret               | Isi dari Hostinger                                        |
+| -------------------- | --------------------------------------------------------- |
+| `DEPLOY_HOST`        | IP / hostname SSH                                         |
+| `DEPLOY_USER`        | username `u…`                                             |
+| `DEPLOY_SSH_KEY`     | isi penuh private key (`BEGIN` … `END`)                   |
+| `DEPLOY_PATH`        | `/home/u…/domains/namadomain.com/public_html`             |
+| `DEPLOY_PORT`        | `65002` (opsional; default workflow sudah 65002)          |
 | `DEPLOY_KNOWN_HOSTS` | (opsional) output `ssh-keyscan -p 65002 HOST` dari laptop |
 
 Opsional: `DEPLOY_PHP` jika `php` tidak ketemu (mis. `/opt/alt/php83/usr/bin/php`).
