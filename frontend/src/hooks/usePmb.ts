@@ -15,6 +15,7 @@ import type {
   Setting,
 } from '@/types'
 import type { PmbAdminUpdateFormValues, PmbPortalDraftValues, PmbRegisterFormValues } from '@/schemas/pmb'
+import type { PmbEmailBroadcastFormValues, PmbEmailSendFormValues } from '@/schemas/pmb-email'
 import { buildDraftPayload, syncLegacyParentFields } from '@/schemas/pmb'
 import {
   ALLOWED_PMB_PROOF_TYPES,
@@ -514,6 +515,42 @@ export function usePmbPortalUpload() {
   })
 
   return { ...mutation, progress, phase }
+}
+
+export function useSendPmbEmail() {
+  return useMutation({
+    mutationFn: async (payload: PmbEmailSendFormValues) => {
+      const { data } = await api.post<ApiResponse<{ queued: number; skipped: number }>>(
+        '/admin/pmb-emails/send',
+        payload,
+      )
+      return data
+    },
+    onSuccess: (response) => {
+      const queued = response.data?.queued ?? 0
+      const skipped = response.data?.skipped ?? 0
+      toast.success(`Email dijadwalkan (${queued} terkirim, ${skipped} dilewati).`)
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Gagal mengirim email.')),
+  })
+}
+
+export function useBroadcastPmbEmail() {
+  return useMutation({
+    mutationFn: async (payload: PmbEmailBroadcastFormValues) => {
+      const { data } = await api.post<ApiResponse<{ queued: number; skipped: number }>>(
+        '/admin/pmb-emails/broadcast',
+        payload,
+      )
+      return data
+    },
+    onSuccess: (response) => {
+      const queued = response.data?.queued ?? 0
+      const skipped = response.data?.skipped ?? 0
+      toast.success(`Broadcast dijadwalkan (${queued} terkirim, ${skipped} dilewati).`)
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Gagal broadcast email.')),
+  })
 }
 
 export function useDeletePmbRegistration() {

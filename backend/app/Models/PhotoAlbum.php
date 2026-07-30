@@ -30,6 +30,9 @@ class PhotoAlbum extends Model
     {
         static::creating(function (Model $model): void {
             $model->uuid ??= (string) Str::uuid();
+            if (empty($model->slug) && ! empty($model->title)) {
+                $model->slug = Str::slug($model->title).'-'.Str::random(6);
+            }
         });
     }
 

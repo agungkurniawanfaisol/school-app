@@ -20,6 +20,7 @@ abstract class TestCase extends BaseTestCase
         $this->forceSqliteTestingDatabase();
 
         parent::setUp();
+        config(['queue.default' => 'sync']);
         $this->withoutMiddleware(ThrottleRequests::class);
     }
 
@@ -28,12 +29,15 @@ abstract class TestCase extends BaseTestCase
         putenv('DB_CONNECTION=sqlite');
         putenv('DB_DATABASE=:memory:');
         putenv('DB_URL');
+        putenv('QUEUE_CONNECTION=sync');
         $_ENV['DB_CONNECTION'] = 'sqlite';
         $_ENV['DB_DATABASE'] = ':memory:';
         $_ENV['DB_URL'] = '';
+        $_ENV['QUEUE_CONNECTION'] = 'sync';
         $_SERVER['DB_CONNECTION'] = 'sqlite';
         $_SERVER['DB_DATABASE'] = ':memory:';
         $_SERVER['DB_URL'] = '';
+        $_SERVER['QUEUE_CONNECTION'] = 'sync';
     }
 
     protected function createSchool(array $attributes = []): School

@@ -14,6 +14,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
+import { PmbEmailDialog } from '@/components/admin/pmb/PmbEmailDialog'
 import { PmbMessageThread } from '@/components/pmb/PmbMessageThread'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -21,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useAdminPmbMessage, useAdminPmbRegistrationByUuid, useUpdatePmbByUuid } from '@/hooks/usePmb'
+import { useAdminPmbMessage, useAdminPmbRegistrationByUuid, useSendPmbEmail, useUpdatePmbByUuid } from '@/hooks/usePmb'
 import { PMB_STATUS_DESCRIPTIONS } from '@/config/pmb-portal-nav'
 import { resolveAssetUrl } from '@/lib/safe-url'
 import type { PmbAdminUpdateFormValues } from '@/schemas/pmb'
@@ -166,10 +167,12 @@ export function PmbRegistrationDetailPage() {
   const navigate = useNavigate()
   const { data, isLoading, refetch, isFetching } = useAdminPmbRegistrationByUuid(uuid)
   const updateItem = useUpdatePmbByUuid(uuid)
+  const sendEmail = useSendPmbEmail()
   const message = useAdminPmbMessage(uuid)
   const [status, setStatus] = useState<AdminWritableStatus>('awaiting_verification')
   const [notes, setNotes] = useState('')
   const [messageBody, setMessageBody] = useState('')
+  const [emailOpen, setEmailOpen] = useState(false)
 
   useEffect(() => {
     if (!data) return
@@ -195,6 +198,12 @@ export function PmbRegistrationDetailPage() {
   const photoUrl = data.student_photo?.url ? resolveAssetUrl(data.student_photo.url, '') : ''
   const paymentVerified = Boolean(paymentInfo?.verified_at)
   const awaitingPayment = data.status === 'awaiting_verification' && !paymentVerified
+  const isAccepted = data.status === 'accepted'
+  const isRejected = data.status === 'rejected'
+  const loaIssued = Boolean(data.loa_issued_at)
+  const showPaymentActions = !isAccepted && !isRejected
+  const showIssueLoa = isAccepted && !loaIssued
+  const showQuickActions = showPaymentActions || showIssueLoa
   const statusHelp =
     data.status_description ||
     t(`pages.pmb.statusDesc.${status}`, { defaultValue: PMB_STATUS_DESCRIPTIONS[status] ?? '' })
@@ -212,7 +221,11 @@ export function PmbRegistrationDetailPage() {
           </p>
         ) : null}
         <p className="text-xs text-muted-foreground">
-          Ubah status, verifikasi pembayaran, atau terbitkan LoA dari panel ini.
+          {showQuickActions
+            ? 'Ubah status, verifikasi pembayaran, atau terbitkan LoA dari panel ini.'
+            : isAccepted
+              ? 'Pendaftaran sudah diterima. LoA telah diterbitkan.'
+              : 'Pendaftaran sudah ditolak. Status masih dapat diubah jika diperlukan.'}
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -253,42 +266,72 @@ export function PmbRegistrationDetailPage() {
           />
           <p className="text-xs text-muted-foreground">{t('form.adminNotesHint')}</p>
         </div>
-        <div className="space-y-2 border-t border-primary/10 pt-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Tindakan cepat</p>
-          <Button
-            type="button"
-            className="min-h-11 w-full justify-start gap-2"
-            variant={awaitingPayment ? 'default' : 'outline'}
-            onClick={() => updateItem.mutate({ action: 'verify_payment' })}
-            disabled={updateItem.isPending}
-          >
-            <CheckCircle2 className="h-4 w-4" aria-hidden />
-            Verifikasi pembayaran
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="min-h-11 w-full justify-start gap-2 border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive"
-            onClick={() => updateItem.mutate({ action: 'reject_payment' })}
-            disabled={updateItem.isPending}
-          >
-            <XCircle className="h-4 w-4" aria-hidden />
-            Tolak pembayaran
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="min-h-11 w-full justify-start gap-2"
-            disabled={data.status !== 'accepted' || updateItem.isPending}
-            onClick={() => updateItem.mutate({ action: 'issue_loa' })}
-          >
-            <FileText className="h-4 w-4" aria-hidden />
-            Terbitkan LoA
-          </Button>
-        </div>
+        {showQuickActions ? (
+          <div className="space-y-2 border-t border-primary/10 pt-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Tindakan cepat</p>
+            {showPaymentActions ? (
+              <>
+                <Button
+                  type="button"
+                  className="min-h-11 w-full justify-start gap-2"
+                  variant={awaitingPayment ? 'default' : 'outline'}
+                  onClick={() => updateItem.mutate({ action: 'verify_payment' })}
+                  disabled={updateItem.isPending}
+                >
+                  <CheckCircle2 className="h-4 w-4" aria-hidden />
+                  Verifikasi pembayaran
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-11 w-full justify-start gap-2 border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive"
+                  onClick={() => updateItem.mutate({ action: 'reject_payment' })}
+                  disabled={updateItem.isPending}
+                >
+                  <XCircle className="h-4 w-4" aria-hidden />
+                  Tolak pembayaran
+                </Button>
+              </>
+            ) : null}
+            {showIssueLoa ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11 w-full justify-start gap-2"
+                disabled={updateItem.isPending}
+                onClick={() => updateItem.mutate({ action: 'issue_loa' })}
+              >
+                <FileText className="h-4 w-4" aria-hidden />
+                Terbitkan LoA
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   )
+
+  const emailPanel = data.parent_email ? (
+    <Card className="admin-card-elevated border-primary/15">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">Kirim email</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-xs text-muted-foreground">
+          Email dikirim ke <strong>{data.parent_email}</strong> (Email Aktif 1).
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          className="min-h-11 w-full justify-start gap-2"
+          onClick={() => setEmailOpen(true)}
+        >
+          <Mail className="h-4 w-4" aria-hidden />
+          Tulis email ke pendaftar
+        </Button>
+      </CardContent>
+    </Card>
+  ) : null
 
   return (
     <AdminFormShell
@@ -384,6 +427,7 @@ export function PmbRegistrationDetailPage() {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_22rem]">
         <aside className="order-1 space-y-4 lg:order-2 lg:sticky lg:top-4 lg:self-start">
           {actionPanel}
+          {emailPanel}
         </aside>
 
         <div className="order-2 space-y-6 lg:order-1">
@@ -517,6 +561,21 @@ export function PmbRegistrationDetailPage() {
           </Card>
         </div>
       </div>
+
+      <PmbEmailDialog
+        mode="send"
+        open={emailOpen}
+        onOpenChange={setEmailOpen}
+        registrationUuids={[uuid]}
+        recipientCount={1}
+        isSubmitting={sendEmail.isPending}
+        onSend={(values) => {
+          sendEmail.mutate(values, {
+            onSuccess: () => setEmailOpen(false),
+          })
+        }}
+        onBroadcast={() => undefined}
+      />
     </AdminFormShell>
   )
 }

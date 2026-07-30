@@ -1,14 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Mail, Megaphone } from 'lucide-react'
 import { AdminPaginatedTable } from '@/components/admin/AdminPaginatedTable'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
 import { AdminFilterField } from '@/components/admin/AdminToolbar'
 import { PmbAnalyticsDashboard } from '@/components/admin/pmb/PmbAnalyticsDashboard'
+import { PmbEmailDialog } from '@/components/admin/pmb/PmbEmailDialog'
 import { PmbExportActions } from '@/components/admin/pmb/PmbExportActions'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAdminAcademicYearsList } from '@/hooks/useAcademicYears'
-import { useAdminPmbRegistrationsList, useAdminPmbStats } from '@/hooks/usePmb'
+import { useAdminPmbRegistrationsList, useAdminPmbStats, useBroadcastPmbEmail, useSendPmbEmail } from '@/hooks/usePmb'
 import type { ListFilters, PmbRegistration } from '@/types'
 import { useTranslation } from 'react-i18next'
 
@@ -42,6 +46,11 @@ export function PmbRegistrationsListPage() {
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('all')
   const [sortValue, setSortValue] = useState('created_at:desc')
+  const [selectedUuids, setSelectedUuids] = useState<string[]>([])
+  const [sendOpen, setSendOpen] = useState(false)
+  const [broadcastOpen, setBroadcastOpen] = useState(false)
+  const sendEmail = useSendPmbEmail()
+  const broadcastEmail = useBroadcastPmbEmail()
 
   useEffect(() => {
     if (!academicYear && activeYear) {
@@ -71,6 +80,24 @@ export function PmbRegistrationsListPage() {
   const { data: stats, isLoading: statsLoading, isFetching: statsFetching } = useAdminPmbStats(sharedFilters)
 
   const yearLabel = academicYear && academicYear !== 'all' ? academicYear : undefined
+  const pageRows = data?.data ?? []
+  const pageUuids = pageRows.map((row) => row.uuid)
+  const allPageSelected = pageUuids.length > 0 && pageUuids.every((uuid) => selectedUuids.includes(uuid))
+
+  const toggleRow = (uuid: string, checked: boolean) => {
+    setSelectedUuids((current) => (
+      checked ? [...new Set([...current, uuid])] : current.filter((item) => item !== uuid)
+    ))
+  }
+
+  const togglePage = (checked: boolean) => {
+    setSelectedUuids((current) => {
+      if (!checked) {
+        return current.filter((uuid) => !pageUuids.includes(uuid))
+      }
+      return [...new Set([...current, ...pageUuids])]
+    })
+  }
 
   return (
     <div className="pmb-registrations-page space-y-1">
@@ -78,10 +105,31 @@ export function PmbRegistrationsListPage() {
         title={t('pages.pmb.listTitle')}
         description={t('pages.pmb.listDesc')}
         headerActions={
-          <PmbExportActions
-            filters={sharedFilters}
-            isRefreshing={isFetching || statsFetching}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11 gap-2"
+              disabled={selectedUuids.length === 0}
+              onClick={() => setSendOpen(true)}
+            >
+              <Mail className="h-4 w-4" aria-hidden />
+              Kirim email ({selectedUuids.length})
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11 gap-2"
+              onClick={() => setBroadcastOpen(true)}
+            >
+              <Megaphone className="h-4 w-4" aria-hidden />
+              Broadcast
+            </Button>
+            <PmbExportActions
+              filters={sharedFilters}
+              isRefreshing={isFetching || statsFetching}
+            />
+          </div>
         }
         beforeTable={
           <div className="space-y-6">
@@ -191,6 +239,24 @@ export function PmbRegistrationsListPage() {
         }
         columns={[
           {
+            key: 'select',
+            header: (
+              <Checkbox
+                checked={allPageSelected}
+                onCheckedChange={(checked) => togglePage(checked === true)}
+                aria-label="Pilih semua di halaman ini"
+              />
+            ),
+            className: 'w-10',
+            cell: (item) => (
+              <Checkbox
+                checked={selectedUuids.includes(item.uuid)}
+                onCheckedChange={(checked) => toggleRow(item.uuid, checked === true)}
+                aria-label={`Pilih ${item.student_name ?? item.registration_number}`}
+              />
+            ),
+          },
+          {
             key: 'number',
             header: t('table.registrationNo'),
             cell: (item) => (
@@ -229,6 +295,37 @@ export function PmbRegistrationsListPage() {
           item.has_admin_unread ? 'bg-primary/5 hover:bg-primary/10' : undefined
         }
         rowActions={(item) => <AdminSimpleRowActions viewHref={`/admin/pmb-registrations/${item.uuid}`} />}
+      />
+
+      <PmbEmailDialog
+        mode="send"
+        open={sendOpen}
+        onOpenChange={setSendOpen}
+        registrationUuids={selectedUuids}
+        recipientCount={selectedUuids.length}
+        isSubmitting={sendEmail.isPending}
+        onSend={(values) => {
+          sendEmail.mutate(values, {
+            onSuccess: () => {
+              setSendOpen(false)
+              setSelectedUuids([])
+            },
+          })
+        }}
+        onBroadcast={() => undefined}
+      />
+
+      <PmbEmailDialog
+        mode="broadcast"
+        open={broadcastOpen}
+        onOpenChange={setBroadcastOpen}
+        isSubmitting={broadcastEmail.isPending}
+        onSend={() => undefined}
+        onBroadcast={(values) => {
+          broadcastEmail.mutate(values, {
+            onSuccess: () => setBroadcastOpen(false),
+          })
+        }}
       />
     </div>
   )

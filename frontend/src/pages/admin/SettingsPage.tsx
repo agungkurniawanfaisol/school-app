@@ -10,6 +10,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { AdminPageHeader } from '@/components/admin/AdminPageHeader'
+import { GmailOAuthCard } from '@/components/admin/GmailOAuthCard'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -286,6 +287,8 @@ export function SettingsPage() {
         title={t('pages.settings.title')}
         description={t('pages.settings.desc')}
       />
+
+      <GmailOAuthCard />
 
       {groups.length === 0 ? (
         <Card className="admin-card">

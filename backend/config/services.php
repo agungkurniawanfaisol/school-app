@@ -45,6 +45,16 @@ return [
             (string) env('GOOGLE_REDIRECT_URI', ''),
         ) ?: null,
         'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
+        // Gmail send OAuth (reuse CLIENT_ID/SECRET; separate redirect + refresh token)
+        'gmail_redirect' => preg_replace(
+            '/^GOOGLE_GMAIL_REDIRECT_URI=/i',
+            '',
+            (string) env(
+                'GOOGLE_GMAIL_REDIRECT_URI',
+                rtrim((string) env('APP_URL', 'http://localhost:8000'), '/').'/api/admin/gmail/oauth/callback'
+            ),
+        ) ?: null,
+        'gmail_refresh_token' => env('GOOGLE_GMAIL_REFRESH_TOKEN'),
     ],
 
 ];

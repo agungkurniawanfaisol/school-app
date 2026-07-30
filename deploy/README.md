@@ -154,7 +154,54 @@ GOOGLE_CLIENT_SECRET=...
 # ❌ GOOGLE_REDIRECT_URI=GOOGLE_REDIRECT_URI=https://...
 # ✅ GOOGLE_REDIRECT_URI=https://namadomain.com/api/admin/auth/google/callback
 GOOGLE_REDIRECT_URI=https://namadomain.com/api/admin/auth/google/callback
+
+# Email PMB (Gmail OAuth — google/apiclient, gratis)
+MAIL_MAILER=gmail
+MAIL_FROM_ADDRESS=email@gmail.com
+MAIL_FROM_NAME="PMB Nurul Hikmah"
+GOOGLE_GMAIL_REDIRECT_URI=https://namadomain.com/api/admin/gmail/oauth/callback
 ```
+
+### Email PMB (Gmail OAuth)
+
+PMB mengirim email lewat **Gmail API + OAuth2** (`google/apiclient`), pola sama PMB UNIPDA. Tidak perlu Mailgun/SendGrid/App Password.
+
+**Google Cloud Console** (boleh project yang sama dengan login admin):
+
+1. **APIs & Services → Library** → enable **Gmail API**
+2. **Credentials → OAuth client** (Web application)
+3. Tambah **Authorized redirect URI**:
+   - Local: `http://localhost:8000/api/admin/gmail/oauth/callback`
+   - Production: `https://namadomain.com/api/admin/gmail/oauth/callback`
+4. Client ID/Secret login admin (`GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`) **boleh dipakai ulang**
+
+**Di `.env`:**
+
+```env
+MAIL_MAILER=gmail
+MAIL_FROM_ADDRESS=emailpengirim@gmail.com
+MAIL_FROM_NAME="PMB Nurul Hikmah"
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_GMAIL_REDIRECT_URI=https://namadomain.com/api/admin/gmail/oauth/callback
+```
+
+**Hubungkan akun Gmail sekali** (login sebagai admin):
+
+1. Buka halaman Settings admin → **Hubungkan Gmail**, atau  
+   `GET /api/admin/gmail/oauth/redirect` lalu buka `data.url`
+2. Pilih akun Gmail pengirim → Allow
+3. Refresh token disimpan terenkripsi di `storage/app/private/gmail-oauth.json`
+4. Cek: `GET /api/admin/gmail/oauth/status` → `ready_to_send: true`
+
+Jalankan queue worker (wajib agar email terkirim):
+
+```bash
+cd /path/to/app/backend
+php artisan queue:work --sleep=3 --tries=3
+```
+
+**Catatan:** Callback login admin (`/api/admin/auth/google/callback`) **berbeda** dari callback Gmail send (`/api/admin/gmail/oauth/callback`) — keduanya harus ada di Google Cloud.
 
 Pastikan juga:
 

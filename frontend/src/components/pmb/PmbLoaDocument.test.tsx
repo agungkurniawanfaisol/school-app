@@ -24,6 +24,13 @@ const registration = {
   academic_year: '2026-2027',
   status: 'accepted',
   draft_payload: { nickname: 'Sam' },
+  student_photo: {
+    id: 12,
+    uuid: 'photo-uuid',
+    url: '/storage/uploads/pmb/student.jpg',
+    mime_type: 'image/jpeg',
+    original_name: 'student.jpg',
+  },
   loa_issued_at: '2026-07-29T10:00:00Z',
   created_at: '2026-07-01T00:00:00Z',
   updated_at: '2026-07-29T10:00:00Z',
@@ -44,5 +51,24 @@ describe('PmbLoaDocument', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Simpan LoA (PDF)' }))
     expect(printPmbDocument).toHaveBeenCalledWith('loa')
+  })
+
+  it('shows uploaded student photo on the LoA', () => {
+    render(<PmbLoaDocument registration={registration} schoolName="Sekolah Nurul Hikmah" />)
+
+    const photo = screen.getByTestId('pmb-loa-student-photo').querySelector('img')
+    expect(photo).toHaveAttribute('src', expect.stringContaining('/storage/uploads/pmb/student.jpg'))
+    expect(photo).toHaveAttribute('alt', 'Foto Samuel')
+  })
+
+  it('hides photo frame when student photo is missing', () => {
+    render(
+      <PmbLoaDocument
+        registration={{ ...registration, student_photo: null }}
+        schoolName="Sekolah Nurul Hikmah"
+      />,
+    )
+
+    expect(screen.queryByTestId('pmb-loa-student-photo')).not.toBeInTheDocument()
   })
 })

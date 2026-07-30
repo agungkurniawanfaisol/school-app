@@ -17,6 +17,7 @@ use App\Models\PmbRegistrationEvent;
 use App\Models\PmbRegistrationMessage;
 use App\Repositories\BaseRepository;
 use App\Repositories\PmbRegistrationRepository;
+use App\Services\PmbEmailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -26,7 +27,10 @@ class PmbRegistrationController extends Controller
 {
     use HandlesCrud;
 
-    public function __construct(private PmbRegistrationRepository $pmbRegistrationRepository) {}
+    public function __construct(
+        private PmbRegistrationRepository $pmbRegistrationRepository,
+        private PmbEmailService $pmbEmailService,
+    ) {}
 
     protected function repository(): BaseRepository
     {
@@ -204,6 +208,7 @@ class PmbRegistrationController extends Controller
             $this->recordEvent($registration, $actorId, 'status_changed', 'Status diubah menjadi '.$label.'.');
         }
 
+        $previousStatus = $registration->status;
         $previousNotes = $registration->notes;
         $incomingNotes = array_key_exists('notes', $data) ? $data['notes'] : null;
         $shouldNotifyPendaftar = array_key_exists('notes', $data)
@@ -219,6 +224,11 @@ class PmbRegistrationController extends Controller
         }
 
         $registration = $this->pmbRegistrationRepository->update($registration, $data);
+
+        if ($registration->status === PmbRegistration::STATUS_ACCEPTED
+            && $previousStatus !== PmbRegistration::STATUS_ACCEPTED) {
+            $this->pmbEmailService->queueAccepted($registration);
+        }
 
         if ($shouldNotifyPendaftar) {
             PmbRegistrationMessage::query()->create([

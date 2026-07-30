@@ -25,6 +25,9 @@ export function PmbLoaDocument({
 }: PmbLoaDocumentProps) {
   const draft = (registration.draft_payload ?? {}) as Record<string, unknown>
   const logoSrc = resolveAssetUrl(schoolLogo, '/logo.png')
+  const photoSrc = registration.student_photo?.url
+    ? resolveAssetUrl(registration.student_photo.url, '')
+    : null
   const issuedAt = registration.loa_issued_at ?? registration.updated_at ?? new Date().toISOString()
   const academicYear =
     registration.academic_year || draftStr(draft, 'academic_year') || '—'
@@ -69,26 +72,41 @@ export function PmbLoaDocument({
               <strong>DITERIMA</strong> sebagai peserta didik baru:
             </p>
 
-            <dl className="grid gap-1.5 sm:grid-cols-[10rem_1fr] sm:gap-x-3">
-              <dt className="text-zinc-600">Nama siswa</dt>
-              <dd className="font-semibold uppercase">
-                {registration.student_name ?? '—'}
-                {nickname ? ` (${nickname})` : ''}
-              </dd>
-              <dt className="text-zinc-600">Tempat / tgl lahir</dt>
-              <dd>
-                {(registration.birth_place || draftStr(draft, 'birth_place') || '—').toUpperCase()},{' '}
-                {formatIdDate(registration.birth_date || draftStr(draft, 'birth_date') || null)}
-              </dd>
-              <dt className="text-zinc-600">Jenis kelamin</dt>
-              <dd>{genderLabel(registration.gender ?? (draftStr(draft, 'gender') as 'L' | 'P' | ''))}</dd>
-              <dt className="text-zinc-600">Jenjang / program</dt>
-              <dd className="uppercase">{grade}</dd>
-              <dt className="text-zinc-600">Tahun ajaran</dt>
-              <dd>{academicYear}</dd>
-              <dt className="text-zinc-600">No. registrasi</dt>
-              <dd className="font-mono font-semibold">{registration.registration_number}</dd>
-            </dl>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <dl className="min-w-0 flex-1 grid gap-1.5 sm:grid-cols-[10rem_1fr] sm:gap-x-3">
+                <dt className="text-zinc-600">Nama siswa</dt>
+                <dd className="font-semibold uppercase">
+                  {registration.student_name ?? '—'}
+                  {nickname ? ` (${nickname})` : ''}
+                </dd>
+                <dt className="text-zinc-600">Tempat / tgl lahir</dt>
+                <dd>
+                  {(registration.birth_place || draftStr(draft, 'birth_place') || '—').toUpperCase()},{' '}
+                  {formatIdDate(registration.birth_date || draftStr(draft, 'birth_date') || null)}
+                </dd>
+                <dt className="text-zinc-600">Jenis kelamin</dt>
+                <dd>{genderLabel(registration.gender ?? (draftStr(draft, 'gender') as 'L' | 'P' | ''))}</dd>
+                <dt className="text-zinc-600">Jenjang / program</dt>
+                <dd className="uppercase">{grade}</dd>
+                <dt className="text-zinc-600">Tahun ajaran</dt>
+                <dd>{academicYear}</dd>
+                <dt className="text-zinc-600">No. registrasi</dt>
+                <dd className="font-mono font-semibold">{registration.registration_number}</dd>
+              </dl>
+
+              {photoSrc ? (
+                <div
+                  className="mx-auto shrink-0 overflow-hidden rounded border border-zinc-400 bg-zinc-50 sm:mx-0"
+                  data-testid="pmb-loa-student-photo"
+                >
+                  <img
+                    src={photoSrc}
+                    alt={registration.student_name ? `Foto ${registration.student_name}` : 'Foto siswa'}
+                    className="h-[4.5cm] w-[3.5cm] object-cover"
+                  />
+                </div>
+              ) : null}
+            </div>
 
             <p>
               Orang tua/wali diharapkan menyelesaikan kewajiban administrasi dan mengikuti prosedur

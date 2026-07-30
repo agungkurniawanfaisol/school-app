@@ -136,4 +136,9 @@ class PmbRegistration extends Model
     {
         return $this->hasMany(PmbRegistrationEvent::class);
     }
+
+    public function emailLogs(): HasMany
+    {
+        return $this->hasMany(PmbEmailLog::class);
+    }
 }

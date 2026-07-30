@@ -25,6 +25,7 @@ use App\Models\User;
 use App\Repositories\AcademicYearRepository;
 use App\Repositories\PmbRegistrationRepository;
 use App\Repositories\TestimonialRepository;
+use App\Services\PmbEmailService;
 use App\Support\PmbPortalAvatar;
 use App\Support\TestimonialPhotoPublisher;
 use Illuminate\Http\JsonResponse;
@@ -42,6 +43,7 @@ class PmbPortalController extends Controller
         private PmbRegistrationRepository $pmbRegistrationRepository,
         private AcademicYearRepository $academicYearRepository,
         private TestimonialRepository $testimonialRepository,
+        private PmbEmailService $pmbEmailService,
     ) {}
 
     public function login(LoginRequest $request): JsonResponse
@@ -354,6 +356,8 @@ class PmbPortalController extends Controller
         $registration = $this->pmbRegistrationRepository->update($registration, $data);
 
         $this->recordEvent($registration, $request->user()->id, 'submitted', 'Pendaftaran dikirim; menunggu verifikasi.');
+
+        $this->pmbEmailService->queueSubmitted($registration);
 
         return response()->json([
             'message' => 'Pendaftaran berhasil dikirim.',

@@ -41,6 +41,21 @@ vi.mock('@/hooks/useSettings', () => ({
   useUpdateSetting: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
+vi.mock('@/hooks/useGmailOAuth', () => ({
+  useGmailOAuthStatus: () => ({
+    isLoading: false,
+    data: {
+      client_configured: true,
+      connected: false,
+      ready_to_send: false,
+      from_address: null,
+      redirect_uri: 'http://localhost:8000/api/admin/gmail/oauth/callback',
+    },
+  }),
+  useConnectGmailOAuth: () => ({ mutate: vi.fn(), isPending: false }),
+  useDisconnectGmailOAuth: () => ({ mutate: vi.fn(), isPending: false }),
+}))
+
 describe('SettingsPage', () => {
   it('hides pmb_fee and points admins to the fees page', () => {
     const queryClient = new QueryClient({

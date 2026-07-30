@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Mail\Transport\GmailApiTransport;
 use App\Repositories\AcademicYearRepository;
 use App\Repositories\CourseEnrollmentRepository;
 use App\Repositories\CourseLessonRepository;
@@ -22,6 +23,8 @@ use App\Repositories\SettingRepository;
 use App\Repositories\StudentActivityRepository;
 use App\Repositories\TeacherRepository;
 use App\Repositories\TestimonialRepository;
+use App\Services\GmailOAuthService;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -58,6 +61,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        Mail::extend('gmail-api', function () {
+            return new GmailApiTransport($this->app->make(GmailOAuthService::class));
+        });
     }
 }

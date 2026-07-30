@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils'
 
 export interface AdminTableColumn<T> {
   key: string
-  header: string
+  header: React.ReactNode
   cell: (item: T) => React.ReactNode
   className?: string
 }

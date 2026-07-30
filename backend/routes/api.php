@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\ExtracurricularController as AdminExtracurricularController;
 use App\Http\Controllers\Admin\FaqController as AdminFaqController;
+use App\Http\Controllers\Admin\GmailOAuthController;
 use App\Http\Controllers\Admin\GoogleAuthController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Admin\CourseEnrollmentController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\Admin\MediaController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\PhotoAlbumController as AdminPhotoAlbumController;
 use App\Http\Controllers\Admin\PmbDocumentController;
+use App\Http\Controllers\Admin\PmbEmailController;
 use App\Http\Controllers\Admin\PmbFeeController as AdminPmbFeeController;
 use App\Http\Controllers\Admin\PmbRegistrationController as AdminPmbRegistrationController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -163,6 +165,10 @@ Route::prefix('admin')->group(function (): void {
         Route::post('exchange', [GoogleAuthController::class, 'exchange']);
     });
 
+    // Browser callback from Google (no Sanctum) — state validated in service.
+    Route::get('gmail/oauth/callback', [GmailOAuthController::class, 'callback'])
+        ->middleware('throttle:10,1');
+
     Route::middleware(['auth:sanctum', EnsurePanelUser::class])->group(function (): void {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
@@ -170,6 +176,11 @@ Route::prefix('admin')->group(function (): void {
         Route::patch('profile', [ProfileController::class, 'update']);
 
         Route::middleware(EnsureUserIsAdmin::class)->group(function (): void {
+            Route::get('gmail/oauth/status', [GmailOAuthController::class, 'status']);
+            Route::get('gmail/oauth/redirect', [GmailOAuthController::class, 'redirect'])
+                ->middleware('throttle:10,1');
+            Route::delete('gmail/oauth', [GmailOAuthController::class, 'disconnect']);
+
             Route::apiResource('users', UserController::class);
             Route::apiResource('schools', AdminSchoolController::class);
         Route::apiResource('hero-sliders', AdminHeroSliderController::class);
@@ -211,6 +222,10 @@ Route::prefix('admin')->group(function (): void {
 
         Route::middleware(EnsureAdminPmbOrAdmin::class)->group(function (): void {
             Route::get('academic-years', [AdminAcademicYearController::class, 'index']);
+            Route::post('pmb-emails/send', [PmbEmailController::class, 'send'])
+                ->middleware('throttle:5,1');
+            Route::post('pmb-emails/broadcast', [PmbEmailController::class, 'broadcast'])
+                ->middleware('throttle:5,1');
             Route::apiResource('pmb-fees', AdminPmbFeeController::class);
             Route::get('pmb-registrations/stats', [AdminPmbRegistrationController::class, 'stats']);
             Route::get('pmb-registrations/notifications', [AdminPmbRegistrationController::class, 'notifications']);
