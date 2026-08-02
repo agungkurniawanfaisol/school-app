@@ -12,12 +12,15 @@ export const PMB_MOBILE_BOTTOM_NAV = '5.5rem'
 export const PMB_PORTAL_MAIN_PB =
   'pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] sm:px-6 sm:pt-6 lg:px-8 lg:pb-8'
 
-/** Wizard sticky action bar sits above bottom nav on small screens. */
+/** Wizard sticky action bar sits above bottom nav while bottom nav is visible (< lg). */
 export const PMB_WIZARD_FOOTER_STICKY =
-  'sticky bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] z-10 sm:static lg:bottom-auto'
+  'sticky bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] z-10 lg:static lg:bottom-auto'
 
-/** Reserve space so last form fields are not hidden behind sticky wizard footer. */
-export const PMB_WIZARD_FOOTER_SPACER = 'h-[4.5rem] shrink-0 sm:hidden'
+/**
+ * Reserve space so last form fields are not hidden behind sticky wizard footer.
+ * Stacked CTAs (Kembali + Lanjut) need ~8.5rem including padding/border.
+ */
+export const PMB_WIZARD_FOOTER_SPACER = 'h-[8.5rem] shrink-0 lg:hidden'
 
 /** Prevent iOS auto-zoom on focus — 16px minimum on mobile. */
 export const PMB_INPUT_TEXT = 'text-base sm:text-sm'

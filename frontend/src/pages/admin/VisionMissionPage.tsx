@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ExternalLink, GripVertical, Plus, Trash2 } from 'lucide-react'
+import { ChevronUp, ExternalLink, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
@@ -92,18 +92,15 @@ function MissionItemsList({
       <div className="space-y-2">
         {items.map((item, index) => (
           <div key={index} className="flex items-center gap-2">
-            <div className="flex flex-col">
-              <button
-                type="button"
-                className="rounded p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30"
-                disabled={index === 0}
-                onClick={() => moveItem(index, index - 1)}
-                aria-label={t('pages.visionMission.moveUp')}
-                tabIndex={-1}
-              >
-                <GripVertical className="h-4 w-4" />
-              </button>
-            </div>
+            <button
+              type="button"
+              className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30"
+              disabled={index === 0}
+              onClick={() => moveItem(index, index - 1)}
+              aria-label={t('pages.visionMission.moveUp')}
+            >
+              <ChevronUp className="h-4 w-4" aria-hidden />
+            </button>
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
               {index + 1}
             </span>
@@ -111,7 +108,7 @@ function MissionItemsList({
               value={item}
               onChange={(e) => updateItem(index, e.target.value)}
               placeholder={t('pages.visionMission.missionPlaceholder', { n: index + 1 })}
-              className="h-10 flex-1"
+              className="h-11 flex-1"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
@@ -125,7 +122,7 @@ function MissionItemsList({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 shrink-0 text-destructive hover:text-destructive"
+                  className="size-11 shrink-0 text-destructive hover:text-destructive"
                   disabled={items.length <= 1}
                   onClick={() => removeItem(index)}
                   aria-label={t('pages.visionMission.removePointN', { n: index + 1 })}
@@ -140,8 +137,7 @@ function MissionItemsList({
         <Button
           type="button"
           variant="outline"
-          size="sm"
-          className="mt-1 w-full gap-1.5"
+          className="mt-1 min-h-11 w-full gap-1.5"
           onClick={addItem}
         >
           <Plus className="h-4 w-4" />

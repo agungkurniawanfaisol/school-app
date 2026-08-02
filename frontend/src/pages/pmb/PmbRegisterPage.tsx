@@ -470,7 +470,7 @@ export function PmbRegisterPage() {
                 className={cn(
                   PMB_WIZARD_FOOTER_STICKY,
                   '-mx-4 mt-4 border-t border-primary/10 bg-card/95 px-4 py-3 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)] backdrop-blur-sm',
-                  'sm:mx-0 sm:mt-6 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:shadow-none sm:backdrop-blur-none',
+                  'lg:mx-0 lg:mt-6 lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:shadow-none lg:backdrop-blur-none',
                 )}
               >
                 <div className="flex flex-col gap-3 sm:flex-row">

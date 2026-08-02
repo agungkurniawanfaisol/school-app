@@ -302,7 +302,7 @@ export function VirtualTourEditorPage() {
                 type="button"
                 size="sm"
                 variant="outline"
-                className="min-h-9"
+                className="min-h-11"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadMedia.isPending}
               >
@@ -342,8 +342,9 @@ export function VirtualTourEditorPage() {
                         type="button"
                         size="icon"
                         variant={startSceneUuid === scene.uuid ? 'default' : 'ghost'}
-                        className="h-8 w-8"
+                        className="size-11"
                         title={t('pages.virtualTour.setStartLocation')}
+                        aria-label={t('pages.virtualTour.setStartLocation')}
                         onClick={() => setStartSceneUuid(scene.uuid ?? null)}
                       >
                         <MapPin className="h-4 w-4" aria-hidden />
@@ -352,7 +353,8 @@ export function VirtualTourEditorPage() {
                         type="button"
                         size="icon"
                         variant="ghost"
-                        className="h-8 w-8 text-destructive"
+                        className="size-11 text-destructive"
+                        aria-label={t('common.delete')}
                         onClick={() => scene.uuid && removeScene(scene.uuid)}
                       >
                         <Trash2 className="h-4 w-4" aria-hidden />
@@ -380,7 +382,7 @@ export function VirtualTourEditorPage() {
                 <Button
                   type="button"
                   variant={placementMode ? 'default' : 'outline'}
-                  className="min-h-10"
+                  className="min-h-11"
                   disabled={!activeScene || otherScenes.length === 0}
                   onClick={() => setPlacementMode((value) => !value)}
                 >
@@ -390,7 +392,7 @@ export function VirtualTourEditorPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="min-h-10"
+                  className="min-h-11"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadMedia.isPending}
                 >

@@ -97,7 +97,7 @@ export function PmbWizardStepRingkasan({
       <Button
         type="button"
         variant="link"
-        className="h-auto px-0 text-xs font-medium text-primary"
+        className="min-h-11 px-2 text-sm font-medium text-primary"
         onClick={() => onEditStep(stepIndex)}
       >
         Ubah {label}

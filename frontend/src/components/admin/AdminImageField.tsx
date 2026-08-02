@@ -47,7 +47,7 @@ export function AdminImageField({
               type="button"
               size="icon"
               variant="secondary"
-              className="absolute right-2 top-2 h-8 w-8"
+              className="absolute right-2 top-2 size-11"
               onClick={() => onChange('')}
               aria-label={t('components.adminImage.removeImageAria')}
             >
@@ -85,7 +85,7 @@ export function AdminImageField({
           <Button
             type="button"
             variant="outline"
-            size="sm"
+            className="min-h-11"
             onClick={() => inputRef.current?.click()}
             disabled={upload.isPending}
           >

@@ -39,6 +39,8 @@ export const PMB_STATUS_DESCRIPTIONS: Record<string, string> = {
 export interface PmbPortalNavItem {
   id: string
   label: string
+  /** Shorter label for bottom nav (mobile). Falls back to `label`. */
+  shortLabel?: string
   href: string
   icon: LucideIcon
   external?: boolean
@@ -82,6 +84,13 @@ export function buildPmbPortalNav({ isAuthenticated, registration }: BuildPmbPor
           ? 'Perbaiki data'
           : 'Data pendaftaran'
       : 'Masuk & Daftar',
+    shortLabel: isAuthenticated
+      ? registration?.status === 'draft'
+        ? 'Lanjut'
+        : registration?.status === 'needs_revision'
+          ? 'Perbaiki'
+          : 'Data'
+      : 'Masuk',
     href: '/pmb/daftar',
     icon: ClipboardList,
   })
@@ -90,6 +99,7 @@ export function buildPmbPortalNav({ isAuthenticated, registration }: BuildPmbPor
     items.push({
       id: 'status',
       label: 'Status & Timeline',
+      shortLabel: 'Status',
       href: `/pmb/portal/pendaftaran/${registration.uuid}`,
       icon: Route,
     })
@@ -98,6 +108,7 @@ export function buildPmbPortalNav({ isAuthenticated, registration }: BuildPmbPor
       items.push({
         id: 'loa',
         label: 'Surat Penerimaan',
+        shortLabel: 'LoA',
         href: `/pmb/portal/pendaftaran/${registration.uuid}#loa`,
         icon: FileCheck,
       })
@@ -108,6 +119,7 @@ export function buildPmbPortalNav({ isAuthenticated, registration }: BuildPmbPor
     items.push({
       id: 'testimonial',
       label: 'Testimoni',
+      shortLabel: 'Testimoni',
       href: '/pmb/portal/testimoni',
       icon: Star,
     })
@@ -116,6 +128,7 @@ export function buildPmbPortalNav({ isAuthenticated, registration }: BuildPmbPor
   items.push({
     id: 'info',
     label: 'Info PMB',
+    shortLabel: 'Info',
     href: '/pmb',
     icon: Info,
   })

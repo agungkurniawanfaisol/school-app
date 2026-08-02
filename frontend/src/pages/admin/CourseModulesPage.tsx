@@ -39,17 +39,25 @@ function ModuleLessons({ moduleId }: { moduleId: number }) {
         {data?.data.map((lesson) => (
           <li key={lesson.id} className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2 text-sm">
             <span>{lesson.title}</span>
-            <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(lesson.id)}>
-              <Trash2 className="h-4 w-4" />
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="size-11 text-destructive"
+              aria-label={t('common.delete')}
+              onClick={() => setDeleteId(lesson.id)}
+            >
+              <Trash2 className="h-4 w-4" aria-hidden />
             </Button>
           </li>
         ))}
       </ul>
-      <div className="flex gap-2">
-        <Input placeholder={t('form.newLessonTitle')} value={title} onChange={(e) => setTitle(e.target.value)} className="h-10" />
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input placeholder={t('form.newLessonTitle')} value={title} onChange={(e) => setTitle(e.target.value)} className="h-11" />
         <Button
           type="button"
           size="sm"
+          className="h-11 w-full sm:w-auto"
           disabled={!title || createLesson.isPending}
           onClick={() => {
             const slug = slugify(title)
@@ -131,8 +139,15 @@ export function CourseModulesPage() {
           <AccordionItem key={mod.id} value={String(mod.id)} className="admin-card overflow-hidden rounded-xl border px-4">
             <div className="flex items-center gap-2">
               <AccordionTrigger className="flex-1 hover:no-underline">{mod.title}</AccordionTrigger>
-              <Button type="button" size="icon" variant="ghost" className="h-9 w-9 shrink-0 text-destructive" onClick={() => setDeleteTarget(mod)}>
-                <Trash2 className="h-4 w-4" />
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="size-11 shrink-0 text-destructive"
+                aria-label={t('common.delete')}
+                onClick={() => setDeleteTarget(mod)}
+              >
+                <Trash2 className="h-4 w-4" aria-hidden />
               </Button>
             </div>
             <AccordionContent>

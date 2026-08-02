@@ -87,7 +87,47 @@ export function AdminContentRowActions({
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="flex justify-end gap-0.5">
+      {/* Mobile: overflow menu — avoids 4×44px icons crowding ~320px cards */}
+      <div className="flex justify-end md:hidden">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="min-h-11 min-w-11"
+              aria-label={t('common.moreActions')}
+            >
+              <MoreHorizontal className="h-4 w-4" aria-hidden />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem asChild>
+              <Link to={editHref}>{t('common.edit')}</Link>
+            </DropdownMenuItem>
+            {previewHref && (
+              <DropdownMenuItem asChild>
+                <Link to={previewHref}>{t('common.preview')}</Link>
+              </DropdownMenuItem>
+            )}
+            {isPublished && onUnpublish ? (
+              <DropdownMenuItem onClick={onUnpublish} disabled={isPublishing}>
+                {t('common.unpublish')}
+              </DropdownMenuItem>
+            ) : onPublish ? (
+              <DropdownMenuItem onClick={onPublish} disabled={isPublishing}>
+                {t('common.publish')}
+              </DropdownMenuItem>
+            ) : null}
+            {(onPublish || onUnpublish) && <DropdownMenuSeparator />}
+            <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={onDelete}>
+              {t('common.delete')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="hidden justify-end gap-0.5 md:flex">
         <IconButton label={t('common.edit')} href={editHref} asChild>
           <Pencil className="h-4 w-4" />
         </IconButton>
@@ -138,7 +178,7 @@ export function AdminSimpleRowActions({ editHref, onDelete, viewHref, extraItems
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button type="button" size="icon" variant="ghost" className="min-h-11 min-w-11" aria-label={t('common.moreActions')}>
-          <MoreHorizontal className="h-4 w-4" />
+          <MoreHorizontal className="h-4 w-4" aria-hidden />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

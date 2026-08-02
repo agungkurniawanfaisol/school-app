@@ -48,7 +48,7 @@ export function PmbNotificationPanel({
             type="button"
             variant="ghost"
             size="sm"
-            className="h-9 shrink-0 text-xs text-primary"
+            className="h-11 shrink-0 px-3 text-xs text-primary"
             onClick={onMarkAllRead}
             disabled={markAllPending}
           >

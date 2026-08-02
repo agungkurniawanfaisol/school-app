@@ -163,13 +163,11 @@ export function PhotoAlbumFormPage() {
                           placeholder={t('form.photoUrl')}
                           value={photo.url}
                           onChange={(e) => updatePhoto(index, 'url', e.target.value)}
-                          className="h-9"
                         />
                         <Input
                           placeholder={t('form.captionOptional')}
                           value={photo.caption}
                           onChange={(e) => updatePhoto(index, 'caption', e.target.value)}
-                          className="h-9"
                         />
                       </div>
                     </div>

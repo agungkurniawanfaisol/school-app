@@ -43,7 +43,7 @@ export function CoursesListPage() {
         ]}
         rowActions={(item) => (
           <div className="flex justify-end gap-1">
-            <Button asChild size="icon" variant="ghost" className="h-9 w-9" title={t('pages.courses.manageModules')}>
+            <Button asChild size="icon" variant="ghost" className="size-11" title={t('pages.courses.manageModules')}>
               <Link to={`/admin/courses/${item.id}/modules`} aria-label={t('pages.courses.manageModulesAria')}>
                 <Layers className="h-4 w-4" />
               </Link>

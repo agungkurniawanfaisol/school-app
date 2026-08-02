@@ -92,7 +92,7 @@ function TeacherListCard({
               <Badge variant={teacher.is_active ? 'default' : 'secondary'}>
                 {teacher.is_active ? t('status.active') : t('status.inactive')}
               </Badge>
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100 motion-reduce:opacity-100">
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-primary opacity-100 transition-opacity duration-200 md:opacity-0 md:group-hover:opacity-100 motion-reduce:opacity-100">
                 {t('common.detail')}
                 <ChevronRight className="h-3.5 w-3.5" aria-hidden />
               </span>
@@ -303,8 +303,8 @@ export function AdminTeachersListPage() {
 
       <div className="admin-list-panel">
         <div className="admin-list-toolbar">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <div className="relative w-full sm:max-w-md">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-center">
+            <div className="relative w-full sm:col-span-2 lg:max-w-md lg:flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
               <Input
                 placeholder={t('pages.teachers.list.searchPlaceholder')}
@@ -324,7 +324,7 @@ export function AdminTeachersListPage() {
                 setPage(1)
               }}
             >
-              <SelectTrigger className="h-11 w-full sm:w-40" aria-label={t('common.filterStatus')}>
+              <SelectTrigger className="h-11 w-full lg:w-40" aria-label={t('common.filterStatus')}>
                 <SelectValue placeholder={t('form.status')} />
               </SelectTrigger>
               <SelectContent>
@@ -340,7 +340,7 @@ export function AdminTeachersListPage() {
                 setPage(1)
               }}
             >
-              <SelectTrigger className="h-11 w-full sm:w-44" aria-label={t('common.filterFeatured')}>
+              <SelectTrigger className="h-11 w-full lg:w-44" aria-label={t('common.filterFeatured')}>
                 <SelectValue placeholder={t('form.featured')} />
               </SelectTrigger>
               <SelectContent>
@@ -355,7 +355,7 @@ export function AdminTeachersListPage() {
                 setPage(1)
               }}
             >
-              <SelectTrigger className="h-11 w-full sm:w-44" aria-label={t('common.filterType')}>
+              <SelectTrigger className="h-11 w-full lg:w-44" aria-label={t('common.filterType')}>
                 <SelectValue placeholder={t('form.type')} />
               </SelectTrigger>
               <SelectContent>

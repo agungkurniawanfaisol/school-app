@@ -114,7 +114,7 @@ export function FacilityPhotoGalleryEditor({ photos, onChange }: FacilityPhotoGa
                     type="button"
                     variant="destructive"
                     size="icon"
-                    className="absolute right-2 top-2 h-9 w-9"
+                    className="absolute right-2 top-2 size-11"
                     aria-label={t('components.facilityGallery.removePhotoAria', { n: index + 1 })}
                     onClick={() => removePhoto(index)}
                   >

@@ -60,7 +60,7 @@ function AdminNavLink({
       onClick={onNavigate}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'admin-nav-link group flex min-h-10 items-center gap-3 rounded-lg px-2.5 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sidebar-accent)]',
+        'admin-nav-link group flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sidebar-accent)]',
         nested && 'ml-3',
         active && 'admin-nav-link--active font-medium',
       )}
@@ -212,7 +212,7 @@ export function AdminSidebarTree({ mode = 'full', onNavigate, className }: Admin
           onClick={onNavigate}
           aria-current={dashboardActive ? 'page' : undefined}
           className={cn(
-            'admin-nav-link mb-3 flex min-h-10 items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sidebar-accent)]',
+            'admin-nav-link mb-3 flex min-h-11 items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--sidebar-accent)]',
             dashboardActive && 'admin-nav-link--active',
           )}
         >
@@ -238,7 +238,7 @@ export function AdminSidebarTree({ mode = 'full', onNavigate, className }: Admin
             <AccordionItem key={group.labelKey} value={group.labelKey} className="border-none">
               <AccordionTrigger
                 className={cn(
-                  'admin-nav-group-trigger min-h-10 rounded-lg px-2.5 py-2 text-sm font-medium hover:no-underline [&>svg]:text-[var(--sidebar-muted)]',
+                  'admin-nav-group-trigger min-h-11 rounded-lg px-2.5 py-2 text-sm font-medium hover:no-underline [&>svg]:text-[var(--sidebar-muted)]',
                   groupActive && 'text-[var(--sidebar-text)]',
                 )}
               >

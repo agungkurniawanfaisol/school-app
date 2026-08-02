@@ -210,7 +210,7 @@ export function PmbTestimonialPage() {
                             </div>
                           )}
                           {hasPhoto && !isUploading && (
-                            <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                            <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
                               <RefreshCw className="size-5" aria-hidden />
                             </span>
                           )}

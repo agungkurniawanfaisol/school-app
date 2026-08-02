@@ -104,7 +104,7 @@ export function PmbWizardStepper({
             const status = stepStatus(index, safeStep)
             return (
               <li key={label} className="flex min-w-[4.5rem] shrink-0 snap-center flex-col items-center gap-1">
-                {renderStepControl(label, index, status, 'h-9 w-9')}
+                {renderStepControl(label, index, status, 'size-11')}
                 <span
                   className={cn(
                     'max-w-[4.75rem] truncate text-center text-[11px] leading-tight sm:text-xs',
@@ -126,7 +126,7 @@ export function PmbWizardStepper({
           return (
             <li key={label} className="flex flex-1 flex-col items-center">
               <div className="flex w-full items-center">
-                {renderStepControl(label, index, status, 'relative z-10 h-9 w-9 shrink-0')}
+                {renderStepControl(label, index, status, 'relative z-10 size-11 shrink-0')}
                 {!isLast && (
                   <div
                     className={cn(

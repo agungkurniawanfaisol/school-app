@@ -122,7 +122,7 @@ export function PmbStudentPhotoUpload({
             )}
 
             {hasPhoto && !isUploading && (
-              <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/45 text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100 motion-reduce:transition-none [@media(hover:none)]:opacity-0">
+              <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-black/45 text-white opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 sm:group-active:opacity-100 motion-reduce:transition-none">
                 <Camera className="size-6" aria-hidden />
                 <span className="text-xs font-semibold">Ganti foto</span>
               </span>

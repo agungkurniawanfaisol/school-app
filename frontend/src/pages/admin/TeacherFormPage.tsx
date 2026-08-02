@@ -728,10 +728,10 @@ export function TeacherFormPage() {
 
       <Tabs defaultValue="content" className="lg:hidden">
         <TabsList className="grid h-11 w-full grid-cols-2">
-          <TabsTrigger value="settings" className="min-h-10">
+          <TabsTrigger value="settings" className="min-h-11">
             {t('pages.teachers.form.settingsTab')}
           </TabsTrigger>
-          <TabsTrigger value="content" className="min-h-10">
+          <TabsTrigger value="content" className="min-h-11">
             {t('pages.teachers.form.contentTab')}
           </TabsTrigger>
         </TabsList>

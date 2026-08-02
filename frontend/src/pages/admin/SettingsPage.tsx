@@ -141,7 +141,7 @@ function SettingField({ setting }: { setting: Setting }) {
           <p className="text-xs leading-relaxed text-muted-foreground">{meta.description}</p>
         )}
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         {isMultiline ? (
           <Textarea
             id={`setting-${setting.id}`}
@@ -155,7 +155,7 @@ function SettingField({ setting }: { setting: Setting }) {
             id={`setting-${setting.id}`}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="h-10 flex-1"
+            className="h-11 flex-1"
           />
         )}
         <Button
@@ -165,8 +165,8 @@ function SettingField({ setting }: { setting: Setting }) {
           disabled={update.isPending || !hasChanged}
           onClick={handleSave}
           className={cn(
-            'h-10 shrink-0 gap-1.5 transition-all',
-            isMultiline && 'self-end',
+            'h-11 w-full shrink-0 gap-1.5 transition-all sm:w-auto',
+            isMultiline && 'sm:self-end',
             saved && 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400',
           )}
         >

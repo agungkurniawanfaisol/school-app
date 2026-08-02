@@ -10,7 +10,7 @@ interface PmbStarRatingProps {
 
 export function PmbStarRating({ value, onChange, disabled = false, className }: PmbStarRatingProps) {
   return (
-    <div className={cn('flex items-center gap-1', className)} role="radiogroup" aria-label="Rating testimoni">
+    <div className={cn('flex w-full max-w-sm flex-wrap items-center justify-between gap-0.5', className)} role="radiogroup" aria-label="Rating testimoni">
       {Array.from({ length: 5 }).map((_, index) => {
         const rating = index + 1
         const active = rating <= value
@@ -25,13 +25,13 @@ export function PmbStarRating({ value, onChange, disabled = false, className }: 
             disabled={disabled}
             onClick={() => onChange(rating)}
             className={cn(
-              'rounded-md p-1 transition-colors motion-reduce:transition-none',
+              'inline-flex size-11 items-center justify-center rounded-md transition-colors motion-reduce:transition-none',
               disabled ? 'cursor-not-allowed opacity-60' : 'hover:bg-primary/10',
             )}
           >
             <Star
               className={cn(
-                'size-8',
+                'size-7',
                 active ? 'fill-[var(--gold-accent)] text-[var(--gold-accent)]' : 'text-muted-foreground/35',
               )}
               aria-hidden

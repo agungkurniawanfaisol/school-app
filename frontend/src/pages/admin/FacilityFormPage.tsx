@@ -326,7 +326,7 @@ export function FacilityFormPage() {
       </Card>
 
       <Tabs defaultValue="content" className="lg:hidden">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid h-auto min-h-11 w-full grid-cols-3 gap-1 p-1">
           <TabsTrigger value="content">{t('form.content')}</TabsTrigger>
           <TabsTrigger value="gallery">{t('common.gallery')}</TabsTrigger>
           <TabsTrigger value="settings">{t('common.settings')}</TabsTrigger>

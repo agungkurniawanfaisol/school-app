@@ -108,7 +108,7 @@ export function AdminHeader() {
 
       <div className="flex shrink-0 items-center gap-2">
         {showPmbBell && <AdminPmbNotificationBell />}
-        <LanguageSwitcher className="h-10 w-10" />
+        <LanguageSwitcher />
         {user?.role && (
           <Badge variant="secondary" className="hidden capitalize sm:inline-flex">
             {user.role}
@@ -117,8 +117,8 @@ export function AdminHeader() {
         {user?.name && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full p-0" aria-label={t('header.accountMenu')}>
-                <Avatar className="h-9 w-9 border border-primary/20">
+              <Button variant="ghost" size="icon" className="size-11 rounded-full p-0" aria-label={t('header.accountMenu')}>
+                <Avatar className="size-9 border border-primary/20">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">
                     {getUserInitials(user.name)}
                   </AvatarFallback>

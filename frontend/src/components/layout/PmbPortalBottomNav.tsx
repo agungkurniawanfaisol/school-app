@@ -38,6 +38,7 @@ export function PmbPortalBottomNav({ isAuthenticated, registration }: PmbPortalB
               <Link
                 key={item.id}
                 to={item.href}
+                aria-label={item.label}
                 className={cn(
                   'relative flex min-h-[52px] min-w-[4.5rem] flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1.5 text-center transition-colors',
                   'active:scale-[0.96] motion-reduce:active:scale-100',
@@ -57,7 +58,7 @@ export function PmbPortalBottomNav({ isAuthenticated, registration }: PmbPortalB
                   )}
                 </span>
                 <span className={cn('max-w-full truncate text-[10px] leading-tight sm:text-xs', active && 'font-semibold')}>
-                  {item.label}
+                  {item.shortLabel ?? item.label}
                 </span>
                 {active && (
                   <span className="absolute bottom-1 h-0.5 w-8 rounded-full bg-primary" aria-hidden />

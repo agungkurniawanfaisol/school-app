@@ -66,7 +66,7 @@ export function AdminNav({
               type="button"
               variant="ghost"
               size="icon"
-              className="size-8 shrink-0 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
+              className="size-11 shrink-0 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
               onClick={onCollapse}
               aria-label={t('nav.collapseSidebar')}
             >
@@ -105,7 +105,7 @@ export function AdminNav({
         <div className="grid grid-cols-2 gap-2">
           <Button
             variant="ghost"
-            className="min-h-10 justify-start gap-2 border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.04)] text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
+            className="min-h-11 justify-start gap-2 border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.04)] text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-text)]"
             asChild
           >
             <Link to="/" onClick={onNavigate}>
@@ -116,7 +116,7 @@ export function AdminNav({
 
           <Button
             variant="ghost"
-            className="min-h-10 justify-start gap-2 border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.04)] text-[var(--sidebar-muted)] hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-300"
+            className="min-h-11 justify-start gap-2 border border-[rgb(255_255_255/0.08)] bg-[rgb(255_255_255/0.04)] text-[var(--sidebar-muted)] hover:border-red-400/30 hover:bg-red-500/10 hover:text-red-300"
             onClick={() => logout.mutate()}
             disabled={logout.isPending}
           >

@@ -248,7 +248,7 @@ export function ActivityFormPage() {
 
       <div className="lg:grid lg:grid-cols-[320px_1fr] lg:gap-6">
         <Tabs defaultValue="content" className="lg:hidden">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid h-auto min-h-11 w-full grid-cols-3 gap-1 p-1">
             <TabsTrigger value="content">{t('common.content')}</TabsTrigger>
             <TabsTrigger value="media">{t('common.gallery')}</TabsTrigger>
             <TabsTrigger value="settings">{t('common.settings')}</TabsTrigger>
