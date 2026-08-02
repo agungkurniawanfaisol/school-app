@@ -36,11 +36,11 @@ export function PmbCtaSection() {
               <p className="mb-8 max-w-xl text-lg leading-relaxed text-white/90">
                 {t('pmb.desc')}
               </p>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
                 <Button
                   asChild
                   size="lg"
-                  className="btn-shine h-12 bg-white px-7 text-primary shadow-xl transition-transform hover:scale-[1.02] hover:bg-white/90"
+                  className="btn-shine h-12 w-full bg-white px-7 text-primary shadow-xl transition-transform hover:scale-[1.02] hover:bg-white/90 sm:w-auto"
                 >
                   <Link to="/pmb/daftar">{t('pmb.register')}</Link>
                 </Button>
@@ -48,7 +48,7 @@ export function PmbCtaSection() {
                   asChild
                   size="lg"
                   variant="outline"
-                  className="h-12 border-white/50 bg-transparent px-7 text-white transition-transform hover:scale-[1.02] hover:bg-white/10"
+                  className="h-12 w-full border-white/50 bg-transparent px-7 text-white transition-transform hover:scale-[1.02] hover:bg-white/10 sm:w-auto"
                 >
                   <Link to="/pmb">{t('pmb.requirements')}</Link>
                 </Button>

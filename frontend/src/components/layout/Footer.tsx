@@ -40,7 +40,7 @@ export function Footer() {
   const social = school?.social_media
 
   return (
-    <footer className="relative bg-footer text-white">
+    <footer className="relative bg-footer pb-16 text-white lg:pb-0">
       <FooterWave />
 
       <div className="container-page pb-10 pt-12 md:pt-16">
@@ -62,14 +62,14 @@ export function Footer() {
             <h4 className="text-sm font-semibold uppercase tracking-wider text-white/90">
               {t('footer.quickLinks')}
             </h4>
-            <ul className="space-y-2.5 text-sm text-white/75">
+            <ul className="space-y-1 text-sm text-white/75">
               <li>
-                <a href="#tentang" className="transition-colors hover:text-white">
+                <a href="#tentang" className="inline-flex min-h-11 items-center transition-colors hover:text-white">
                   {t('footer.aboutUs')}
                 </a>
               </li>
               <li>
-                <Link to="/pmb" className="transition-colors hover:text-white">
+                <Link to="/pmb" className="inline-flex min-h-11 items-center transition-colors hover:text-white">
                   {t('footer.pmb')}
                 </Link>
               </li>
@@ -93,7 +93,7 @@ export function Footer() {
               {school?.phone && (
                 <li className="flex gap-2.5">
                   <Phone className="h-4 w-4 shrink-0 text-[var(--gold-accent)]" />
-                  <a href={`tel:${school.phone}`} className="hover:text-white">
+                  <a href={`tel:${school.phone}`} className="inline-flex min-h-11 items-center hover:text-white">
                     {school.phone}
                   </a>
                 </li>
@@ -105,7 +105,7 @@ export function Footer() {
                     href={`https://wa.me/${school.whatsapp.replace(/\D/g, '')}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="hover:text-white"
+                    className="inline-flex min-h-11 items-center hover:text-white"
                   >
                     {t('footer.waLabel')}: {school.whatsapp}
                   </a>
@@ -114,7 +114,7 @@ export function Footer() {
               {school?.email && (
                 <li className="flex gap-2.5">
                   <Mail className="h-4 w-4 shrink-0 text-[var(--gold-accent)]" />
-                  <a href={`mailto:${school.email}`} className="hover:text-white">
+                  <a href={`mailto:${school.email}`} className="inline-flex min-h-11 items-center hover:text-white">
                     {school.email}
                   </a>
                 </li>
@@ -133,7 +133,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
+                  className="flex size-11 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
                 >
                   <Facebook className="h-5 w-5" />
                 </a>
@@ -144,7 +144,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
+                  className="flex size-11 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
                 >
                   <Instagram className="h-5 w-5" />
                 </a>
@@ -155,7 +155,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="YouTube"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
+                  className="flex size-11 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
                 >
                   <Youtube className="h-5 w-5" />
                 </a>

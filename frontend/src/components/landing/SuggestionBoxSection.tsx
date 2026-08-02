@@ -131,7 +131,7 @@ export function SuggestionBoxSection() {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isPending}>
+                  <Button type="submit" className="h-11 w-full" disabled={isPending}>
                     <Send className="mr-2 h-4 w-4" aria-hidden />
                     {isPending ? t('suggestion.sending') : t('suggestion.send')}
                   </Button>

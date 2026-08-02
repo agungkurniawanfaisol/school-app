@@ -69,7 +69,7 @@ export function Header() {
         <Link
           to="/"
           className={cn(
-            'relative z-10 flex shrink-0 items-center gap-2.5 font-semibold transition-opacity hover:opacity-90',
+            'relative z-10 flex min-w-0 max-w-[min(100%,12rem)] items-center gap-2 font-semibold transition-opacity hover:opacity-90 sm:max-w-[min(100%,18rem)] sm:gap-2.5',
             isHeroOverlay ? 'text-white' : 'text-primary',
           )}
         >
@@ -77,9 +77,9 @@ export function Header() {
             logo={school?.logo}
             alt={school?.name ?? 'Nurul Hikmah'}
             variant="header"
-            className={cn(isHeroOverlay && 'drop-shadow-md')}
+            className={cn('shrink-0', isHeroOverlay && 'drop-shadow-md')}
           />
-          <span className="font-heading text-lg font-bold tracking-tight">
+          <span className="truncate font-heading text-base font-bold tracking-tight sm:text-lg">
             {t('header.brand')}
           </span>
         </Link>

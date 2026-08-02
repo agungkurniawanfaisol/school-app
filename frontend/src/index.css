@@ -138,12 +138,17 @@
   html {
     scroll-behavior: auto;
     scrollbar-gutter: stable;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
     margin: 0;
     min-height: 100svh;
+    overflow-x: clip;
+    touch-action: manipulation;
   }
 
   h1, h2, h3, h4, h5, h6 {

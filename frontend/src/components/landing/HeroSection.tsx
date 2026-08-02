@@ -82,7 +82,7 @@ export function HeroSection() {
         <CarouselContent className="-ml-0">
           {slides.map((slide) => (
             <CarouselItem key={slide.id} className="pl-0">
-              <div className="relative min-h-[75vh] lg:min-h-[90vh]">
+              <div className="relative min-h-[55vh] sm:min-h-[65vh] lg:min-h-[90vh]">
                 {slide.image ? (
                   <img
                     src={slide.image}
@@ -118,7 +118,7 @@ export function HeroSection() {
                   aria-hidden
                 />
 
-                <div className="container-page relative z-10 flex min-h-[75vh] flex-col justify-center py-20 text-white lg:min-h-[90vh] lg:py-24">
+                <div className="container-page relative z-10 flex min-h-[55vh] flex-col justify-center py-16 text-white sm:min-h-[65vh] sm:py-20 lg:min-h-[90vh] lg:py-24">
                   <div className="grid items-center gap-12 lg:grid-cols-2">
                     <StaggerChildren className="space-y-6">
                       <StaggerItem>
@@ -151,11 +151,11 @@ export function HeroSection() {
                       )}
 
                       <StaggerItem>
-                        <div className="flex flex-wrap gap-3">
+                        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">
                           <Button
                             asChild
                             size="lg"
-                            className="btn-shine h-12 bg-white px-7 text-primary shadow-xl shadow-black/25 transition-transform hover:scale-[1.02] hover:bg-white/95"
+                            className="btn-shine h-12 w-full bg-white px-7 text-primary shadow-xl shadow-black/25 transition-transform hover:scale-[1.02] hover:bg-white/95 sm:w-auto"
                           >
                             <Link to={resolveHeroCtaLink(slide.cta_url)}>
                               {slide.cta_text ?? t('hero.registerPmb')}
@@ -165,7 +165,7 @@ export function HeroSection() {
                             asChild
                             size="lg"
                             variant="outline"
-                            className="h-12 border-white/50 bg-white/5 px-7 text-white backdrop-blur-sm transition-transform hover:scale-[1.02] hover:bg-white/15"
+                            className="h-12 w-full border-white/50 bg-white/5 px-7 text-white backdrop-blur-sm transition-transform hover:scale-[1.02] hover:bg-white/15 sm:w-auto"
                           >
                             <a href="#tentang">{t('hero.explore')}</a>
                           </Button>
