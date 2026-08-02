@@ -28,7 +28,7 @@ export function LanguageSwitcher({ className, onHero = false }: { className?: st
           variant="ghost"
           size="icon"
           className={cn(
-            'h-9 w-9',
+            'size-11',
             onHero && 'text-white hover:bg-white/20 hover:text-white',
             className,
           )}
