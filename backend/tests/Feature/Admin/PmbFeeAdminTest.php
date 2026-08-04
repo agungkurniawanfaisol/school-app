@@ -15,7 +15,7 @@ class PmbFeeAdminTest extends TestCase
 
     private const RESOURCE = 'pmb-fees';
 
-    private function validPayload(?int $schoolId = null, ?int $yearId = null): array
+    private function validPayload(?int $schoolId = null, ?int $yearId = null, array $overrides = []): array
     {
         $school = $schoolId ? null : $this->createSchool();
         $resolvedSchoolId = $schoolId ?? $school->id;
@@ -25,13 +25,19 @@ class PmbFeeAdminTest extends TestCase
                 \App\Models\School::query()->findOrFail($resolvedSchoolId)
             )->create(['label' => '2026/2027']);
 
-        return [
+        return array_merge([
             'school_id' => $resolvedSchoolId,
             'academic_year_id' => $year->id,
+            'name' => 'SD Reguler',
+            'jenjang' => 'sd',
+            'program' => 'reguler',
             'amount' => 350000,
+            'bank_name' => 'BSI',
+            'account_number' => '1234567890',
+            'account_holder' => 'Yayasan Nurul Hikmah',
             'notes' => 'Biaya pendaftaran',
             'is_active' => true,
-        ];
+        ], $overrides);
     }
 
     public function test_guest_cannot_access(): void
@@ -39,55 +45,55 @@ class PmbFeeAdminTest extends TestCase
         $this->assertAdminGuestCannotAccess(self::RESOURCE);
     }
 
-    public function test_admin_pmb_can_store_and_activate_single_fee(): void
+    public function test_admin_pmb_can_store_multiple_active_fees(): void
     {
         $school = $this->createSchool();
-        $yearA = AcademicYear::factory()->for($school)->create(['label' => '2025/2026']);
-        $yearB = AcademicYear::factory()->for($school)->active()->create(['label' => '2026/2027']);
-
-        PmbFee::factory()->create([
-            'school_id' => $school->id,
-            'academic_year_id' => $yearA->id,
-            'amount' => 300000,
-            'is_active' => true,
-        ]);
+        $year = AcademicYear::factory()->for($school)->active()->create(['label' => '2026/2027']);
 
         Sanctum::actingAs(User::factory()->adminPmb()->create());
 
-        $this->postJson($this->adminUrl(self::RESOURCE), [
-            'school_id' => $school->id,
-            'academic_year_id' => $yearB->id,
+        $this->postJson($this->adminUrl(self::RESOURCE), $this->validPayload($school->id, $year->id, [
+            'name' => 'SD Reguler',
+            'jenjang' => 'sd',
+            'program' => 'reguler',
             'amount' => 350000,
-            'notes' => 'TA baru',
-            'is_active' => true,
-        ])
+        ]))
             ->assertCreated()
             ->assertJsonPath('data.amount', 350000)
-            ->assertJsonPath('data.amount_formatted', 'Rp 350.000')
+            ->assertJsonPath('data.jenjang', 'sd')
+            ->assertJsonPath('data.program', 'reguler')
+            ->assertJsonPath('data.bank_name', 'BSI')
+            ->assertJsonPath('data.is_active', true);
+
+        $this->postJson($this->adminUrl(self::RESOURCE), $this->validPayload($school->id, $year->id, [
+            'name' => 'SD ICP',
+            'jenjang' => 'sd',
+            'program' => 'icp',
+            'amount' => 450000,
+        ]))
+            ->assertCreated()
+            ->assertJsonPath('data.program', 'icp')
             ->assertJsonPath('data.is_active', true);
 
         $this->assertDatabaseHas('pmb_fees', [
-            'academic_year_id' => $yearB->id,
+            'academic_year_id' => $year->id,
+            'jenjang' => 'sd',
+            'program' => 'reguler',
             'is_active' => true,
-            'amount' => 350000,
         ]);
         $this->assertDatabaseHas('pmb_fees', [
-            'academic_year_id' => $yearA->id,
-            'is_active' => false,
-        ]);
-        $this->assertDatabaseHas('settings', [
-            'school_id' => $school->id,
-            'group' => 'pmb',
-            'key' => 'pmb_fee',
-            'value' => 'Rp 350.000',
+            'academic_year_id' => $year->id,
+            'jenjang' => 'sd',
+            'program' => 'icp',
+            'is_active' => true,
         ]);
     }
 
-    public function test_cannot_create_duplicate_fee_for_same_year(): void
+    public function test_cannot_create_duplicate_fee_for_same_year_jenjang_program(): void
     {
         $school = $this->createSchool();
         $year = AcademicYear::factory()->for($school)->create(['label' => '2026/2027']);
-        PmbFee::factory()->create([
+        PmbFee::factory()->sdReguler()->create([
             'school_id' => $school->id,
             'academic_year_id' => $year->id,
             'amount' => 300000,
@@ -95,19 +101,18 @@ class PmbFeeAdminTest extends TestCase
 
         Sanctum::actingAs(User::factory()->admin()->create());
 
-        $this->postJson($this->adminUrl(self::RESOURCE), [
-            'school_id' => $school->id,
-            'academic_year_id' => $year->id,
-            'amount' => 350000,
+        $this->postJson($this->adminUrl(self::RESOURCE), $this->validPayload($school->id, $year->id, [
+            'jenjang' => 'sd',
+            'program' => 'reguler',
             'is_active' => false,
-        ])->assertUnprocessable();
+        ]))->assertUnprocessable();
     }
 
     public function test_admin_can_destroy_active_fee(): void
     {
         $school = $this->createSchool();
         $year = AcademicYear::factory()->for($school)->create(['label' => '2026/2027']);
-        $fee = PmbFee::factory()->create([
+        $fee = PmbFee::factory()->sdReguler()->create([
             'school_id' => $school->id,
             'academic_year_id' => $year->id,
             'amount' => 350000,
@@ -126,7 +131,7 @@ class PmbFeeAdminTest extends TestCase
     {
         $school = $this->createSchool();
         $year = AcademicYear::factory()->for($school)->create(['label' => '2026/2027']);
-        $fee = PmbFee::factory()->create([
+        $fee = PmbFee::factory()->sdReguler()->create([
             'school_id' => $school->id,
             'academic_year_id' => $year->id,
             'amount' => 300000,
@@ -138,13 +143,13 @@ class PmbFeeAdminTest extends TestCase
         $this->deleteJson($this->adminUrl(self::RESOURCE.'/'.$fee->id))
             ->assertOk();
 
-        $this->postJson($this->adminUrl(self::RESOURCE), [
-            'school_id' => $school->id,
-            'academic_year_id' => $year->id,
+        $this->postJson($this->adminUrl(self::RESOURCE), $this->validPayload($school->id, $year->id, [
+            'jenjang' => 'sd',
+            'program' => 'reguler',
             'amount' => 350000,
             'notes' => 'BSI',
             'is_active' => true,
-        ])
+        ]))
             ->assertCreated()
             ->assertJsonPath('data.amount', 350000)
             ->assertJsonPath('data.is_active', true);
@@ -154,7 +159,7 @@ class PmbFeeAdminTest extends TestCase
     {
         $school = $this->createSchool();
         $year = AcademicYear::factory()->for($school)->create(['label' => '2025/2026']);
-        $fee = PmbFee::factory()->create([
+        $fee = PmbFee::factory()->tkReguler()->create([
             'school_id' => $school->id,
             'academic_year_id' => $year->id,
             'amount' => 300000,
@@ -169,15 +174,43 @@ class PmbFeeAdminTest extends TestCase
         $this->assertSoftDeleted('pmb_fees', ['id' => $fee->id]);
     }
 
-    public function test_public_active_fee_endpoint(): void
+    public function test_public_lists_active_fees(): void
     {
         $school = $this->createSchool();
         $year = AcademicYear::factory()->for($school)->active()->create(['label' => '2026/2027']);
-        PmbFee::factory()->create([
+        PmbFee::factory()->sdReguler()->active()->create([
             'school_id' => $school->id,
             'academic_year_id' => $year->id,
             'amount' => 375000,
-            'is_active' => true,
+        ]);
+        PmbFee::factory()->sdIcp()->active()->create([
+            'school_id' => $school->id,
+            'academic_year_id' => $year->id,
+            'amount' => 450000,
+        ]);
+        PmbFee::factory()->tkReguler()->create([
+            'school_id' => $school->id,
+            'academic_year_id' => $year->id,
+            'amount' => 200000,
+            'is_active' => false,
+        ]);
+
+        $this->getJson('/api/v1/pmb/fees?school_id='.$school->id)
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonFragment(['amount' => 375000, 'program' => 'reguler'])
+            ->assertJsonFragment(['amount' => 450000, 'program' => 'icp'])
+            ->assertJsonFragment(['bank_name' => 'Bank Syariah Indonesia (BSI)']);
+    }
+
+    public function test_public_active_fee_endpoint_still_works(): void
+    {
+        $school = $this->createSchool();
+        $year = AcademicYear::factory()->for($school)->active()->create(['label' => '2026/2027']);
+        PmbFee::factory()->sdReguler()->active()->create([
+            'school_id' => $school->id,
+            'academic_year_id' => $year->id,
+            'amount' => 375000,
         ]);
 
         $this->getJson('/api/v1/pmb/fees/active?school_id='.$school->id)

@@ -68,6 +68,7 @@ class PmbRegistration extends Model
         'previous_school',
         'grade_applied',
         'academic_year',
+        'pmb_fee_id',
         'status',
         'notes',
         'payment_info',
@@ -120,6 +121,11 @@ class PmbRegistration extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function pmbFee(): BelongsTo
+    {
+        return $this->belongsTo(PmbFee::class);
     }
 
     public function documents(): HasMany

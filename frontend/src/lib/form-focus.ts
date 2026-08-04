@@ -20,7 +20,7 @@ export const PMB_STEP_FIELD_ORDER: Record<number, (keyof PmbPortalDraftValues)[]
     'sibling_count',
   ],
   1: ['father_name', 'mother_name', 'father_phone', 'mother_phone', 'parent_email', 'email_secondary'],
-  2: ['payment_transferred_at', 'payment_note', 'payment_proof_media_id', 'transfer_confirmed'],
+  2: ['pmb_fee_uuid', 'jenjang', 'program', 'payment_transferred_at', 'payment_note', 'payment_proof_media_id', 'transfer_confirmed'],
 }
 
 export function getFirstErrorField<T extends FieldValues>(

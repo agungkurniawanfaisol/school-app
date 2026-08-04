@@ -42,7 +42,12 @@ interface GroupConfig {
 const MULTILINE_SETTING_KEYS = new Set(['pmb_description', 'pmb_requirements'])
 
 /** Managed elsewhere in admin — hide from Settings to avoid duplicate editors. */
-const HIDDEN_SETTING_KEYS = new Set(['pmb_fee'])
+const HIDDEN_SETTING_KEYS = new Set([
+  'pmb_fee',
+  'pmb_bank_name',
+  'pmb_account_number',
+  'pmb_account_holder',
+])
 
 const GROUP_ICONS: Record<string, LucideIcon> = {
   general: Globe,

@@ -302,10 +302,11 @@ export function useSavePmbDraft() {
         payment_transferred_at,
         transfer_confirmed,
         current_step,
+        pmb_fee_uuid,
         ...fields
       } = payload
 
-      const draft_payload = buildDraftPayload(fields)
+      const draft_payload = buildDraftPayload({ ...fields, pmb_fee_uuid, transfer_confirmed })
       const { parent_name, parent_phone } = syncLegacyParentFields(fields)
 
       const body: Record<string, unknown> = {
@@ -317,12 +318,15 @@ export function useSavePmbDraft() {
         parent_email: fields.parent_email || null,
         parent_name,
         parent_phone,
+        grade_applied: fields.grade_applied ?? null,
+        pmb_fee_uuid: pmb_fee_uuid ?? null,
         draft_payload,
         current_step,
       }
 
-      if (payment_proof_media_id || payment_note || payment_transferred_at) {
+      if (payment_proof_media_id || payment_note || payment_transferred_at || pmb_fee_uuid) {
         body.payment_info = {
+          ...(pmb_fee_uuid ? { pmb_fee_uuid } : {}),
           ...(payment_proof_media_id ? { proof_media_id: payment_proof_media_id } : {}),
           ...(payment_note ? { note: payment_note } : {}),
           ...(payment_transferred_at ? { transferred_at: payment_transferred_at } : {}),
@@ -363,11 +367,14 @@ export function useSubmitPmbRegistration() {
         parent_name,
         parent_phone,
         parent_email: payload.parent_email || null,
+        grade_applied: payload.grade_applied ?? null,
+        pmb_fee_uuid: payload.pmb_fee_uuid ?? null,
         draft_payload,
         payment_info: {
           proof_media_id: payload.payment_proof_media_id,
           note: payload.payment_note ?? null,
           transferred_at: payload.payment_transferred_at ?? null,
+          pmb_fee_uuid: payload.pmb_fee_uuid ?? null,
         },
       }
       return (await api.post<ApiResponse<PmbRegistration>>('/v1/pmb/portal/registration/submit', body)).data.data
@@ -397,11 +404,14 @@ export function useSubmitPmbCorrection() {
         parent_name,
         parent_phone,
         parent_email: payload.parent_email || null,
+        grade_applied: payload.grade_applied ?? null,
+        pmb_fee_uuid: payload.pmb_fee_uuid ?? null,
         draft_payload,
         payment_info: {
           proof_media_id: payload.payment_proof_media_id,
           note: payload.payment_note ?? null,
           transferred_at: payload.payment_transferred_at ?? null,
+          pmb_fee_uuid: payload.pmb_fee_uuid ?? null,
         },
       }
       return (await api.post<ApiResponse<PmbRegistration>>('/v1/pmb/portal/registration/correction', body)).data.data

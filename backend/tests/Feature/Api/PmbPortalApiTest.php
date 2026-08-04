@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Api;
 
+use App\Models\AcademicYear;
 use App\Models\Media;
+use App\Models\PmbFee;
 use App\Models\PmbRegistration;
 use App\Models\PmbRegistrationMessage;
 use App\Models\School;
@@ -14,6 +16,16 @@ use Tests\TestCase;
 
 class PmbPortalApiTest extends TestCase
 {
+    private function createActiveFee(School $school, array $overrides = []): PmbFee
+    {
+        $year = AcademicYear::factory()->for($school)->active()->create();
+
+        return PmbFee::factory()->sdReguler()->active()->create(array_merge([
+            'school_id' => $school->id,
+            'academic_year_id' => $year->id,
+        ], $overrides));
+    }
+
     public function test_guest_cannot_access_portal(): void
     {
         $this->getJson('/api/v1/pmb/portal/registration')->assertUnauthorized();
@@ -196,7 +208,9 @@ class PmbPortalApiTest extends TestCase
     public function test_submit_with_proof_sets_awaiting_verification(): void
     {
         Storage::fake('public');
+        \Illuminate\Support\Facades\Mail::fake();
         $school = School::factory()->create();
+        $fee = $this->createActiveFee($school);
         $user = User::factory()->pendaftar()->create();
         Sanctum::actingAs($user);
 
@@ -222,26 +236,81 @@ class PmbPortalApiTest extends TestCase
             'parent_name' => 'Budi Santoso',
             'parent_phone' => '081234567890',
             'grade_applied' => 'SD',
+            'pmb_fee_uuid' => $fee->uuid,
             'payment_info' => [
                 'proof_media_id' => $media->id,
-                'bank_name' => 'BSI',
-                'account_name' => 'Budi',
-                'amount' => '250000',
+                'pmb_fee_uuid' => $fee->uuid,
             ],
         ]);
 
         $response->assertOk()
-            ->assertJsonPath('data.status', 'awaiting_verification');
+            ->assertJsonPath('data.status', 'awaiting_verification')
+            ->assertJsonPath('data.pmb_fee_id', $fee->id)
+            ->assertJsonPath('data.payment_info.bank_name', $fee->bank_name);
+    }
 
-        $this->assertDatabaseHas('pmb_registration_events', [
-            'type' => 'submitted',
+    public function test_draft_clears_pmb_fee_id_when_uuid_explicitly_null(): void
+    {
+        $school = School::factory()->create();
+        $fee = $this->createActiveFee($school);
+        $user = User::factory()->pendaftar()->create();
+        Sanctum::actingAs($user);
+
+        PmbRegistration::factory()->create([
+            'school_id' => $school->id,
+            'user_id' => $user->id,
+            'status' => 'draft',
+            'pmb_fee_id' => $fee->id,
+            'payment_info' => ['pmb_fee_uuid' => $fee->uuid],
+            'draft_payload' => ['pmb_fee_uuid' => $fee->uuid, 'jenjang' => 'sd', 'program' => 'reguler'],
         ]);
+
+        $this->patchJson('/api/v1/pmb/portal/registration', [
+            'school_id' => $school->id,
+            'pmb_fee_uuid' => null,
+            'draft_payload' => [
+                'jenjang' => 'tk',
+                'program' => null,
+                'pmb_fee_uuid' => null,
+            ],
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.pmb_fee_id', null);
+
+        $this->assertDatabaseHas('pmb_registrations', [
+            'user_id' => $user->id,
+            'pmb_fee_id' => null,
+        ]);
+    }
+
+    public function test_draft_keeps_pmb_fee_id_when_fee_uuid_omitted(): void
+    {
+        $school = School::factory()->create();
+        $fee = $this->createActiveFee($school);
+        $user = User::factory()->pendaftar()->create();
+        Sanctum::actingAs($user);
+
+        PmbRegistration::factory()->create([
+            'school_id' => $school->id,
+            'user_id' => $user->id,
+            'status' => 'draft',
+            'pmb_fee_id' => $fee->id,
+            'payment_info' => ['pmb_fee_uuid' => $fee->uuid],
+        ]);
+
+        $this->patchJson('/api/v1/pmb/portal/registration', [
+            'school_id' => $school->id,
+            'draft_payload' => ['nickname' => 'Mad'],
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.pmb_fee_id', $fee->id);
     }
 
     public function test_pendaftar_can_save_draft_and_submit_correction_while_in_review(): void
     {
         Storage::fake('public');
         $school = School::factory()->create();
+        $fee = $this->createActiveFee($school);
         $user = User::factory()->pendaftar()->create();
         Sanctum::actingAs($user);
 
@@ -273,12 +342,17 @@ class PmbPortalApiTest extends TestCase
             'student_name' => 'Ahmad Lama',
             'parent_name' => 'Budi',
             'parent_phone' => '081234567890',
-            'payment_info' => ['proof_media_id' => $oldProof->id],
+            'pmb_fee_id' => $fee->id,
+            'payment_info' => [
+                'proof_media_id' => $oldProof->id,
+                'pmb_fee_uuid' => $fee->uuid,
+            ],
         ]);
 
         $this->patchJson('/api/v1/pmb/portal/registration', [
             'student_name' => 'Ahmad Baru',
-            'draft_payload' => ['nickname' => 'Mad'],
+            'pmb_fee_uuid' => $fee->uuid,
+            'draft_payload' => ['nickname' => 'Mad', 'pmb_fee_uuid' => $fee->uuid],
         ])
             ->assertOk()
             ->assertJsonPath('data.status', 'needs_revision')
@@ -289,9 +363,11 @@ class PmbPortalApiTest extends TestCase
             'parent_name' => 'Budi Santoso',
             'parent_phone' => '081234567890',
             'grade_applied' => 'SD',
+            'pmb_fee_uuid' => $fee->uuid,
             'payment_info' => [
                 'proof_media_id' => $newProof->id,
                 'note' => 'Bukti transfer baru',
+                'pmb_fee_uuid' => $fee->uuid,
             ],
         ])
             ->assertOk()
@@ -499,6 +575,7 @@ class PmbPortalApiTest extends TestCase
 
     public function test_issue_loa_requires_accepted_status(): void
     {
+        \Illuminate\Support\Facades\Mail::fake();
         $school = School::factory()->create();
         $adminPmb = User::factory()->adminPmb()->create();
         $registration = PmbRegistration::factory()->create([

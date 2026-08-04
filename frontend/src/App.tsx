@@ -390,6 +390,7 @@ export default function App() {
             <Route path="pmb-registrations/:uuid" element={<LazyAdmin><PmbRegistrationDetailPage /></LazyAdmin>} />
             <Route path="pmb-fees" element={<LazyAdmin><PmbFeesListPage /></LazyAdmin>} />
             <Route path="pmb-fees/create" element={<LazyAdmin><PmbFeeFormPage /></LazyAdmin>} />
+            <Route path="pmb-fees/:id/edit" element={<LazyAdmin><PmbFeeFormPage /></LazyAdmin>} />
             <Route path="academic-years" element={<LazyAdmin><AcademicYearsListPage /></LazyAdmin>} />
             <Route path="academic-years/create" element={<LazyAdmin><AcademicYearFormPage /></LazyAdmin>} />
             <Route path="academic-years/:id/edit" element={<LazyAdmin><AcademicYearFormPage /></LazyAdmin>} />

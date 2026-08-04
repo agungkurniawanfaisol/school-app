@@ -1,5 +1,5 @@
 import { Calendar, CreditCard } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import type { UseMutationResult } from '@tanstack/react-query'
 import { PmbFileUploadZone } from '@/components/pmb/PmbFileUploadZone'
@@ -9,9 +9,11 @@ import { PmbTextarea } from '@/components/pmb/PmbTextInput'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
+import type { PmbFee } from '@/hooks/usePmbFees'
 import type { UploadPhase } from '@/hooks/useMediaUpload'
 import { PMB_INPUT_TEXT } from '@/lib/pmb-portal-layout'
 import { cn } from '@/lib/utils'
+import { jenjangLabel, programLabel } from '@/schemas/pmb-fee'
 import type { PmbPortalDraftValues } from '@/schemas/pmb'
 import type { Media } from '@/types'
 
@@ -19,10 +21,7 @@ type PmbPortalUploadPurpose = 'student_photo' | 'payment_proof' | 'testimonial_p
 
 interface PmbWizardStepPembayaranProps {
   form: UseFormReturn<PmbPortalDraftValues>
-  fee?: string | null
-  bankName?: string | null
-  accountNumber?: string | null
-  accountHolder?: string | null
+  fees: PmbFee[]
   proofPreviewUrl?: string | null
   upload: UseMutationResult<Media, Error, { file: File; purpose: PmbPortalUploadPurpose }, unknown> & {
     progress: number
@@ -32,26 +31,127 @@ interface PmbWizardStepPembayaranProps {
 
 export function PmbWizardStepPembayaran({
   form,
-  fee,
-  bankName,
-  accountNumber,
-  accountHolder,
+  fees,
   upload,
   proofPreviewUrl,
 }: PmbWizardStepPembayaranProps) {
   const proofId = form.watch('payment_proof_media_id')
   const transferConfirmed = form.watch('transfer_confirmed')
+  const selectedJenjang = form.watch('jenjang')
+  const selectedFeeUuid = form.watch('pmb_fee_uuid')
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+
+  const jenjangOptions = useMemo(() => {
+    const set = new Set(fees.map((fee) => fee.jenjang))
+    return (['tk', 'sd'] as const).filter((j) => set.has(j))
+  }, [fees])
+
+  const programFees = useMemo(
+    () => fees.filter((fee) => fee.jenjang === selectedJenjang),
+    [fees, selectedJenjang],
+  )
+
+  const selectedFee = useMemo(
+    () => fees.find((fee) => fee.uuid === selectedFeeUuid) ?? null,
+    [fees, selectedFeeUuid],
+  )
+
+  const selectJenjang = (jenjang: 'tk' | 'sd') => {
+    form.setValue('jenjang', jenjang, { shouldDirty: true, shouldValidate: true })
+    form.setValue('program', null, { shouldDirty: true })
+    form.setValue('pmb_fee_uuid', null, { shouldDirty: true })
+    form.setValue('fee_name', null, { shouldDirty: true })
+    form.setValue('grade_applied', jenjang.toUpperCase(), { shouldDirty: true })
+  }
+
+  const selectFee = (fee: PmbFee) => {
+    form.setValue('jenjang', fee.jenjang, { shouldDirty: true, shouldValidate: true })
+    form.setValue('program', fee.program, { shouldDirty: true, shouldValidate: true })
+    form.setValue('pmb_fee_uuid', fee.uuid, { shouldDirty: true, shouldValidate: true })
+    form.setValue('fee_name', fee.name, { shouldDirty: true })
+    form.setValue('grade_applied', fee.jenjang.toUpperCase(), { shouldDirty: true })
+  }
 
   return (
     <div className="space-y-5">
-      <PmbPaymentNotice
-        fee={fee}
-        bankName={bankName}
-        accountNumber={accountNumber}
-        accountHolder={accountHolder}
-        studentName={form.watch('student_name')}
-      />
+      <PmbFormSection
+        icon={CreditCard}
+        title="Pilih Jenjang & Program"
+        description="Pilih jenjang terlebih dahulu, lalu program. Nominal dan rekening tampil otomatis."
+      >
+        <div className="space-y-3">
+          <p className="text-sm font-medium">1. Jenjang</p>
+          <div className="grid grid-cols-2 gap-2">
+            {jenjangOptions.map((jenjang) => {
+              const active = selectedJenjang === jenjang
+              return (
+                <button
+                  key={jenjang}
+                  type="button"
+                  onClick={() => selectJenjang(jenjang)}
+                  className={cn(
+                    'min-h-11 rounded-xl border px-3 py-3 text-sm font-semibold transition-colors',
+                    active
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-background text-foreground hover:border-primary/40',
+                  )}
+                >
+                  {jenjangLabel(jenjang)}
+                </button>
+              )
+            })}
+          </div>
+          {jenjangOptions.length === 0 && (
+            <p className="text-sm text-amber-800">Biaya aktif belum diatur. Hubungi admin sekolah.</p>
+          )}
+        </div>
+
+        {selectedJenjang && (
+          <div className="space-y-3">
+            <p className="text-sm font-medium">2. Program</p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {programFees.map((fee) => {
+                const active = selectedFeeUuid === fee.uuid
+                return (
+                  <button
+                    key={fee.uuid}
+                    type="button"
+                    onClick={() => selectFee(fee)}
+                    className={cn(
+                      'min-h-11 rounded-xl border px-3 py-3 text-left transition-colors',
+                      active
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border bg-background hover:border-primary/40',
+                    )}
+                  >
+                    <span className="block text-sm font-semibold">{programLabel(fee.program)}</span>
+                    <span className="mt-0.5 block text-xs text-muted-foreground">{fee.amount_formatted}</span>
+                  </button>
+                )
+              })}
+            </div>
+            {programFees.length === 0 && (
+              <p className="text-sm text-muted-foreground">Belum ada program aktif untuk jenjang ini.</p>
+            )}
+          </div>
+        )}
+
+        {form.formState.errors.pmb_fee_uuid && (
+          <p className="text-sm font-medium text-destructive">
+            {form.formState.errors.pmb_fee_uuid.message}
+          </p>
+        )}
+      </PmbFormSection>
+
+      {selectedFee && (
+        <PmbPaymentNotice
+          fee={selectedFee.amount_formatted}
+          bankName={selectedFee.bank_name}
+          accountNumber={selectedFee.account_number}
+          accountHolder={selectedFee.account_holder}
+          studentName={form.watch('student_name')}
+        />
+      )}
 
       <PmbFormSection
         icon={CreditCard}

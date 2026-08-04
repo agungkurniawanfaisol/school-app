@@ -3,9 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\PmbFee;
-use App\Models\Setting;
 use App\Repositories\Contracts\RepositoryInterface;
-use App\Support\Rupiah;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +18,8 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
     protected function defaultSelect(): array
     {
         return [
-            'id', 'uuid', 'school_id', 'academic_year_id', 'amount', 'notes', 'is_active',
+            'id', 'uuid', 'school_id', 'academic_year_id', 'name', 'jenjang', 'program',
+            'amount', 'bank_name', 'account_number', 'account_holder', 'notes', 'is_active',
             'created_at', 'updated_at',
         ];
     }
@@ -34,7 +34,7 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
 
     protected function searchableColumns(): array
     {
-        return ['notes'];
+        return ['name', 'notes', 'bank_name', 'account_holder', 'jenjang', 'program'];
     }
 
     public function findActiveForSchool(int $schoolId): ?Model
@@ -45,30 +45,62 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
             return $this->newQuery()
                 ->where('school_id', $schoolId)
                 ->where('is_active', true)
+                ->orderBy('jenjang')
+                ->orderBy('program')
                 ->orderByDesc('id')
                 ->first();
         });
     }
 
+    /**
+     * @return Collection<int, PmbFee>
+     */
+    public function listActiveForSchool(int $schoolId): Collection
+    {
+        $key = $this->cacheKey('listActiveForSchool', ['school_id' => $schoolId]);
+
+        return $this->remember($key, function () use ($schoolId) {
+            return $this->newQuery()
+                ->where('school_id', $schoolId)
+                ->where('is_active', true)
+                ->orderBy('jenjang')
+                ->orderBy('program')
+                ->orderBy('id')
+                ->get();
+        });
+    }
+
+    public function findActiveByUuidForSchool(string $uuid, int $schoolId): ?PmbFee
+    {
+        $fee = $this->newQuery()
+            ->where('uuid', $uuid)
+            ->where('school_id', $schoolId)
+            ->where('is_active', true)
+            ->first();
+
+        return $fee instanceof PmbFee ? $fee : null;
+    }
+
     public function create(array $data): Model
     {
         return DB::transaction(function () use ($data) {
-            if (! empty($data['is_active'])) {
-                $this->deactivateOthers((int) $data['school_id']);
-            }
-
-            // Unique (school_id, academic_year_id) still applies to soft-deleted rows.
-            // Restore + update instead of inserting a conflicting row.
+            // Unique (school_id, academic_year_id, jenjang, program) still applies to soft-deleted rows.
             $trashed = $this->model()::withTrashed()
                 ->where('school_id', $data['school_id'])
                 ->where('academic_year_id', $data['academic_year_id'])
+                ->where('jenjang', $data['jenjang'])
+                ->where('program', $data['program'])
                 ->onlyTrashed()
                 ->first();
 
             if ($trashed instanceof PmbFee) {
                 $trashed->restore();
                 $trashed->update([
+                    'name' => $data['name'],
                     'amount' => $data['amount'],
+                    'bank_name' => $data['bank_name'] ?? null,
+                    'account_number' => $data['account_number'] ?? null,
+                    'account_holder' => $data['account_holder'] ?? null,
                     'notes' => $data['notes'] ?? null,
                     'is_active' => (bool) ($data['is_active'] ?? false),
                 ]);
@@ -77,7 +109,6 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
                 $model = $this->model()::create($data);
             }
 
-            $this->syncSettingIfActive($model);
             $this->clearCache();
 
             return $model->fresh($this->defaultWith());
@@ -87,48 +118,11 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
     public function update(Model $model, array $data): Model
     {
         return DB::transaction(function () use ($model, $data) {
-            if (! empty($data['is_active'])) {
-                $this->deactivateOthers((int) $model->school_id, (int) $model->id);
-            }
-
             $model->update($data);
             $fresh = $model->fresh($this->defaultWith());
-            $this->syncSettingIfActive($fresh);
             $this->clearCache();
 
             return $fresh;
         });
-    }
-
-    private function deactivateOthers(int $schoolId, ?int $exceptId = null): void
-    {
-        $query = $this->model()::query()
-            ->where('school_id', $schoolId)
-            ->where('is_active', true);
-
-        if ($exceptId !== null) {
-            $query->whereKeyNot($exceptId);
-        }
-
-        $query->update(['is_active' => false]);
-    }
-
-    private function syncSettingIfActive(?Model $model): void
-    {
-        if (! $model instanceof PmbFee || ! $model->is_active) {
-            return;
-        }
-
-        Setting::query()->updateOrCreate(
-            [
-                'school_id' => $model->school_id,
-                'group' => 'pmb',
-                'key' => 'pmb_fee',
-            ],
-            [
-                'value' => Rupiah::format((int) $model->amount),
-                'type' => 'string',
-            ],
-        );
     }
 }

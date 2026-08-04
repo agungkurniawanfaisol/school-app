@@ -57,7 +57,7 @@ vi.mock('@/hooks/useGmailOAuth', () => ({
 }))
 
 describe('SettingsPage', () => {
-  it('hides pmb_fee and points admins to the fees page', () => {
+  it('hides pmb fee and bank settings and points admins to the fees page', () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     })
@@ -73,7 +73,7 @@ describe('SettingsPage', () => {
     )
 
     expect(screen.queryByDisplayValue('Rp 350.000')).not.toBeInTheDocument()
-    expect(screen.getByDisplayValue('BSI')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('BSI')).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Biaya Pendaftaran PMB/i })).toHaveAttribute(
       'href',
       '/admin/pmb-fees',

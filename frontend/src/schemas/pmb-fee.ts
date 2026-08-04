@@ -1,13 +1,22 @@
 import { z } from 'zod'
 
+export const PMB_FEE_JENJANGS = ['tk', 'sd'] as const
+export const PMB_FEE_PROGRAMS = ['reguler', 'icp'] as const
+
 export const pmbFeeFormSchema = z.object({
   school_id: z.number().int().positive(),
   academic_year_id: z.number().int().positive('Tahun ajaran wajib dipilih.'),
+  name: z.string().trim().min(1, 'Nama biaya wajib diisi.').max(100),
+  jenjang: z.enum(PMB_FEE_JENJANGS, { required_error: 'Jenjang wajib dipilih.' }),
+  program: z.enum(PMB_FEE_PROGRAMS, { required_error: 'Program wajib dipilih.' }),
   amount: z
     .number({ invalid_type_error: 'Nominal wajib diisi.' })
     .int('Nominal harus bilangan bulat.')
     .min(1000, 'Nominal minimal Rp 1.000.')
     .max(100_000_000, 'Nominal terlalu besar.'),
+  bank_name: z.string().trim().min(1, 'Bank transfer wajib diisi.').max(100),
+  account_number: z.string().trim().min(1, 'Nomor rekening wajib diisi.').max(50),
+  account_holder: z.string().trim().min(1, 'Atas nama rekening wajib diisi.').max(150),
   notes: z.string().max(255).optional().nullable(),
   is_active: z.boolean().optional(),
 })
@@ -22,4 +31,16 @@ export function parseRupiahInput(raw: string): number | null {
   const digits = raw.replace(/\D/g, '')
   if (!digits) return null
   return Number(digits)
+}
+
+export function jenjangLabel(jenjang: string): string {
+  return jenjang === 'tk' ? 'TK' : jenjang === 'sd' ? 'SD' : jenjang.toUpperCase()
+}
+
+export function programLabel(program: string): string {
+  return program === 'icp' ? 'ICP' : program === 'reguler' ? 'Reguler' : program
+}
+
+export function defaultFeeName(jenjang: string, program: string): string {
+  return `${jenjangLabel(jenjang)} ${programLabel(program)}`
 }

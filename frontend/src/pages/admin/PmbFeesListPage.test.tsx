@@ -17,8 +17,14 @@ vi.mock('@/hooks/usePmbFees', () => ({
           school_id: 1,
           academic_year_id: 1,
           academic_year: { id: 1, uuid: 'y1', label: '2026/2027', is_active: true },
+          name: 'SD Reguler',
+          jenjang: 'sd',
+          program: 'reguler',
           amount: 350000,
           amount_formatted: 'Rp 350.000',
+          bank_name: 'BSI',
+          account_number: '123',
+          account_holder: 'Yayasan',
           is_active: true,
           notes: null,
           created_at: null,
@@ -30,8 +36,14 @@ vi.mock('@/hooks/usePmbFees', () => ({
           school_id: 1,
           academic_year_id: 2,
           academic_year: { id: 2, uuid: 'y2', label: '2025/2026', is_active: false },
+          name: 'SD ICP',
+          jenjang: 'sd',
+          program: 'icp',
           amount: 300000,
           amount_formatted: 'Rp 300.000',
+          bank_name: 'BSI',
+          account_number: '123',
+          account_holder: 'Yayasan',
           is_active: false,
           notes: null,
           created_at: null,
@@ -45,18 +57,8 @@ vi.mock('@/hooks/usePmbFees', () => ({
   useActivatePmbFee: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
-vi.mock('@/hooks/useSettings', () => ({
-  usePublicSettings: () => ({
-    data: [
-      { key: 'pmb_bank_name', value: 'Bank Syariah Indonesia (BSI)' },
-      { key: 'pmb_account_number', value: '7123456789' },
-      { key: 'pmb_account_holder', value: 'Yayasan Nurul Hikmah' },
-    ],
-  }),
-}))
-
 describe('PmbFeesListPage', () => {
-  it('lists fees, shows bank banner, and exposes actions for active fees', () => {
+  it('lists multi-program fees without settings bank banner', () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     })
@@ -72,16 +74,10 @@ describe('PmbFeesListPage', () => {
     )
 
     expect(screen.getAllByText('Rp 350.000').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('2025/2026').length).toBeGreaterThan(0)
-    expect(screen.getByText('Bank Syariah Indonesia (BSI)')).toBeInTheDocument()
-    expect(screen.getByText('7123456789')).toBeInTheDocument()
-    expect(screen.getByText('Yayasan Nurul Hikmah')).toBeInTheDocument()
-    expect(document.querySelector('a[href*="/edit"]')).toBeNull()
+    expect(screen.getAllByText('SD Reguler').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('ICP').length).toBeGreaterThan(0)
+    expect(screen.queryByText('7123456789')).not.toBeInTheDocument()
     expect(document.querySelector('a[href="/admin/pmb-fees/create"]')).not.toBeNull()
-    expect(document.querySelector('a[href="/admin/settings"]')).not.toBeNull()
-
-    // Active + inactive rows both expose the actions menu (delete always available).
-    // Desktop table + mobile cards may both mount action triggers.
     expect(screen.getAllByLabelText('Aksi lainnya').length).toBeGreaterThanOrEqual(2)
   })
 })

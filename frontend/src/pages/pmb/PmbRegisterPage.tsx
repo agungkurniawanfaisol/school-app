@@ -32,12 +32,11 @@ import { useAuthMe } from '@/hooks/useAuth'
 import {
   usePmbPortalRegistration,
   usePmbPortalUpload,
-  usePmbSettings,
   useSavePmbDraft,
   useSubmitPmbCorrection,
   useSubmitPmbRegistration,
 } from '@/hooks/usePmb'
-import { useActivePmbFee } from '@/hooks/usePmbFees'
+import { useActivePmbFees } from '@/hooks/usePmbFees'
 import { useSchool } from '@/hooks/useSchool'
 import {
   pmbDataDiriStepSchema,
@@ -96,6 +95,17 @@ function mapRegistrationToForm(
     email_secondary: draft.email_secondary ?? '',
     parent_name: registration.parent_name ?? draft.parent_name ?? '',
     parent_phone: registration.parent_phone ?? draft.parent_phone ?? '',
+    grade_applied: registration.grade_applied ?? draft.grade_applied ?? null,
+    pmb_fee_uuid:
+      (registration.payment_info?.pmb_fee_uuid as string | undefined) ?? draft.pmb_fee_uuid ?? null,
+    jenjang: (draft.jenjang as PmbPortalDraftValues['jenjang'])
+      ?? ((registration.payment_info?.jenjang as PmbPortalDraftValues['jenjang']) ?? null),
+    program: (draft.program as PmbPortalDraftValues['program'])
+      ?? ((registration.payment_info?.program as PmbPortalDraftValues['program']) ?? null),
+    fee_name:
+      draft.fee_name
+      ?? (registration.payment_info?.fee_name as string | undefined)
+      ?? null,
     payment_proof_media_id:
       (registration.payment_info?.proof_media_id as number | undefined) ?? draft.payment_proof_media_id,
     payment_transferred_at:
@@ -117,8 +127,7 @@ export function PmbRegisterPage() {
   const { data: school } = useSchool()
   const { data: activeYear } = useActiveAcademicYear(school?.id)
   const { data: registration } = usePmbPortalRegistration(school?.id)
-  const { data: settings } = usePmbSettings(school?.id)
-  const { data: activeFee } = useActivePmbFee(school?.id)
+  const { data: fees = [] } = useActivePmbFees(school?.id)
   const saveDraft = useSavePmbDraft()
   const submit = useSubmitPmbRegistration()
   const submitCorrection = useSubmitPmbCorrection()
@@ -129,9 +138,6 @@ export function PmbRegisterPage() {
   const hydratedRegistrationUuid = useRef<string | null>(null)
   const hasSubmittedRef = useRef(false)
   const [studentPhotoPreviewUrl, setStudentPhotoPreviewUrl] = useState<string | null>(null)
-
-  const settingMap = Object.fromEntries((settings ?? []).map((s) => [s.key, s.value]))
-  const resolvedFee = activeFee?.amount_formatted ?? settingMap.pmb_fee
 
   const resolvedAcademicYear = activeYear?.label ?? getAcademicYear()
   const stepLabel = WIZARD_STEP_LABELS[step]
@@ -439,10 +445,7 @@ export function PmbRegisterPage() {
                 {step === 2 && (
                   <PmbWizardStepPembayaran
                     form={form}
-                    fee={resolvedFee}
-                    bankName={settingMap.pmb_bank_name}
-                    accountNumber={settingMap.pmb_account_number}
-                    accountHolder={settingMap.pmb_account_holder}
+                    fees={fees}
                     upload={upload}
                     proofPreviewUrl={paymentProofUrl}
                   />

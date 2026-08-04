@@ -17,8 +17,14 @@ export interface PmbFee {
     label: string
     is_active: boolean
   } | null
+  name: string
+  jenjang: 'tk' | 'sd'
+  program: 'reguler' | 'icp'
   amount: number
   amount_formatted: string
+  bank_name?: string | null
+  account_number?: string | null
+  account_holder?: string | null
   notes?: string | null
   is_active: boolean
   created_at: string | null
@@ -28,16 +34,32 @@ export interface PmbFee {
 export const pmbFeeKeys = {
   all: ['pmb-fees'] as const,
   active: (schoolId?: number) => [...pmbFeeKeys.all, 'active', schoolId] as const,
+  activeList: (schoolId?: number) => [...pmbFeeKeys.all, 'active-list', schoolId] as const,
   lists: () => [...pmbFeeKeys.all, 'list'] as const,
   list: (filters: ListFilters) => [...pmbFeeKeys.lists(), buildQueryParams(filters)] as const,
   adminDetail: (id: number) => [...pmbFeeKeys.all, 'admin', id] as const,
 }
 
+/** @deprecated Prefer useActivePmbFees */
 export function useActivePmbFee(schoolId?: number) {
   return useQuery({
     queryKey: pmbFeeKeys.active(schoolId),
     queryFn: async () => {
       const { data } = await api.get<ApiResponse<PmbFee>>('/v1/pmb/fees/active', {
+        params: buildQueryParams({ school_id: schoolId }),
+      })
+      return data.data
+    },
+    enabled: !!schoolId,
+    ...queryConfig,
+  })
+}
+
+export function useActivePmbFees(schoolId?: number) {
+  return useQuery({
+    queryKey: pmbFeeKeys.activeList(schoolId),
+    queryFn: async () => {
+      const { data } = await api.get<ApiResponse<PmbFee[]>>('/v1/pmb/fees', {
         params: buildQueryParams({ school_id: schoolId }),
       })
       return data.data
@@ -118,7 +140,13 @@ export function useActivatePmbFee() {
       const { data } = await api.put<ApiResponse<PmbFee>>(`/admin/pmb-fees/${fee.id}`, {
         school_id: fee.school_id,
         academic_year_id: fee.academic_year_id,
+        name: fee.name,
+        jenjang: fee.jenjang,
+        program: fee.program,
         amount: fee.amount,
+        bank_name: fee.bank_name,
+        account_number: fee.account_number,
+        account_holder: fee.account_holder,
         notes: fee.notes ?? null,
         is_active: true,
       })

@@ -173,6 +173,7 @@ export const pmbOrangTuaStepSchema = z
   })
 
 export const pmbPaymentStepSchema = z.object({
+  pmb_fee_uuid: z.string().uuid('Pilih jenjang dan program biaya pendaftaran.'),
   payment_proof_media_id: z.number().int().positive('Bukti transfer wajib diunggah.'),
   payment_transferred_at: z.string().optional().nullable(),
   payment_note: optionalSentenceStartString(500),
@@ -210,6 +211,10 @@ export const pmbPortalDraftSchema = z.object({
   gender: z.enum(['L', 'P']).optional().nullable(),
   grade_applied: z.string().optional().nullable(),
   previous_school: z.string().optional().nullable(),
+  pmb_fee_uuid: z.string().uuid().optional().nullable(),
+  jenjang: z.enum(['tk', 'sd']).optional().nullable(),
+  program: z.enum(['reguler', 'icp']).optional().nullable(),
+  fee_name: z.string().optional().nullable(),
   payment_proof_media_id: z.number().optional(),
   student_photo_media_id: z.number().optional(),
   payment_transferred_at: z.string().optional().nullable(),
@@ -240,6 +245,10 @@ export function buildDraftPayload(values: Partial<PmbPortalDraftValues>) {
     address_rw: values.address_rw ?? null,
     kabupaten: values.kabupaten ?? null,
     provinsi: values.provinsi ?? null,
+    pmb_fee_uuid: values.pmb_fee_uuid ?? null,
+    jenjang: values.jenjang ?? null,
+    program: values.program ?? null,
+    fee_name: values.fee_name ?? null,
   }
 }
 

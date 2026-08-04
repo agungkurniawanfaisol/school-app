@@ -5,8 +5,6 @@ namespace Database\Seeders;
 use App\Models\AcademicYear;
 use App\Models\PmbFee;
 use App\Models\School;
-use App\Models\Setting;
-use App\Support\Rupiah;
 use Illuminate\Database\Seeder;
 
 class PmbFeeSeeder extends Seeder
@@ -14,6 +12,13 @@ class PmbFeeSeeder extends Seeder
     public function run(): void
     {
         $schools = School::query()->where('is_active', true)->orderBy('id')->get();
+
+        $catalog = [
+            ['name' => 'TK Reguler', 'jenjang' => PmbFee::JENJANG_TK, 'program' => PmbFee::PROGRAM_REGULER, 'amount' => 250000],
+            ['name' => 'TK ICP', 'jenjang' => PmbFee::JENJANG_TK, 'program' => PmbFee::PROGRAM_ICP, 'amount' => 350000],
+            ['name' => 'SD Reguler', 'jenjang' => PmbFee::JENJANG_SD, 'program' => PmbFee::PROGRAM_REGULER, 'amount' => 350000],
+            ['name' => 'SD ICP', 'jenjang' => PmbFee::JENJANG_SD, 'program' => PmbFee::PROGRAM_ICP, 'amount' => 450000],
+        ];
 
         foreach ($schools as $school) {
             $activeYear = AcademicYear::query()
@@ -30,57 +35,25 @@ class PmbFeeSeeder extends Seeder
                 continue;
             }
 
-            $settingValue = Setting::query()
-                ->where('school_id', $school->id)
-                ->where('group', 'pmb')
-                ->where('key', 'pmb_fee')
-                ->value('value');
-
-            $amount = Rupiah::parse(is_string($settingValue) ? $settingValue : null) ?? 350000;
-
-            $previousYear = AcademicYear::query()
-                ->where('school_id', $school->id)
-                ->where('label', '!=', $activeYear->label)
-                ->orderByDesc('id')
-                ->first();
-
-            if ($previousYear !== null) {
+            foreach ($catalog as $item) {
                 PmbFee::query()->updateOrCreate(
                     [
                         'school_id' => $school->id,
-                        'academic_year_id' => $previousYear->id,
+                        'academic_year_id' => $activeYear->id,
+                        'jenjang' => $item['jenjang'],
+                        'program' => $item['program'],
                     ],
                     [
-                        'amount' => max(1000, $amount - 50000),
-                        'notes' => 'Biaya tahun ajaran sebelumnya',
-                        'is_active' => false,
+                        'name' => $item['name'],
+                        'amount' => $item['amount'],
+                        'bank_name' => 'Bank Syariah Indonesia (BSI)',
+                        'account_number' => '1234567890',
+                        'account_holder' => 'Yayasan Nurul Hikmah',
+                        'notes' => 'Biaya pendaftaran '.$item['name'],
+                        'is_active' => true,
                     ],
                 );
             }
-
-            PmbFee::query()->updateOrCreate(
-                [
-                    'school_id' => $school->id,
-                    'academic_year_id' => $activeYear->id,
-                ],
-                [
-                    'amount' => $amount,
-                    'notes' => 'Biaya pendaftaran aktif',
-                    'is_active' => true,
-                ],
-            );
-
-            Setting::query()->updateOrCreate(
-                [
-                    'school_id' => $school->id,
-                    'group' => 'pmb',
-                    'key' => 'pmb_fee',
-                ],
-                [
-                    'value' => Rupiah::format($amount),
-                    'type' => 'string',
-                ],
-            );
         }
     }
 }

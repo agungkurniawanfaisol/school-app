@@ -71,6 +71,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware(\App\Http\Middleware\TranslateResponse::class)->group(function (): void {
     Route::get('academic-years/active', [AcademicYearController::class, 'active']);
+    Route::get('pmb/fees', [PmbFeeController::class, 'index']);
     Route::get('pmb/fees/active', [PmbFeeController::class, 'active']);
 
     Route::get('landing', \App\Http\Controllers\Api\V1\LandingController::class);

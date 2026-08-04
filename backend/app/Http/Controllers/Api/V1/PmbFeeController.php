@@ -13,6 +13,21 @@ class PmbFeeController extends Controller
 {
     public function __construct(private PmbFeeRepository $pmbFeeRepository) {}
 
+    public function index(Request $request): JsonResponse
+    {
+        $schoolId = $this->resolveSchoolId($request);
+        if ($schoolId === null) {
+            return response()->json(['message' => 'Data sekolah tidak ditemukan.'], 404);
+        }
+
+        $fees = $this->pmbFeeRepository->listActiveForSchool($schoolId);
+
+        return response()->json([
+            'data' => PmbFeeResource::collection($fees),
+        ]);
+    }
+
+    /** @deprecated Prefer GET /pmb/fees — returns first active fee for backward compatibility. */
     public function active(Request $request): JsonResponse
     {
         $schoolId = $this->resolveSchoolId($request);

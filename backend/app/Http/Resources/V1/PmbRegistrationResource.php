@@ -29,6 +29,7 @@ class PmbRegistrationResource extends JsonResource
             'address' => $this->address,
             'previous_school' => $this->previous_school,
             'grade_applied' => $this->grade_applied,
+            'pmb_fee_id' => $this->pmb_fee_id,
             'academic_year' => $this->academic_year
                 ?? (is_array($this->draft_payload) ? ($this->draft_payload['academic_year'] ?? null) : null),
             'status' => $this->status,

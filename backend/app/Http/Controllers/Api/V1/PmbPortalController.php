@@ -23,6 +23,7 @@ use App\Models\School;
 use App\Models\Testimonial;
 use App\Models\User;
 use App\Repositories\AcademicYearRepository;
+use App\Repositories\PmbFeeRepository;
 use App\Repositories\PmbRegistrationRepository;
 use App\Repositories\TestimonialRepository;
 use App\Services\PmbEmailService;
@@ -42,6 +43,7 @@ class PmbPortalController extends Controller
     public function __construct(
         private PmbRegistrationRepository $pmbRegistrationRepository,
         private AcademicYearRepository $academicYearRepository,
+        private PmbFeeRepository $pmbFeeRepository,
         private TestimonialRepository $testimonialRepository,
         private PmbEmailService $pmbEmailService,
     ) {}
@@ -281,6 +283,11 @@ class PmbPortalController extends Controller
             $data['academic_year'] = $data['draft_payload']['academic_year'] ?? $this->resolveAcademicYear($schoolId);
         }
 
+        $feeError = $this->applySelectedFee($data, $schoolId, requireFee: false);
+        if ($feeError !== null) {
+            return $feeError;
+        }
+
         // Never allow status change via draft/correction autosave.
         unset($data['status']);
 
@@ -318,6 +325,11 @@ class PmbPortalController extends Controller
             $data['academic_year'] = $data['draft_payload']['academic_year'] ?? $registration->academic_year ?? $this->resolveAcademicYear($schoolId);
         }
 
+        $feeError = $this->applySelectedFee($data, $schoolId, requireFee: true, existing: $registration);
+        if ($feeError !== null) {
+            return $feeError;
+        }
+
         $registration = $this->pmbRegistrationRepository->update($registration, $data);
 
         $this->recordEvent($registration, $request->user()->id, 'correction_submitted', 'Pendaftar mengirim perbaikan data/bukti pembayaran.');
@@ -352,6 +364,11 @@ class PmbPortalController extends Controller
             $data['academic_year'] = $data['draft_payload']['academic_year'] ?? $registration->academic_year ?? $this->resolveAcademicYear($schoolId);
         }
         $data['current_step'] = 5;
+
+        $feeError = $this->applySelectedFee($data, $schoolId, requireFee: true, existing: $registration);
+        if ($feeError !== null) {
+            return $feeError;
+        }
 
         $registration = $this->pmbRegistrationRepository->update($registration, $data);
 
@@ -510,5 +527,65 @@ class PmbPortalController extends Controller
         $startYear = $now->month >= 7 ? $now->year : $now->year - 1;
 
         return "{$startYear}/".($startYear + 1);
+    }
+
+    /**
+     * Resolve pmb_fee_uuid from request/draft/payment_info and attach fee snapshot.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private function applySelectedFee(
+        array &$data,
+        int $schoolId,
+        bool $requireFee,
+        ?PmbRegistration $existing = null,
+    ): ?JsonResponse {
+        $explicitFeeKey = array_key_exists('pmb_fee_uuid', $data)
+            || array_key_exists('pmb_fee_uuid', $data['draft_payload'] ?? [])
+            || array_key_exists('pmb_fee_uuid', $data['payment_info'] ?? []);
+
+        $uuid = $data['pmb_fee_uuid']
+            ?? ($data['draft_payload']['pmb_fee_uuid'] ?? null)
+            ?? ($data['payment_info']['pmb_fee_uuid'] ?? null)
+            ?? null;
+
+        unset($data['pmb_fee_uuid']);
+
+        if (! is_string($uuid) || $uuid === '') {
+            if ($requireFee && empty($existing?->pmb_fee_id)) {
+                return response()->json([
+                    'message' => 'Pilih jenjang dan program biaya pendaftaran terlebih dahulu.',
+                    'errors' => ['pmb_fee_uuid' => ['Pilih jenjang dan program biaya pendaftaran terlebih dahulu.']],
+                ], 422);
+            }
+
+            // Draft explicitly cleared the fee (e.g. jenjang changed before picking program).
+            if (! $requireFee && $explicitFeeKey) {
+                $data['pmb_fee_id'] = null;
+            }
+
+            return null;
+        }
+
+        $fee = $this->pmbFeeRepository->findActiveByUuidForSchool($uuid, $schoolId);
+        if ($fee === null) {
+            return response()->json([
+                'message' => 'Biaya pendaftaran tidak valid atau tidak aktif.',
+                'errors' => ['pmb_fee_uuid' => ['Biaya pendaftaran tidak valid atau tidak aktif.']],
+            ], 422);
+        }
+
+        $snapshot = $fee->toPaymentSnapshot();
+        $data['pmb_fee_id'] = $fee->id;
+        $data['grade_applied'] = $fee->gradeAppliedLabel();
+        $data['payment_info'] = array_merge($data['payment_info'] ?? [], $snapshot);
+        $data['draft_payload'] = array_merge($data['draft_payload'] ?? [], [
+            'pmb_fee_uuid' => $fee->uuid,
+            'jenjang' => $fee->jenjang,
+            'program' => $fee->program,
+            'fee_name' => $fee->name,
+        ]);
+
+        return null;
     }
 }

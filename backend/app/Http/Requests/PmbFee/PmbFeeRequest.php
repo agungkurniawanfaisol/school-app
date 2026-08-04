@@ -25,6 +25,9 @@ abstract class PmbFeeRequest extends FormRequest
             : (is_numeric($routeFee) ? PmbFee::query()->find((int) $routeFee) : null);
 
         $schoolId = (int) ($this->input('school_id') ?? $existing?->school_id ?? 0);
+        $yearId = (int) ($this->input('academic_year_id') ?? $existing?->academic_year_id ?? 0);
+        $jenjang = (string) ($this->input('jenjang') ?? $existing?->jenjang ?? '');
+        $program = (string) ($this->input('program') ?? $existing?->program ?? '');
         $ignoreId = $existing?->id;
 
         return [
@@ -32,9 +35,6 @@ abstract class PmbFeeRequest extends FormRequest
             'academic_year_id' => [
                 'required',
                 'exists:academic_years,id',
-                Rule::unique('pmb_fees', 'academic_year_id')
-                    ->where(fn ($query) => $query->where('school_id', $schoolId)->whereNull('deleted_at'))
-                    ->ignore($ignoreId),
                 function (string $attribute, mixed $value, \Closure $fail) use ($schoolId): void {
                     if (! is_numeric($value)) {
                         return;
@@ -50,7 +50,24 @@ abstract class PmbFeeRequest extends FormRequest
                     }
                 },
             ],
+            'name' => ['required', 'string', 'max:100'],
+            'jenjang' => ['required', 'string', Rule::in(PmbFee::JENJANGS)],
+            'program' => [
+                'required',
+                'string',
+                Rule::in(PmbFee::PROGRAMS),
+                Rule::unique('pmb_fees', 'program')
+                    ->where(fn ($query) => $query
+                        ->where('school_id', $schoolId)
+                        ->where('academic_year_id', $yearId)
+                        ->where('jenjang', $jenjang)
+                        ->whereNull('deleted_at'))
+                    ->ignore($ignoreId),
+            ],
             'amount' => ['required', 'integer', 'min:1000', 'max:100000000'],
+            'bank_name' => ['required', 'string', 'max:100'],
+            'account_number' => ['required', 'string', 'max:50'],
+            'account_holder' => ['required', 'string', 'max:150'],
             'notes' => ['nullable', 'string', 'max:255'],
             'is_active' => ['sometimes', 'boolean'],
         ];
@@ -62,8 +79,11 @@ abstract class PmbFeeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'academic_year_id.unique' => 'Biaya untuk tahun ajaran ini sudah ada.',
+            'program.unique' => 'Biaya untuk kombinasi tahun ajaran, jenjang, dan program ini sudah ada.',
             'amount.min' => 'Nominal minimal Rp 1.000.',
+            'bank_name.required' => 'Bank transfer wajib diisi.',
+            'account_number.required' => 'Nomor rekening wajib diisi.',
+            'account_holder.required' => 'Atas nama rekening wajib diisi.',
         ];
     }
 }

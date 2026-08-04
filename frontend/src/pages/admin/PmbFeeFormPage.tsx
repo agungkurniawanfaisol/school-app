@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { Card, CardContent } from '@/components/ui/card'
@@ -8,23 +8,40 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAdminAcademicYearsList } from '@/hooks/useAcademicYears'
-import { useCreatePmbFee } from '@/hooks/usePmbFees'
+import { useAdminPmbFeeDetail, useCreatePmbFee, useUpdatePmbFee } from '@/hooks/usePmbFees'
 import { useSchool } from '@/hooks/useSchool'
-import { formatRupiah, parseRupiahInput } from '@/schemas/pmb-fee'
+import {
+  defaultFeeName,
+  formatRupiah,
+  parseRupiahInput,
+  pmbFeeFormSchema,
+  type PmbFeeFormValues,
+} from '@/schemas/pmb-fee'
 
 export function PmbFeeFormPage() {
   const { t } = useTranslation('admin')
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const feeId = id ? Number(id) : 0
+  const isEdit = feeId > 0
   const { data: school } = useSchool()
   const { data: yearsData } = useAdminAcademicYearsList({ per_page: 50 })
+  const { data: existing } = useAdminPmbFeeDetail(feeId)
   const years = yearsData?.data ?? []
   const createItem = useCreatePmbFee()
+  const updateItem = useUpdatePmbFee(feeId)
 
   const [academicYearId, setAcademicYearId] = useState('')
+  const [name, setName] = useState('')
+  const [jenjang, setJenjang] = useState<'tk' | 'sd'>('sd')
+  const [program, setProgram] = useState<'reguler' | 'icp'>('reguler')
   const [amountInput, setAmountInput] = useState('350000')
+  const [bankName, setBankName] = useState('')
+  const [accountNumber, setAccountNumber] = useState('')
+  const [accountHolder, setAccountHolder] = useState('')
   const [notes, setNotes] = useState('')
   const [isActive, setIsActive] = useState(true)
+  const [nameTouched, setNameTouched] = useState(false)
 
   useEffect(() => {
     if (academicYearId || years.length === 0) return
@@ -32,34 +49,63 @@ export function PmbFeeFormPage() {
     setAcademicYearId(String((active ?? years[0]).id))
   }, [academicYearId, years])
 
+  useEffect(() => {
+    if (!existing) return
+    setAcademicYearId(String(existing.academic_year_id))
+    setName(existing.name)
+    setJenjang(existing.jenjang)
+    setProgram(existing.program)
+    setAmountInput(String(existing.amount))
+    setBankName(existing.bank_name ?? '')
+    setAccountNumber(existing.account_number ?? '')
+    setAccountHolder(existing.account_holder ?? '')
+    setNotes(existing.notes ?? '')
+    setIsActive(existing.is_active)
+    setNameTouched(true)
+  }, [existing])
+
+  useEffect(() => {
+    if (nameTouched || isEdit) return
+    setName(defaultFeeName(jenjang, program))
+  }, [jenjang, program, nameTouched, isEdit])
+
   const amount = useMemo(() => parseRupiahInput(amountInput), [amountInput])
   const preview = amount != null ? formatRupiah(amount) : '—'
 
-  if (id) {
-    return <Navigate to="/admin/pmb-fees" replace />
-  }
-
-  const payload = {
+  const payload: PmbFeeFormValues = {
     school_id: school?.id ?? 0,
     academic_year_id: Number(academicYearId),
+    name: name.trim(),
+    jenjang,
+    program,
     amount: amount ?? 0,
+    bank_name: bankName.trim(),
+    account_number: accountNumber.trim(),
+    account_holder: accountHolder.trim(),
     notes: notes.trim() || null,
     is_active: isActive,
   }
 
+  const parsed = pmbFeeFormSchema.safeParse(payload)
+  const isSubmitting = createItem.isPending || updateItem.isPending
+
   const handleSave = () => {
-    if (!payload.school_id || !payload.academic_year_id || amount == null) return
-    createItem.mutate(payload, { onSuccess: () => navigate('/admin/pmb-fees') })
+    if (!parsed.success) return
+    if (isEdit) {
+      updateItem.mutate(parsed.data, { onSuccess: () => navigate('/admin/pmb-fees') })
+      return
+    }
+    createItem.mutate(parsed.data, { onSuccess: () => navigate('/admin/pmb-fees') })
   }
 
   return (
     <AdminFormShell
-      title={t('pages.pmbFees.createTitle')}
+      title={isEdit ? t('pages.pmbFees.editTitle', { defaultValue: 'Edit Biaya PMB' }) : t('pages.pmbFees.createTitle')}
       backHref="/admin/pmb-fees"
       onSubmit={handleSave}
       onCancel={() => navigate('/admin/pmb-fees')}
-      isSubmitting={createItem.isPending}
-      isDisabled={!payload.school_id || !payload.academic_year_id || amount == null}
+      isSubmitting={isSubmitting}
+      isDisabled={!parsed.success}
     >
       <Card className="admin-card">
         <CardContent className="space-y-4 p-4 sm:p-6">
@@ -80,6 +126,46 @@ export function PmbFeeFormPage() {
             </Select>
           </div>
 
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Jenjang</Label>
+              <Select value={jenjang} onValueChange={(v) => setJenjang(v as 'tk' | 'sd')}>
+                <SelectTrigger className="h-11">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tk">TK</SelectItem>
+                  <SelectItem value="sd">SD</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Program</Label>
+              <Select value={program} onValueChange={(v) => setProgram(v as 'reguler' | 'icp')}>
+                <SelectTrigger className="h-11">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="reguler">Reguler</SelectItem>
+                  <SelectItem value="icp">ICP</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="fee_name">Nama biaya</Label>
+            <Input
+              id="fee_name"
+              value={name}
+              onChange={(e) => {
+                setNameTouched(true)
+                setName(e.target.value)
+              }}
+              className="h-11"
+            />
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="amount">{t('form.pmbFeeAmount')}</Label>
             <Input
@@ -96,6 +182,29 @@ export function PmbFeeFormPage() {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="bank_name">Bank Transfer</Label>
+            <Input id="bank_name" value={bankName} onChange={(e) => setBankName(e.target.value)} className="h-11" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="account_number">Nomor Rekening</Label>
+            <Input
+              id="account_number"
+              value={accountNumber}
+              onChange={(e) => setAccountNumber(e.target.value)}
+              className="h-11 font-mono"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="account_holder">Atas Nama Rekening</Label>
+            <Input
+              id="account_holder"
+              value={accountHolder}
+              onChange={(e) => setAccountHolder(e.target.value)}
+              className="h-11"
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="notes">{t('form.notes')}</Label>
             <Input
               id="notes"
@@ -109,7 +218,9 @@ export function PmbFeeFormPage() {
           <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
             <div>
               <p className="font-medium">{t('form.setActivePmbFee')}</p>
-              <p className="text-sm text-muted-foreground">{t('form.setActivePmbFeeHint')}</p>
+              <p className="text-sm text-muted-foreground">
+                Beberapa biaya boleh aktif bersamaan (TK/SD × Reguler/ICP).
+              </p>
             </div>
             <Switch
               checked={isActive}
