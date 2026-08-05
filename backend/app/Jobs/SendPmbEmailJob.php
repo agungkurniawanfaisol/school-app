@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Mail\Pmb\PmbCustomMail;
 use App\Mail\Pmb\PmbRegistrationAcceptedMail;
+use App\Mail\Pmb\PmbRegistrationStatusChangedMail;
 use App\Mail\Pmb\PmbRegistrationSubmittedMail;
 use App\Models\PmbEmailLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -40,7 +41,14 @@ class SendPmbEmailJob implements ShouldQueue
         try {
             $mailable = match ($log->type) {
                 PmbEmailLog::TYPE_SUBMITTED => new PmbRegistrationSubmittedMail($log->registration),
-                PmbEmailLog::TYPE_ACCEPTED => new PmbRegistrationAcceptedMail($log->registration),
+                PmbEmailLog::TYPE_ACCEPTED => new PmbRegistrationAcceptedMail(
+                    $log->registration,
+                    $log->body,
+                ),
+                PmbEmailLog::TYPE_STATUS_CHANGED => new PmbRegistrationStatusChangedMail(
+                    $log->registration,
+                    $log->body,
+                ),
                 PmbEmailLog::TYPE_CUSTOM, PmbEmailLog::TYPE_BROADCAST => new PmbCustomMail(
                     $log->registration,
                     $log->subject,

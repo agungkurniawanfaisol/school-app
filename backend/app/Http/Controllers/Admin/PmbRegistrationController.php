@@ -225,9 +225,9 @@ class PmbRegistrationController extends Controller
 
         $registration = $this->pmbRegistrationRepository->update($registration, $data);
 
-        if ($registration->status === PmbRegistration::STATUS_ACCEPTED
-            && $previousStatus !== PmbRegistration::STATUS_ACCEPTED) {
-            $this->pmbEmailService->queueAccepted($registration);
+        if ($registration->status !== $previousStatus) {
+            $noteForEmail = $shouldNotifyPendaftar ? trim((string) $incomingNotes) : null;
+            $this->pmbEmailService->queueStatusChanged($registration, $previousStatus, $noteForEmail);
         }
 
         if ($shouldNotifyPendaftar) {

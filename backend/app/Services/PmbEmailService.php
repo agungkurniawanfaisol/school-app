@@ -25,20 +25,51 @@ class PmbEmailService
     }
 
     /**
+     * Queue email when admin changes registration status.
+     *
      * @return array{queued: int, skipped: int}
      */
-    public function queueAccepted(PmbRegistration $registration): array
-    {
-        if ($this->hasSentAcceptedEmail($registration)) {
+    public function queueStatusChanged(
+        PmbRegistration $registration,
+        string $previousStatus,
+        ?string $adminNote = null,
+    ): array {
+        if ($registration->status === $previousStatus) {
             return ['queued' => 0, 'skipped' => 0];
         }
 
+        $note = $adminNote !== null ? trim($adminNote) : null;
+        if ($note === '') {
+            $note = null;
+        }
+
+        if ($registration->status === PmbRegistration::STATUS_ACCEPTED) {
+            return $this->queueAccepted($registration, $note);
+        }
+
+        $label = PmbRegistration::STATUS_LABELS[$registration->status] ?? $registration->status;
+        $subject = 'Update status PMB ('.$label.') — '.$registration->registration_number;
+
+        return $this->queueForRegistration(
+            $registration,
+            PmbEmailLog::TYPE_STATUS_CHANGED,
+            $subject,
+            $note,
+        );
+    }
+
+    /**
+     * @return array{queued: int, skipped: int}
+     */
+    public function queueAccepted(PmbRegistration $registration, ?string $adminNote = null): array
+    {
         $subject = 'Selamat — Pendaftaran diterima ('.$registration->registration_number.')';
 
         return $this->queueForRegistration(
             $registration,
             PmbEmailLog::TYPE_ACCEPTED,
             $subject,
+            $adminNote,
         );
     }
 
@@ -82,15 +113,6 @@ class PmbEmailService
             ],
             $body,
         );
-    }
-
-    private function hasSentAcceptedEmail(PmbRegistration $registration): bool
-    {
-        return PmbEmailLog::query()
-            ->where('pmb_registration_id', $registration->id)
-            ->where('type', PmbEmailLog::TYPE_ACCEPTED)
-            ->where('status', PmbEmailLog::STATUS_SENT)
-            ->exists();
     }
 
     /**

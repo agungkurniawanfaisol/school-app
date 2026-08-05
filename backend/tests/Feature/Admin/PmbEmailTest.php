@@ -4,9 +4,11 @@ namespace Tests\Feature\Admin;
 
 use App\Mail\Pmb\PmbCustomMail;
 use App\Mail\Pmb\PmbRegistrationAcceptedMail;
+use App\Mail\Pmb\PmbRegistrationStatusChangedMail;
 use App\Mail\Pmb\PmbRegistrationSubmittedMail;
 use App\Models\Media;
 use App\Models\PmbEmailLog;
+use App\Models\PmbFee;
 use App\Models\PmbRegistration;
 use App\Models\School;
 use App\Models\User;
@@ -23,6 +25,7 @@ class PmbEmailTest extends TestCase
         Storage::fake('public');
 
         $school = School::factory()->create();
+        $fee = PmbFee::factory()->sdReguler()->active()->create(['school_id' => $school->id]);
         $user = User::factory()->pendaftar()->create();
         Sanctum::actingAs($user);
 
@@ -50,8 +53,10 @@ class PmbEmailTest extends TestCase
             'parent_phone' => '081234567890',
             'parent_email' => 'orangtua@example.com',
             'grade_applied' => 'SD',
+            'pmb_fee_uuid' => $fee->uuid,
             'payment_info' => [
                 'proof_media_id' => $media->id,
+                'pmb_fee_uuid' => $fee->uuid,
             ],
         ])->assertOk();
 
@@ -72,6 +77,7 @@ class PmbEmailTest extends TestCase
         Storage::fake('public');
 
         $school = School::factory()->create();
+        $fee = PmbFee::factory()->sdReguler()->active()->create(['school_id' => $school->id]);
         $user = User::factory()->pendaftar()->create();
         Sanctum::actingAs($user);
 
@@ -98,8 +104,10 @@ class PmbEmailTest extends TestCase
             'parent_name' => 'Budi Santoso',
             'parent_phone' => '081234567890',
             'grade_applied' => 'SD',
+            'pmb_fee_uuid' => $fee->uuid,
             'payment_info' => [
                 'proof_media_id' => $media->id,
+                'pmb_fee_uuid' => $fee->uuid,
             ],
         ])->assertOk();
 
@@ -111,7 +119,7 @@ class PmbEmailTest extends TestCase
         ]);
     }
 
-    public function test_accepted_status_queues_accepted_email_once(): void
+    public function test_accepted_status_queues_accepted_email_and_notes_only_does_not(): void
     {
         Mail::fake();
 
@@ -140,6 +148,89 @@ class PmbEmailTest extends TestCase
         ])->assertOk();
 
         Mail::assertNothingSent();
+    }
+
+    public function test_needs_revision_status_queues_email_with_admin_note(): void
+    {
+        Mail::fake();
+
+        $school = School::factory()->create();
+        $admin = User::factory()->adminPmb()->create();
+        $registration = PmbRegistration::factory()->create([
+            'school_id' => $school->id,
+            'status' => 'awaiting_verification',
+            'parent_email' => 'revisi@example.com',
+            'student_name' => 'Siti Aminah',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->patchJson('/api/admin/pmb-registrations/by-uuid/'.$registration->uuid, [
+            'status' => 'needs_revision',
+            'notes' => 'Mohon unggah ulang bukti pembayaran yang lebih jelas.',
+        ])->assertOk();
+
+        $this->assertDatabaseHas('pmb_email_logs', [
+            'pmb_registration_id' => $registration->id,
+            'type' => PmbEmailLog::TYPE_STATUS_CHANGED,
+            'recipient_email' => 'revisi@example.com',
+            'status' => PmbEmailLog::STATUS_SENT,
+        ]);
+
+        Mail::assertSent(PmbRegistrationStatusChangedMail::class, function (PmbRegistrationStatusChangedMail $mail) {
+            return $mail->hasTo('revisi@example.com')
+                && $mail->adminNote === 'Mohon unggah ulang bukti pembayaran yang lebih jelas.';
+        });
+    }
+
+    public function test_rejected_status_queues_status_changed_email(): void
+    {
+        Mail::fake();
+
+        $school = School::factory()->create();
+        $admin = User::factory()->adminPmb()->create();
+        $registration = PmbRegistration::factory()->create([
+            'school_id' => $school->id,
+            'status' => 'awaiting_verification',
+            'parent_email' => 'ditolak@example.com',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->patchJson('/api/admin/pmb-registrations/by-uuid/'.$registration->uuid, [
+            'status' => 'rejected',
+            'notes' => 'Kuota jenjang sudah penuh.',
+        ])->assertOk();
+
+        Mail::assertSent(PmbRegistrationStatusChangedMail::class, function (PmbRegistrationStatusChangedMail $mail) {
+            return $mail->hasTo('ditolak@example.com')
+                && $mail->adminNote === 'Kuota jenjang sudah penuh.';
+        });
+    }
+
+    public function test_status_change_to_accepted_again_sends_email(): void
+    {
+        Mail::fake();
+
+        $school = School::factory()->create();
+        $admin = User::factory()->adminPmb()->create();
+        $registration = PmbRegistration::factory()->create([
+            'school_id' => $school->id,
+            'status' => 'rejected',
+            'parent_email' => 'ulang@example.com',
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $this->patchJson('/api/admin/pmb-registrations/by-uuid/'.$registration->uuid, [
+            'status' => 'accepted',
+            'notes' => 'Setelah pertimbangan ulang, diterima.',
+        ])->assertOk();
+
+        Mail::assertSent(PmbRegistrationAcceptedMail::class, function (PmbRegistrationAcceptedMail $mail) {
+            return $mail->hasTo('ulang@example.com')
+                && $mail->adminNote === 'Setelah pertimbangan ulang, diterima.';
+        });
     }
 
     public function test_admin_can_send_custom_email_to_selected_registrations(): void

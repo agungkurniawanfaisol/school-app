@@ -15,6 +15,8 @@ class PmbEmailLog extends Model
 
     public const TYPE_ACCEPTED = 'accepted';
 
+    public const TYPE_STATUS_CHANGED = 'status_changed';
+
     public const TYPE_CUSTOM = 'custom';
 
     public const TYPE_BROADCAST = 'broadcast';

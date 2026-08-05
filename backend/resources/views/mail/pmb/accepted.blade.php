@@ -9,6 +9,13 @@
         ({{ $registration->registration_number }}) telah <strong>DITERIMA</strong>.
     </p>
 
+    @if (! empty($adminNote))
+        <p style="margin:20px 0;padding:14px 16px;background:#f9fafb;border-left:4px solid #15803d;border-radius:4px;">
+            <strong>Catatan dari panitia:</strong><br>
+            {{ $adminNote }}
+        </p>
+    @endif
+
     <p>
         Silakan masuk ke portal PMB untuk melihat surat penerimaan (LoA) dan formulir pendaftaran:
     </p>

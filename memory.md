@@ -31,6 +31,14 @@
 
 ## 3. Completed (recent sessions)
 
+### 2026-08-05 — PMB status-change emails
+
+- Admin ubah status PMB → email otomatis ke `parent_email` (semua status)
+- Catatan admin di update yang sama ikut di isi email
+- `accepted` tetap template khusus; status lain → `PmbRegistrationStatusChangedMail`
+- Spec/plan: `docs/superpowers/specs/2026-08-05-pmb-status-change-email-design.md`
+- **Ops:** pastikan Gmail OAuth + `queue:work` di live
+
 ### 2026-07-29 — PMB Registrations Analytics Dashboard
 
 - Admin `/admin/pmb-registrations`: KPI + Recharts (status/jenjang/tren/sekolah asal), filter bersama, sort, Cetak, Unduh CSV
