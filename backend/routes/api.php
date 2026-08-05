@@ -181,6 +181,8 @@ Route::prefix('admin')->group(function (): void {
             Route::get('gmail/oauth/redirect', [GmailOAuthController::class, 'redirect'])
                 ->middleware('throttle:10,1');
             Route::delete('gmail/oauth', [GmailOAuthController::class, 'disconnect']);
+            Route::post('gmail/send-test', [GmailOAuthController::class, 'sendTest'])
+                ->middleware('throttle:10,1');
 
             Route::apiResource('users', UserController::class);
             Route::apiResource('schools', AdminSchoolController::class);

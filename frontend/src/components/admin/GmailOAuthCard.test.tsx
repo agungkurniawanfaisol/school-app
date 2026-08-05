@@ -8,18 +8,19 @@ vi.mock('@/hooks/useGmailOAuth', () => ({
     isLoading: false,
     data: {
       client_configured: true,
-      connected: false,
-      ready_to_send: false,
+      connected: true,
+      ready_to_send: true,
       from_address: 'pmb@example.com',
       redirect_uri: 'http://localhost:8000/api/admin/gmail/oauth/callback',
     },
   }),
   useConnectGmailOAuth: () => ({ mutate: vi.fn(), isPending: false }),
   useDisconnectGmailOAuth: () => ({ mutate: vi.fn(), isPending: false }),
+  useSendGmailTest: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
 describe('GmailOAuthCard', () => {
-  it('shows connect button when not connected', () => {
+  it('shows connect button and send-test form when ready', () => {
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     })
@@ -31,7 +32,10 @@ describe('GmailOAuthCard', () => {
     )
 
     expect(screen.getByTestId('gmail-oauth-card')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Hubungkan Gmail/i })).toBeInTheDocument()
-    expect(screen.getByText(/Belum terhubung/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Hubungkan ulang/i })).toBeInTheDocument()
+    expect(screen.getByText(/Siap mengirim/i)).toBeInTheDocument()
+    expect(screen.getByTestId('gmail-send-test-form')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Kirim Gmail$/i })).toBeInTheDocument()
+    expect(screen.getByLabelText(/Kepada/i)).toBeInTheDocument()
   })
 })

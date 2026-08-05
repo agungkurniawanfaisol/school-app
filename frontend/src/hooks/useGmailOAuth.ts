@@ -55,3 +55,16 @@ export function useDisconnectGmailOAuth() {
     onError: (error) => toast.error(getApiErrorMessage(error, 'Gagal memutus koneksi Gmail.')),
   })
 }
+
+export function useSendGmailTest() {
+  return useMutation({
+    mutationFn: async (payload: { to: string; subject: string; body: string }) => {
+      const { data } = await api.post<{ message: string }>('/admin/gmail/send-test', payload)
+      return data
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || 'Email uji berhasil dikirim.')
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error, 'Gagal mengirim email uji.')),
+  })
+}

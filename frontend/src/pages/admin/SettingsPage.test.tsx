@@ -54,6 +54,7 @@ vi.mock('@/hooks/useGmailOAuth', () => ({
   }),
   useConnectGmailOAuth: () => ({ mutate: vi.fn(), isPending: false }),
   useDisconnectGmailOAuth: () => ({ mutate: vi.fn(), isPending: false }),
+  useSendGmailTest: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
 describe('SettingsPage', () => {

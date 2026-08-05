@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Gmail\SendGmailTestRequest;
+use App\Mail\GmailTestMail;
 use App\Services\GmailOAuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 class GmailOAuthController extends Controller
@@ -16,6 +19,29 @@ class GmailOAuthController extends Controller
     public function status(): JsonResponse
     {
         return response()->json(['data' => $this->gmailOAuth->status()]);
+    }
+
+    public function sendTest(SendGmailTestRequest $request): JsonResponse
+    {
+        if (! $this->gmailOAuth->isReadyToSend()) {
+            return response()->json([
+                'message' => 'Gmail belum siap mengirim. Hubungkan akun Gmail terlebih dahulu.',
+            ], 422);
+        }
+
+        $data = $request->validated();
+
+        try {
+            Mail::to($data['to'])->send(new GmailTestMail($data['subject'], $data['body']));
+        } catch (Throwable $exception) {
+            return response()->json([
+                'message' => 'Gagal mengirim email uji: '.$exception->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'message' => 'Email uji berhasil dikirim.',
+        ]);
     }
 
     public function redirect(): JsonResponse|RedirectResponse
