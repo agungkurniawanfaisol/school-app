@@ -31,6 +31,13 @@
 
 ## 3. Completed (recent sessions)
 
+### 2026-08-06 — Fix announcement update 500
+
+- Root cause: `RichContentAdminRequest` pakai `$this->content` (= raw HTTP body) → konten rusak
+- `slug: null` dari frontend menabrak kolom NOT NULL
+- Fix: `input('content')`; omit/null slug on update; auto-slug on create
+- Tes: `AnnouncementAdminTest` + News/Curriculum masih hijau
+
 ### 2026-08-06 — Admin unduh bukti transfer PMB
 
 - Detail: tombol **Unduh bukti**; daftar: ikon unduh per baris yang punya bukti

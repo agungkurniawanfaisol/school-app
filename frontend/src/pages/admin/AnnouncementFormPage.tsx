@@ -62,7 +62,6 @@ export function AnnouncementFormPage() {
   const payload = {
     school_id: school?.id ?? existing?.school_id ?? 0,
     title,
-    slug: null as string | null,
     content,
     priority,
     is_pinned: isPinned,

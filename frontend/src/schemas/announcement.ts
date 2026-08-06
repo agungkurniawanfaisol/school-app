@@ -6,7 +6,7 @@ export function createAnnouncementSchema(t: AdminTFunction) {
   return z.object({
     school_id: z.number().int().positive(t('validation.schoolRequired')),
     title: z.string().min(1, t('validation.titleRequired')).max(200),
-    slug: z.string().max(250).optional().nullable(),
+    slug: z.string().max(250).optional(),
     content: z.string().min(1, t('validation.contentRequired')),
     priority: z.enum(['normal', 'important', 'urgent']).default('normal'),
     is_pinned: z.boolean().default(false),

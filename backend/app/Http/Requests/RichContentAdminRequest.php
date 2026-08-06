@@ -16,8 +16,9 @@ abstract class RichContentAdminRequest extends AdminFormRequest
 
     protected function decodeContentJsonString(): void
     {
-        if ($this->has('content_json') && is_string($this->content_json)) {
-            $decoded = json_decode($this->content_json, true);
+        $contentJson = $this->input('content_json');
+        if ($this->has('content_json') && is_string($contentJson)) {
+            $decoded = json_decode($contentJson, true);
             $this->merge([
                 'content_json' => is_array($decoded) ? $decoded : null,
             ]);
@@ -29,8 +30,10 @@ abstract class RichContentAdminRequest extends AdminFormRequest
         /** @var RichContentSanitizer $sanitizer */
         $sanitizer = app(RichContentSanitizer::class);
 
-        if ($this->has('content') && is_string($this->content)) {
-            $this->merge(['content' => $sanitizer->sanitizeHtml($this->content)]);
+        // Must use input('content') — $this->content is Symfony's raw request body property.
+        $content = $this->input('content');
+        if ($this->has('content') && is_string($content)) {
+            $this->merge(['content' => $sanitizer->sanitizeHtml($content)]);
         }
 
         if ($this->has('content_json') && is_array($this->input('content_json'))) {
