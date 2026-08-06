@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Mail, Megaphone } from 'lucide-react'
+import { Download, Mail, Megaphone } from 'lucide-react'
 import { AdminPaginatedTable } from '@/components/admin/AdminPaginatedTable'
 import { AdminStatusBadge } from '@/components/admin/AdminStatusBadge'
 import { AdminSimpleRowActions } from '@/components/admin/AdminRowActions'
@@ -11,8 +11,10 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAdminAcademicYearsList } from '@/hooks/useAcademicYears'
 import { useAdminPmbRegistrationsList, useAdminPmbStats, useBroadcastPmbEmail, useSendPmbEmail } from '@/hooks/usePmb'
+import { paymentProofFileName, resolvePaymentProofDownloadUrl } from '@/lib/pmb-payment-proof'
 import type { ListFilters, PmbRegistration } from '@/types'
 import { useTranslation } from 'react-i18next'
 
@@ -294,7 +296,35 @@ export function PmbRegistrationsListPage() {
         getRowClassName={(item: PmbRegistration) =>
           item.has_admin_unread ? 'bg-primary/5 hover:bg-primary/10' : undefined
         }
-        rowActions={(item) => <AdminSimpleRowActions viewHref={`/admin/pmb-registrations/${item.uuid}`} />}
+        rowActions={(item) => {
+          const paymentInfo = (item.payment_info ?? null) as Record<string, unknown> | null
+          const downloadUrl = resolvePaymentProofDownloadUrl(paymentInfo)
+
+          return (
+            <TooltipProvider delayDuration={300}>
+              <div className="flex items-center justify-end gap-0.5">
+                {downloadUrl ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button asChild size="icon" variant="ghost" className="h-11 w-11 min-h-11 min-w-11">
+                        <a
+                          href={downloadUrl}
+                          download={paymentProofFileName(paymentInfo)}
+                          aria-label={`Unduh bukti transfer ${item.student_name ?? item.registration_number}`}
+                          data-testid={`pmb-proof-download-${item.uuid}`}
+                        >
+                          <Download className="h-4 w-4" aria-hidden />
+                        </a>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Unduh bukti</TooltipContent>
+                  </Tooltip>
+                ) : null}
+                <AdminSimpleRowActions viewHref={`/admin/pmb-registrations/${item.uuid}`} />
+              </div>
+            </TooltipProvider>
+          )
+        }}
       />
 
       <PmbEmailDialog

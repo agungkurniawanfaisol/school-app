@@ -142,7 +142,7 @@ class PmbPortalController extends Controller
         ], 201);
     }
 
-    public function showMedia(Media $media): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function showMedia(Request $request, Media $media): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         if ($media->collection !== 'pmb' || $media->disk !== 'local') {
             abort(404);
@@ -156,10 +156,19 @@ class PmbPortalController extends Controller
             abort(404);
         }
 
+        $filename = $media->original_name ?: $media->filename ?: 'bukti-transfer';
+        $headers = [
+            'Content-Type' => $media->mime_type ?? 'application/octet-stream',
+        ];
+
+        if ($request->boolean('download')) {
+            return Storage::disk('local')->download($media->path, $filename, $headers);
+        }
+
         return Storage::disk('local')->response(
             $media->path,
-            $media->original_name ?? $media->filename,
-            ['Content-Type' => $media->mime_type ?? 'application/octet-stream'],
+            $filename,
+            $headers,
         );
     }
 

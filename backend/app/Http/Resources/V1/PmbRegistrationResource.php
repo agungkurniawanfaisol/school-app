@@ -88,6 +88,7 @@ class PmbRegistrationResource extends JsonResource
 
         return array_merge($info, [
             'proof_url' => PmbMediaUrl::resolve($media),
+            'proof_download_url' => PmbMediaUrl::resolve($media, download: true),
             'proof_mime_type' => $media->mime_type,
             'proof_name' => $media->original_name,
         ]);

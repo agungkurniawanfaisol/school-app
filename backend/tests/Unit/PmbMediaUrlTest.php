@@ -44,4 +44,25 @@ class PmbMediaUrlTest extends TestCase
 
         $this->assertSame('/storage/uploads/news/a.jpg', PmbMediaUrl::resolve($media));
     }
+
+    public function test_download_url_includes_signed_download_flag(): void
+    {
+        Storage::fake('local');
+
+        $media = Media::factory()->create([
+            'collection' => 'pmb',
+            'mime_type' => 'image/jpeg',
+            'path' => 'uploads/pmb/bukti.jpg',
+            'disk' => 'local',
+        ]);
+
+        $url = PmbMediaUrl::resolve($media, download: true);
+
+        $this->assertIsString($url);
+        $this->assertStringContainsString('download=1', $url);
+        $this->assertTrue(URL::hasValidSignature(
+            request()->create($url, 'GET'),
+            absolute: false,
+        ));
+    }
 }

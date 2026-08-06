@@ -33,6 +33,7 @@ const registration = {
   payment_info: {
     proof_media_id: 2,
     proof_url: '/api/v1/pmb/portal/media/proof-uuid?signature=def',
+    proof_download_url: '/api/v1/pmb/portal/media/proof-uuid?download=1&signature=dl',
     proof_mime_type: 'image/png',
     proof_name: 'bukti.png',
     note: 'Transfer BSI',
@@ -98,6 +99,11 @@ describe('PmbRegistrationDetailPage', () => {
     )
     expect(screen.getByText(/Transfer BSI/)).toBeInTheDocument()
     expect(screen.getByText('Nama panggilan')).toBeInTheDocument()
+    const downloadLink = screen.getByRole('link', { name: /Unduh bukti/i })
+    expect(downloadLink).toHaveAttribute(
+      'href',
+      '/api/v1/pmb/portal/media/proof-uuid?download=1&signature=dl',
+    )
   })
 
   it('hides payment action buttons when status is accepted', () => {

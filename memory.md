@@ -31,6 +31,12 @@
 
 ## 3. Completed (recent sessions)
 
+### 2026-08-06 — Admin unduh bukti transfer PMB
+
+- Detail: tombol **Unduh bukti**; daftar: ikon unduh per baris yang punya bukti
+- Signed URL `?download=1` → `Content-Disposition: attachment` (`PmbMediaUrl` + `showMedia`)
+- Spec: `docs/superpowers/specs/2026-08-06-pmb-payment-proof-download-design.md`
+
 ### 2026-08-05 — PMB status-change emails
 
 - Admin ubah status PMB → email otomatis ke `parent_email` (semua status)

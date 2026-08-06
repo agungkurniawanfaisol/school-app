@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   CheckCircle2,
+  Download,
   ExternalLink,
   FileText,
   Mail,
@@ -25,6 +26,7 @@ import { Input } from '@/components/ui/input'
 import { useAdminPmbMessage, useAdminPmbRegistrationByUuid, useSendPmbEmail, useUpdatePmbByUuid } from '@/hooks/usePmb'
 import { PMB_STATUS_DESCRIPTIONS } from '@/config/pmb-portal-nav'
 import { resolveAssetUrl } from '@/lib/safe-url'
+import { paymentProofFileName, resolvePaymentProofDownloadUrl } from '@/lib/pmb-payment-proof'
 import type { PmbAdminUpdateFormValues } from '@/schemas/pmb'
 import { cn } from '@/lib/utils'
 
@@ -496,6 +498,17 @@ export function PmbRegistrationDetailPage() {
                   alt="Bukti pembayaran pendaftaran"
                   className="max-w-xl"
                 />
+                {resolvePaymentProofDownloadUrl(paymentInfo) ? (
+                  <Button asChild variant="outline" className="min-h-11 gap-2">
+                    <a
+                      href={resolvePaymentProofDownloadUrl(paymentInfo)}
+                      download={paymentProofFileName(paymentInfo)}
+                    >
+                      <Download className="h-4 w-4" aria-hidden />
+                      Unduh bukti
+                    </a>
+                  </Button>
+                ) : null}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <FieldItem
                     label="Tanggal transfer"

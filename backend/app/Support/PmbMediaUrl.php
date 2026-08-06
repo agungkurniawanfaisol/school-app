@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\URL;
 
 class PmbMediaUrl
 {
-    public static function resolve(?Media $media): ?string
+    public static function resolve(?Media $media, bool $download = false): ?string
     {
         if ($media === null || ! is_string($media->path) || $media->path === '') {
             return null;
@@ -18,11 +18,16 @@ class PmbMediaUrl
         }
 
         if ($media->collection === 'pmb' && $media->disk === 'local') {
+            $parameters = ['media' => $media->uuid];
+            if ($download) {
+                $parameters['download'] = 1;
+            }
+
             // Relative signed URL so browsers hit Vite/nginx proxy instead of Docker hostname.
             return URL::temporarySignedRoute(
                 'v1.pmb.portal.media',
                 now()->addHour(),
-                ['media' => $media->uuid],
+                $parameters,
                 absolute: false,
             );
         }

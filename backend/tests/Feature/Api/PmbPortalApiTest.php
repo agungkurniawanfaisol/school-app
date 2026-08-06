@@ -479,12 +479,16 @@ class PmbPortalApiTest extends TestCase
 
         $photoUrl = $response->json('data.student_photo.url');
         $proofUrl = $response->json('data.payment_info.proof_url');
+        $proofDownloadUrl = $response->json('data.payment_info.proof_download_url');
         $this->assertIsString($photoUrl);
         $this->assertIsString($proofUrl);
+        $this->assertIsString($proofDownloadUrl);
         $this->assertStringContainsString('/api/v1/pmb/portal/media/'.$photo->uuid, $photoUrl);
         $this->assertStringContainsString('/api/v1/pmb/portal/media/'.$proof->uuid, $proofUrl);
+        $this->assertStringContainsString('download=1', $proofDownloadUrl);
         $this->assertStringContainsString('signature=', $photoUrl);
         $this->assertStringContainsString('signature=', $proofUrl);
+        $this->assertStringContainsString('signature=', $proofDownloadUrl);
     }
 
     public function test_admin_saving_notes_creates_message_visible_to_pendaftar(): void
@@ -812,5 +816,30 @@ class PmbPortalApiTest extends TestCase
         $this->assertStringStartsWith('/api/v1/pmb/portal/media/', $url);
 
         $this->get($url)->assertOk();
+    }
+
+    public function test_pmb_media_download_forces_attachment_disposition(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('uploads/pmb/bukti.pdf', '%PDF-fake');
+
+        $media = Media::factory()->create([
+            'collection' => 'pmb',
+            'mime_type' => 'application/pdf',
+            'path' => 'uploads/pmb/bukti.pdf',
+            'disk' => 'local',
+            'original_name' => 'bukti-transfer.pdf',
+        ]);
+
+        $url = \App\Support\PmbMediaUrl::resolve($media, download: true);
+        $this->assertIsString($url);
+
+        $this->get($url)
+            ->assertOk()
+            ->assertHeader('content-disposition');
+
+        $disposition = (string) $this->get($url)->headers->get('content-disposition');
+        $this->assertStringContainsString('attachment', $disposition);
+        $this->assertStringContainsString('bukti-transfer.pdf', $disposition);
     }
 }
