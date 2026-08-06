@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { editorLinkSchema } from '@/lib/editorUrls'
+import { focusEditor } from '@/lib/tiptap-focus'
 
 interface EditorLinkDialogProps {
   editor: Editor
@@ -35,12 +36,12 @@ export function EditorLinkDialog({ editor, open, onOpenChange }: EditorLinkDialo
       return
     }
 
-    editor.chain().focus().extendMarkRange('link').setLink({ href: parsed.data }).run()
+    focusEditor(editor).extendMarkRange('link').setLink({ href: parsed.data }).run()
     onOpenChange(false)
   }
 
   const handleRemove = () => {
-    editor.chain().focus().extendMarkRange('link').unsetLink().run()
+    focusEditor(editor).extendMarkRange('link').unsetLink().run()
     setUrl('')
     onOpenChange(false)
   }

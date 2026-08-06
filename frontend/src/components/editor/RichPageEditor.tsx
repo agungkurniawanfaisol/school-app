@@ -8,12 +8,17 @@ import { EditorToolbar } from '@/components/editor/EditorToolbar'
 import { MediaBubbleMenu } from '@/components/editor/MediaBubbleMenu'
 import { useMediaUpload } from '@/hooks/useMediaUpload'
 import { getApiErrorMessage } from '@/lib/api'
+import { focusEditor } from '@/lib/tiptap-focus'
 import { isAllowedImageFile } from '@/lib/uploadValidation'
 import { EMPTY_EDITOR_DOC, parseEditorDocument, type EditorDocument } from '@/schemas/editor'
 
 function collectImageFiles(dataTransfer: DataTransfer | null) {
   if (!dataTransfer?.files?.length) return []
   return Array.from(dataTransfer.files).filter((file) => isAllowedImageFile(file))
+}
+
+function stableDocKey(doc: unknown): string {
+  return JSON.stringify(parseEditorDocument(doc))
 }
 
 async function insertImagesAtPosition(
@@ -28,7 +33,7 @@ async function insertImagesAtPosition(
     nodes.push({ type: 'image', attrs: { src: url } })
   }
   if (nodes.length > 0) {
-    editor.chain().focus().insertContentAt(pos, nodes).run()
+    focusEditor(editor).insertContentAt(pos, nodes).run()
   }
 }
 
@@ -50,6 +55,8 @@ export function RichPageEditor({
   onChangeRef.current = onChange
   const uploadImageRef = useRef<(file: File) => Promise<string>>(async () => '')
   const editorRef = useRef<Editor | null>(null)
+  /** Last document key emitted by this editor — skip echo setContent that jumps the caret. */
+  const lastEmittedKeyRef = useRef<string | null>(null)
 
   const handleImageUpload = useCallback(
     async (file: File) => {
@@ -126,7 +133,9 @@ export function RichPageEditor({
     },
     onUpdate: ({ editor: ed }) => {
       if (ed.isDestroyed) return
-      onChangeRef.current?.(ed.getJSON() as EditorDocument, ed.getHTML())
+      const json = ed.getJSON() as EditorDocument
+      lastEmittedKeyRef.current = stableDocKey(json)
+      onChangeRef.current?.(json, ed.getHTML())
     },
   })
 
@@ -136,18 +145,24 @@ export function RichPageEditor({
 
   useEffect(() => {
     if (!editor || editor.isDestroyed || value === undefined) return
-    const current = JSON.stringify(editor.getJSON())
-    const next = JSON.stringify(parseEditorDocument(value))
-    if (current !== next) {
-      editor.commands.setContent(parseEditorDocument(value) as JSONContent)
+
+    const nextKey = stableDocKey(value)
+    if (lastEmittedKeyRef.current === nextKey) return
+    if (stableDocKey(editor.getJSON()) === nextKey) {
+      lastEmittedKeyRef.current = nextKey
+      return
     }
+
+    // External update only (e.g. loaded from API) — do not emit onUpdate / scroll.
+    editor.commands.setContent(parseEditorDocument(value) as JSONContent, { emitUpdate: false })
+    lastEmittedKeyRef.current = nextKey
   }, [editor, value])
 
   const insertImage = async (file: File) => {
     if (!editor || editor.isDestroyed) return
     try {
       const url = await handleImageUpload(file)
-      editor.chain().focus().setImage({ src: url }).run()
+      focusEditor(editor).setImage({ src: url }).run()
     } catch (error) {
       toast.error(getApiErrorMessage(error, 'Gagal mengunggah gambar.'))
     }
@@ -157,7 +172,7 @@ export function RichPageEditor({
     if (!editor || editor.isDestroyed) return
     try {
       const media = await upload.mutateAsync(file)
-      editor.chain().focus().insertContent({ type: 'videoBlock', attrs: { src: media.url } }).run()
+      focusEditor(editor).insertContent({ type: 'videoBlock', attrs: { src: media.url } }).run()
     } catch (error) {
       toast.error(getApiErrorMessage(error, 'Gagal mengunggah video.'))
     }
@@ -165,14 +180,12 @@ export function RichPageEditor({
 
   const insertYoutube = (url: string) => {
     if (!editor || editor.isDestroyed) return
-    editor.chain().focus().setYoutubeVideo({ src: url }).run()
+    focusEditor(editor).setYoutubeVideo({ src: url }).run()
   }
 
   const insertColumns = () => {
     if (!editor || editor.isDestroyed) return
-    editor
-      .chain()
-      .focus()
+    focusEditor(editor)
       .insertContent({
         type: 'columns',
         content: [

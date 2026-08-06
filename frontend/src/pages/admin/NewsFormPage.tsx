@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import {
   useAdminNewsDetail,
@@ -263,45 +262,20 @@ export function NewsFormPage() {
         </CardContent>
       </Card>
 
-      <div className="lg:grid lg:grid-cols-[320px_1fr] lg:gap-6">
-        <Tabs defaultValue="content" className="lg:hidden">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="content">{t('form.content')}</TabsTrigger>
-            <TabsTrigger value="settings">{t('common.settings')}</TabsTrigger>
-          </TabsList>
-          <TabsContent value="settings" className="mt-4">
-            <Card>
-              <CardContent className="p-4">{metaFields}</CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="content" className="mt-4">
-            <RichPageEditor
-              collection="news"
-              value={contentJson}
-              onChange={(json, html) => {
-                setContentJson(json)
-                setContentHtml(html)
-                setDirty(true)
-              }}
-            />
-          </TabsContent>
-        </Tabs>
-
-        <Card className="hidden lg:block">
+      <div className="space-y-4 lg:grid lg:grid-cols-[320px_1fr] lg:gap-6 lg:space-y-0">
+        <Card>
           <CardContent className="p-4">{metaFields}</CardContent>
         </Card>
 
-        <div className="hidden lg:block">
-          <RichPageEditor
-            collection="news"
-            value={contentJson}
-            onChange={(json, html) => {
-              setContentJson(json)
-              setContentHtml(html)
-              setDirty(true)
-            }}
-          />
-        </div>
+        <RichPageEditor
+          collection="news"
+          value={contentJson}
+          onChange={(json, html) => {
+            setContentJson(json)
+            setContentHtml(html)
+            setDirty(true)
+          }}
+        />
       </div>
 
       <Dialog open={fullscreenOpen} onOpenChange={setFullscreenOpen}>

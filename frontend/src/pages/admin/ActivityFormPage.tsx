@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import {
   useAdminActivityDetail,
@@ -20,7 +20,7 @@ import {
   useUpdateActivity,
 } from '@/hooks/useActivities'
 import { useSchool } from '@/hooks/useSchool'
-import { slugify } from '@/lib/utils'
+import { cn, slugify } from '@/lib/utils'
 import { EMPTY_EDITOR_DOC, type EditorDocument } from '@/schemas/editor'
 import type { ActivityFormValues, ActivityPhotoFormValues } from '@/schemas/activity'
 
@@ -36,6 +36,7 @@ export function ActivityFormPage() {
   const publishActivity = usePublishActivity()
   const [fullscreenOpen, setFullscreenOpen] = useState(false)
   const [dirty, setDirty] = useState(false)
+  const [mobileTab, setMobileTab] = useState('content')
 
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
@@ -247,19 +248,23 @@ export function ActivityFormPage() {
       </Card>
 
       <div className="lg:grid lg:grid-cols-[320px_1fr] lg:gap-6">
-        <Tabs defaultValue="content" className="lg:hidden">
-          <TabsList className="grid h-auto min-h-11 w-full grid-cols-3 gap-1 p-1">
-            <TabsTrigger value="content">{t('common.content')}</TabsTrigger>
-            <TabsTrigger value="media">{t('common.gallery')}</TabsTrigger>
-            <TabsTrigger value="settings">{t('common.settings')}</TabsTrigger>
-          </TabsList>
-          <TabsContent value="settings" className="mt-4">
-            <Card><CardContent className="p-4">{metaFields}</CardContent></Card>
-          </TabsContent>
-          <TabsContent value="media" className="mt-4 space-y-4">
-            {mediaFields}
-          </TabsContent>
-          <TabsContent value="content" className="mt-4">
+        <div className="space-y-4">
+          <Tabs value={mobileTab} onValueChange={setMobileTab} className="lg:hidden">
+            <TabsList className="grid h-auto min-h-11 w-full grid-cols-3 gap-1 p-1">
+              <TabsTrigger value="content">{t('common.content')}</TabsTrigger>
+              <TabsTrigger value="media">{t('common.gallery')}</TabsTrigger>
+              <TabsTrigger value="settings">{t('common.settings')}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <Card className={cn(mobileTab !== 'settings' && 'max-lg:hidden')}>
+            <CardContent className="p-4">{metaFields}</CardContent>
+          </Card>
+        </div>
+
+        <div className="space-y-4">
+          <div className={cn(mobileTab !== 'media' && 'max-lg:hidden')}>{mediaFields}</div>
+          <div className={cn(mobileTab !== 'content' && 'max-lg:hidden')}>
             <RichPageEditor
               collection="activities"
               value={contentJson}
@@ -269,21 +274,7 @@ export function ActivityFormPage() {
                 setDirty(true)
               }}
             />
-          </TabsContent>
-        </Tabs>
-
-        <Card className="hidden lg:block"><CardContent className="p-4">{metaFields}</CardContent></Card>
-        <div className="hidden space-y-4 lg:block">
-          {mediaFields}
-          <RichPageEditor
-            collection="activities"
-            value={contentJson}
-            onChange={(json, html) => {
-              setContentJson(json)
-              setContentHtml(html)
-              setDirty(true)
-            }}
-          />
+          </div>
         </div>
       </div>
 

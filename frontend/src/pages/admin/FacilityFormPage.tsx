@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import {
   useAdminFacilityDetail,
@@ -26,7 +26,7 @@ import {
 import { useMediaUpload } from '@/hooks/useMediaUpload'
 import { useSchool } from '@/hooks/useSchool'
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges'
-import { slugify } from '@/lib/utils'
+import { cn, slugify } from '@/lib/utils'
 import { EMPTY_EDITOR_DOC, type EditorDocument } from '@/schemas/editor'
 import { createFacilitySchema, type FacilityFormValues, type FacilityPhotoFormValues } from '@/schemas/facility'
 
@@ -46,6 +46,7 @@ export function FacilityFormPage() {
 
   const [fullscreenOpen, setFullscreenOpen] = useState(false)
   const [dirty, setDirty] = useState(false)
+  const [mobileTab, setMobileTab] = useState('content')
   useUnsavedChanges(dirty)
 
   const [name, setName] = useState('')
@@ -325,27 +326,31 @@ export function FacilityFormPage() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="content" className="lg:hidden">
-        <TabsList className="grid h-auto min-h-11 w-full grid-cols-3 gap-1 p-1">
-          <TabsTrigger value="content">{t('form.content')}</TabsTrigger>
-          <TabsTrigger value="gallery">{t('common.gallery')}</TabsTrigger>
-          <TabsTrigger value="settings">{t('common.settings')}</TabsTrigger>
-        </TabsList>
-        <TabsContent value="settings" className="mt-4">
-          <Card>
+      <div className="lg:grid lg:grid-cols-[300px_1fr] lg:gap-6">
+        <div className="space-y-4 lg:space-y-6">
+          <Tabs value={mobileTab} onValueChange={setMobileTab} className="lg:hidden">
+            <TabsList className="grid h-auto min-h-11 w-full grid-cols-3 gap-1 p-1">
+              <TabsTrigger value="content">{t('form.content')}</TabsTrigger>
+              <TabsTrigger value="gallery">{t('common.gallery')}</TabsTrigger>
+              <TabsTrigger value="settings">{t('common.settings')}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <Card className={cn(mobileTab !== 'settings' && 'max-lg:hidden')}>
             <CardContent className="p-4">{metaFields}</CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="gallery" className="mt-4">
-          <FacilityPhotoGalleryEditor
-            photos={photos}
-            onChange={(next) => {
-              setPhotos(next)
-              setDirty(true)
-            }}
-          />
-        </TabsContent>
-        <TabsContent value="content" className="mt-4">
+          <div className={cn(mobileTab !== 'gallery' && 'max-lg:hidden')}>
+            <FacilityPhotoGalleryEditor
+              photos={photos}
+              onChange={(next) => {
+                setPhotos(next)
+                setDirty(true)
+              }}
+            />
+          </div>
+        </div>
+
+        <div className={cn(mobileTab !== 'content' && 'max-lg:hidden')}>
           <RichPageEditor
             collection="facilities"
             value={contentJson}
@@ -355,31 +360,7 @@ export function FacilityFormPage() {
               setDirty(true)
             }}
           />
-        </TabsContent>
-      </Tabs>
-
-      <div className="hidden gap-6 lg:grid lg:grid-cols-[300px_1fr]">
-        <div className="space-y-6">
-          <Card>
-            <CardContent className="p-4">{metaFields}</CardContent>
-          </Card>
-          <FacilityPhotoGalleryEditor
-            photos={photos}
-            onChange={(next) => {
-              setPhotos(next)
-              setDirty(true)
-            }}
-          />
         </div>
-        <RichPageEditor
-          collection="facilities"
-          value={contentJson}
-          onChange={(json, html) => {
-            setContentJson(json)
-            setContentHtml(html)
-            setDirty(true)
-          }}
-        />
       </div>
 
       <Dialog open={fullscreenOpen} onOpenChange={setFullscreenOpen}>

@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { Editor } from '@tiptap/react'
-import { EMPTY_EDITOR_DOC } from '@/schemas/editor'
+import { EMPTY_EDITOR_DOC, type EditorDocument } from '@/schemas/editor'
 
 const useEditorMock = vi.fn()
 
@@ -86,5 +86,74 @@ describe('RichPageEditor', () => {
     renderEditor(<RichPageEditor value={EMPTY_EDITOR_DOC} />)
 
     expect(await screen.findByTestId('toolbar')).toBeInTheDocument()
+  })
+
+  it('skips setContent when value matches current editor document', async () => {
+    const setContent = vi.fn()
+    const ready = {
+      isDestroyed: false,
+      getJSON: vi.fn(() => EMPTY_EDITOR_DOC),
+      getHTML: vi.fn(() => '<p></p>'),
+      commands: { setContent },
+      chain: vi.fn(),
+    } as unknown as Editor
+
+    useEditorMock.mockReturnValue(ready)
+    const { RichPageEditor } = await import('@/components/editor/RichPageEditor')
+
+    renderEditor(<RichPageEditor value={EMPTY_EDITOR_DOC} onChange={vi.fn()} />)
+
+    expect(await screen.findByTestId('toolbar')).toBeInTheDocument()
+    expect(setContent).not.toHaveBeenCalled()
+  })
+
+  it('applies setContent for external value changes', async () => {
+    const setContent = vi.fn()
+    const ready = {
+      isDestroyed: false,
+      getJSON: vi.fn(() => EMPTY_EDITOR_DOC),
+      getHTML: vi.fn(() => '<p></p>'),
+      commands: { setContent },
+      chain: vi.fn(),
+    } as unknown as Editor
+
+    useEditorMock.mockReturnValue(ready)
+    const { RichPageEditor } = await import('@/components/editor/RichPageEditor')
+
+    const external: EditorDocument = {
+      type: 'doc',
+      content: [
+        {
+          type: 'paragraph',
+          content: [{ type: 'text', text: 'Dari API' }],
+        },
+      ],
+    }
+
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    })
+
+    const { rerender } = render(
+      <QueryClientProvider client={client}>
+        <RichPageEditor value={EMPTY_EDITOR_DOC} onChange={vi.fn()} />
+      </QueryClientProvider>,
+    )
+
+    expect(await screen.findByTestId('toolbar')).toBeInTheDocument()
+    setContent.mockClear()
+
+    rerender(
+      <QueryClientProvider client={client}>
+        <RichPageEditor value={external} onChange={vi.fn()} />
+      </QueryClientProvider>,
+    )
+
+    await waitFor(() => {
+      expect(setContent).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'doc' }),
+        { emitUpdate: false },
+      )
+    })
   })
 })

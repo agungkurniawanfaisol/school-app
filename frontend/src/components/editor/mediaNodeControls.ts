@@ -1,4 +1,5 @@
 import type { Editor } from '@tiptap/react'
+import { focusEditor } from '@/lib/tiptap-focus'
 
 const DELETE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>`
 
@@ -13,7 +14,7 @@ export function isImageNodeActive(editor: Editor) {
 }
 
 export function setImageAlign(editor: Editor, align: ImageAlign) {
-  editor.chain().focus().updateAttributes('image', { align }).run()
+  focusEditor(editor).updateAttributes('image', { align }).run()
 }
 
 export function getImageAlign(editor: Editor): ImageAlign {
@@ -28,11 +29,11 @@ export function isMediaNodeActive(editor: Editor) {
 }
 
 export function deleteNodeAtPosition(editor: Editor, pos: number, nodeSize: number) {
-  editor.chain().focus().deleteRange({ from: pos, to: pos + nodeSize }).run()
+  focusEditor(editor).deleteRange({ from: pos, to: pos + nodeSize }).run()
 }
 
 export function deleteSelectedMedia(editor: Editor) {
-  editor.chain().focus().deleteSelection().run()
+  focusEditor(editor).deleteSelection().run()
 }
 
 export function isMediaControlEvent(event: Event) {

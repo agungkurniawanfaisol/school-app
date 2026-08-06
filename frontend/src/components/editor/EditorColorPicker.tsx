@@ -2,6 +2,7 @@ import type { Editor } from '@tiptap/react'
 import { Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { focusEditor } from '@/lib/tiptap-focus'
 
 const TEXT_COLORS = [
   { label: 'Hitam', value: '#171717' },
@@ -40,7 +41,7 @@ export function EditorColorPicker({ editor }: EditorColorPickerProps) {
               style={{ backgroundColor: color.value }}
               aria-label={color.label}
               title={color.label}
-              onClick={() => editor.chain().focus().setColor(color.value).run()}
+              onClick={() => focusEditor(editor).setColor(color.value).run()}
             />
           ))}
         </div>
@@ -49,7 +50,7 @@ export function EditorColorPicker({ editor }: EditorColorPickerProps) {
           variant="ghost"
           size="sm"
           className="mt-2 h-8 w-full text-xs"
-          onClick={() => editor.chain().focus().unsetColor().run()}
+          onClick={() => focusEditor(editor).unsetColor().run()}
         >
           Hapus warna
         </Button>
