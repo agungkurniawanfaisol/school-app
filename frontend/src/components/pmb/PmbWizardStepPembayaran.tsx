@@ -13,7 +13,7 @@ import type { PmbFee } from '@/hooks/usePmbFees'
 import type { UploadPhase } from '@/hooks/useMediaUpload'
 import { PMB_INPUT_TEXT } from '@/lib/pmb-portal-layout'
 import { cn } from '@/lib/utils'
-import { jenjangLabel, programLabel } from '@/schemas/pmb-fee'
+import { jenjangLabel, programLabel, type PmbFeeJenjang, PMB_FEE_JENJANGS } from '@/schemas/pmb-fee'
 import type { PmbPortalDraftValues } from '@/schemas/pmb'
 import type { Media } from '@/types'
 
@@ -43,7 +43,7 @@ export function PmbWizardStepPembayaran({
 
   const jenjangOptions = useMemo(() => {
     const set = new Set(fees.map((fee) => fee.jenjang))
-    return (['tk', 'sd'] as const).filter((j) => set.has(j))
+    return PMB_FEE_JENJANGS.filter((j) => set.has(j))
   }, [fees])
 
   const programFees = useMemo(
@@ -56,7 +56,7 @@ export function PmbWizardStepPembayaran({
     [fees, selectedFeeUuid],
   )
 
-  const selectJenjang = (jenjang: 'tk' | 'sd') => {
+  const selectJenjang = (jenjang: PmbFeeJenjang) => {
     form.setValue('jenjang', jenjang, { shouldDirty: true, shouldValidate: true })
     form.setValue('program', null, { shouldDirty: true })
     form.setValue('pmb_fee_uuid', null, { shouldDirty: true })
@@ -81,7 +81,7 @@ export function PmbWizardStepPembayaran({
       >
         <div className="space-y-3">
           <p className="text-sm font-medium">1. Jenjang</p>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {jenjangOptions.map((jenjang) => {
               const active = selectedJenjang === jenjang
               return (
@@ -124,7 +124,7 @@ export function PmbWizardStepPembayaran({
                         : 'border-border bg-background hover:border-primary/40',
                     )}
                   >
-                    <span className="block text-sm font-semibold">{programLabel(fee.program)}</span>
+                    <span className="block text-sm font-semibold">{programLabel(fee.program, fee.program_name)}</span>
                     <span className="mt-0.5 block text-xs text-muted-foreground">{fee.amount_formatted}</span>
                   </button>
                 )

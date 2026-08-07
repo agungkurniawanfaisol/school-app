@@ -13,6 +13,7 @@ import {
   Heart,
   Image,
   ImageIcon,
+  Layers,
   LayoutDashboard,
   Mail,
   Megaphone,
@@ -106,6 +107,7 @@ export const adminNavTree: AdminNavGroup[] = [
     defaultHref: '/admin/pmb-registrations',
     children: [
       { labelKey: 'nav.pmbRegistrations', href: '/admin/pmb-registrations', icon: GraduationCap },
+      { labelKey: 'nav.pmbPrograms', href: '/admin/pmb-programs', icon: Layers },
       { labelKey: 'nav.pmbFees', href: '/admin/pmb-fees', icon: Wallet },
       { labelKey: 'nav.faqs', href: '/admin/faqs', icon: HelpCircle },
     ],
@@ -176,6 +178,7 @@ export function isAdminPmbAllowedPath(pathname: string): boolean {
   return (
     pathname === '/admin/profile'
     || pathname.startsWith('/admin/pmb-registrations')
+    || pathname.startsWith('/admin/pmb-programs')
     || pathname.startsWith('/admin/pmb-fees')
     || pathname.startsWith('/admin/faqs')
   )
@@ -310,6 +313,12 @@ export function getAdminBreadcrumbs(pathname: string): AdminBreadcrumb[] {
   if (pathname.startsWith('/admin/pmb-registrations')) {
     crumbs.push({ labelKey: 'nav.group.pmb' }, { labelKey: 'nav.pmbRegistrations' })
     if (pathname !== '/admin/pmb-registrations') crumbs.push({ labelKey: 'nav.breadcrumb.detail' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/pmb-programs')) {
+    crumbs.push({ labelKey: 'nav.group.pmb' }, { labelKey: 'nav.pmbPrograms', href: '/admin/pmb-programs' })
+    if (pathname.endsWith('/create')) crumbs.push({ labelKey: 'nav.breadcrumb.add' })
     return crumbs
   }
 

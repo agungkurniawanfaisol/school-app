@@ -52,7 +52,7 @@ export function PmbFeesListPage() {
           {
             key: 'program',
             header: 'Program',
-            cell: (item) => programLabel(item.program),
+            cell: (item) => programLabel(item.program, item.program_name),
           },
           {
             key: 'year',

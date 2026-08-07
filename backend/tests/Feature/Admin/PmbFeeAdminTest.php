@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Models\AcademicYear;
 use App\Models\PmbFee;
+use App\Models\PmbProgram;
 use App\Models\User;
 use Laravel\Sanctum\Sanctum;
 use Tests\Concerns\AssertsAdminCrud;
@@ -15,6 +16,25 @@ class PmbFeeAdminTest extends TestCase
 
     private const RESOURCE = 'pmb-fees';
 
+    private function programId(int $schoolId, string $code = 'reguler', string $name = 'Reguler'): int
+    {
+        $program = PmbProgram::query()
+            ->where('school_id', $schoolId)
+            ->where('code', $code)
+            ->first();
+
+        if ($program) {
+            return (int) $program->id;
+        }
+
+        return (int) PmbProgram::factory()->create([
+            'school_id' => $schoolId,
+            'code' => $code,
+            'name' => $name,
+            'is_active' => true,
+        ])->id;
+    }
+
     private function validPayload(?int $schoolId = null, ?int $yearId = null, array $overrides = []): array
     {
         $school = $schoolId ? null : $this->createSchool();
@@ -25,12 +45,16 @@ class PmbFeeAdminTest extends TestCase
                 \App\Models\School::query()->findOrFail($resolvedSchoolId)
             )->create(['label' => '2026/2027']);
 
+        $code = $overrides['program'] ?? 'reguler';
+        $programName = $code === 'icp' ? 'ICP' : 'Reguler';
+        unset($overrides['program']);
+
         return array_merge([
             'school_id' => $resolvedSchoolId,
             'academic_year_id' => $year->id,
             'name' => 'SD Reguler',
             'jenjang' => 'sd',
-            'program' => 'reguler',
+            'pmb_program_id' => $this->programId($resolvedSchoolId, $code, $programName),
             'amount' => 350000,
             'bank_name' => 'BSI',
             'account_number' => '1234567890',
@@ -62,6 +86,7 @@ class PmbFeeAdminTest extends TestCase
             ->assertJsonPath('data.amount', 350000)
             ->assertJsonPath('data.jenjang', 'sd')
             ->assertJsonPath('data.program', 'reguler')
+            ->assertJsonPath('data.program_name', 'Reguler')
             ->assertJsonPath('data.bank_name', 'BSI')
             ->assertJsonPath('data.is_active', true);
 
@@ -73,6 +98,7 @@ class PmbFeeAdminTest extends TestCase
         ]))
             ->assertCreated()
             ->assertJsonPath('data.program', 'icp')
+            ->assertJsonPath('data.program_name', 'ICP')
             ->assertJsonPath('data.is_active', true);
 
         $this->assertDatabaseHas('pmb_fees', [
@@ -89,11 +115,36 @@ class PmbFeeAdminTest extends TestCase
         ]);
     }
 
+    public function test_admin_pmb_can_store_kb_fee(): void
+    {
+        $school = $this->createSchool();
+        $year = AcademicYear::factory()->for($school)->active()->create(['label' => '2026/2027']);
+
+        Sanctum::actingAs(User::factory()->adminPmb()->create());
+
+        $this->postJson($this->adminUrl(self::RESOURCE), $this->validPayload($school->id, $year->id, [
+            'name' => 'KB Reguler',
+            'jenjang' => 'kb',
+            'program' => 'reguler',
+            'amount' => 200000,
+        ]))
+            ->assertCreated()
+            ->assertJsonPath('data.jenjang', 'kb')
+            ->assertJsonPath('data.name', 'KB Reguler');
+
+        $this->assertDatabaseHas('pmb_fees', [
+            'academic_year_id' => $year->id,
+            'jenjang' => 'kb',
+            'program' => 'reguler',
+            'amount' => 200000,
+        ]);
+    }
+
     public function test_cannot_create_duplicate_fee_for_same_year_jenjang_program(): void
     {
         $school = $this->createSchool();
         $year = AcademicYear::factory()->for($school)->create(['label' => '2026/2027']);
-        PmbFee::factory()->sdReguler()->create([
+        $fee = PmbFee::factory()->sdReguler()->create([
             'school_id' => $school->id,
             'academic_year_id' => $year->id,
             'amount' => 300000,
@@ -103,7 +154,7 @@ class PmbFeeAdminTest extends TestCase
 
         $this->postJson($this->adminUrl(self::RESOURCE), $this->validPayload($school->id, $year->id, [
             'jenjang' => 'sd',
-            'program' => 'reguler',
+            'pmb_program_id' => $fee->pmb_program_id,
             'is_active' => false,
         ]))->assertUnprocessable();
     }

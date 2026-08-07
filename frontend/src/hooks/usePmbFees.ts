@@ -18,8 +18,10 @@ export interface PmbFee {
     is_active: boolean
   } | null
   name: string
-  jenjang: 'tk' | 'sd'
-  program: 'reguler' | 'icp'
+  jenjang: 'kb' | 'tk' | 'sd'
+  pmb_program_id: number
+  program: string
+  program_name?: string | null
   amount: number
   amount_formatted: string
   bank_name?: string | null

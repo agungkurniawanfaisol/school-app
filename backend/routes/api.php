@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\PhotoAlbumController as AdminPhotoAlbumController
 use App\Http\Controllers\Admin\PmbDocumentController;
 use App\Http\Controllers\Admin\PmbEmailController;
 use App\Http\Controllers\Admin\PmbFeeController as AdminPmbFeeController;
+use App\Http\Controllers\Admin\PmbProgramController as AdminPmbProgramController;
 use App\Http\Controllers\Admin\PmbRegistrationController as AdminPmbRegistrationController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SchoolController as AdminSchoolController;
@@ -230,6 +231,7 @@ Route::prefix('admin')->group(function (): void {
             Route::post('pmb-emails/broadcast', [PmbEmailController::class, 'broadcast'])
                 ->middleware('throttle:5,1');
             Route::apiResource('pmb-fees', AdminPmbFeeController::class);
+            Route::apiResource('pmb-programs', AdminPmbProgramController::class);
             Route::get('pmb-registrations/stats', [AdminPmbRegistrationController::class, 'stats']);
             Route::get('pmb-registrations/notifications', [AdminPmbRegistrationController::class, 'notifications']);
             Route::post('pmb-registrations/notifications/read', [AdminPmbRegistrationController::class, 'markNotificationsRead']);

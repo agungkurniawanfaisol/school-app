@@ -1,7 +1,7 @@
 # PMB Program Master — Design
 
 **Date:** 2026-08-07  
-**Status:** Approved (pending user review of this file)  
+**Status:** Approved  
 **Related:** [pmb-fees-design](./2026-07-29-pmb-fees-design.md), admin form `/admin/pmb-fees/create`
 
 ## Goal

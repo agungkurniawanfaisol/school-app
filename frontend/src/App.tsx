@@ -128,6 +128,12 @@ const PmbFeesListPage = lazy(() =>
 const PmbFeeFormPage = lazy(() =>
   import('@/pages/admin/PmbFeeFormPage').then((m) => ({ default: m.PmbFeeFormPage })),
 )
+const PmbProgramsListPage = lazy(() =>
+  import('@/pages/admin/PmbProgramsListPage').then((m) => ({ default: m.PmbProgramsListPage })),
+)
+const PmbProgramFormPage = lazy(() =>
+  import('@/pages/admin/PmbProgramFormPage').then((m) => ({ default: m.PmbProgramFormPage })),
+)
 const SchoolsListPage = lazy(() => import('@/pages/admin/SchoolsListPage').then((m) => ({ default: m.SchoolsListPage })))
 const SchoolFormPage = lazy(() => import('@/pages/admin/SchoolFormPage').then((m) => ({ default: m.SchoolFormPage })))
 const VisionMissionPage = lazy(() =>
@@ -388,6 +394,9 @@ export default function App() {
             <Route path="contact-messages/:id" element={<LazyAdmin><ContactMessageDetailPage /></LazyAdmin>} />
             <Route path="pmb-registrations" element={<LazyAdmin><PmbRegistrationsListPage /></LazyAdmin>} />
             <Route path="pmb-registrations/:uuid" element={<LazyAdmin><PmbRegistrationDetailPage /></LazyAdmin>} />
+            <Route path="pmb-programs" element={<LazyAdmin><PmbProgramsListPage /></LazyAdmin>} />
+            <Route path="pmb-programs/create" element={<LazyAdmin><PmbProgramFormPage /></LazyAdmin>} />
+            <Route path="pmb-programs/:id/edit" element={<LazyAdmin><PmbProgramFormPage /></LazyAdmin>} />
             <Route path="pmb-fees" element={<LazyAdmin><PmbFeesListPage /></LazyAdmin>} />
             <Route path="pmb-fees/create" element={<LazyAdmin><PmbFeeFormPage /></LazyAdmin>} />
             <Route path="pmb-fees/:id/edit" element={<LazyAdmin><PmbFeeFormPage /></LazyAdmin>} />

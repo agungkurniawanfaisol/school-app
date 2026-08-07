@@ -74,6 +74,7 @@ describe('admin-nav', () => {
     expect(nav.groups).toHaveLength(1)
     expect(nav.groups[0]?.labelKey).toBe('nav.group.pmb')
     expect(isAdminPmbAllowedPath('/admin/pmb-registrations/example')).toBe(true)
+    expect(isAdminPmbAllowedPath('/admin/pmb-programs')).toBe(true)
     expect(isAdminPmbAllowedPath('/admin/pmb-fees')).toBe(true)
     expect(isAdminPmbAllowedPath('/admin/news')).toBe(false)
   })

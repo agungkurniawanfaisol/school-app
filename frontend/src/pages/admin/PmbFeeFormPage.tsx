@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AdminFormShell } from '@/components/admin/AdminFormShell'
 import { Card, CardContent } from '@/components/ui/card'
@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useAdminAcademicYearsList } from '@/hooks/useAcademicYears'
 import { useAdminPmbFeeDetail, useCreatePmbFee, useUpdatePmbFee } from '@/hooks/usePmbFees'
+import { useAdminPmbProgramsList } from '@/hooks/usePmbPrograms'
 import { useSchool } from '@/hooks/useSchool'
 import {
   defaultFeeName,
@@ -16,6 +17,7 @@ import {
   parseRupiahInput,
   pmbFeeFormSchema,
   type PmbFeeFormValues,
+  type PmbFeeJenjang,
 } from '@/schemas/pmb-fee'
 
 export function PmbFeeFormPage() {
@@ -26,15 +28,21 @@ export function PmbFeeFormPage() {
   const isEdit = feeId > 0
   const { data: school } = useSchool()
   const { data: yearsData } = useAdminAcademicYearsList({ per_page: 50 })
+  const { data: programsData } = useAdminPmbProgramsList({
+    per_page: 100,
+    is_active: true,
+    school_id: school?.id,
+  })
   const { data: existing } = useAdminPmbFeeDetail(feeId)
   const years = yearsData?.data ?? []
+  const programs = programsData?.data ?? []
   const createItem = useCreatePmbFee()
   const updateItem = useUpdatePmbFee(feeId)
 
   const [academicYearId, setAcademicYearId] = useState('')
   const [name, setName] = useState('')
-  const [jenjang, setJenjang] = useState<'tk' | 'sd'>('sd')
-  const [program, setProgram] = useState<'reguler' | 'icp'>('reguler')
+  const [jenjang, setJenjang] = useState<PmbFeeJenjang>('sd')
+  const [programId, setProgramId] = useState('')
   const [amountInput, setAmountInput] = useState('350000')
   const [bankName, setBankName] = useState('')
   const [accountNumber, setAccountNumber] = useState('')
@@ -43,6 +51,30 @@ export function PmbFeeFormPage() {
   const [isActive, setIsActive] = useState(true)
   const [nameTouched, setNameTouched] = useState(false)
 
+  const selectedProgram = useMemo(
+    () => programs.find((p) => String(p.id) === programId) ?? null,
+    [programs, programId],
+  )
+
+  const programOptions = useMemo(() => {
+    if (!existing?.pmb_program_id) return programs
+    if (programs.some((p) => p.id === existing.pmb_program_id)) return programs
+    return [
+      {
+        id: existing.pmb_program_id,
+        uuid: '',
+        school_id: existing.school_id,
+        code: existing.program,
+        name: existing.program_name ?? existing.program,
+        sort_order: 0,
+        is_active: true,
+        created_at: null,
+        updated_at: null,
+      },
+      ...programs,
+    ]
+  }, [programs, existing])
+
   useEffect(() => {
     if (academicYearId || years.length === 0) return
     const active = years.find((year) => year.is_active)
@@ -50,11 +82,16 @@ export function PmbFeeFormPage() {
   }, [academicYearId, years])
 
   useEffect(() => {
+    if (programId || programs.length === 0 || isEdit) return
+    setProgramId(String(programs[0].id))
+  }, [programId, programs, isEdit])
+
+  useEffect(() => {
     if (!existing) return
     setAcademicYearId(String(existing.academic_year_id))
     setName(existing.name)
     setJenjang(existing.jenjang)
-    setProgram(existing.program)
+    setProgramId(String(existing.pmb_program_id))
     setAmountInput(String(existing.amount))
     setBankName(existing.bank_name ?? '')
     setAccountNumber(existing.account_number ?? '')
@@ -65,9 +102,9 @@ export function PmbFeeFormPage() {
   }, [existing])
 
   useEffect(() => {
-    if (nameTouched || isEdit) return
-    setName(defaultFeeName(jenjang, program))
-  }, [jenjang, program, nameTouched, isEdit])
+    if (nameTouched || isEdit || !selectedProgram) return
+    setName(defaultFeeName(jenjang, selectedProgram.name))
+  }, [jenjang, selectedProgram, nameTouched, isEdit])
 
   const amount = useMemo(() => parseRupiahInput(amountInput), [amountInput])
   const preview = amount != null ? formatRupiah(amount) : '—'
@@ -77,7 +114,7 @@ export function PmbFeeFormPage() {
     academic_year_id: Number(academicYearId),
     name: name.trim(),
     jenjang,
-    program,
+    pmb_program_id: Number(programId) || 0,
     amount: amount ?? 0,
     bank_name: bankName.trim(),
     account_number: accountNumber.trim(),
@@ -129,11 +166,12 @@ export function PmbFeeFormPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label>Jenjang</Label>
-              <Select value={jenjang} onValueChange={(v) => setJenjang(v as 'tk' | 'sd')}>
+              <Select value={jenjang} onValueChange={(v) => setJenjang(v as PmbFeeJenjang)}>
                 <SelectTrigger className="h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="kb">KB</SelectItem>
                   <SelectItem value="tk">TK</SelectItem>
                   <SelectItem value="sd">SD</SelectItem>
                 </SelectContent>
@@ -141,15 +179,26 @@ export function PmbFeeFormPage() {
             </div>
             <div className="space-y-2">
               <Label>Program</Label>
-              <Select value={program} onValueChange={(v) => setProgram(v as 'reguler' | 'icp')}>
+              <Select value={programId} onValueChange={setProgramId}>
                 <SelectTrigger className="h-11">
-                  <SelectValue />
+                  <SelectValue placeholder="Pilih program" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="reguler">Reguler</SelectItem>
-                  <SelectItem value="icp">ICP</SelectItem>
+                  {programOptions.map((program) => (
+                    <SelectItem key={program.id} value={String(program.id)}>
+                      {program.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              {programs.length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Belum ada program aktif.{' '}
+                  <Link to="/admin/pmb-programs/create" className="text-primary underline">
+                    Tambah program
+                  </Link>
+                </p>
+              )}
             </div>
           </div>
 
@@ -219,7 +268,7 @@ export function PmbFeeFormPage() {
             <div>
               <p className="font-medium">{t('form.setActivePmbFee')}</p>
               <p className="text-sm text-muted-foreground">
-                Beberapa biaya boleh aktif bersamaan (TK/SD × Reguler/ICP).
+                Beberapa biaya boleh aktif bersamaan (jenjang × program).
               </p>
             </div>
             <Switch

@@ -18,7 +18,7 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
     protected function defaultSelect(): array
     {
         return [
-            'id', 'uuid', 'school_id', 'academic_year_id', 'name', 'jenjang', 'program',
+            'id', 'uuid', 'school_id', 'academic_year_id', 'name', 'jenjang', 'pmb_program_id', 'program',
             'amount', 'bank_name', 'account_number', 'account_holder', 'notes', 'is_active',
             'created_at', 'updated_at',
         ];
@@ -29,6 +29,7 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
         return [
             'academicYear:id,uuid,label,is_active',
             'school:id,name,slug',
+            'pmbProgram:id,uuid,code,name,is_active',
         ];
     }
 
@@ -89,7 +90,7 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
                 ->where('school_id', $data['school_id'])
                 ->where('academic_year_id', $data['academic_year_id'])
                 ->where('jenjang', $data['jenjang'])
-                ->where('program', $data['program'])
+                ->where('pmb_program_id', $data['pmb_program_id'])
                 ->onlyTrashed()
                 ->first();
 
@@ -97,6 +98,8 @@ class PmbFeeRepository extends BaseRepository implements RepositoryInterface
                 $trashed->restore();
                 $trashed->update([
                     'name' => $data['name'],
+                    'program' => $data['program'] ?? $trashed->program,
+                    'pmb_program_id' => $data['pmb_program_id'],
                     'amount' => $data['amount'],
                     'bank_name' => $data['bank_name'] ?? null,
                     'account_number' => $data['account_number'] ?? null,

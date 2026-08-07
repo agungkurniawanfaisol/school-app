@@ -4,6 +4,7 @@ namespace App\Http\Requests\PmbFee;
 
 use App\Models\AcademicYear;
 use App\Models\PmbFee;
+use App\Models\PmbProgram;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,7 +28,6 @@ abstract class PmbFeeRequest extends FormRequest
         $schoolId = (int) ($this->input('school_id') ?? $existing?->school_id ?? 0);
         $yearId = (int) ($this->input('academic_year_id') ?? $existing?->academic_year_id ?? 0);
         $jenjang = (string) ($this->input('jenjang') ?? $existing?->jenjang ?? '');
-        $program = (string) ($this->input('program') ?? $existing?->program ?? '');
         $ignoreId = $existing?->id;
 
         return [
@@ -52,11 +52,26 @@ abstract class PmbFeeRequest extends FormRequest
             ],
             'name' => ['required', 'string', 'max:100'],
             'jenjang' => ['required', 'string', Rule::in(PmbFee::JENJANGS)],
-            'program' => [
+            'pmb_program_id' => [
                 'required',
-                'string',
-                Rule::in(PmbFee::PROGRAMS),
-                Rule::unique('pmb_fees', 'program')
+                'integer',
+                Rule::exists('pmb_programs', 'id')->where(fn ($query) => $query
+                    ->where('school_id', $schoolId)
+                    ->whereNull('deleted_at')),
+                function (string $attribute, mixed $value, \Closure $fail) use ($existing): void {
+                    if (! is_numeric($value)) {
+                        return;
+                    }
+                    $program = PmbProgram::query()->find((int) $value);
+                    if ($program === null) {
+                        return;
+                    }
+                    $sameAsExisting = $existing && (int) $existing->pmb_program_id === (int) $value;
+                    if (! $sameAsExisting && ! $program->is_active) {
+                        $fail('Program tidak aktif. Pilih program aktif dari master.');
+                    }
+                },
+                Rule::unique('pmb_fees', 'pmb_program_id')
                     ->where(fn ($query) => $query
                         ->where('school_id', $schoolId)
                         ->where('academic_year_id', $yearId)
@@ -79,11 +94,22 @@ abstract class PmbFeeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'program.unique' => 'Biaya untuk kombinasi tahun ajaran, jenjang, dan program ini sudah ada.',
+            'pmb_program_id.unique' => 'Biaya untuk kombinasi tahun ajaran, jenjang, dan program ini sudah ada.',
+            'pmb_program_id.required' => 'Program wajib dipilih.',
             'amount.min' => 'Nominal minimal Rp 1.000.',
             'bank_name.required' => 'Bank transfer wajib diisi.',
             'account_number.required' => 'Nomor rekening wajib diisi.',
             'account_holder.required' => 'Atas nama rekening wajib diisi.',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->filled('pmb_program_id') && ! $this->filled('program')) {
+            $code = PmbProgram::query()->whereKey((int) $this->input('pmb_program_id'))->value('code');
+            if (is_string($code)) {
+                $this->merge(['program' => $code]);
+            }
+        }
     }
 }

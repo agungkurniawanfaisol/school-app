@@ -17,6 +17,7 @@ use App\Repositories\MediaRepository;
 use App\Repositories\NewsRepository;
 use App\Repositories\PmbDocumentRepository;
 use App\Repositories\PmbFeeRepository;
+use App\Repositories\PmbProgramRepository;
 use App\Repositories\PmbRegistrationRepository;
 use App\Repositories\SchoolRepository;
 use App\Repositories\SettingRepository;
@@ -49,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
             CourseProgressRepository::class,
             PmbRegistrationRepository::class,
             PmbFeeRepository::class,
+            PmbProgramRepository::class,
             PmbDocumentRepository::class,
             MediaRepository::class,
             SettingRepository::class,

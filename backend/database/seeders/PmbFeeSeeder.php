@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\AcademicYear;
 use App\Models\PmbFee;
+use App\Models\PmbProgram;
 use App\Models\School;
 use Illuminate\Database\Seeder;
 
@@ -35,16 +36,28 @@ class PmbFeeSeeder extends Seeder
                 continue;
             }
 
+            $reguler = PmbProgram::query()->firstOrCreate(
+                ['school_id' => $school->id, 'code' => 'reguler'],
+                ['name' => 'Reguler', 'sort_order' => 10, 'is_active' => true],
+            );
+            $icp = PmbProgram::query()->firstOrCreate(
+                ['school_id' => $school->id, 'code' => 'icp'],
+                ['name' => 'ICP', 'sort_order' => 20, 'is_active' => true],
+            );
+
             foreach ($catalog as $item) {
+                $program = $item['program'] === PmbFee::PROGRAM_ICP ? $icp : $reguler;
+
                 PmbFee::query()->updateOrCreate(
                     [
                         'school_id' => $school->id,
                         'academic_year_id' => $activeYear->id,
                         'jenjang' => $item['jenjang'],
-                        'program' => $item['program'],
+                        'pmb_program_id' => $program->id,
                     ],
                     [
                         'name' => $item['name'],
+                        'program' => $item['program'],
                         'amount' => $item['amount'],
                         'bank_name' => 'Bank Syariah Indonesia (BSI)',
                         'account_number' => '1234567890',
