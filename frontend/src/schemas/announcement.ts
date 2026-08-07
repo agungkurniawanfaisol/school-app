@@ -15,7 +15,20 @@ export function createAnnouncementSchema(t: AdminTFunction) {
     is_active: z.boolean().default(true),
     order: z.number().int().min(0).default(0),
     cta_text: z.string().max(100).optional().nullable(),
-    cta_url: z.string().max(500).url(t('validation.urlInvalid')).optional().nullable().or(z.literal('')),
+    cta_url: z
+      .string()
+      .max(500)
+      .optional()
+      .nullable()
+      .or(z.literal(''))
+      .refine(
+        (v) =>
+          !v ||
+          v === '' ||
+          (v.startsWith('/') && !v.startsWith('//')) ||
+          /^https?:\/\//i.test(v),
+        t('validation.urlInvalid'),
+      ),
   })
 }
 

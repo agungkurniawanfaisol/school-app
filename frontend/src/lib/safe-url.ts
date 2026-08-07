@@ -1,6 +1,16 @@
 const DANGEROUS_PROTOCOL = /^(javascript|data|vbscript):/i
 const DOCKER_INTERNAL_HOSTS = new Set(['backend', 'nginx', 'frontend'])
 
+/** Known school frontend hosts — absolute CTAs rewrite to in-app paths. */
+const KNOWN_APP_HOSTS = new Set([
+  'nurulhikmahsda.sch.id',
+  'www.nurulhikmahsda.sch.id',
+  'nurulhikmah.sch.id',
+  'www.nurulhikmah.sch.id',
+  'localhost',
+  '127.0.0.1',
+])
+
 export function isSafeHttpUrl(url: string): boolean {
   try {
     const parsed = new URL(url)
@@ -102,6 +112,35 @@ export function resolveSafeHref(url: string | null | undefined): string | null {
     return trimmed
   }
   return null
+}
+
+/**
+ * Prefer in-app relative paths for CTA links on known school domains
+ * (avoids 404 when CMS stores absolute URL on a wrong/legacy host).
+ */
+export function resolveInAppHref(url: string | null | undefined): string | null {
+  const safe = resolveSafeHref(url)
+  if (!safe) return null
+  if (isSafeRelativePath(safe)) return safe
+
+  try {
+    const parsed = new URL(safe)
+    const host = parsed.hostname.toLowerCase()
+    const currentHost =
+      typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : ''
+    if (KNOWN_APP_HOSTS.has(host) || (currentHost && host === currentHost)) {
+      const path = `${parsed.pathname}${parsed.search}${parsed.hash}`
+      return path || '/'
+    }
+  } catch {
+    return safe
+  }
+
+  return safe
+}
+
+export function isInAppHref(href: string): boolean {
+  return isSafeRelativePath(href)
 }
 
 export function buildTeacherSharePath(uuid: string): string {

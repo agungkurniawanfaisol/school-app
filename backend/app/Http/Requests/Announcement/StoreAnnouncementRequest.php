@@ -33,7 +33,23 @@ class StoreAnnouncementRequest extends RichContentAdminRequest
             'is_active' => ['sometimes', 'boolean'],
             'order' => ['sometimes', 'integer', 'min:0'],
             'cta_text' => ['nullable', 'string', 'max:100'],
-            'cta_url' => ['nullable', 'string', 'max:500', 'url'],
+            'cta_url' => [
+                'nullable',
+                'string',
+                'max:500',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (! is_string($value) || $value === '') {
+                        return;
+                    }
+                    if (str_starts_with($value, '/') && ! str_starts_with($value, '//')) {
+                        return;
+                    }
+                    if (filter_var($value, FILTER_VALIDATE_URL) && preg_match('#^https?://#i', $value)) {
+                        return;
+                    }
+                    $fail('URL tombol aksi harus path relatif (contoh /pmb/daftar) atau URL http(s).');
+                },
+            ],
         ];
     }
 

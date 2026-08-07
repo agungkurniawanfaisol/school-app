@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildTeacherSharePath,
+  isInAppHref,
   resolveAssetUrl,
+  resolveInAppHref,
   resolveMailto,
   resolveSafeHref,
   resolveSocialHref,
@@ -65,5 +67,16 @@ describe('safe-url', () => {
     expect(resolveSafeHref('https://example.com')).toBe('https://example.com')
     expect(resolveSafeHref('//evil.com')).toBeNull()
     expect(resolveSafeHref('javascript:alert(1)')).toBeNull()
+  })
+
+  it('resolveInAppHref rewrites known school absolute URLs to relative paths', () => {
+    expect(resolveInAppHref('https://nurulhikmah.sch.id/pmb/daftar')).toBe('/pmb/daftar')
+    expect(resolveInAppHref('https://nurulhikmahsda.sch.id/pmb/daftar?x=1#top')).toBe(
+      '/pmb/daftar?x=1#top',
+    )
+    expect(resolveInAppHref('/pmb/daftar')).toBe('/pmb/daftar')
+    expect(resolveInAppHref('https://google.com/search')).toBe('https://google.com/search')
+    expect(isInAppHref('/pmb/daftar')).toBe(true)
+    expect(isInAppHref('https://google.com')).toBe(false)
   })
 })

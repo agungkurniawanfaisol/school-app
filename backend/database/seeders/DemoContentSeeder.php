@@ -669,7 +669,7 @@ class DemoContentSeeder extends Seeder
                 'priority' => 'urgent',
                 'is_pinned' => true,
                 'cta_text' => 'Daftar Sekarang',
-                'cta_url' => 'https://nurulhikmah.sch.id/pmb/daftar',
+                'cta_url' => '/pmb/daftar',
                 'published_at' => now()->subDays(3),
                 'expires_at' => now()->addDays(30),
             ],

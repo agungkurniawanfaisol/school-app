@@ -136,7 +136,10 @@ export function AnnouncementFormPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="cta_url">{t('form.ctaUrl')}</Label>
-              <Input id="cta_url" value={ctaUrl} onChange={(e) => setCtaUrl(e.target.value)} placeholder="https://..." className="h-11" />
+              <Input id="cta_url" value={ctaUrl} onChange={(e) => setCtaUrl(e.target.value)} placeholder="/pmb/daftar" className="h-11" />
+              <p className="text-xs text-muted-foreground">
+                Gunakan path relatif (mis. /pmb/daftar) agar tidak 404 di domain lain.
+              </p>
             </div>
           </div>
           <div className="flex items-center justify-between rounded-lg border border-primary/10 p-4">

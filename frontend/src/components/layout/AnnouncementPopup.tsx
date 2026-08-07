@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AlertTriangle, ExternalLink, Info, Megaphone } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -12,7 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useAnnouncementsList } from '@/hooks/useAnnouncements'
-import { resolveSafeHref } from '@/lib/safe-url'
+import { isInAppHref, resolveInAppHref } from '@/lib/safe-url'
 import type { Announcement } from '@/types'
 
 const POPUP_DISMISSED_KEY = 'nh-dismissed-popups'
@@ -58,6 +59,9 @@ const priorityColors = {
   normal: 'text-primary',
 } as const
 
+const ctaClassName =
+  'inline-flex w-full items-center justify-center gap-2 rounded-md border border-primary bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20'
+
 export function AnnouncementPopup() {
   const { t } = useTranslation('layout')
   const { data } = useAnnouncementsList({ per_page: 5 })
@@ -90,7 +94,7 @@ export function AnnouncementPopup() {
 
   const Icon = priorityIcons[popup.priority]
   const iconColor = priorityColors[popup.priority]
-  const ctaHref = resolveSafeHref(popup.cta_url)
+  const ctaHref = resolveInAppHref(popup.cta_url)
 
   function handleClose() {
     if (dontShow) {
@@ -119,15 +123,21 @@ export function AnnouncementPopup() {
         </DialogHeader>
         <DialogFooter className="flex-col gap-3 sm:flex-col">
           {popup.cta_text && ctaHref && (
-            <a
-              href={ctaHref}
-              target={ctaHref.startsWith('/') ? undefined : '_blank'}
-              rel={ctaHref.startsWith('/') ? undefined : 'noopener noreferrer'}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-primary bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
-            >
-              {popup.cta_text}
-              <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-            </a>
+            isInAppHref(ctaHref) ? (
+              <Link to={ctaHref} className={ctaClassName} onClick={handleClose}>
+                {popup.cta_text}
+              </Link>
+            ) : (
+              <a
+                href={ctaHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={ctaClassName}
+              >
+                {popup.cta_text}
+                <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+              </a>
+            )
           )}
           <label className="flex items-center gap-2 text-sm text-muted-foreground">
             <Checkbox

@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AlertTriangle, ExternalLink, Info, Megaphone, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { useAnnouncementsList } from '@/hooks/useAnnouncements'
-import { resolveSafeHref } from '@/lib/safe-url'
+import { isInAppHref, resolveInAppHref } from '@/lib/safe-url'
 import type { Announcement } from '@/types'
 
 const DISMISSED_KEY = 'nh-dismissed-banners'
@@ -61,7 +62,8 @@ export function AnnouncementBanner() {
 
   const config = priorityConfig[active.priority]
   const Icon = config.icon
-  const ctaHref = resolveSafeHref(active.cta_url)
+  const ctaHref = resolveInAppHref(active.cta_url)
+  const ctaClass = `hidden items-center gap-1 rounded-md border px-3 py-1 text-xs font-medium transition-colors sm:inline-flex ${config.btnClass}`
 
   function handleDismiss() {
     dismiss(active!.uuid)
@@ -74,15 +76,21 @@ export function AnnouncementBanner() {
         <Icon className="h-4 w-4 shrink-0" aria-hidden />
         <p className="flex-1 text-sm font-medium">{active.title}</p>
         {active.cta_text && ctaHref && (
-          <a
-            href={ctaHref}
-            target={ctaHref.startsWith('/') ? undefined : '_blank'}
-            rel={ctaHref.startsWith('/') ? undefined : 'noopener noreferrer'}
-            className={`hidden items-center gap-1 rounded-md border px-3 py-1 text-xs font-medium transition-colors sm:inline-flex ${config.btnClass}`}
-          >
-            {active.cta_text}
-            <ExternalLink className="h-3 w-3" aria-hidden />
-          </a>
+          isInAppHref(ctaHref) ? (
+            <Link to={ctaHref} className={ctaClass}>
+              {active.cta_text}
+            </Link>
+          ) : (
+            <a
+              href={ctaHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={ctaClass}
+            >
+              {active.cta_text}
+              <ExternalLink className="h-3 w-3" aria-hidden />
+            </a>
+          )
         )}
         <Button
           variant="ghost"

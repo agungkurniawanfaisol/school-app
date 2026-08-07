@@ -38,7 +38,7 @@ class AnnouncementAdminTest extends TestCase
             'order' => 1,
             'is_active' => true,
             'cta_text' => 'Daftar Sekarang',
-            'cta_url' => 'https://nurulhikmah.sch.id/pmb/daftar',
+            'cta_url' => '/pmb/daftar',
         ])
             ->assertOk()
             ->assertJsonPath('data.title', 'Pendaftaran Siswa Baru 2026/2027 Telah Dibuka!')
