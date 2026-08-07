@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
         $this->call(DemoContentSeeder::class);
         $this->call(PmbFeeSeeder::class);
         $this->call(VirtualTourSeeder::class);
+        $this->call(AppReleaseSeeder::class);
 
         $teacher = Teacher::query()->orderBy('id')->first();
 

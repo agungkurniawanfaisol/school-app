@@ -42,6 +42,11 @@ describe('admin-nav', () => {
       { labelKey: 'nav.group.system' },
       { labelKey: 'nav.schoolStats', href: '/admin/statistik-sekolah' },
     ])
+    expect(getAdminBreadcrumbs('/admin/app-releases')).toEqual([
+      { labelKey: 'nav.admin', href: '/admin' },
+      { labelKey: 'nav.group.system' },
+      { labelKey: 'nav.appReleases', href: '/admin/app-releases' },
+    ])
   })
 
   it('getAdminGroupDefaultHref returns default page per group', () => {

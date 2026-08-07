@@ -1,13 +1,60 @@
+import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import packageJson from './package.json' with { type: 'json' }
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+const appVersion = process.env.VITE_APP_VERSION ?? packageJson.version
+const gitSha = process.env.VITE_GIT_SHA ?? ''
+
+function emitVersionJson(): Plugin {
+  const payload = () =>
+    `${JSON.stringify(
+      {
+        version: appVersion,
+        builtAt: new Date().toISOString(),
+        gitSha: gitSha || null,
+      },
+      null,
+      2,
+    )}\n`
+
+  return {
+    name: 'emit-version-json',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const url = req.url?.split('?')[0]
+        if (url !== '/version.json') {
+          next()
+          return
+        }
+        res.setHeader('Content-Type', 'application/json')
+        res.setHeader('Cache-Control', 'no-store')
+        res.end(payload())
+      })
+    },
+    closeBundle() {
+      const outDir = path.resolve(__dirname, 'dist')
+      fs.mkdirSync(outDir, { recursive: true })
+      fs.writeFileSync(path.join(outDir, 'version.json'), payload())
+    },
+  }
+}
 
 export default defineConfig(({ mode }) => ({
+  define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(appVersion),
+    'import.meta.env.VITE_GIT_SHA': JSON.stringify(gitSha),
+  },
   plugins: [
     react(),
     tailwindcss(),
+    emitVersionJson(),
     ...(mode === 'production'
       ? [
           VitePWA({
@@ -29,7 +76,12 @@ export default defineConfig(({ mode }) => ({
               cleanupOutdatedCaches: true,
               runtimeCaching: [
                 {
-                  urlPattern: /^\/api\/v1\/(news|schools|facilities|teachers|curriculums|student-activities|testimonials|school-values|courses|hero-sliders|virtual-tours|settings)/,
+                  // Match with or without cache-bust query (?t=…).
+                  urlPattern: /\/version\.json(\?.*)?$/,
+                  handler: 'NetworkOnly',
+                },
+                {
+                  urlPattern: /^\/api\/v1\/(news|schools|facilities|teachers|curriculums|student-activities|testimonials|school-values|courses|hero-sliders|virtual-tours|settings|app-releases)/,
                   handler: 'StaleWhileRevalidate',
                   options: {
                     cacheName: 'api-public',

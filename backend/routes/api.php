@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AcademicYearController as AdminAcademicYearController;
 use App\Http\Controllers\Admin\AchievementController as AdminAchievementController;
 use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
+use App\Http\Controllers\Admin\AppReleaseController as AdminAppReleaseController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
 use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
@@ -42,6 +43,7 @@ use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\Api\V1\AchievementController;
 use App\Http\Controllers\Api\V1\AcademicYearController;
 use App\Http\Controllers\Api\V1\AnnouncementController;
+use App\Http\Controllers\Api\V1\AppReleaseController;
 use App\Http\Controllers\Api\V1\ContactMessageController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\CurriculumController;
@@ -113,6 +115,7 @@ Route::prefix('v1')->middleware(\App\Http\Middleware\TranslateResponse::class)->
     Route::get('extracurriculars', [ExtracurricularController::class, 'index']);
     Route::get('extracurriculars/{uuid}', [ExtracurricularController::class, 'show'])->whereUuid('uuid');
     Route::get('announcements', [AnnouncementController::class, 'index']);
+    Route::get('app-releases', [AppReleaseController::class, 'index']);
     Route::get('documents', [DocumentController::class, 'index']);
     Route::get('events', [EventController::class, 'index']);
     Route::get('events/{uuid}', [EventController::class, 'show'])->whereUuid('uuid');
@@ -209,6 +212,7 @@ Route::prefix('admin')->group(function (): void {
         Route::apiResource('achievements', AdminAchievementController::class);
         Route::apiResource('extracurriculars', AdminExtracurricularController::class);
         Route::apiResource('announcements', AdminAnnouncementController::class);
+        Route::apiResource('app-releases', AdminAppReleaseController::class);
         Route::apiResource('documents', AdminDocumentController::class);
         Route::apiResource('events', AdminEventController::class);
         Route::apiResource('photo-albums', AdminPhotoAlbumController::class);

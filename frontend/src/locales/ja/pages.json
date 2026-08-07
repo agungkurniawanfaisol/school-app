@@ -277,5 +277,10 @@
   "suggestion.send": "提案を送信",
   "suggestion.sending": "送信中...",
   "suggestion.subjectRequired": "件名は必須です",
-  "suggestion.messageRequired": "メッセージは必須です"
+  "suggestion.messageRequired": "メッセージは必須です",
+  "versionHistory.title": "バージョン履歴",
+  "versionHistory.subtitle": "ヌルル・ヒクマ・イスラム学校アプリの変更履歴。",
+  "versionHistory.metaDesc": "ヌルル・ヒクマアプリのバージョン履歴と変更ノート。",
+  "versionHistory.backHome": "ホームに戻る",
+  "versionHistory.empty": "リリースノートはまだありません。"
 }

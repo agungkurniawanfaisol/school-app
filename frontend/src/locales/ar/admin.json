@@ -916,5 +916,17 @@
   "components.visionMission.homePreviewDesc": "معاينة العرض في الصفحة الرئيسية",
   "preview.scheduleStarts": "سيبدأ العرض في {{date}}",
   "preview.scheduleEnded": "انتهى جدول العرض في {{date}}",
-  "preview.liveUntil": "يعرض حتى {{date}}"
+  "preview.liveUntil": "يعرض حتى {{date}}",
+  "nav.appReleases": "سجل الإصدارات",
+  "table.version": "الإصدار",
+  "form.version": "الإصدار",
+  "form.releaseNotes": "ملاحظات الإصدار",
+  "pages.appReleases.listTitle": "سجل إصدارات التطبيق",
+  "pages.appReleases.listDesc": "ملاحظات الإصدار المعروضة في الصفحة العامة",
+  "pages.appReleases.createTitle": "إضافة ملاحظة إصدار",
+  "pages.appReleases.editTitle": "تعديل ملاحظة الإصدار",
+  "pages.appReleases.versionHint": "استخدم نفس semver الموجود في package.json عند النشر (مثل 1.0.0).",
+  "validation.versionRequired": "الإصدار مطلوب",
+  "validation.versionSemver": "يجب أن يكون الإصدار بتنسيق semver مثل 1.0.0",
+  "validation.bodyRequired": "ملاحظات الإصدار مطلوبة"
 }

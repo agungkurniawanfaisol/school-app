@@ -37,6 +37,7 @@ import { AchievementDetailPage } from '@/pages/achievements/AchievementDetailPag
 import { AgendaCatalogPage } from '@/pages/agenda/AgendaCatalogPage'
 import { AgendaDetailPage } from '@/pages/agenda/AgendaDetailPage'
 import { SuggestionBoxPage } from '@/pages/suggestion/SuggestionBoxPage'
+import { VersionHistoryPage } from '@/pages/version/VersionHistoryPage'
 
 const DashboardPage = lazy(() => import('@/pages/admin/DashboardPage').then((m) => ({ default: m.DashboardPage })))
 const AdminNewsListPage = lazy(() => import('@/pages/admin/NewsListPage').then((m) => ({ default: m.AdminNewsListPage })))
@@ -160,6 +161,12 @@ const VirtualTourViewerPage = lazy(() =>
 )
 const FaqsListPage = lazy(() => import('@/pages/admin/FaqsListPage').then((m) => ({ default: m.FaqsListPage })))
 const FaqFormPage = lazy(() => import('@/pages/admin/FaqFormPage').then((m) => ({ default: m.FaqFormPage })))
+const AppReleasesListPage = lazy(() =>
+  import('@/pages/admin/AppReleasesListPage').then((m) => ({ default: m.AppReleasesListPage })),
+)
+const AppReleaseFormPage = lazy(() =>
+  import('@/pages/admin/AppReleaseFormPage').then((m) => ({ default: m.AppReleaseFormPage })),
+)
 const AchievementsListPage = lazy(() =>
   import('@/pages/admin/AchievementsListPage').then((m) => ({ default: m.AchievementsListPage })),
 )
@@ -261,6 +268,7 @@ export default function App() {
           <Route path="/agenda" element={<AgendaCatalogPage />} />
           <Route path="/agenda/detail/:uuid" element={<AgendaDetailPage />} />
           <Route path="/kotak-saran" element={<SuggestionBoxPage />} />
+          <Route path="/riwayat-versi" element={<VersionHistoryPage />} />
 
           <Route path="/admin/login" element={<LoginPage />} />
           <Route path="/admin/login/oauth" element={<OAuthCallbackPage />} />
@@ -372,6 +380,9 @@ export default function App() {
             <Route path="faqs" element={<LazyAdmin><FaqsListPage /></LazyAdmin>} />
             <Route path="faqs/create" element={<LazyAdmin><FaqFormPage /></LazyAdmin>} />
             <Route path="faqs/:id/edit" element={<LazyAdmin><FaqFormPage /></LazyAdmin>} />
+            <Route path="app-releases" element={<LazyAdmin><AppReleasesListPage /></LazyAdmin>} />
+            <Route path="app-releases/create" element={<LazyAdmin><AppReleaseFormPage /></LazyAdmin>} />
+            <Route path="app-releases/:id/edit" element={<LazyAdmin><AppReleaseFormPage /></LazyAdmin>} />
             <Route path="achievements" element={<LazyAdmin><AchievementsListPage /></LazyAdmin>} />
             <Route path="achievements/create" element={<LazyAdmin><AchievementFormPage /></LazyAdmin>} />
             <Route path="achievements/:id/edit" element={<LazyAdmin><AchievementFormPage /></LazyAdmin>} />

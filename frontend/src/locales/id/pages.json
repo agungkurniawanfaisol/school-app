@@ -277,5 +277,10 @@
   "suggestion.send": "Kirim Saran",
   "suggestion.sending": "Mengirim...",
   "suggestion.subjectRequired": "Subjek wajib diisi",
-  "suggestion.messageRequired": "Pesan wajib diisi"
+  "suggestion.messageRequired": "Pesan wajib diisi",
+  "versionHistory.title": "Riwayat Versi",
+  "versionHistory.subtitle": "Catatan perubahan aplikasi Sekolah Islam Nurul Hikmah.",
+  "versionHistory.metaDesc": "Riwayat versi dan catatan perubahan aplikasi Nurul Hikmah.",
+  "versionHistory.backHome": "Kembali ke beranda",
+  "versionHistory.empty": "Belum ada catatan rilis."
 }

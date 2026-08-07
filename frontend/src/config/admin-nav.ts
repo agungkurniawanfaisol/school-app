@@ -22,6 +22,7 @@ import {
   Settings,
   Sparkles,
   Star,
+  Tag,
   Target,
   Users,
   UserCog,
@@ -125,6 +126,7 @@ export const adminNavTree: AdminNavGroup[] = [
       { labelKey: 'nav.contactMessages', href: '/admin/contact-messages', icon: Mail },
       { labelKey: 'nav.users', href: '/admin/users', icon: UserCog },
       { labelKey: 'nav.academicYears', href: '/admin/academic-years', icon: Calendar },
+      { labelKey: 'nav.appReleases', href: '/admin/app-releases', icon: Tag },
       { labelKey: 'nav.settings', href: '/admin/settings', icon: Settings },
     ],
   },
@@ -330,6 +332,13 @@ export function getAdminBreadcrumbs(pathname: string): AdminBreadcrumb[] {
 
   if (pathname.startsWith('/admin/academic-years')) {
     crumbs.push({ labelKey: 'nav.group.system' }, { labelKey: 'nav.academicYears', href: '/admin/academic-years' })
+    if (pathname.endsWith('/create')) crumbs.push({ labelKey: 'nav.breadcrumb.add' })
+    else if (pathname.includes('/edit')) crumbs.push({ labelKey: 'nav.breadcrumb.edit' })
+    return crumbs
+  }
+
+  if (pathname.startsWith('/admin/app-releases')) {
+    crumbs.push({ labelKey: 'nav.group.system' }, { labelKey: 'nav.appReleases', href: '/admin/app-releases' })
     if (pathname.endsWith('/create')) crumbs.push({ labelKey: 'nav.breadcrumb.add' })
     else if (pathname.includes('/edit')) crumbs.push({ labelKey: 'nav.breadcrumb.edit' })
     return crumbs

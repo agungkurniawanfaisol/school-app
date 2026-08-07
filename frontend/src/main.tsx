@@ -8,6 +8,7 @@ import { LanguageProvider } from '@/components/i18n'
 import { ThemeProvider, useTheme } from '@/components/theme'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
+import { AppUpdateNotifier } from '@/components/layout/AppUpdateNotifier'
 import App from './App.tsx'
 import { authKeys } from '@/hooks/useAuth'
 import { pmbKeys } from '@/hooks/usePmb'
@@ -46,6 +47,7 @@ function AppShell() {
   return (
     <TooltipProvider delayDuration={300}>
       <AuthSessionSync />
+      <AppUpdateNotifier />
       <App />
       <Toaster position="top-center" richColors closeButton theme={resolvedTheme} />
     </TooltipProvider>

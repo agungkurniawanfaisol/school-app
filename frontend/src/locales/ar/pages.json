@@ -277,5 +277,10 @@
   "suggestion.send": "إرسال الاقتراح",
   "suggestion.sending": "جارٍ الإرسال...",
   "suggestion.subjectRequired": "الموضوع مطلوب",
-  "suggestion.messageRequired": "الرسالة مطلوبة"
+  "suggestion.messageRequired": "الرسالة مطلوبة",
+  "versionHistory.title": "سجل الإصدارات",
+  "versionHistory.subtitle": "سجل تغييرات تطبيق مدرسة نور الحكمة الإسلامية.",
+  "versionHistory.metaDesc": "سجل إصدارات وملاحظات تغيير تطبيق نور الحكمة.",
+  "versionHistory.backHome": "العودة إلى الصفحة الرئيسية",
+  "versionHistory.empty": "لا توجد ملاحظات إصدار بعد."
 }

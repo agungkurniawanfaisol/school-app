@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Mail\Transport\GmailApiTransport;
 use App\Repositories\AcademicYearRepository;
+use App\Repositories\AppReleaseRepository;
 use App\Repositories\CourseEnrollmentRepository;
 use App\Repositories\CourseLessonRepository;
 use App\Repositories\CourseModuleRepository;
@@ -34,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $bindings = [
             AcademicYearRepository::class,
+            AppReleaseRepository::class,
             SchoolRepository::class,
             HeroSliderRepository::class,
             CurriculumRepository::class,

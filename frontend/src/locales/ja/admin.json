@@ -916,5 +916,17 @@
   "components.visionMission.homePreviewDesc": "ホームページ表示プレビュー",
   "preview.scheduleStarts": "{{date}} から公開予定",
   "preview.scheduleEnded": "表示スケジュールは {{date}} に終了",
-  "preview.liveUntil": "{{date}} まで公開"
+  "preview.liveUntil": "{{date}} まで公開",
+  "nav.appReleases": "バージョン履歴",
+  "table.version": "バージョン",
+  "form.version": "バージョン",
+  "form.releaseNotes": "リリースノート",
+  "pages.appReleases.listTitle": "アプリのバージョン履歴",
+  "pages.appReleases.listDesc": "公開ページに表示されるリリースノート",
+  "pages.appReleases.createTitle": "リリースノートを追加",
+  "pages.appReleases.editTitle": "リリースノートを編集",
+  "pages.appReleases.versionHint": "デプロイ時の package.json と同じ semver を使用してください（例: 1.0.0）。",
+  "validation.versionRequired": "バージョンは必須です",
+  "validation.versionSemver": "バージョンは semver 形式である必要があります（例: 1.0.0）",
+  "validation.bodyRequired": "リリースノートは必須です"
 }

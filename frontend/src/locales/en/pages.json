@@ -277,5 +277,10 @@
   "suggestion.send": "Send Suggestion",
   "suggestion.sending": "Sending...",
   "suggestion.subjectRequired": "Subject is required",
-  "suggestion.messageRequired": "Message is required"
+  "suggestion.messageRequired": "Message is required",
+  "versionHistory.title": "Version History",
+  "versionHistory.subtitle": "Application changelog for Nurul Hikmah Islamic School.",
+  "versionHistory.metaDesc": "Version history and changelog for the Nurul Hikmah app.",
+  "versionHistory.backHome": "Back to home",
+  "versionHistory.empty": "No release notes yet."
 }

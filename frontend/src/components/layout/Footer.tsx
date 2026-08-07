@@ -2,6 +2,7 @@ import { Facebook, Instagram, Mail, MapPin, Phone, Youtube } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { SchoolLogo } from '@/components/brand/SchoolLogo'
+import { AppVersionBadge } from '@/components/layout/AppVersionBadge'
 import { Separator } from '@/components/ui/separator'
 import { useSchool } from '@/hooks/useSchool'
 import { isAllowedMapEmbedUrl } from '@/lib/google-maps-embed'
@@ -184,9 +185,10 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} {school?.name ?? 'Nurul Hikmah School'}. {t('footer.copyright')}
           </p>
-          <p className="flex items-center gap-1.5">
-            {t('footer.madeWith')}
-          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-end">
+            <AppVersionBadge variant="footer" />
+            <p className="flex items-center gap-1.5">{t('footer.madeWith')}</p>
+          </div>
         </div>
       </div>
     </footer>

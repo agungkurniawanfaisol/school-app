@@ -2,6 +2,7 @@ import { ExternalLink, LogOut, PanelLeftClose, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { SchoolLogo } from '@/components/brand/SchoolLogo'
+import { AppVersionBadge } from '@/components/layout/AppVersionBadge'
 import { AdminSidebarTree } from '@/components/layout/AdminSidebarTree'
 import { ThemeToggle } from '@/components/theme'
 import { Button } from '@/components/ui/button'
@@ -98,8 +99,11 @@ export function AdminNav({
 
       <div className="admin-sidebar-footer relative shrink-0 space-y-2 p-3">
         <div className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5">
-          <span className="text-xs font-medium text-[var(--sidebar-muted)]">{t('nav.theme')}</span>
-          <ThemeToggle variant="outline" className="border-[rgb(255_255_255/0.15)] bg-[rgb(255_255_255/0.06)] text-[var(--sidebar-text)] hover:bg-[rgb(255_255_255/0.12)]" />
+          <AppVersionBadge variant="sidebar" className="px-1" />
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-[var(--sidebar-muted)]">{t('nav.theme')}</span>
+            <ThemeToggle variant="outline" className="border-[rgb(255_255_255/0.15)] bg-[rgb(255_255_255/0.06)] text-[var(--sidebar-text)] hover:bg-[rgb(255_255_255/0.12)]" />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2">

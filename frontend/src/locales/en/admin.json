@@ -915,5 +915,17 @@
   "components.visionMission.homePreviewDesc": "Homepage display preview",
   "preview.scheduleStarts": "Scheduled to go live on {{date}}",
   "preview.scheduleEnded": "Display schedule ended on {{date}}",
-  "preview.liveUntil": "Live until {{date}}"
+  "preview.liveUntil": "Live until {{date}}",
+  "nav.appReleases": "Version History",
+  "table.version": "Version",
+  "form.version": "Version",
+  "form.releaseNotes": "Release notes",
+  "pages.appReleases.listTitle": "App Version History",
+  "pages.appReleases.listDesc": "Release notes shown on the public changelog page",
+  "pages.appReleases.createTitle": "Add Release Note",
+  "pages.appReleases.editTitle": "Edit Release Note",
+  "pages.appReleases.versionHint": "Use the same semver as package.json on deploy (e.g. 1.0.0).",
+  "validation.versionRequired": "Version is required",
+  "validation.versionSemver": "Version must be semver, e.g. 1.0.0",
+  "validation.bodyRequired": "Release notes are required"
 }

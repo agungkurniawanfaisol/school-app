@@ -38,6 +38,7 @@
   "nav.contactMessages": "Kontak Masuk",
   "nav.users": "Pengguna",
   "nav.settings": "Pengaturan",
+  "nav.appReleases": "Riwayat Versi",
   "nav.courses": "Kursus",
   "nav.breadcrumb.add": "Tambah",
   "nav.breadcrumb.edit": "Edit",
@@ -277,6 +278,11 @@
   "pages.announcements.listDesc": "Pengumuman dan informasi penting sekolah",
   "pages.announcements.createTitle": "Tambah Pengumuman",
   "pages.announcements.editTitle": "Edit Pengumuman",
+  "pages.appReleases.listTitle": "Riwayat Versi Aplikasi",
+  "pages.appReleases.listDesc": "Catatan rilis yang tampil di halaman publik",
+  "pages.appReleases.createTitle": "Tambah Catatan Rilis",
+  "pages.appReleases.editTitle": "Edit Catatan Rilis",
+  "pages.appReleases.versionHint": "Gunakan semver yang sama dengan package.json saat deploy (contoh 1.0.0).",
   "pages.teachers.listTitle": "Kelola Guru",
   "pages.teachers.listDesc": "Direktori tenaga pendidik sekolah — kelola profil, status, dan konten publik.",
   "pages.teachers.createLabel": "Tambah Guru",
@@ -920,5 +926,11 @@
   "components.visionMission.homePreviewDesc": "Pratinjau tampilan di beranda",
   "preview.scheduleStarts": "Akan tayang mulai {{date}}",
   "preview.scheduleEnded": "Jadwal tampil berakhir {{date}}",
-  "preview.liveUntil": "Tayang hingga {{date}}"
+  "preview.liveUntil": "Tayang hingga {{date}}",
+  "table.version": "Versi",
+  "form.version": "Versi",
+  "form.releaseNotes": "Catatan perubahan",
+  "validation.versionRequired": "Versi wajib diisi",
+  "validation.versionSemver": "Versi harus format semver, contoh 1.0.0",
+  "validation.bodyRequired": "Catatan rilis wajib diisi"
 }

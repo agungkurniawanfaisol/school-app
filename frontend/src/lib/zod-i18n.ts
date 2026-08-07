@@ -45,6 +45,9 @@ const ID_VALIDATION_DEFAULTS: Record<string, string> = {
   'validation.minOnePanorama': 'Minimal satu panorama',
   'validation.endAfterStart': 'Waktu berakhir harus setelah waktu mulai.',
   'validation.invalidStartTime': 'Waktu mulai tidak valid.',
+  'validation.versionRequired': 'Versi wajib diisi',
+  'validation.versionSemver': 'Versi harus format semver, contoh 1.0.0',
+  'validation.bodyRequired': 'Catatan rilis wajib diisi',
 }
 
 function interpolate(template: string, options?: Record<string, unknown>): string {
